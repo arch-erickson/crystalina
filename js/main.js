@@ -7,8 +7,9 @@ const money = n => '$' + n.toFixed(2);
 const SOCIALS = [
   { name: 'Instagram', url: 'https://instagram.com/crystalinawater', icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4.5"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>' },
   { name: 'X', url: 'https://x.com/crystalinawater', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.9 3H21l-6.8 7.8L22.2 21h-6.3l-4.9-6.4L5.4 21H2.2l7.3-8.3L2 3h6.4l4.4 5.9L17.9 3zm-1.1 16.1h1.7L7.1 4.8H5.3l11.5 14.3z"/></svg>' },
-  { name: 'Facebook', url: 'https://facebook.com/crystalinawater', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.5h2.5l.5-3h-3V8.6c0-.9.3-1.6 1.7-1.6h1.4V4.3c-.6-.1-1.5-.2-2.4-.2-2.4 0-4 1.4-4 4v2.4H7.5v3h2.7V21h3.3z"/></svg>' },
-  { name: 'WhatsApp', url: 'https://wa.me/19294556788', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.2-.8l.5-.7c.1-.2 0-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.9.9-1.1 2.2-.3 3.7a12 12 0 0 0 4.6 4.5c1.7.9 2.7 1 3.6.7.6-.2 1.4-.8 1.6-1.5.2-.7.2-1.2.1-1.3-.1-.2-.3-.2-.6-.3z"/></svg>' }
+  { name: 'Facebook', url: 'https://www.facebook.com/profile.php?id=61591728311575', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-7.5h2.5l.5-3h-3V8.6c0-.9.3-1.6 1.7-1.6h1.4V4.3c-.6-.1-1.5-.2-2.4-.2-2.4 0-4 1.4-4 4v2.4H7.5v3h2.7V21h3.3z"/></svg>' },
+  { name: 'LinkedIn', url: 'https://www.linkedin.com/company/crystalina-water/', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2 2 0 1 1-.02 4 2 2 0 0 1 .02-4zM3.5 9h3v11.5h-3V9zm5.5 0h2.87v1.57h.04c.4-.76 1.38-1.57 2.84-1.57 3.04 0 3.6 2 3.6 4.6v6.9h-3v-6.12c0-1.46-.03-3.34-2.03-3.34-2.04 0-2.35 1.59-2.35 3.23v6.23H9V9z"/></svg>' },
+  { name: 'WhatsApp', url: 'https://wa.me/19178094803', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.2-.8l.5-.7c.1-.2 0-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.9.9-1.1 2.2-.3 3.7a12 12 0 0 0 4.6 4.5c1.7.9 2.7 1 3.6.7.6-.2 1.4-.8 1.6-1.5.2-.7.2-1.2.1-1.3-.1-.2-.3-.2-.6-.3z"/></svg>' }
 ];
 
 const NAV_LINKS = [
@@ -39,7 +40,7 @@ function renderHeader(active = '') {
   el.innerHTML = `
   <div class="announce-bar">
     <span>💧 Free shipping on orders over $99 — delivered anywhere in the five boroughs</span>
-    <a href="tel:+19294556788" class="announce-phone">📞 (929) 455-6788</a>
+    <a href="tel:+19178094803" class="announce-phone">📞 (917) 809-4803</a>
   </div>
   <header class="site-header">
     <div class="container header-inner">
@@ -212,13 +213,13 @@ function renderFooter() {
       <h4>Support</h4>
       <a href="contact.html">Contact Us</a>
       <a href="account.html">My Account</a>
-      <a href="tel:+19294556788">(929) 455-6788</a>
-      <a href="mailto:hello@crystalinawater.com">hello@crystalinawater.com</a>
-      <a href="https://wa.me/19294556788" target="_blank" rel="noopener">WhatsApp Us</a>
+      <a href="tel:+19178094803">(917) 809-4803</a>
+      <a href="mailto:info@crystalina.org">info@crystalina.org</a>
+      <a href="https://wa.me/19178094803" target="_blank" rel="noopener">WhatsApp Us</a>
     </div>
     <div>
       <h4>Visit</h4>
-      <p class="footer-addr">Crystalina Water Co.<br>123 Water Purity Way<br>New York, NY 10001</p>
+      <p class="footer-addr">Crystalina Water Co.<br>New York City, NY, USA</p>
       <p class="footer-addr">Mon–Sat, 8am–7pm ET</p>
     </div>
   </div>

@@ -105,7 +105,7 @@
           <a class="btn btn-outline" href="product.html?id=${p.id}">View Details</a>
           <button class="btn btn-ghost" id="quizRestart">Start Over</button>
         </div>
-        <p style="margin-top:22px;font-size:.84rem;color:var(--muted);">Not sure? <a class="link" href="https://wa.me/19294556788" target="_blank" rel="noopener">Message us on WhatsApp</a> — a real New Yorker will help you pick.</p>`;
+        <p style="margin-top:22px;font-size:.84rem;color:var(--muted);">Not sure? <a class="link" href="https://wa.me/19178094803" target="_blank" rel="noopener">Message us on WhatsApp</a> — a real New Yorker will help you pick.</p>`;
       document.getElementById('quizAdd').addEventListener('click', () => { Store.addToCart(p.id); toast('Added to cart ✓'); openCart(); });
       document.getElementById('quizRestart').addEventListener('click', () => { step = 0; answers.length = 0; render(); });
     }

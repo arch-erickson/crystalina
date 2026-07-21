@@ -45,4 +45,5 @@ New products appear in the shop immediately.
 - Checkout simulates orders; wire up Stripe/PayPal next.
 - Product and lifestyle images are placeholders (branded SVGs + stock photos) — replace with real photography.
 - NYC water statistics are illustrative first-draft figures; verify against NYC DEP reports and lab data before publishing claims.
-- Social links point to `crystalinawater` handles — update once accounts exist. WhatsApp/phone: (929) 455-6788.
+- Contact: phone/WhatsApp (917) 809-4803, info@crystalina.org, New York City, NY.
+- Socials: Instagram/X @crystalinawater, Facebook profile 61591728311575, LinkedIn company/crystalina-water.
