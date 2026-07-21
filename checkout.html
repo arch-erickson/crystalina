@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Crystalina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z' fill='%231E7BE0'/></svg>">
+</head>
+<body>
+
+<main>
+  <section class="page-hero">
+    <div class="container"><h1>Checkout</h1><p>Secure checkout — this first draft simulates orders locally; payment processing comes next.</p></div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="checkout-layout" id="checkoutLayout">
+        <div class="panel">
+          <h3>Shipping Details</h3>
+          <div class="form-error" id="coError"></div>
+          <form id="checkoutForm">
+            <div class="field-row">
+              <div class="field"><label>First name</label><input required id="fFirst"></div>
+              <div class="field"><label>Last name</label><input required id="fLast"></div>
+            </div>
+            <div class="field"><label>Email</label><input type="email" required id="fEmail"></div>
+            <div class="field"><label>Phone</label><input type="tel" id="fPhone" placeholder="(929) 555-0123"></div>
+            <div class="field"><label>Street address</label><input required id="fAddr" placeholder="Apt / unit included"></div>
+            <div class="field-row">
+              <div class="field"><label>Borough / City</label>
+                <select id="fBorough">
+                  <option>Manhattan</option><option>Brooklyn</option><option>Queens</option>
+                  <option>The Bronx</option><option>Staten Island</option><option>Other (NY metro)</option>
+                </select>
+              </div>
+              <div class="field"><label>ZIP code</label><input required id="fZip" pattern="\d{5}"></div>
+            </div>
+            <div class="field"><label>Add professional installation?</label>
+              <select id="fInstall">
+                <option value="no">No — I'll install it myself</option>
+                <option value="yes">Yes — contact me to schedule (+$89, billed later)</option>
+              </select>
+            </div>
+            <h3 style="margin:22px 0 14px">Payment</h3>
+            <p style="font-size:.85rem;color:var(--muted);background:var(--ice-50);border:1px dashed var(--silver);border-radius:9px;padding:12px 16px;margin-bottom:16px;">
+              💳 Payment integration (Stripe / PayPal / Apple Pay) will be wired up in the next phase. Placing an order here simulates it for testing.</p>
+            <button type="submit" class="btn btn-primary btn-block">Place Order</button>
+          </form>
+        </div>
+        <div class="panel">
+          <h3>Order Summary</h3>
+          <div id="summaryItems"></div>
+          <div id="summaryTotals"></div>
+        </div>
+      </div>
+      <div class="order-success" id="orderSuccess" style="display:none"></div>
+    </div>
+  </section>
+</main>
+
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+<script>
+  initPage('');
+
+  const user = Store.currentUser();
+  if (user) {
+    const [first, ...rest] = user.name.split(' ');
+    document.getElementById('fFirst').value = first;
+    document.getElementById('fLast').value = rest.join(' ');
+    document.getElementById('fEmail').value = user.email;
+  }
+
+  function renderSummary() {
+    const { items, subtotal } = Store.cartDetails();
+    const layout = document.getElementById('checkoutLayout');
+    if (!items.length && document.getElementById('orderSuccess').style.display === 'none') {
+      layout.innerHTML = `<div class="panel" style="grid-column:1/-1;text-align:center;padding:60px;">
+        <h3>Your cart is empty</h3>
+        <p style="color:var(--muted);margin:10px 0 22px;">Add a filtration system before checking out.</p>
+        <a href="shop.html" class="btn btn-primary">Shop Filters</a></div>`;
+      return;
+    }
+    const shipping = subtotal >= 99 ? 0 : 9.99;
+    const tax = subtotal * 0.08875;
+    document.getElementById('summaryItems').innerHTML = items.map(i => `
+      <div class="summary-line">
+        <span style="display:flex;gap:10px;align-items:center;">
+          <img src="${i.product.image}" style="width:42px;height:42px;border-radius:8px;object-fit:cover;">
+          ${i.product.name} × ${i.qty}
+        </span>
+        <strong>${money(i.product.price * i.qty)}</strong>
+      </div>`).join('');
+    document.getElementById('summaryTotals').innerHTML = `
+      <div class="summary-line"><span>Subtotal</span><span>${money(subtotal)}</span></div>
+      <div class="summary-line"><span>Shipping</span><span>${shipping === 0 ? 'FREE 🎉' : money(shipping)}</span></div>
+      <div class="summary-line"><span>NYC sales tax (8.875%)</span><span>${money(tax)}</span></div>
+      <div class="summary-total"><span>Total</span><span>${money(subtotal + shipping + tax)}</span></div>`;
+  }
+
+  document.getElementById('checkoutForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const order = Store.placeOrder({
+      name: `${document.getElementById('fFirst').value} ${document.getElementById('fLast').value}`.trim(),
+      email: document.getElementById('fEmail').value,
+      phone: document.getElementById('fPhone').value,
+      address: document.getElementById('fAddr').value,
+      borough: document.getElementById('fBorough').value,
+      zip: document.getElementById('fZip').value,
+      installation: document.getElementById('fInstall').value === 'yes',
+      userId: user ? user.id : null
+    });
+    if (!order) return;
+    document.getElementById('checkoutLayout').style.display = 'none';
+    const s = document.getElementById('orderSuccess');
+    s.style.display = 'block';
+    s.innerHTML = `
+      <div class="big-check">✓</div>
+      <h2>Thank you! Order ${order.id} confirmed.</h2>
+      <p style="color:var(--muted);margin:12px 0 8px;">A confirmation email will be sent to <strong>${order.customer.email}</strong>.
+      Total charged: <strong>${money(order.total)}</strong>.</p>
+      ${order.customer.installation ? '<p style="color:var(--muted);">🛠️ Our installation team will call you within 1 business day to schedule.</p>' : ''}
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap;">
+        <a href="shop.html" class="btn btn-primary">Continue Shopping</a>
+        <a href="account.html" class="btn btn-outline">View My Orders</a>
+      </div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  document.addEventListener('cart:changed', renderSummary);
+  renderSummary();
+</script>
+</body>
+</html>

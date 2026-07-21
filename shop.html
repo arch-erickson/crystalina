@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop Water Filters — Crystalina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z' fill='%231E7BE0'/></svg>">
+</head>
+<body>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <h1>Shop Filtration Systems</h1>
+      <p>Every system is specced for New York City water. Free delivery in the five boroughs on orders over $99.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container shop-layout">
+      <aside class="shop-sidebar">
+        <h4>Categories</h4>
+        <div class="cat-filter" id="catFilter"></div>
+      </aside>
+      <div>
+        <div class="shop-toolbar">
+          <input type="search" id="searchInput" placeholder="Search products…">
+          <select id="sortSelect">
+            <option value="featured">Sort: Featured</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating">Top Rated</option>
+          </select>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+        <div class="shop-empty" id="shopEmpty" style="display:none">
+          <h3>No products found</h3>
+          <p>Try a different search or category.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+<script>
+  initPage('shop.html');
+
+  const params = new URLSearchParams(location.search);
+  let activeCat = params.get('cat') || 'All';
+  let query = '';
+  let sort = 'featured';
+
+  const cats = ['All', ...new Set(Store.getProducts().map(p => p.category))];
+  const catFilter = document.getElementById('catFilter');
+
+  function renderCats() {
+    catFilter.innerHTML = cats.map(c =>
+      `<button class="${c === activeCat ? 'active' : ''}" data-cat="${c}">${c}</button>`).join('');
+    catFilter.querySelectorAll('button').forEach(b =>
+      b.addEventListener('click', () => { activeCat = b.dataset.cat; renderCats(); renderGrid(); }));
+  }
+
+  function renderGrid() {
+    let list = Store.getProducts().filter(p =>
+      (activeCat === 'All' || p.category === activeCat) &&
+      (!query || (p.name + ' ' + p.short + ' ' + p.category).toLowerCase().includes(query)));
+    if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
+    if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
+    if (sort === 'rating') list.sort((a, b) => b.rating - a.rating);
+    document.getElementById('shopGrid').innerHTML = list.map(productCard).join('');
+    document.getElementById('shopEmpty').style.display = list.length ? 'none' : 'block';
+    bindAddButtons();
+  }
+
+  document.getElementById('searchInput').addEventListener('input', e => { query = e.target.value.toLowerCase(); renderGrid(); });
+  document.getElementById('sortSelect').addEventListener('change', e => { sort = e.target.value; renderGrid(); });
+
+  renderCats();
+  renderGrid();
+</script>
+</body>
+</html>

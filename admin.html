@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Crystalina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z' fill='%231E7BE0'/></svg>">
+</head>
+<body class="admin-body">
+
+<div class="admin-shell">
+  <aside class="admin-side">
+    <a class="brand" href="index.html" style="color:#fff">
+      <span class="brand-text"><span class="brand-name">CRYSTALINA</span><span class="brand-tag" style="color:var(--cyan-300)">Admin Panel</span></span>
+    </a>
+    <button class="side-link active" data-view="overview">📊 Overview</button>
+    <button class="side-link" data-view="products">📦 Products</button>
+    <button class="side-link" data-view="orders">🧾 Orders</button>
+    <button class="side-link" data-view="customers">👥 Customers</button>
+    <div class="side-foot">
+      <button class="side-link" onclick="location.href='index.html'">🌐 View Store</button>
+      <button class="side-link" id="adminSignOut">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <!-- OVERVIEW -->
+    <section id="view-overview">
+      <div class="admin-head">
+        <h1>Dashboard Overview</h1>
+        <span class="admin-badge" id="adminWho"></span>
+      </div>
+      <div class="stat-cards" id="statCards"></div>
+      <div class="admin-panel">
+        <h3 style="margin-bottom:16px;">⚠️ Low Stock Alerts</h3>
+        <div id="lowStockWrap"></div>
+      </div>
+      <div class="admin-panel">
+        <h3 style="margin-bottom:16px;">Recent Orders</h3>
+        <div id="recentOrdersWrap"></div>
+      </div>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section id="view-products" style="display:none">
+      <div class="admin-head">
+        <h1>Products</h1>
+        <button class="btn btn-primary" id="addProductBtn">+ Add New Product</button>
+      </div>
+      <div class="admin-panel" style="overflow-x:auto;">
+        <table class="admin-table" id="productsTable">
+          <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Badge</th><th>Actions</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section id="view-orders" style="display:none">
+      <div class="admin-head"><h1>Orders</h1></div>
+      <div class="admin-panel" style="overflow-x:auto;">
+        <table class="admin-table" id="ordersTable">
+          <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Borough</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p id="noOrders" style="color:var(--muted);font-size:.9rem;display:none;">No orders yet. Orders placed at checkout will appear here.</p>
+      </div>
+    </section>
+
+    <!-- CUSTOMERS -->
+    <section id="view-customers" style="display:none">
+      <div class="admin-head"><h1>Customers</h1></div>
+      <div class="admin-panel" style="overflow-x:auto;">
+        <table class="admin-table" id="customersTable">
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Orders</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <h2 id="modalTitle">Add New Product</h2>
+    <div class="form-error" id="prodError"></div>
+    <form id="productForm">
+      <div class="field">
+        <label>Product image</label>
+        <div class="img-drop" id="imgDrop">
+          <div id="imgPreviewWrap"><p>📷 Click to upload or drag &amp; drop<br><small>PNG / JPG — stored locally in this draft</small></p></div>
+        </div>
+        <input type="file" id="imgInput" accept="image/*" style="display:none">
+      </div>
+      <div class="field"><label>Product name *</label><input id="pName" required placeholder="Crystalina RO-7 Compact System"></div>
+      <div class="field-row">
+        <div class="field"><label>Category *</label>
+          <select id="pCat">
+            <option>Reverse Osmosis</option><option>Whole House</option><option>Countertop</option>
+            <option>Shower &amp; Bath</option><option>Faucet &amp; Pitcher</option>
+            <option>Replacement Filters</option><option>Accessories</option>
+          </select>
+        </div>
+        <div class="field"><label>Badge (optional)</label>
+          <select id="pBadge"><option value="">None</option><option>Best Seller</option><option>New</option><option>Popular</option><option>Sale</option></select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label>Price (USD) *</label><input id="pPrice" type="number" min="0" step="0.01" required placeholder="199.99"></div>
+        <div class="field"><label>Compare-at price (optional)</label><input id="pCompare" type="number" min="0" step="0.01" placeholder="249.99"></div>
+      </div>
+      <div class="field"><label># In stock *</label><input id="pStock" type="number" min="0" step="1" required placeholder="25"></div>
+      <div class="field"><label>Short description (product cards) *</label><input id="pShort" required maxlength="120" placeholder="One-line summary shown in the shop grid"></div>
+      <div class="field"><label>Full description *</label><textarea id="pDesc" rows="4" required placeholder="Full product story shown on the product page"></textarea></div>
+      <div class="field"><label>Key features (one per line)</label><textarea id="pSpecs" rows="3" placeholder="10 filtration stages&#10;100 gallons per day&#10;Includes designer faucet"></textarea></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="modalCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="modalSave">Save Product</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

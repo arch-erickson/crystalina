@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Account — Crystalina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z' fill='%231E7BE0'/></svg>">
+</head>
+<body>
+
+<main>
+  <section class="page-hero">
+    <div class="container"><h1 id="acctTitle">My Account</h1><p id="acctSub"></p></div>
+  </section>
+
+  <section class="section">
+    <div class="container account-grid" id="acctGrid">
+      <div class="panel">
+        <h3 id="acctName"></h3>
+        <p style="font-size:.86rem;color:var(--muted);" id="acctEmail"></p>
+        <hr style="border:none;border-top:1px solid #e4ecf6;margin:18px 0;">
+        <a href="shop.html" class="btn btn-outline btn-block btn-sm" style="margin-bottom:10px;">Shop Filters</a>
+        <a href="quiz.html" class="btn btn-outline btn-block btn-sm" style="margin-bottom:10px;">Find Your Filter</a>
+        <button class="btn btn-danger btn-block btn-sm" id="signOutBtn">Sign Out</button>
+      </div>
+      <div class="panel">
+        <h3>Order History</h3>
+        <div id="ordersWrap"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const user = Store.currentUser();
+  if (!user) location.href = 'signin.html';
+  else if (user.role === 'admin') location.href = 'admin.html';
+
+  initPage('');
+
+  document.getElementById('acctSub').textContent = 'Welcome back, ' + user.name.split(' ')[0] + '!';
+  document.getElementById('acctName').textContent = user.name;
+  document.getElementById('acctEmail').textContent = user.email;
+  document.getElementById('signOutBtn').addEventListener('click', () => { Store.signOut(); location.href = 'index.html'; });
+
+  const mine = Store.getOrders().filter(o => o.customer.userId === user.id || o.customer.email.toLowerCase() === user.email.toLowerCase());
+  document.getElementById('ordersWrap').innerHTML = mine.length
+    ? mine.map(o => `
+      <div class="order-card">
+        <div class="order-head">
+          <strong>Order ${o.id}</strong>
+          <span class="status-pill status-${o.status}">${o.status}</span>
+        </div>
+        <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;">${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })} · ${o.items.reduce((n,i)=>n+i.qty,0)} item(s) · ${money(o.total)}</div>
+        <div style="font-size:.84rem;">${o.items.map(i => `${i.name} × ${i.qty}`).join('<br>')}</div>
+      </div>`).join('')
+    : `<p style="color:var(--muted);font-size:.9rem;">No orders yet. <a href="shop.html" class="link">Start shopping →</a></p>`;
+</script>
+</body>
+</html>

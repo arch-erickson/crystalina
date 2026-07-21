@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Filter — Crystalina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z' fill='%231E7BE0'/></svg>">
+</head>
+<body>
+
+<main>
+  <section class="page-hero">
+    <div class="container">
+      <h1>Find Your Perfect Filter</h1>
+      <p>Five quick questions about your NYC home — we'll match you with the right system.</p>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <div class="quiz-card" id="quizCard"></div>
+    </div>
+  </section>
+</main>
+
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+<script>
+  initPage('quiz.html');
+
+  const QUESTIONS = [
+    { q: 'Do you rent or own your home?', opts: [
+      { t: '🏢 I rent — no plumbing changes allowed', tag: 'rent' },
+      { t: '🏢 I rent — small installs are okay', tag: 'rent-flex' },
+      { t: '🏠 I own an apartment / co-op / condo', tag: 'own' },
+      { t: '🏘️ I own a brownstone / townhouse / full home', tag: 'house' }]},
+    { q: 'How old is your building?', opts: [
+      { t: 'Before 1961 (lead solder era)', tag: 'old' },
+      { t: '1961–1990', tag: 'mid' },
+      { t: 'After 1990', tag: 'new' },
+      { t: 'Not sure', tag: 'old' }]},
+    { q: "What's your top priority?", opts: [
+      { t: '🥤 Best possible drinking water (lead, PFAS, microplastics)', tag: 'purity' },
+      { t: '🚿 Softer skin & hair in the shower', tag: 'shower' },
+      { t: '🏠 Protecting the whole home & appliances', tag: 'whole' },
+      { t: '💰 Better taste on a budget', tag: 'budget' }]},
+    { q: 'How many people are in your household?', opts: [
+      { t: 'Just me', tag: 'small' }, { t: '2–3 people', tag: 'med' },
+      { t: '4–5 people', tag: 'large' }, { t: '6+', tag: 'large' }]},
+    { q: "What's your budget for cleaner water?", opts: [
+      { t: 'Under $50', tag: 'b1' }, { t: '$50 – $200', tag: 'b2' },
+      { t: '$200 – $400', tag: 'b3' }, { t: '$400+', tag: 'b4' }]}
+  ];
+
+  const card = document.getElementById('quizCard');
+  let step = 0;
+  const answers = [];
+
+  function pickProduct() {
+    const has = t => answers.includes(t);
+    if (has('shower')) return 'shower-12';
+    if (has('whole') || (has('house') && !has('b1') && !has('b2'))) return 'wh-3stage';
+    if (has('budget') && has('b1')) return 'faucet-pure';
+    if (has('rent') && (has('b1'))) return 'pitcher-glacier';
+    if (has('rent')) return 'ct-luxe';
+    if (has('b1')) return 'faucet-pure';
+    if (has('b2')) return 'ro-classic-5';
+    if (has('purity') && (has('b4') || has('b3'))) return 'ro-alkaline-10';
+    if (has('b3') || has('b4')) return 'ro-alkaline-10';
+    return 'ro-classic-5';
+  }
+
+  function render() {
+    if (step < QUESTIONS.length) {
+      const { q, opts } = QUESTIONS[step];
+      card.innerHTML = `
+        <div class="quiz-progress"><div style="width:${step / QUESTIONS.length * 100}%"></div></div>
+        <p style="font-size:.8rem;color:var(--muted);font-weight:600;">QUESTION ${step + 1} OF ${QUESTIONS.length}</p>
+        <h2 class="quiz-q">${q}</h2>
+        <div class="quiz-opts">${opts.map((o, i) => `<button data-i="${i}">${o.t}</button>`).join('')}</div>
+        ${step > 0 ? '<p style="margin-top:20px"><span class="link" id="quizBack">← Back</span></p>' : ''}`;
+      card.querySelectorAll('.quiz-opts button').forEach(b =>
+        b.addEventListener('click', () => { answers[step] = opts[b.dataset.i].tag; step++; render(); }));
+      const back = document.getElementById('quizBack');
+      if (back) back.addEventListener('click', () => { step--; answers.length = step; render(); });
+    } else {
+      const p = Store.getProduct(pickProduct()) || Store.getProducts()[0];
+      card.innerHTML = `
+        <div class="quiz-progress"><div style="width:100%"></div></div>
+        <p style="font-size:.8rem;color:var(--success);font-weight:700;">✓ YOUR MATCH</p>
+        <h2 class="quiz-q">We recommend the ${p.name}</h2>
+        <div style="display:grid;grid-template-columns:140px 1fr;gap:20px;align-items:center;margin-bottom:22px;">
+          <img src="${p.image}" style="border-radius:12px;aspect-ratio:1;object-fit:cover;" alt="${p.name}">
+          <div>
+            <p style="color:var(--muted);font-size:.92rem;">${p.short}</p>
+            <p style="font-size:1.3rem;font-weight:800;color:var(--navy-800);margin-top:8px;">${money(p.price)}
+              ${p.comparePrice ? `<span style="font-size:.9rem;color:var(--muted);text-decoration:line-through;font-weight:500;"> ${money(p.comparePrice)}</span>` : ''}</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <button class="btn btn-primary" id="quizAdd">Add to Cart</button>
+          <a class="btn btn-outline" href="product.html?id=${p.id}">View Details</a>
+          <button class="btn btn-ghost" id="quizRestart">Start Over</button>
+        </div>
+        <p style="margin-top:22px;font-size:.84rem;color:var(--muted);">Not sure? <a class="link" href="https://wa.me/19294556788" target="_blank" rel="noopener">Message us on WhatsApp</a> — a real New Yorker will help you pick.</p>`;
+      document.getElementById('quizAdd').addEventListener('click', () => { Store.addToCart(p.id); toast('Added to cart ✓'); openCart(); });
+      document.getElementById('quizRestart').addEventListener('click', () => { step = 0; answers.length = 0; render(); });
+    }
+  }
+  render();
+</script>
+</body>
+</html>

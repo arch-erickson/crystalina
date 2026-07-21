@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — Crystalina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2s-7 8-7 13a7 7 0 0 0 14 0c0-5-7-13-7-13z' fill='%231E7BE0'/></svg>">
+</head>
+<body>
+
+<main>
+  <section class="section" id="pdSection">
+    <div class="container pd-layout" id="pdLayout"></div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Keep Exploring</span>
+        <h2>You Might Also Like</h2>
+      </div>
+      <div class="product-grid" id="relatedGrid"></div>
+    </div>
+  </section>
+</main>
+
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+<script>
+  initPage('shop.html');
+
+  const id = new URLSearchParams(location.search).get('id');
+  const p = Store.getProduct(id);
+  const layout = document.getElementById('pdLayout');
+
+  if (!p) {
+    layout.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px 0;">
+      <h1>Product not found</h1>
+      <p style="color:var(--muted); margin:12px 0 24px;">It may have been removed from the catalog.</p>
+      <a class="btn btn-primary" href="shop.html">Back to Shop</a></div>`;
+  } else {
+    document.title = p.name + ' — Crystalina';
+    const stockCls = p.stock === 0 ? 'out' : p.stock <= 15 ? 'low' : 'in';
+    const stockMsg = p.stock === 0 ? '✕ Out of stock' : p.stock <= 15 ? `⚠ Low stock — only ${p.stock} left` : '✓ In stock, ships in 1–2 business days';
+    layout.innerHTML = `
+      <div class="pd-img"><img src="${p.image}" alt="${p.name}"></div>
+      <div>
+        <span class="pd-cat">${p.category}</span>
+        <h1 class="pd-name">${p.name}</h1>
+        <div class="pd-rating">★ ${p.rating} <span>· ${p.reviews} reviews</span></div>
+        <div class="pd-prices">
+          <span class="pd-price">${money(p.price)}</span>
+          ${p.comparePrice ? `<span class="pd-compare">${money(p.comparePrice)}</span>` : ''}
+        </div>
+        <div class="pd-stock ${stockCls}">${stockMsg}</div>
+        <p class="pd-desc">${p.description}</p>
+        <div class="pd-specs">
+          <h4>Key Features</h4>
+          <ul class="checklist">${(p.specs || []).map(s => `<li>${s}</li>`).join('')}</ul>
+        </div>
+        <div class="pd-qtyrow">
+          <div class="qty-picker">
+            <button id="qDec">−</button><span id="qVal">1</span><button id="qInc">+</button>
+          </div>
+          <button class="btn btn-primary" style="flex:1" id="addBtn" ${p.stock === 0 ? 'disabled' : ''}>
+            ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+          </button>
+        </div>
+        <a href="https://wa.me/19294556788?text=${encodeURIComponent('Hi! I have a question about the ' + p.name)}" target="_blank" rel="noopener" class="btn btn-outline btn-block">💬 Ask us about this product on WhatsApp</a>
+        <div class="pd-perks">
+          <span>🚚 Free five-borough delivery on orders over $99</span>
+          <span>🛠️ Professional NYC installation available at checkout</span>
+          <span>↩️ 60-day returns · 1-year warranty</span>
+        </div>
+      </div>`;
+
+    let qty = 1;
+    const qVal = document.getElementById('qVal');
+    document.getElementById('qInc').addEventListener('click', () => { qty = Math.min(qty + 1, Math.max(p.stock, 1)); qVal.textContent = qty; });
+    document.getElementById('qDec').addEventListener('click', () => { qty = Math.max(1, qty - 1); qVal.textContent = qty; });
+    const addBtn = document.getElementById('addBtn');
+    if (p.stock > 0) addBtn.addEventListener('click', () => { Store.addToCart(p.id, qty); toast('Added to cart ✓'); openCart(); });
+
+    const related = Store.getProducts().filter(x => x.id !== p.id && x.category === p.category);
+    const fill = Store.getProducts().filter(x => x.id !== p.id && x.category !== p.category);
+    document.getElementById('relatedGrid').innerHTML = [...related, ...fill].slice(0, 4).map(productCard).join('');
+    bindAddButtons();
+  }
+</script>
+</body>
+</html>
