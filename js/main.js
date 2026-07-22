@@ -21,12 +21,12 @@ const NAV_LINKS = [
 ];
 
 /* Branded droplet logo mark */
-// Two logo lockups, handled separately:
-//  LOGO_MARK — the compact C + droplet mark (used in the footer; also the favicon source).
-//  LOGO_FULL — the extended lockup with the "CRYSTALINA — Pure Water. Pure Life." wordmark
-//              (used in the header). Its text is dark navy, so it only sits on light backgrounds.
+// Logo pieces, composed separately so each can be sized independently:
+//  LOGO_MARK — the compact C + droplet mark (footer + favicon source).
+//  LOGO_LOCKUP — header lockup: the mark on the left + the trimmed wordmark on the right.
+//                The wordmark text is dark navy, so this only sits on light backgrounds.
 const LOGO_MARK = `<img src="logo-mark.png" class="logo-mark" alt="Crystalina" width="48" height="48">`;
-const LOGO_FULL = `<img src="extended-logo-mark.png" class="logo-full" alt="Crystalina — Pure Water. Pure Life.">`;
+const LOGO_LOCKUP = `<img src="logo-mark.png" class="brand-mark" alt=""><img src="logo-text.png" class="brand-wordmark" alt="Crystalina — Pure Water. Pure Life.">`;
 
 /* ---------- header ---------- */
 function renderHeader(active = '') {
@@ -40,7 +40,7 @@ function renderHeader(active = '') {
   <header class="site-header">
     <div class="container header-inner">
       <a class="brand" href="index.html" aria-label="Crystalina — Pure Water. Pure Life.">
-        ${LOGO_FULL}
+        ${LOGO_LOCKUP}
       </a>
       <nav class="main-nav" id="mainNav">
         ${NAV_LINKS.map(l => `<a href="${l.href}" class="${active === l.href ? 'active' : ''}">${l.label}</a>`).join('')}
