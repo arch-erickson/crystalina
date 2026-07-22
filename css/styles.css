@@ -4,16 +4,17 @@
    ============================================================ */
 
 :root {
-  --navy-900: #071D40;
-  --navy-800: #0B2A5B;
-  --navy-700: #123C7A;
-  --navy-600: #14468C;
-  --blue-500: #1E7BE0;
-  --blue-400: #3FA9F5;
-  --cyan-300: #48C6EF;
-  --ice-100: #EAF4FD;
-  --ice-50: #F5FAFF;
-  --silver: #C9D4E3;
+  /* Palette sampled from the Crystalina logo mark */
+  --navy-900: #15375D;   /* deepest navy — footer, deep gradients */
+  --navy-800: #1F4C80;   /* primary brand navy — headings, logo, buttons */
+  --navy-700: #26538A;   /* logo deep navy */
+  --navy-600: #3877BC;   /* logo mid blue */
+  --blue-500: #2A7BC4;   /* vivid blue — links, CTAs */
+  --blue-400: #53A4DA;   /* logo light blue — wave tips */
+  --cyan-300: #3DC7F4;   /* logo droplet cyan — signature accent */
+  --ice-100: #E6F4FC;
+  --ice-50: #F3FAFE;
+  --silver: #CFD2D3;     /* logo silver band */
   --ink: #16233A;
   --muted: #5B6B84;
   --white: #FFFFFF;
@@ -22,8 +23,8 @@
   --amber: #E8A13D;
   --radius: 14px;
   --radius-sm: 9px;
-  --shadow: 0 10px 30px rgba(11, 42, 91, .10);
-  --shadow-lg: 0 22px 60px rgba(11, 42, 91, .18);
+  --shadow: 0 10px 30px rgba(21, 55, 93, .10);
+  --shadow-lg: 0 22px 60px rgba(21, 55, 93, .18);
   --font: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
 

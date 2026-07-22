@@ -21,17 +21,10 @@ const NAV_LINKS = [
 ];
 
 /* Branded droplet logo mark */
-const LOGO_SVG = `
-<svg viewBox="0 0 48 48" class="logo-mark" aria-hidden="true">
-  <path d="M24 42a15 15 0 0 1-15-15C9 15 24 15 24 15s-9.5 4-9.5 12A9.5 9.5 0 0 0 24 36.5 9.5 9.5 0 0 0 33.5 27C33.5 19 24 15 24 15s15 0 15 12a15 15 0 0 1-15 15z" fill="none"/>
-  <path d="M24 4a15.4 15.4 0 1 0 0 30.8A15.4 15.4 0 0 0 24 4zm0 27.3a11.9 11.9 0 1 1 0-23.8 11.9 11.9 0 0 1 0 23.8z" fill="#0B2A5B" opacity="0" />
-  <path d="M35.8 8.6A15.5 15.5 0 1 0 39 19.4h-4.1a11.6 11.6 0 1 1-2.4-8.2l3.3-2.6z" fill="url(#lgA)"/>
-  <path d="M24 9s-7.6 8.7-7.6 14.2a7.6 7.6 0 0 0 15.2 0C31.6 17.7 24 9 24 9z" fill="url(#lgB)"/>
-  <defs>
-    <linearGradient id="lgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0B2A5B"/><stop offset="1" stop-color="#1E7BE0"/></linearGradient>
-    <linearGradient id="lgB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48C6EF"/><stop offset="1" stop-color="#1565C0"/></linearGradient>
-  </defs>
-</svg>`;
+// Crystalina logo mark (the C + droplet). The extended wordmark lockup
+// ("CRYSTALINA — Pure Water. Pure Life.") is handled separately, via the
+// brand-text block beside this mark, and will be swapped for logo-full later.
+const LOGO_SVG = `<img src="logo-mark.png" class="logo-mark" alt="Crystalina" width="48" height="48">`;
 
 /* ---------- header ---------- */
 function renderHeader(active = '') {
