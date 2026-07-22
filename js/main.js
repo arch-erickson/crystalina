@@ -21,10 +21,12 @@ const NAV_LINKS = [
 ];
 
 /* Branded droplet logo mark */
-// Crystalina logo mark (the C + droplet). The extended wordmark lockup
-// ("CRYSTALINA — Pure Water. Pure Life.") is handled separately, via the
-// brand-text block beside this mark, and will be swapped for logo-full later.
-const LOGO_SVG = `<img src="logo-mark.png" class="logo-mark" alt="Crystalina" width="48" height="48">`;
+// Two logo lockups, handled separately:
+//  LOGO_MARK — the compact C + droplet mark (used in the footer; also the favicon source).
+//  LOGO_FULL — the extended lockup with the "CRYSTALINA — Pure Water. Pure Life." wordmark
+//              (used in the header). Its text is dark navy, so it only sits on light backgrounds.
+const LOGO_MARK = `<img src="logo-mark.png" class="logo-mark" alt="Crystalina" width="48" height="48">`;
+const LOGO_FULL = `<img src="extended-logo-mark.png" class="logo-full" alt="Crystalina — Pure Water. Pure Life.">`;
 
 /* ---------- header ---------- */
 function renderHeader(active = '') {
@@ -37,12 +39,8 @@ function renderHeader(active = '') {
   </div>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="index.html">
-        ${LOGO_SVG}
-        <span class="brand-text">
-          <span class="brand-name">CRYSTALINA</span>
-          <span class="brand-tag">Pure Water. Pure Life.</span>
-        </span>
+      <a class="brand" href="index.html" aria-label="Crystalina — Pure Water. Pure Life.">
+        ${LOGO_FULL}
       </a>
       <nav class="main-nav" id="mainNav">
         ${NAV_LINKS.map(l => `<a href="${l.href}" class="${active === l.href ? 'active' : ''}">${l.label}</a>`).join('')}
@@ -180,7 +178,7 @@ function renderFooter() {
   </div>
   <div class="container footer-grid">
     <div class="footer-brand">
-      ${LOGO_SVG}
+      ${LOGO_MARK}
       <p class="footer-tag">Pure Water. Pure Life.</p>
       <p class="footer-desc">Water filtration systems designed for New York City homes — from studio apartments to brownstones.</p>
       <div class="socials">

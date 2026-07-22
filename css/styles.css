@@ -71,6 +71,7 @@ h1, h2, h3, h4 { line-height: 1.2; color: var(--navy-800); font-weight: 700; }
 .header-inner { display: flex; align-items: center; gap: 28px; padding: 12px 0; }
 .brand { display: flex; align-items: center; gap: 10px; }
 .logo-mark { width: 44px; height: 44px; flex: none; }
+.logo-full { height: 52px; width: auto; max-width: 100%; display: block; }
 .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
 .brand-name { font-weight: 800; letter-spacing: .12em; color: var(--navy-800); font-size: 1.15rem; }
 .brand-tag { font-size: .6rem; letter-spacing: .22em; text-transform: uppercase; color: var(--blue-500); font-weight: 600; }
@@ -422,4 +423,5 @@ body.cart-open { overflow: hidden; }
   .icon-label { display: none; }
   .field-row { grid-template-columns: 1fr; }
   .bar-row { grid-template-columns: 100px 1fr 42px; }
+  .logo-full { height: 42px; }
 }
