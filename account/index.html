@@ -6,13 +6,13 @@
 <title>My Account — Crystalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css">
-<link rel="icon" type="image/png" sizes="96x96" href="favicon-96.png?v=4">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=4">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=4">
-<link rel="icon" href="favicon.ico?v=4" sizes="any">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=4">
-<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=4">
+<link rel="icon" href="/favicon.ico?v=4" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4">
+<link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
 
@@ -27,8 +27,8 @@
         <h3 id="acctName"></h3>
         <p style="font-size:.86rem;color:var(--muted);" id="acctEmail"></p>
         <hr style="border:none;border-top:1px solid #e4ecf6;margin:18px 0;">
-        <a href="shop.html" class="btn btn-outline btn-block btn-sm" style="margin-bottom:10px;">Shop Filters</a>
-        <a href="quiz.html" class="btn btn-outline btn-block btn-sm" style="margin-bottom:10px;">Find Your Filter</a>
+        <a href="/shop/" class="btn btn-outline btn-block btn-sm" style="margin-bottom:10px;">Shop Filters</a>
+        <a href="/quiz/" class="btn btn-outline btn-block btn-sm" style="margin-bottom:10px;">Find Your Filter</a>
         <button class="btn btn-danger btn-block btn-sm" id="signOutBtn">Sign Out</button>
       </div>
       <div class="panel">
@@ -39,19 +39,19 @@
   </section>
 </main>
 
-<script src="js/store.js"></script>
-<script src="js/main.js"></script>
+<script src="/js/store.js"></script>
+<script src="/js/main.js"></script>
 <script>
   const user = Store.currentUser();
-  if (!user) location.href = 'signin.html';
-  else if (user.role === 'admin') location.href = 'admin.html';
+  if (!user) location.href = '/signin/';
+  else if (user.role === 'admin') location.href = '/admin/';
 
   initPage('');
 
   document.getElementById('acctSub').textContent = 'Welcome back, ' + user.name.split(' ')[0] + '!';
   document.getElementById('acctName').textContent = user.name;
   document.getElementById('acctEmail').textContent = user.email;
-  document.getElementById('signOutBtn').addEventListener('click', () => { Store.signOut(); location.href = 'index.html'; });
+  document.getElementById('signOutBtn').addEventListener('click', () => { Store.signOut(); location.href = '/'; });
 
   const mine = Store.getOrders().filter(o => o.customer.userId === user.id || o.customer.email.toLowerCase() === user.email.toLowerCase());
   document.getElementById('ordersWrap').innerHTML = mine.length
@@ -64,7 +64,7 @@
         <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;">${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })} · ${o.items.reduce((n,i)=>n+i.qty,0)} item(s) · ${money(o.total)}</div>
         <div style="font-size:.84rem;">${o.items.map(i => `${i.name} × ${i.qty}`).join('<br>')}</div>
       </div>`).join('')
-    : `<p style="color:var(--muted);font-size:.9rem;">No orders yet. <a href="shop.html" class="link">Start shopping →</a></p>`;
+    : `<p style="color:var(--muted);font-size:.9rem;">No orders yet. <a href="/shop/" class="link">Start shopping →</a></p>`;
 </script>
 </body>
 </html>

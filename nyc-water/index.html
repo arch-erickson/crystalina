@@ -7,13 +7,13 @@
 <meta name="description" content="What's really in New York City tap water? Lead service lines, aging mains, chlorine, PFAS and more — and how filtration fixes it.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css">
-<link rel="icon" type="image/png" sizes="96x96" href="favicon-96.png?v=4">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=4">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=4">
-<link rel="icon" href="favicon.ico?v=4" sizes="any">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=4">
-<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=4">
+<link rel="icon" href="/favicon.ico?v=4" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4">
+<link rel="manifest" href="/site.webmanifest">
 </head>
 <body>
 
@@ -107,8 +107,8 @@
           <li><strong>Everyone:</strong> a $20 TDS meter shows you the before/after in seconds</li>
         </ul>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <a href="quiz.html" class="btn btn-primary">Find Your Filter</a>
-          <a href="shop.html" class="btn btn-outline">Shop All Systems</a>
+          <a href="/quiz/" class="btn btn-primary">Find Your Filter</a>
+          <a href="/shop/" class="btn btn-outline">Shop All Systems</a>
         </div>
       </div>
       <img src="https://images.unsplash.com/photo-1524594157360-d1e29a5d05e2?auto=format&fit=crop&w=900&q=70" alt="Clean water pouring from a filtered tap" onerror="this.onerror=null;this.src=Store.placeholder('Point-of-Use Filtration',1)">
@@ -137,16 +137,16 @@
           <h2>Ready to Take Control of Your Water?</h2>
           <p>60 seconds. Five questions. The right filter for your NYC home.</p>
         </div>
-        <a href="quiz.html" class="btn btn-light">Take the Quiz →</a>
+        <a href="/quiz/" class="btn btn-light">Take the Quiz →</a>
       </div>
     </div>
   </section>
 </main>
 
-<script src="js/store.js"></script>
-<script src="js/main.js"></script>
+<script src="/js/store.js"></script>
+<script src="/js/main.js"></script>
 <script>
-  initPage('nyc-water.html');
+  initPage('/nyc-water/');
   const io = new IntersectionObserver(entries => entries.forEach(e => {
     if (e.isIntersecting) { e.target.style.width = e.target.dataset.w + '%'; io.unobserve(e.target); }
   }), { threshold: 0.4 });

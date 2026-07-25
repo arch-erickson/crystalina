@@ -4,11 +4,11 @@
 
 (() => {
   const user = Store.currentUser();
-  if (!user || user.role !== 'admin') { location.href = 'signin.html?mode=admin'; return; }
+  if (!user || user.role !== 'admin') { location.href = '/signin/?mode=admin'; return; }
   document.getElementById('adminWho').textContent = 'Signed in as ' + user.name;
 
   document.getElementById('adminSignOut').addEventListener('click', () => {
-    Store.signOut(); location.href = 'index.html';
+    Store.signOut(); location.href = '/';
   });
 
   /* ---------- view switching ---------- */

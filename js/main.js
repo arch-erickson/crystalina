@@ -13,11 +13,11 @@ const SOCIALS = [
 ];
 
 const NAV_LINKS = [
-  { label: 'Shop', href: 'shop.html' },
-  { label: 'NYC Water Facts', href: 'nyc-water.html' },
-  { label: 'Find Your Filter', href: 'quiz.html' },
-  { label: 'About Us', href: 'about.html' },
-  { label: 'Contact', href: 'contact.html' }
+  { label: 'Shop', href: '/shop/' },
+  { label: 'NYC Water Facts', href: '/nyc-water/' },
+  { label: 'Find Your Filter', href: '/quiz/' },
+  { label: 'About Us', href: '/about/' },
+  { label: 'Contact', href: '/contact/' }
 ];
 
 /* Branded droplet logo mark */
@@ -25,8 +25,8 @@ const NAV_LINKS = [
 //  LOGO_MARK — the compact C + droplet mark (footer + favicon source).
 //  LOGO_LOCKUP — header lockup: the mark on the left + the trimmed wordmark on the right.
 //                The wordmark text is dark navy, so this only sits on light backgrounds.
-const LOGO_MARK = `<img src="logo-mark.png" class="logo-mark" alt="Crystalina" width="48" height="48">`;
-const LOGO_LOCKUP = `<img src="logo-mark.png" class="brand-mark" alt=""><img src="logo-text.png" class="brand-wordmark" alt="Crystalina — Pure Water. Pure Life.">`;
+const LOGO_MARK = `<img src="/logo-mark.png" class="logo-mark" alt="Crystalina" width="48" height="48">`;
+const LOGO_LOCKUP = `<img src="/logo-mark.png" class="brand-mark" alt=""><img src="/logo-text.png" class="brand-wordmark" alt="Crystalina — Pure Water. Pure Life.">`;
 
 /* ---------- header ---------- */
 function renderHeader(active = '') {
@@ -39,14 +39,14 @@ function renderHeader(active = '') {
   </div>
   <header class="site-header">
     <div class="container header-inner">
-      <a class="brand" href="index.html" aria-label="Crystalina — Pure Water. Pure Life.">
+      <a class="brand" href="/" aria-label="Crystalina — Pure Water. Pure Life.">
         ${LOGO_LOCKUP}
       </a>
       <nav class="main-nav" id="mainNav">
         ${NAV_LINKS.map(l => `<a href="${l.href}" class="${active === l.href ? 'active' : ''}">${l.label}</a>`).join('')}
       </nav>
       <div class="header-actions">
-        <a href="${user ? (user.role === 'admin' ? 'admin.html' : 'account.html') : 'signin.html'}" class="icon-btn" title="${user ? user.name : 'Sign in'}">
+        <a href="${user ? (user.role === 'admin' ? '/admin/' : '/account/') : '/signin/'}" class="icon-btn" title="${user ? user.name : 'Sign in'}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
           <span class="icon-label">${user ? user.name.split(' ')[0] : 'Sign In'}</span>
         </a>
@@ -82,7 +82,7 @@ function renderCartDrawer() {
     <div class="cart-foot">
       <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
       <p class="cart-note">Shipping &amp; NYC sales tax calculated at checkout.</p>
-      <a href="checkout.html" class="btn btn-primary btn-block" id="checkoutBtn">Checkout</a>
+      <a href="/checkout/" class="btn btn-primary btn-block" id="checkoutBtn">Checkout</a>
       <button class="btn btn-ghost btn-block" id="cartContinueBtn">Continue Shopping</button>
     </div>
   </aside>
@@ -118,13 +118,13 @@ function renderCartItems() {
   if (!items.length) {
     wrap.innerHTML = `<div class="cart-empty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" width="52"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2.5 3.5h3l2.6 12h10.4l2.5-8.5H6.2"/></svg>
-      <p>Your cart is empty.</p><a class="btn btn-primary" href="shop.html">Shop Filters</a></div>`;
+      <p>Your cart is empty.</p><a class="btn btn-primary" href="/shop/">Shop Filters</a></div>`;
   } else {
     wrap.innerHTML = items.map(i => `
       <div class="cart-item">
         <img src="${i.product.image}" alt="${i.product.name}">
         <div class="ci-info">
-          <a href="product.html?id=${i.id}" class="ci-name">${i.product.name}</a>
+          <a href="/product/?id=${i.id}" class="ci-name">${i.product.name}</a>
           <div class="ci-price">${money(i.product.price)}</div>
           <div class="ci-qty">
             <button data-act="dec" data-id="${i.id}">−</button>
@@ -187,23 +187,23 @@ function renderFooter() {
     </div>
     <div>
       <h4>Shop</h4>
-      <a href="shop.html?cat=Reverse%20Osmosis">Reverse Osmosis</a>
-      <a href="shop.html?cat=Whole%20House">Whole House</a>
-      <a href="shop.html?cat=Countertop">Countertop</a>
-      <a href="shop.html?cat=Shower%20%26%20Bath">Shower &amp; Bath</a>
-      <a href="shop.html?cat=Replacement%20Filters">Replacement Filters</a>
+      <a href="/shop/?cat=Reverse%20Osmosis">Reverse Osmosis</a>
+      <a href="/shop/?cat=Whole%20House">Whole House</a>
+      <a href="/shop/?cat=Countertop">Countertop</a>
+      <a href="/shop/?cat=Shower%20%26%20Bath">Shower &amp; Bath</a>
+      <a href="/shop/?cat=Replacement%20Filters">Replacement Filters</a>
     </div>
     <div>
       <h4>Learn</h4>
-      <a href="nyc-water.html">NYC Water Facts</a>
-      <a href="quiz.html">Find Your Filter</a>
-      <a href="about.html">Our Story</a>
-      <a href="contact.html">FAQ</a>
+      <a href="/nyc-water/">NYC Water Facts</a>
+      <a href="/quiz/">Find Your Filter</a>
+      <a href="/about/">Our Story</a>
+      <a href="/contact/">FAQ</a>
     </div>
     <div>
       <h4>Support</h4>
-      <a href="contact.html">Contact Us</a>
-      <a href="account.html">My Account</a>
+      <a href="/contact/">Contact Us</a>
+      <a href="/account/">My Account</a>
       <a href="tel:+19178094803">(917) 809-4803</a>
       <a href="mailto:info@crystalina.org">info@crystalina.org</a>
       <a href="https://wa.me/19178094803" target="_blank" rel="noopener">WhatsApp Us</a>
@@ -217,7 +217,7 @@ function renderFooter() {
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
       <span>© ${new Date().getFullYear()} Crystalina Water Co. All rights reserved. Proudly serving the five boroughs.</span>
-      <span class="footer-links"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="#">Shipping &amp; Returns</a> · <a href="signin.html?mode=admin">Admin</a></span>
+      <span class="footer-links"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="#">Shipping &amp; Returns</a> · <a href="/signin/?mode=admin">Admin</a></span>
     </div>
   </div>`;
   document.body.appendChild(el);
@@ -228,7 +228,7 @@ function productCard(p) {
   const off = p.comparePrice ? Math.round((1 - p.price / p.comparePrice) * 100) : 0;
   return `
   <div class="product-card">
-    <a href="product.html?id=${p.id}" class="pc-img">
+    <a href="/product/?id=${p.id}" class="pc-img">
       <img src="${p.image}" alt="${p.name}" loading="lazy">
       ${p.badge ? `<span class="pc-badge">${p.badge}</span>` : ''}
       ${off ? `<span class="pc-off">-${off}%</span>` : ''}
@@ -236,7 +236,7 @@ function productCard(p) {
     </a>
     <div class="pc-body">
       <span class="pc-cat">${p.category}</span>
-      <a href="product.html?id=${p.id}" class="pc-name">${p.name}</a>
+      <a href="/product/?id=${p.id}" class="pc-name">${p.name}</a>
       <div class="pc-rating">★ ${p.rating} <span>(${p.reviews})</span></div>
       <div class="pc-prices">
         <span class="pc-price">${money(p.price)}</span>
