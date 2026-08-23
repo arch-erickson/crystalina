@@ -21,11 +21,12 @@ This image fills the **entire** hero (no image box). Text sits over the left thi
 navy gradient; the right side stays visible, so the subject must live on the **right half**.
 - **Size:** 2600 × 1500 (landscape, 16:9-ish). Keep the composition's focal point on the right;
   the left ~40% should be calmer/simpler (a wall, window light, or soft gradient) with room for text.
-- **Prompt:** "Editorial lifestyle photograph, a poised woman in a bright, airy modern New York City
-  kitchen holding a glass of crystal-clear water, standing on the right side of the frame, soft
+- **Prompt:** "Editorial lifestyle photograph, a happy young family (two parents and a child)
+  together in a bright, airy modern New York City kitchen, smiling and sharing glasses of
+  crystal-clear water, grouped on the right side of the frame, warm genuine candid moment, soft
   natural window light, shallow depth of field, calm and premium, cool blue color grade, the left
-  side of the frame is a softly lit neutral wall with gentle negative space, sophisticated and
-  aspirational, high-end brand photography, blue palette #15375D #2A7BC4 #3DC7F4."
+  side of the frame is a softly lit neutral wall with gentle negative space for text, sophisticated
+  and aspirational, high-end brand photography, blue palette #15375D #2A7BC4 #3DC7F4."
 - **Alternate (product-forward) prompt:** "Premium under-sink reverse osmosis system with brushed
   stainless canisters and blue tubing, dramatically lit on the right side of a dark studio scene,
   water droplets and soft caustic reflections, deep navy to cyan gradient filling the left as
