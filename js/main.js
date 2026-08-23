@@ -172,6 +172,50 @@ function applySiteSettings() {
   }
   if (body) body.textContent = settings.heroBody;
   if (hero && settings.heroImage) hero.style.setProperty('--hero-image', `url("${settings.heroImage.replace(/"/g, '\\"')}")`);
+  applyPageSections();
+}
+
+function applyPageSections() {
+  const main = document.querySelector('main');
+  const sections = Store.getAdminData?.().pageSections || [];
+  if (!main || !sections.length) return;
+  const configuredIds = new Set(sections.map(section => section.id));
+  main.querySelectorAll('[data-home-section]').forEach(section => {
+    if (!configuredIds.has(section.dataset.homeSection)) section.hidden = true;
+  });
+  sections.forEach(config => {
+    let section = main.querySelector(`[data-home-section="${CSS.escape(config.id)}"]`);
+    if (!section) {
+      section = document.createElement('section');
+      section.className = 'section section-alt';
+      section.dataset.homeSection = config.id;
+      section.innerHTML = '<div class="container"><div class="section-head"><span class="eyebrow"></span><h2></h2><p></p></div></div>';
+    }
+    if (!section) return;
+    section.hidden = config.enabled === false;
+    if (config.id === 'hero') {
+      const eyebrow = section.querySelector('#homeHeroEyebrow');
+      const heading = section.querySelector('#homeHeroHeading');
+      const body = section.querySelector('#homeHeroBody');
+      if (eyebrow) eyebrow.textContent = config.eyebrow || '';
+      if (heading) {
+        heading.replaceChildren();
+        (config.heading || '').split(/(50 Feet)/).forEach(part => {
+          if (part === '50 Feet') { const accent = document.createElement('em'); accent.textContent = part; heading.append(accent); }
+          else heading.append(document.createTextNode(part));
+        });
+      }
+      if (body) body.textContent = config.body || '';
+    } else {
+      const eyebrow = section.querySelector('.section-head .eyebrow') || section.querySelector('.split .eyebrow');
+      const heading = section.querySelector('.section-head h2') || section.querySelector('.split h2') || section.querySelector('.cta-band h2');
+      const body = section.querySelector('.section-head p') || section.querySelector('.split h2 + p') || section.querySelector('.cta-band p');
+      if (eyebrow && config.eyebrow !== undefined) eyebrow.textContent = config.eyebrow;
+      if (heading && config.heading) heading.textContent = config.heading;
+      if (body && config.body) body.textContent = config.body;
+    }
+    main.appendChild(section);
+  });
 }
 
 /* ---------- cart drawer ---------- */

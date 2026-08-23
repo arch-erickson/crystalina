@@ -48,7 +48,7 @@
 
 <main>
   <!-- HERO -->
-  <section class="hero" style="--hero-image:url('/images/hero-bg.webp')">
+  <section class="hero" data-home-section="hero" style="--hero-image:url('/images/hero-bg.webp')">
     <div class="container hero-inner">
       <div class="hero-content">
         <span class="hero-eyebrow" id="homeHeroEyebrow">NYC's Home Water Filtration Company</span>
@@ -68,7 +68,7 @@
   </section>
 
   <!-- TRUST BAR -->
-  <section class="trust-bar">
+  <section class="trust-bar" data-home-section="trust">
     <div class="container trust-inner">
       <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 3v6c0 5-3.5 9.5-8 11-4.5-1.5-8-6-8-11V5l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-4.5"/></svg> Tested against NSF/ANSI standards</div>
       <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1.5" y="6" width="14" height="11" rx="2"/><path d="M15.5 10h4l3 3v4h-7z"/><circle cx="6" cy="19.5" r="1.8"/><circle cx="18" cy="19.5" r="1.8"/></svg> Free NYC delivery over $99</div>
@@ -78,7 +78,7 @@
   </section>
 
   <!-- CATEGORIES -->
-  <section class="section">
+  <section class="section" data-home-section="categories">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow">Shop By Category</span>
@@ -115,7 +115,7 @@
   </section>
 
   <!-- ANATOMY / EXPLODED PRODUCT -->
-  <section class="section anatomy">
+  <section class="section anatomy" data-home-section="anatomy">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow">Inside the Flagship</span>
@@ -134,7 +134,7 @@
   </section>
 
   <!-- BEST SELLERS -->
-  <section class="section section-alt">
+  <section class="section section-alt" data-home-section="best-sellers">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow">Customer Favorites</span>
@@ -147,7 +147,7 @@
   </section>
 
   <!-- NYC WATER FACTS -->
-  <section class="section nyc-band">
+  <section class="section nyc-band" data-home-section="water-facts">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow" style="color:var(--cyan-300)">Know Your Water</span>
@@ -178,7 +178,7 @@
   </section>
 
   <!-- HOW IT WORKS -->
-  <section class="section">
+  <section class="section" data-home-section="process">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow">Simple By Design</span>
@@ -210,7 +210,7 @@
   </section>
 
   <!-- SPLIT FEATURE -->
-  <section class="section section-alt">
+  <section class="section section-alt" data-home-section="why-crystalina">
     <div class="container split">
       <img src="/images/lifestyle-hydration.webp" alt="Family drinking clean filtered water" onerror="this.onerror=null;this.src=Store.placeholder('Healthy Hydration',2)">
       <div>
@@ -230,7 +230,7 @@
   </section>
 
   <!-- TESTIMONIALS -->
-  <section class="section">
+  <section class="section" data-home-section="testimonials">
     <div class="container">
       <div class="section-head">
         <span class="eyebrow">Real NYC Homes</span>
@@ -257,7 +257,7 @@
   </section>
 
   <!-- CTA -->
-  <section class="section">
+  <section class="section" data-home-section="cta">
     <div class="container">
       <div class="cta-band">
         <div>
@@ -282,11 +282,10 @@
 <script>
   initPage('/');
 
-  // Featured products: badges first, then top-rated, first 4
-  const featured = Store.getProducts()
-    .slice()
-    .sort((a, b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0) || b.reviews - a.reviews)
-    .slice(0, 4);
+  // Featured products: use the admin selection, then fall back to top products.
+  const selectedFeatured = Store.getAdminData().pageSections?.find(section => section.id === 'best-sellers')?.products || [];
+  const featuredFallback = Store.getProducts().slice().sort((a, b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0) || b.reviews - a.reviews);
+  const featured = (selectedFeatured.length ? selectedFeatured.map(id => Store.getProduct(id)).filter(Boolean) : featuredFallback).slice(0, 4);
   document.getElementById('featuredGrid').innerHTML = featured.map(productCard).join('');
   bindAddButtons();
 

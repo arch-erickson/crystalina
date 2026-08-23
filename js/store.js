@@ -148,18 +148,19 @@ const Store = (() => {
 
   function migrateAdminData() {
     const schema = Number(localStorage.getItem(KEYS.adminSchema) || 0);
-    if (schema >= 2) return;
+    if (schema >= 4) return;
     const defaults = seedAdminData();
     const saved = read(KEYS.adminData, {});
-    ['customers', 'supplierProfiles', 'activityLog', 'abandonedCarts', 'outreach'].forEach(collection => { if (!saved[collection]) saved[collection] = defaults[collection]; });
+    ['customers', 'supplierProfiles', 'activityLog', 'abandonedCarts', 'outreach', 'pageSections'].forEach(collection => { if (!saved[collection]) saved[collection] = defaults[collection]; });
     saved.staff = (saved.staff || []).map(member => {
       const current = defaults.staff.find(item => item.email === member.email);
-      return current ? { ...current, ...member, id: current.id, role: current.role, roles: current.roles, photo: member.photo || current.photo } : member;
+      return current ? { ...current, ...member, id: current.id, roles: member.roles?.length ? member.roles : current.roles, photo: member.photo || current.photo } : member;
     });
     defaults.staff.forEach(member => { if (!saved.staff.some(item => item.email === member.email)) saved.staff.push(member); });
     saved.jobs = (saved.jobs || defaults.jobs).map(job => { const current = defaults.jobs.find(item => item.id === job.id); return current ? { ...current, ...job, checklist: job.checklist?.length ? job.checklist : current.checklist } : job; });
+    saved.pageSections = (saved.pageSections || defaults.pageSections).map(section => section.id === 'best-sellers' ? { ...section, products: (section.products || []).map(id => ({ 'whole-house-3': 'wh-3stage', 'countertop-luxe': 'ct-luxe' }[id] || id)) } : section);
     write(KEYS.adminData, { ...defaults, ...saved });
-    localStorage.setItem(KEYS.adminSchema, '2');
+    localStorage.setItem(KEYS.adminSchema, '4');
   }
 
   function seedAdminData() {
@@ -256,6 +257,18 @@ const Store = (() => {
         { id: 'CNT-298', type: 'Promotion', title: 'Free NYC delivery over $99', placement: 'Announcement bar', updated: '2026-08-15', status: 'Published' },
         { id: 'CNT-294', type: 'Banner', title: 'Find the right filter for your building', placement: 'Shop landing page', updated: '2026-08-12', status: 'Draft' },
         { id: 'CNT-287', type: 'Review', title: 'Maya C. review, RO-10 installation', placement: 'Home testimonials', updated: '2026-08-05', status: 'Needs approval' }
+      ],
+      pageSections: [
+        { id: 'hero', type: 'Hero', label: 'Hero', eyebrow: "NYC's Home Water Filtration Company", heading: 'Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.', body: "NYC's water is great at the reservoir, but old mains, aging building pipes, and pre-1961 lead solder stand between it and your glass. Crystalina filters are engineered for exactly that.", enabled: true, products: [] },
+        { id: 'trust', type: 'Trust Bar', label: 'Trust & service promises', eyebrow: '', heading: 'Tested. Delivered. Supported locally.', body: 'Standards, delivery, warranty, and installation assurances.', enabled: true, products: [] },
+        { id: 'categories', type: 'Category Grid', label: 'Shop by category', eyebrow: 'Shop By Category', heading: 'The Right Filter for Every NYC Home', body: "Studio apartment or four-story brownstone, there's a Crystalina system built for your space.", enabled: true, products: [] },
+        { id: 'anatomy', type: 'Product Feature', label: 'RO-10 product anatomy', eyebrow: 'Inside the Flagship', heading: 'The RO-10, Component by Component', body: 'Ten precision stages stand between New York City tap water and your glass.', enabled: true, products: [] },
+        { id: 'best-sellers', type: 'Best Sellers', label: 'Best Sellers', eyebrow: 'Customer Favorites', heading: 'Best Sellers in the Five Boroughs', body: 'The systems New Yorkers order most, from Astoria to Bay Ridge.', enabled: true, products: ['ro-alkaline-10', 'wh-3stage', 'ro-classic-5', 'ct-luxe'] },
+        { id: 'water-facts', type: 'Water Facts', label: 'NYC water facts', eyebrow: 'Know Your Water', heading: "NYC Water Is Famous. It's Also Complicated.", body: "The city's supply is well-treated at the source; the risks come from the journey to your faucet.", enabled: true, products: [] },
+        { id: 'process', type: 'Process', label: 'How it works', eyebrow: 'Simple By Design', heading: 'From Tap to Crystal Clear in 4 Steps', body: 'Find the right system, install it, and keep it performing with timely replacements.', enabled: true, products: [] },
+        { id: 'why-crystalina', type: 'Split Feature', label: 'Why Crystalina', eyebrow: 'Why Crystalina', heading: 'Built for the City. Backed for Life in It.', body: "Crystalina systems are selected for the realities of New York City homes and plumbing.", enabled: true, products: [] },
+        { id: 'testimonials', type: 'Testimonials', label: 'What Our Neighbors Are Saying', eyebrow: 'Real NYC Homes', heading: 'What Our Neighbors Are Saying', body: 'Customer stories from homes across the five boroughs.', enabled: true, products: [] },
+        { id: 'cta', type: 'Call to Action', label: 'Find your system', eyebrow: '', heading: 'Not Sure Which System Fits Your Home?', body: "Answer 5 quick questions and we'll match you to the right filter.", enabled: true, products: [] }
       ],
       roles: [
         { id: 'ROLE-1', role: 'Administrator', members: 1, permissions: 'Full access' },
@@ -411,6 +424,12 @@ const Store = (() => {
     data[collection] = (data[collection] || []).filter(item => item.id !== id);
     saveAdminData(data);
   }
+  function saveAdminCollection(collection, items) {
+    const data = getAdminData();
+    data[collection] = items;
+    saveAdminData(data);
+    return items;
+  }
   function addNotification(notification) {
     return addAdminItem('notifications', { id: 'NOT-' + String(Date.now()).slice(-6), sent: new Date().toISOString(), read: false, ...notification });
   }
@@ -449,7 +468,7 @@ const Store = (() => {
     getUsers, currentUser, signUp, signIn, signOut,
     currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
     getOrders, placeOrder, updateOrderStatus, deleteOrder,
-    getAdminData, updateAdminItem, addAdminItem, deleteAdminItem,
+    getAdminData, updateAdminItem, addAdminItem, deleteAdminItem, saveAdminCollection,
     addNotification, getNotificationsForUser, markNotificationsRead, logActivity,
     getSiteSettings, updateSiteSettings
   };

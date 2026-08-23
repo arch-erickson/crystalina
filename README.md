@@ -22,6 +22,9 @@ npx serve .
 | `signin.html` | Customer sign in / sign up, plus admin mode (`?mode=admin`) |
 | `account.html` | Customer dashboard with order history |
 | `admin/` | Admin dashboard, commerce, subscriptions, field service, staff, purchasing, leads, marketing, support, content, finance, and settings |
+| `technician/` | Role-gated field workspace for assigned jobs, checklists, statuses, and installation photos |
+| `manager/` | Role-gated operations workspace for inventory, support, technician schedules, and job assignments |
+| `sales/` | Role-gated workspace for leads, sales, customers, campaigns, and cart recovery |
 | `nyc-water.html` | Education page: what's in NYC tap water, cost comparison charts, FAQ |
 | `quiz.html` | 5-question "Find Your Filter" recommender |
 | `about.html` / `contact.html` | Brand story and contact form |
@@ -35,11 +38,21 @@ Instagram / X / Facebook / WhatsApp links, floating WhatsApp button.
 - Password: `crystalina2026`
 
 The admin panel includes browser-persistent demo controls for products, orders, subscriptions,
-filter-replacement schedules, service jobs and quality-control photos, staff, suppliers, leads,
+filter-replacement schedules, service-job management, staff, suppliers, leads,
 campaigns, support tickets, content, finance reporting, company details, permissions, and the site
-color palette. Product and landing-page changes appear in the storefront immediately in the same
-browser. A real backend is still required before these controls can be shared across staff or used
-for production operations.
+color palette. It also includes customer/staff/supplier profile overlays, bulk outreach, a landing-page
+layer editor, and multi-role employee assignments. Product and landing-page changes appear in the
+storefront immediately in the same browser.
+
+## Demo staff access
+
+- Technician: `luis@crystalina.org` or `amina@crystalina.org`
+- Manager: `jordan@crystalina.org`
+- Sales Associate: `marcus@crystalina.org`
+- Prototype verification code for each role page: `246810`
+
+These role pages and verification codes are interface prototypes. A real backend, email-code delivery,
+shared database, secure sessions, and server-side permission checks are required before production use.
 
 ## First-draft notes (for the next phase)
 

@@ -345,13 +345,17 @@
   function renderContent() {
     const data = Store.getAdminData();
     const settings = data.siteSettings;
-    document.getElementById('heroEyebrowInput').value = settings.heroEyebrow;
-    document.getElementById('heroHeadingInput').value = settings.heroHeading;
-    document.getElementById('heroBodyInput').value = settings.heroBody;
     document.getElementById('announcementInput').value = settings.announcement;
     document.getElementById('heroImagePreview').style.setProperty('--hero-preview', `url("${settings.heroImage.replace(/"/g, '\\"')}")`);
+    const sections = data.pageSections || [];
+    document.getElementById('pageSectionList').innerHTML = sections.map((section, index) => `<article class="content-layer ${section.enabled === false ? 'is-hidden' : ''}">
+      <div class="layer-order"><span>${String(index + 1).padStart(2, '0')}</span><small>${index === 0 ? 'TOP' : index === sections.length - 1 ? 'BOTTOM' : 'LAYER'}</small></div>
+      <div class="layer-copy"><div><strong>${escapeHTML(section.label || section.heading)}</strong><span>${escapeHTML(section.type)}</span></div><p>${escapeHTML(section.heading || 'Untitled section')}${section.type === 'Best Sellers' ? ` · ${(section.products || []).length} selected products` : ''}</p></div>
+      <label class="layer-toggle"><input type="checkbox" ${section.enabled !== false ? 'checked' : ''} onchange="AdminUI.toggleSection('${section.id}',this.checked)"><span>${section.enabled !== false ? 'Visible' : 'Hidden'}</span></label>
+      <div class="layer-actions"><button class="btn btn-sm btn-ghost" ${index === 0 ? 'disabled' : ''} onclick="AdminUI.moveSection('${section.id}',-1)" aria-label="Move section up">↑</button><button class="btn btn-sm btn-ghost" ${index === sections.length - 1 ? 'disabled' : ''} onclick="AdminUI.moveSection('${section.id}',1)" aria-label="Move section down">↓</button><button class="btn btn-sm btn-outline" onclick="AdminUI.editSection('${section.id}')">Edit</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.duplicateSection('${section.id}')">Duplicate</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteSection('${section.id}')">Delete</button></div>
+    </article>`).join('') || '<p class="admin-subtitle">No landing-page sections. Add a section to start rebuilding the page.</p>';
     const content = contentFilter === 'all' ? data.content : data.content.filter(item => item.type === contentFilter);
-    document.querySelector('#contentTable tbody').innerHTML = content.map(item => `<tr><td><strong>${item.title}</strong><br><small>${item.type}</small></td><td>${item.placement}</td><td>${formatDate(item.updated)}</td><td><select class="admin-select" onchange="AdminUI.setContentStatus('${item.id}',this.value)">${['Draft', 'Needs approval', 'Published', 'Archived'].map(status => `<option ${status === item.status ? 'selected' : ''}>${status}</option>`).join('')}</select></td></tr>`).join('');
+    document.querySelector('#contentTable tbody').innerHTML = content.map(item => `<tr><td><strong>${escapeHTML(item.title)}</strong><br><small>${escapeHTML(item.type)}</small></td><td>${escapeHTML(item.placement)}</td><td>${formatDate(item.updated)}</td><td><select class="admin-select" onchange="AdminUI.setContentStatus('${item.id}',this.value)">${['Draft', 'Needs approval', 'Published', 'Archived'].map(status => `<option ${status === item.status ? 'selected' : ''}>${status}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('content','${item.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('content','${item.id}','${encodeURIComponent(item.title)}')">Delete</button></div></td></tr>`).join('') || '<tr><td colspan="5">No website items match this filter.</td></tr>';
   }
 
   function renderFinance() {
@@ -391,6 +395,11 @@
     document.getElementById('primaryColor').value = settings.primary;
     document.getElementById('accentColor').value = settings.accent;
     updateColorLabels();
+    const roleNames = ['Technician', 'Sales Associate', 'Manager'];
+    document.querySelector('#staffRolesTable tbody').innerHTML = data.staff.map(member => {
+      const roles = staffRoles(member);
+      return `<tr><td><button class="entity-link" onclick="AdminUI.openStaffProfile('${member.id}')">${escapeHTML(member.name)}</button><br><small>${escapeHTML(member.email)}</small></td><td><strong>${escapeHTML(member.id)}</strong></td>${roleNames.map(role => `<td><label class="role-check"><input type="checkbox" ${roles.includes(role) ? 'checked' : ''} onchange="AdminUI.toggleStaffRole('${member.id}','${role}',this.checked)"><span>${roles.includes(role) ? 'Assigned' : 'Not assigned'}</span></label></td>`).join('')}<td><select class="admin-select" onchange="AdminUI.setPrimaryRole('${member.id}',this.value)">${roles.map(role => `<option ${role === member.role ? 'selected' : ''}>${escapeHTML(role)}</option>`).join('')}</select></td></tr>`;
+    }).join('');
     document.querySelector('#rolesTable tbody').innerHTML = data.roles.map(role => `<tr><td><strong>${role.role}</strong></td><td>${role.members}</td><td>${role.permissions}</td><td><select class="admin-select" onchange="AdminUI.setRolePermissions('${role.id}',this.value)">${['Full access', 'Orders, customers, service, inventory', 'Assigned jobs, checklists, photos', 'Leads, quotes, customer notes', 'View only'].map(option => `<option ${option === role.permissions ? 'selected' : ''}>${option}</option>`).join('')}</select></td></tr>`).join('');
   }
 
@@ -439,10 +448,10 @@
     leadFilters = { search: document.getElementById('leadSearch').value.trim().toLowerCase(), stage: document.getElementById('leadStageFilter').value, source: document.getElementById('leadSourceFilter').value }; renderLeads();
   }));
 
-  document.getElementById('heroContentForm').addEventListener('submit', event => {
+  document.getElementById('heroMediaForm').addEventListener('submit', event => {
     event.preventDefault();
     Store.updateSiteSettings(Object.fromEntries(new FormData(event.currentTarget).entries()));
-    toast('Landing page content saved');
+    toast('Announcement saved');
   });
   const heroImageInput = document.getElementById('heroImageInput');
   document.getElementById('heroImageButton').addEventListener('click', () => heroImageInput.click());
@@ -453,6 +462,43 @@
     const reader = new FileReader();
     reader.onload = () => { Store.updateSiteSettings({ heroImage: reader.result }); renderContent(); toast('Landing page image saved'); };
     reader.readAsDataURL(file);
+  });
+
+  const sectionModal = document.getElementById('sectionModal');
+  const sectionForm = document.getElementById('sectionForm');
+  const sectionType = document.getElementById('sectionType');
+  function updateSectionProductVisibility() { document.getElementById('sectionProductsField').hidden = sectionType.value !== 'Best Sellers'; }
+  function closeSectionModal() { sectionModal.classList.remove('open'); sectionForm.reset(); }
+  function openSectionModal(section = null) {
+    const products = Store.getProducts();
+    document.getElementById('sectionModalTitle').textContent = section ? `Edit ${section.label}` : 'Add Page Section';
+    document.getElementById('sectionId').value = section?.id || '';
+    sectionType.value = section?.type || 'Custom Section';
+    document.getElementById('sectionLabel').value = section?.label || '';
+    document.getElementById('sectionEyebrow').value = section?.eyebrow || '';
+    document.getElementById('sectionHeading').value = section?.heading || '';
+    document.getElementById('sectionBody').value = section?.body || '';
+    document.getElementById('sectionEnabled').checked = section?.enabled !== false;
+    document.getElementById('sectionProductOptions').innerHTML = products.map(product => `<label><input type="checkbox" name="products" value="${product.id}" ${(section?.products || []).includes(product.id) ? 'checked' : ''}><span><strong>${escapeHTML(product.name)}</strong><small>${escapeHTML(product.category)}</small></span></label>`).join('') || '<p class="admin-subtitle">Add products before selecting Best Sellers.</p>';
+    sectionType.disabled = Boolean(section && section.type !== 'Custom Section');
+    updateSectionProductVisibility();
+    sectionModal.classList.add('open');
+  }
+  document.getElementById('addSectionBtn').addEventListener('click', () => openSectionModal());
+  document.getElementById('sectionClose').addEventListener('click', closeSectionModal);
+  document.getElementById('sectionCancel').addEventListener('click', closeSectionModal);
+  sectionModal.addEventListener('click', event => { if (event.target === sectionModal) closeSectionModal(); });
+  sectionType.addEventListener('change', updateSectionProductVisibility);
+  sectionForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const formData = new FormData(sectionForm);
+    const id = formData.get('id');
+    const existing = Store.getAdminData().pageSections.find(section => section.id === id);
+    const values = { type: sectionType.value, label: formData.get('label'), eyebrow: formData.get('eyebrow'), heading: formData.get('heading'), body: formData.get('body'), enabled: formData.get('enabled') === 'on', products: formData.getAll('products') };
+    if (existing) Store.updateAdminItem('pageSections', id, values);
+    else Store.saveAdminCollection('pageSections', [...Store.getAdminData().pageSections, { id: `custom-${Date.now()}`, ...values }]);
+    if (id === 'hero') Store.updateSiteSettings({ heroEyebrow: values.eyebrow, heroHeading: values.heading, heroBody: values.body });
+    closeSectionModal(); renderContent(); toast('Landing page section saved');
   });
   document.getElementById('companySettingsForm').addEventListener('submit', event => {
     event.preventDefault(); Store.updateSiteSettings(Object.fromEntries(new FormData(event.currentTarget).entries())); toast('Company details saved');
@@ -541,7 +587,8 @@
     if (recordType === 'customer' && !editingRecordId) Object.assign(values, { products: [], cart: [], installed: [] });
     if (recordType === 'staff') {
       values.initials = values.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
-      values.roles = [values.role];
+      const existingStaff = editingRecordId ? Store.getAdminData().staff.find(member => member.id === editingRecordId) : null;
+      values.roles = existingStaff ? [...new Set([values.role, ...staffRoles(existingStaff).filter(role => role !== existingStaff.role)])] : [values.role];
       if (!editingRecordId) { values.rating = 5; values.jobs = 0; values.photo = ''; }
     }
     if (recordType === 'job' && !editingRecordId) Object.assign(values, { checklist: [{ label: 'Confirm customer and system', done: false }, { label: 'Photograph pre-job condition', done: false }, { label: 'Complete installation requirements', done: false }, { label: 'Pressure and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 5, beforePhoto: '', afterPhoto: '' });
@@ -689,8 +736,45 @@
     setContentStatus(id, status) {
       Store.updateAdminItem('content', id, { status, updated: new Date().toISOString().slice(0, 10) }); renderContent(); toast('Content status updated');
     },
+    editSection(id) { openSectionModal(Store.getAdminData().pageSections.find(section => section.id === id)); },
+    toggleSection(id, enabled) { Store.updateAdminItem('pageSections', id, { enabled }); renderContent(); toast(`Section ${enabled ? 'shown' : 'hidden'} on landing page`); },
+    moveSection(id, direction) {
+      const sections = [...Store.getAdminData().pageSections];
+      const index = sections.findIndex(section => section.id === id);
+      const nextIndex = index + direction;
+      if (index < 0 || nextIndex < 0 || nextIndex >= sections.length) return;
+      [sections[index], sections[nextIndex]] = [sections[nextIndex], sections[index]];
+      Store.saveAdminCollection('pageSections', sections); renderContent(); toast('Landing page order updated');
+    },
+    duplicateSection(id) {
+      const sections = [...Store.getAdminData().pageSections];
+      const index = sections.findIndex(section => section.id === id);
+      if (index < 0) return;
+      const duplicate = { ...sections[index], id: `custom-${Date.now()}`, type: 'Custom Section', label: `${sections[index].label} copy` };
+      sections.splice(index + 1, 0, duplicate); Store.saveAdminCollection('pageSections', sections); renderContent(); toast('Section duplicated');
+    },
+    deleteSection(id) {
+      const section = Store.getAdminData().pageSections.find(item => item.id === id);
+      if (!section || !confirm(`Delete the ${section.label} landing-page section?`)) return;
+      Store.deleteAdminItem('pageSections', id); renderContent(); toast('Landing page section deleted');
+    },
     setRolePermissions(id, permissions) {
       Store.updateAdminItem('roles', id, { permissions }); renderSettings(); toast('Role permissions updated');
+    },
+    toggleStaffRole(id, role, checked) {
+      const member = Store.getAdminData().staff.find(item => item.id === id);
+      if (!member) return;
+      let roles = staffRoles(member);
+      roles = checked ? [...new Set([...roles, role])] : roles.filter(item => item !== role);
+      if (!roles.length) { toast('Each employee must retain at least one role'); renderSettings(); return; }
+      const primary = roles.includes(member.role) ? member.role : roles[0];
+      Store.updateAdminItem('staff', id, { roles, role: primary });
+      Store.logActivity(user.id, `${checked ? 'Assigned' : 'Removed'} ${role} role`, id); renderSettings(); renderStaff(); toast(`${member.name}'s access updated`);
+    },
+    setPrimaryRole(id, role) {
+      const member = Store.getAdminData().staff.find(item => item.id === id);
+      if (!member || !staffRoles(member).includes(role)) return;
+      Store.updateAdminItem('staff', id, { role }); renderSettings(); renderStaff(); toast(`${member.name}'s primary role updated`);
     },
     exportReport() {
       const finance = Store.getAdminData().finance;

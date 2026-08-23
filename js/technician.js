@@ -18,7 +18,10 @@
   ];
 
   function showError(message) { error.textContent = message; error.classList.toggle('show', Boolean(message)); }
-  function sessionIsValid(session) { return session && session.roles?.includes(REQUIRED_ROLE) && session.activeRole === REQUIRED_ROLE; }
+  function sessionIsValid(session) {
+    const member = session && Store.getAdminData().staff.find(item => item.id === session.id);
+    return Boolean(member && (member.roles || [member.role]).includes(REQUIRED_ROLE) && session.activeRole === REQUIRED_ROLE);
+  }
   function showPortal(session) {
     auth.hidden = true; shell.hidden = false;
     document.getElementById('portalStaffName').textContent = session.name;
