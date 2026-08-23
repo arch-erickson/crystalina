@@ -16,13 +16,21 @@ swap the `<img src>` to the local path noted per image.
 
 ---
 
-## 1. Hero background — ACTIVE (`/images/hero-bg.webp`)
-- **Size:** 2400 × 1400 (landscape, will be darkened by a navy overlay; keep detail on the right side).
-- **Prompt:** "Abstract premium water background, smooth flowing water surface and soft caustic light
-  in deep navy blue transitioning to bright cyan, subtle ripples and refracted highlights, clean
-  minimal, lots of negative space on the left for text, cinematic soft lighting, high-end product
-  photography aesthetic, monochrome blue palette #15375D #2A7BC4 #3DC7F4."
-- **Note:** left ~55% should be calmer/darker (text sits there); visual interest concentrated top-right.
+## 1. Hero background — ACTIVE, FULL-BLEED (`/images/hero-bg.webp`)
+This image fills the **entire** hero (no image box). Text sits over the left third on a dark
+navy gradient; the right side stays visible, so the subject must live on the **right half**.
+- **Size:** 2600 × 1500 (landscape, 16:9-ish). Keep the composition's focal point on the right;
+  the left ~40% should be calmer/simpler (a wall, window light, or soft gradient) with room for text.
+- **Prompt:** "Editorial lifestyle photograph, a poised woman in a bright, airy modern New York City
+  kitchen holding a glass of crystal-clear water, standing on the right side of the frame, soft
+  natural window light, shallow depth of field, calm and premium, cool blue color grade, the left
+  side of the frame is a softly lit neutral wall with gentle negative space, sophisticated and
+  aspirational, high-end brand photography, blue palette #15375D #2A7BC4 #3DC7F4."
+- **Alternate (product-forward) prompt:** "Premium under-sink reverse osmosis system with brushed
+  stainless canisters and blue tubing, dramatically lit on the right side of a dark studio scene,
+  water droplets and soft caustic reflections, deep navy to cyan gradient filling the left as
+  negative space, cinematic, high-end product photography, monochrome blue palette."
+- **Note:** deliver a version that reads well when the left ~40% is covered by a dark navy overlay.
 
 ## 2. Exploded RO-10 system — ACTIVE (`/images/exploded-filter.webp`)
 - **Size:** 1200 × 1400 (portrait), **transparent background**.
@@ -34,13 +42,7 @@ swap the `<img src>` to the local path noted per image.
   premium industrial design, navy and cyan accents #1F4C80 #3DC7F4."
 - **Note:** vertical stack from top (intake) to bottom (faucet); crisp edges for the transparent cutout.
 
-## 3. Hero side visual — glass of water (`/images/hero-glass.webp`)
-- **Size:** 900 × 800. Replaces the stock photo in the homepage hero card.
-- **Prompt:** "Close-up of a pristine glass of crystal-clear water being poured on a clean surface,
-  bright water droplets and bubbles, soft blue studio backdrop, condensation, refreshing and pure,
-  premium beverage photography, cool blue palette."
-
-## 4–9. Category tiles (`/images/cat-*.webp`, 800 × 600 each)
+## 3–8. Category tiles (`/images/cat-*.webp`, 800 × 600 each)
 Replace the six stock photos in the homepage "Shop By Category" grid.
 | File | Prompt focus |
 |---|---|

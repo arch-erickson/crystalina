@@ -115,17 +115,21 @@ h1, h2, h3, h4 { line-height: 1.18; color: var(--navy-800); font-weight: 700; fo
 .hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 8px; }
 .hamburger span { width: 24px; height: 2.5px; background: var(--navy-800); border-radius: 2px; }
 
-/* ---------- hero ---------- */
+/* ---------- hero (full-bleed background image) ---------- */
 .hero {
   position: relative; color: #fff; overflow: hidden;
+  min-height: min(88vh, 820px); display: flex; align-items: center;
   background:
-    linear-gradient(118deg, rgba(15,38,64,.94) 0%, rgba(31,76,128,.86) 46%, rgba(42,123,196,.62) 100%),
-    var(--hero-image, none) center/cover no-repeat,
+    linear-gradient(90deg, rgba(11,30,54,.93) 0%, rgba(15,38,64,.74) 40%, rgba(21,55,93,.32) 72%, rgba(21,55,93,.08) 100%),
+    linear-gradient(180deg, rgba(11,30,54,.14), rgba(11,30,54,.26)),
+    var(--hero-image, none) center right / cover no-repeat,
     linear-gradient(120deg, var(--navy-900) 0%, var(--navy-700) 55%, var(--blue-500) 120%);
   background-color: var(--navy-900);
 }
-.hero::after { content: ''; position: absolute; inset: 0; background: radial-gradient(900px 420px at 84% 18%, rgba(61,199,244,.28), transparent 62%); pointer-events: none; }
-.hero-inner { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; padding: 84px 0; position: relative; z-index: 1; }
+.hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(11,30,54,.30), transparent 42%); pointer-events: none; }
+.hero-inner { padding: 72px 0; position: relative; z-index: 1; width: 100%; }
+.hero-content { max-width: 640px; }
+.hero-content h1, .hero-content .lead { text-shadow: 0 1px 18px rgba(7,20,40,.35); }
 .hero h1 { color: #fff; font-size: clamp(2rem, 4.4vw, 3.2rem); margin: 14px 0 18px; }
 .hero h1 em { font-style: normal; color: var(--cyan-300); }
 .hero p.lead { color: #cfe3fb; font-size: 1.08rem; max-width: 520px; margin-bottom: 28px; }
@@ -483,9 +487,9 @@ body.cart-open { overflow: hidden; }
   .main-nav { position: fixed; top: 0; right: -290px; width: 280px; height: 100vh; background: #fff; flex-direction: column; padding: 90px 28px; gap: 8px; box-shadow: -12px 0 40px rgba(7,29,64,.18); transition: right .3s; z-index: 95; margin-left: 0; }
   .main-nav.open { right: 0; }
   .hamburger { display: flex; }
-  .hero-inner, .nyc-grid, .split, .pd-layout, .checkout-layout, .contact-grid, .account-grid { grid-template-columns: 1fr; }
-  .hero-visual { order: -1; }
-  .hero-card { left: 10px; bottom: -16px; }
+  .nyc-grid, .split, .pd-layout, .checkout-layout, .contact-grid, .account-grid { grid-template-columns: 1fr; }
+  .hero { min-height: 74vh; background-position: 68% center; }
+  .hero-inner { padding: 54px 0; }
   .cat-grid, .testi-grid { grid-template-columns: 1fr; }
   .product-grid { grid-template-columns: repeat(2, 1fr); }
   .shop-layout { grid-template-columns: 1fr; }
