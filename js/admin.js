@@ -12,7 +12,7 @@
   });
 
   /* ---------- view switching ---------- */
-  const views = ['overview', 'products', 'orders', 'customers', 'subscriptions', 'service', 'staff', 'suppliers', 'leads', 'marketing', 'support'];
+  const views = ['overview', 'products', 'orders', 'customers', 'subscriptions', 'service', 'staff', 'suppliers', 'leads', 'marketing', 'support', 'content', 'finance', 'settings'];
   function showView(view, updateHash = true) {
     if (!views.includes(view)) view = 'overview';
     document.querySelectorAll('.side-link[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
@@ -222,6 +222,60 @@
     </tr>`).join('') || `<tr><td colspan="7">No tickets match this filter.</td></tr>`;
   }
 
+  let contentFilter = 'all';
+  function renderContent() {
+    const data = Store.getAdminData();
+    const settings = data.siteSettings;
+    document.getElementById('heroEyebrowInput').value = settings.heroEyebrow;
+    document.getElementById('heroHeadingInput').value = settings.heroHeading;
+    document.getElementById('heroBodyInput').value = settings.heroBody;
+    document.getElementById('announcementInput').value = settings.announcement;
+    document.getElementById('heroImagePreview').style.setProperty('--hero-preview', `url("${settings.heroImage.replace(/"/g, '\\"')}")`);
+    const content = contentFilter === 'all' ? data.content : data.content.filter(item => item.type === contentFilter);
+    document.querySelector('#contentTable tbody').innerHTML = content.map(item => `<tr><td><strong>${item.title}</strong><br><small>${item.type}</small></td><td>${item.placement}</td><td>${formatDate(item.updated)}</td><td><select class="admin-select" onchange="AdminUI.setContentStatus('${item.id}',this.value)">${['Draft', 'Needs approval', 'Published', 'Archived'].map(status => `<option ${status === item.status ? 'selected' : ''}>${status}</option>`).join('')}</select></td></tr>`).join('');
+  }
+
+  function renderFinance() {
+    const finance = Store.getAdminData().finance;
+    const revenue = finance.months.reduce((sum, month) => sum + month.revenue, 0);
+    const costs = finance.months.reduce((sum, month) => sum + month.cost, 0);
+    const profit = revenue - costs;
+    const orders = finance.months.reduce((sum, month) => sum + month.orders, 0);
+    document.getElementById('financeStats').innerHTML =
+      statCard('Revenue', money(revenue), 'last 6 months') +
+      statCard('Gross profit', money(profit), `${Math.round((profit / revenue) * 100)}% margin`) +
+      statCard('Orders', orders.toLocaleString(), `${money(revenue / orders)} average value`) +
+      statCard('Outstanding invoices', money(4820), '7 invoices awaiting payment');
+    const max = Math.max(...finance.months.map(month => month.revenue));
+    document.getElementById('revenueChart').innerHTML = finance.months.map(month => {
+      const monthProfit = month.revenue - month.cost;
+      return `<div class="chart-month"><div class="chart-bar" style="height:${Math.round((month.revenue / max) * 100)}%" data-value="${money(month.revenue)}"></div><div class="chart-bar profit" style="height:${Math.round((monthProfit / max) * 100)}%" data-value="${money(monthProfit)}"></div><span>${month.month}</span></div>`;
+    }).join('');
+    const areaTotal = finance.areas.reduce((sum, area) => sum + area.revenue, 0);
+    document.querySelector('#boroughDonut span').innerHTML = `${money(areaTotal / 1000).replace('.00', '')}k<small>Total sales</small>`;
+    document.getElementById('boroughLegend').innerHTML = `<div class="borough-legend">${finance.areas.map(area => `<div><span>${area.name}</span><strong>${Math.round((area.revenue / areaTotal) * 100)}%</strong></div>`).join('')}</div>`;
+    document.querySelector('#areaSalesTable tbody').innerHTML = finance.areas.map(area => { const share = Math.round((area.revenue / areaTotal) * 100); return `<tr><td><strong>${area.name}</strong></td><td>${area.orders}</td><td>${money(area.revenue)}</td><td><div class="share-bar"><i style="width:${share}%"></i></div><small>${share}%</small></td></tr>`; }).join('');
+    document.querySelector('#productSalesTable tbody').innerHTML = finance.products.map(product => `<tr><td><strong>${product.name}</strong></td><td>${product.units}</td><td>${money(product.revenue)}</td><td>${product.margin}%</td></tr>`).join('');
+  }
+
+  function renderSettings() {
+    const data = Store.getAdminData();
+    const settings = data.siteSettings;
+    ['companyName', 'email', 'phone', 'address', 'hours'].forEach(name => {
+      const input = document.querySelector(`#companySettingsForm [name="${name}"]`);
+      if (input) input.value = settings[name];
+    });
+    document.getElementById('navyColor').value = settings.navy;
+    document.getElementById('primaryColor').value = settings.primary;
+    document.getElementById('accentColor').value = settings.accent;
+    updateColorLabels();
+    document.querySelector('#rolesTable tbody').innerHTML = data.roles.map(role => `<tr><td><strong>${role.role}</strong></td><td>${role.members}</td><td>${role.permissions}</td><td><select class="admin-select" onchange="AdminUI.setRolePermissions('${role.id}',this.value)">${['Full access', 'Orders, customers, service, inventory', 'Assigned jobs, checklists, photos', 'Leads, quotes, customer notes', 'View only'].map(option => `<option ${option === role.permissions ? 'selected' : ''}>${option}</option>`).join('')}</select></td></tr>`).join('');
+  }
+
+  function updateColorLabels() {
+    [['navyColor', 'navyValue'], ['primaryColor', 'primaryValue'], ['accentColor', 'accentValue']].forEach(([inputId, valueId]) => { document.getElementById(valueId).textContent = document.getElementById(inputId).value.toUpperCase(); });
+  }
+
   document.querySelectorAll('[data-job-filter]').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('[data-job-filter]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active'); jobFilter = btn.dataset.jobFilter; renderService();
@@ -230,6 +284,38 @@
     document.querySelectorAll('[data-ticket-filter]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active'); ticketFilter = btn.dataset.ticketFilter; renderSupport();
   }));
+  document.querySelectorAll('[data-content-filter]').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-content-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); contentFilter = btn.dataset.contentFilter; renderContent();
+  }));
+
+  document.getElementById('heroContentForm').addEventListener('submit', event => {
+    event.preventDefault();
+    Store.updateSiteSettings(Object.fromEntries(new FormData(event.currentTarget).entries()));
+    toast('Landing page content saved');
+  });
+  const heroImageInput = document.getElementById('heroImageInput');
+  document.getElementById('heroImageButton').addEventListener('click', () => heroImageInput.click());
+  heroImageInput.addEventListener('change', () => {
+    const file = heroImageInput.files[0];
+    if (!file) return;
+    if (file.size > 2.5 * 1024 * 1024) { toast('Image too large, please keep under 2.5 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => { Store.updateSiteSettings({ heroImage: reader.result }); renderContent(); toast('Landing page image saved'); };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('companySettingsForm').addEventListener('submit', event => {
+    event.preventDefault(); Store.updateSiteSettings(Object.fromEntries(new FormData(event.currentTarget).entries())); toast('Company details saved');
+  });
+  document.querySelectorAll('#paletteForm input[type="color"]').forEach(input => input.addEventListener('input', () => {
+    updateColorLabels();
+    const preview = Object.fromEntries(new FormData(document.getElementById('paletteForm')).entries());
+    document.documentElement.style.setProperty('--navy-900', preview.navy); document.documentElement.style.setProperty('--navy-800', preview.navy); document.documentElement.style.setProperty('--blue-500', preview.primary); document.documentElement.style.setProperty('--cyan-300', preview.accent);
+  }));
+  document.getElementById('paletteForm').addEventListener('submit', event => {
+    event.preventDefault(); Store.updateSiteSettings(Object.fromEntries(new FormData(event.currentTarget).entries())); toast('Website color palette saved');
+  });
+  document.getElementById('exportReportBtn').addEventListener('click', () => AdminUI.exportReport());
 
   let pendingPhoto = null;
   const jobPhotoInput = document.getElementById('jobPhotoInput');
@@ -274,6 +360,9 @@
     ] },
     ticket: { title: 'Support Ticket', collection: 'tickets', prefix: 'TKT', fields: [
       ['customer', 'Customer', 'text'], ['subject', 'Issue summary', 'text'], ['type', 'Request type', 'select', ['Troubleshooting', 'Warranty', 'Return', 'General question']], ['priority', 'Priority', 'select', ['Low', 'Normal', 'High']], ['channel', 'Channel', 'select', ['Email', 'Chat', 'Phone']], ['status', 'Status', 'select', ['Open', 'In progress', 'Waiting on customer']]
+    ] },
+    content: { title: 'Website Content', collection: 'content', prefix: 'CNT', fields: [
+      ['type', 'Content type', 'select', ['FAQ', 'Promotion', 'Banner', 'Review']], ['title', 'Title', 'text'], ['placement', 'Website placement', 'text'], ['status', 'Status', 'select', ['Draft', 'Needs approval', 'Published']]
     ] }
   };
 
@@ -305,6 +394,7 @@
     if (recordType === 'campaign') { values.sent = Number(values.sent); values.conversion = Number(values.conversion); }
     if (recordType === 'discount') { values.usage = 0; values.limit = Number(values.limit); values.id = values.id.toUpperCase(); }
     if (recordType === 'ticket') values.updated = new Date().toISOString().slice(0, 10);
+    if (recordType === 'content') values.updated = new Date().toISOString().slice(0, 10);
     if (recordType === 'staff') {
       values.initials = values.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
       if (!editingRecordId) { values.rating = 5; values.jobs = 0; }
@@ -449,6 +539,18 @@
     setTicketStatus(id, status) {
       Store.updateAdminItem('tickets', id, { status, updated: new Date().toISOString().slice(0, 10) }); renderSupport(); toast(`Ticket ${id} updated`);
     },
+    setContentStatus(id, status) {
+      Store.updateAdminItem('content', id, { status, updated: new Date().toISOString().slice(0, 10) }); renderContent(); toast('Content status updated');
+    },
+    setRolePermissions(id, permissions) {
+      Store.updateAdminItem('roles', id, { permissions }); renderSettings(); toast('Role permissions updated');
+    },
+    exportReport() {
+      const finance = Store.getAdminData().finance;
+      const rows = [['Month', 'Revenue', 'Cost', 'Gross Profit', 'Orders'], ...finance.months.map(m => [m.month, m.revenue, m.cost, m.revenue - m.cost, m.orders])];
+      const blob = new Blob([rows.map(row => row.join(',')).join('\n')], { type: 'text/csv' });
+      const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'crystalina-finance-report.csv'; link.click(); URL.revokeObjectURL(link.href); toast('Finance report exported');
+    },
     markDemoAction(message) { toast(message); },
     editRecord(type, id) {
       openRecordModal(type, id);
@@ -459,6 +561,7 @@
     renderOverview(); renderProducts(); renderOrders(); renderCustomers();
     renderSubscriptions(); renderService(); renderStaff(); renderSuppliers();
     renderLeads(); renderMarketing(); renderSupport();
+    renderContent(); renderFinance(); renderSettings();
   }
   renderAll();
 })();

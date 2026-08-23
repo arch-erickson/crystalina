@@ -36,6 +36,10 @@
     <button class="side-link" data-view="leads"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M6 10h12M9 15h6M11 20h2"/></svg> Leads &amp; Quotes</button>
     <button class="side-link" data-view="marketing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14V8l12-4v14L4 14zM16 9h4M16 13h4M7 15l1 5h4l-2-5"/></svg> Marketing</button>
     <button class="side-link" data-view="support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13a8 8 0 0 1 16 0"/><path d="M4 13v5h3v-5H4zM17 13v5h3v-5h-3zM17 20h-5"/></svg> Support</button>
+    <button class="side-link" data-view="content"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h14v18H5zM8 7h8M8 11h8M8 15h5"/></svg> Content &amp; Website</button>
+    <span class="side-group">Business</span>
+    <button class="side-link" data-view="finance"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M6 17v-5M11 17V7M16 17v-8M21 17V4"/></svg> Finance &amp; Reports</button>
+    <button class="side-link" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1z"/></svg> Settings</button>
     <div class="side-foot">
       <button class="side-link" onclick="location.href='/'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18"/></svg> View Store</button>
       <button class="side-link" id="adminSignOut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg> Sign Out</button>
@@ -198,6 +202,70 @@
         <div class="panel-title-row"><h3>Support Queue</h3><div class="filter-pills"><button class="active" data-ticket-filter="all">All</button><button data-ticket-filter="open">Open</button><button data-ticket-filter="warranty">Warranty</button><button data-ticket-filter="returns">Returns</button></div></div>
         <table class="admin-table" id="ticketsTable"><thead><tr><th>Ticket</th><th>Customer</th><th>Issue</th><th>Type</th><th>Priority</th><th>Last activity</th><th>Status</th></tr></thead><tbody></tbody></table>
       </div>
+    </section>
+
+    <!-- CONTENT & WEBSITE -->
+    <section id="view-content" class="admin-view" style="display:none">
+      <div class="admin-head">
+        <div><h1>Content &amp; Website</h1><p class="admin-subtitle">Edit landing-page copy and imagery, FAQs, promotions, banners, and customer reviews.</p></div>
+        <button class="btn btn-primary" data-open-record="content">+ Add Content</button>
+      </div>
+      <div class="admin-two-col content-layout">
+        <form class="admin-panel" id="heroContentForm">
+          <div class="panel-title-row"><h3>Landing Page Hero</h3><span class="admin-badge">Live browser preview</span></div>
+          <div class="field"><label for="heroEyebrowInput">Eyebrow</label><input id="heroEyebrowInput" name="heroEyebrow" required></div>
+          <div class="field"><label for="heroHeadingInput">Headline</label><textarea id="heroHeadingInput" name="heroHeading" rows="3" required></textarea></div>
+          <div class="field"><label for="heroBodyInput">Supporting text</label><textarea id="heroBodyInput" name="heroBody" rows="4" required></textarea></div>
+          <div class="field"><label for="announcementInput">Announcement bar</label><input id="announcementInput" name="announcement" required></div>
+          <div class="field"><label>Hero image</label><button type="button" class="hero-image-control" id="heroImageButton"><span id="heroImagePreview"></span><strong>Replace hero image</strong><small>JPG, PNG, or WebP under 2.5 MB</small></button><input type="file" id="heroImageInput" accept="image/*" hidden></div>
+          <button class="btn btn-primary" type="submit">Save Landing Page</button>
+        </form>
+        <div class="admin-panel table-scroll">
+          <div class="panel-title-row"><h3>Website Content</h3><div class="filter-pills"><button class="active" type="button" data-content-filter="all">All</button><button type="button" data-content-filter="FAQ">FAQs</button><button type="button" data-content-filter="Promotion">Promotions</button><button type="button" data-content-filter="Review">Reviews</button></div></div>
+          <table class="admin-table" id="contentTable"><thead><tr><th>Content</th><th>Placement</th><th>Updated</th><th>Status</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINANCE & REPORTS -->
+    <section id="view-finance" class="admin-view" style="display:none">
+      <div class="admin-head">
+        <div><h1>Finance &amp; Reports</h1><p class="admin-subtitle">Revenue, profit margins, invoices, and performance by area and product.</p></div>
+        <div class="table-actions"><select class="admin-select" id="financePeriod"><option>Last 6 months</option><option>Year to date</option><option>Last 12 months</option></select><button class="btn btn-sm btn-outline" id="exportReportBtn">Export Report</button></div>
+      </div>
+      <div class="stat-cards" id="financeStats"></div>
+      <div class="report-grid">
+        <div class="admin-panel report-wide"><div class="panel-title-row"><h3>Revenue &amp; Gross Profit</h3><span class="chart-legend"><i></i> Revenue <i></i> Profit</span></div><div class="revenue-chart" id="revenueChart"></div></div>
+        <div class="admin-panel"><div class="panel-title-row"><h3>Sales by Borough</h3></div><div class="borough-summary"><div class="donut-chart" id="boroughDonut"><span></span></div><div id="boroughLegend"></div></div></div>
+      </div>
+      <div class="admin-two-col">
+        <div class="admin-panel table-scroll"><div class="panel-title-row"><h3>Sales by Area</h3><span class="admin-badge">All boroughs</span></div><table class="admin-table" id="areaSalesTable"><thead><tr><th>Area</th><th>Orders</th><th>Revenue</th><th>Share</th></tr></thead><tbody></tbody></table></div>
+        <div class="admin-panel table-scroll"><div class="panel-title-row"><h3>Sales by Product</h3><span class="admin-badge">Top 5</span></div><table class="admin-table" id="productSalesTable"><thead><tr><th>Product</th><th>Units</th><th>Revenue</th><th>Margin</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="admin-view" style="display:none">
+      <div class="admin-head"><div><h1>Settings</h1><p class="admin-subtitle">Company details, brand palette, roles, and permissions.</p></div></div>
+      <div class="admin-two-col settings-grid">
+        <form class="admin-panel" id="companySettingsForm">
+          <h3>Company Details</h3>
+          <div class="field"><label for="companyNameInput">Company name</label><input id="companyNameInput" name="companyName" required></div>
+          <div class="field-row"><div class="field"><label for="companyEmailInput">Email</label><input id="companyEmailInput" name="email" type="email" required></div><div class="field"><label for="companyPhoneInput">Phone</label><input id="companyPhoneInput" name="phone" required></div></div>
+          <div class="field"><label for="companyAddressInput">Business address</label><input id="companyAddressInput" name="address" required></div>
+          <div class="field"><label for="companyHoursInput">Business hours</label><input id="companyHoursInput" name="hours" required></div>
+          <button class="btn btn-primary" type="submit">Save Company Details</button>
+        </form>
+        <form class="admin-panel" id="paletteForm">
+          <h3>Website Color Palette</h3><p class="admin-subtitle">Changes preview across the storefront in this browser.</p>
+          <div class="color-control"><input type="color" id="navyColor" name="navy"><div><strong>Navigation navy</strong><span>Headers, footer, dark backgrounds</span></div><code id="navyValue"></code></div>
+          <div class="color-control"><input type="color" id="primaryColor" name="primary"><div><strong>Primary blue</strong><span>Buttons, links, active controls</span></div><code id="primaryValue"></code></div>
+          <div class="color-control"><input type="color" id="accentColor" name="accent"><div><strong>Accent cyan</strong><span>Highlights and signature details</span></div><code id="accentValue"></code></div>
+          <button class="btn btn-primary" type="submit">Apply Color Palette</button>
+        </form>
+      </div>
+      <div class="admin-panel table-scroll"><div class="panel-title-row"><div><h3>Roles &amp; Permissions</h3><p class="admin-subtitle">Define what each staff role can view and edit.</p></div><button class="btn btn-sm btn-outline" onclick="AdminUI.markDemoAction('Role invitation workflow ready for backend integration')">+ Invite Staff</button></div><table class="admin-table" id="rolesTable"><thead><tr><th>Role</th><th>Members</th><th>Access</th><th>Permission preset</th></tr></thead><tbody></tbody></table></div>
+      <div class="admin-callout production-note"><div><strong>Production connection required</strong><span>These controls currently save in this browser. Real staff access, shared edits, uploaded media, and reporting require the planned database and authentication backend.</span></div></div>
     </section>
   </main>
 </div>

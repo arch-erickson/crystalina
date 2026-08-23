@@ -176,7 +176,42 @@ const Store = (() => {
         { id: 'TKT-7038', customer: 'James Wilson', subject: 'Warranty claim for faucet', type: 'Warranty', priority: 'Normal', updated: '2026-08-22', status: 'Waiting on customer', channel: 'Chat' },
         { id: 'TKT-7034', customer: 'Sofia Martinez', subject: 'Return unopened replacement set', type: 'Return', priority: 'Normal', updated: '2026-08-21', status: 'In progress', channel: 'Email' },
         { id: 'TKT-7029', customer: 'Noah Brown', subject: 'VitaShower installation help', type: 'Troubleshooting', priority: 'Low', updated: '2026-08-20', status: 'Resolved', channel: 'Chat' }
-      ]
+      ],
+      finance: {
+        months: [
+          { month: 'Mar', revenue: 18400, cost: 10950, orders: 52 }, { month: 'Apr', revenue: 21300, cost: 12400, orders: 61 },
+          { month: 'May', revenue: 19800, cost: 11600, orders: 58 }, { month: 'Jun', revenue: 24900, cost: 13950, orders: 73 },
+          { month: 'Jul', revenue: 28700, cost: 15800, orders: 84 }, { month: 'Aug', revenue: 32600, cost: 17400, orders: 96 }
+        ],
+        areas: [
+          { name: 'Brooklyn', revenue: 42600, orders: 118 }, { name: 'Queens', revenue: 36700, orders: 104 }, { name: 'Manhattan', revenue: 31900, orders: 82 },
+          { name: 'Bronx', revenue: 17400, orders: 49 }, { name: 'Staten Island', revenue: 7100, orders: 21 }
+        ],
+        products: [
+          { name: 'RO-10 Alkaline', units: 94, revenue: 32899, margin: 48 }, { name: 'Whole Home 3-Stage', units: 41, revenue: 20499, margin: 43 },
+          { name: 'RO-5 Classic', units: 72, revenue: 15839, margin: 46 }, { name: 'Replacement Filter Sets', units: 186, revenue: 10972, margin: 55 },
+          { name: 'Countertop Luxe', units: 57, revenue: 10259, margin: 44 }
+        ]
+      },
+      content: [
+        { id: 'CNT-301', type: 'FAQ', title: 'How often should I replace my filters?', placement: 'Contact / FAQ', updated: '2026-08-18', status: 'Published' },
+        { id: 'CNT-298', type: 'Promotion', title: 'Free NYC delivery over $99', placement: 'Announcement bar', updated: '2026-08-15', status: 'Published' },
+        { id: 'CNT-294', type: 'Banner', title: 'Find the right filter for your building', placement: 'Shop landing page', updated: '2026-08-12', status: 'Draft' },
+        { id: 'CNT-287', type: 'Review', title: 'Maya C. review, RO-10 installation', placement: 'Home testimonials', updated: '2026-08-05', status: 'Needs approval' }
+      ],
+      roles: [
+        { id: 'ROLE-1', role: 'Administrator', members: 1, permissions: 'Full access' },
+        { id: 'ROLE-2', role: 'Operations Manager', members: 1, permissions: 'Orders, customers, service, inventory' },
+        { id: 'ROLE-3', role: 'Technician', members: 2, permissions: 'Assigned jobs, checklists, photos' },
+        { id: 'ROLE-4', role: 'Sales Representative', members: 1, permissions: 'Leads, quotes, customer notes' }
+      ],
+      siteSettings: {
+        companyName: 'Crystalina Water Co.', email: 'info@crystalina.org', phone: '(917) 809-4803', address: 'New York City, NY, USA', hours: 'Monday to Saturday, 8am to 7pm ET',
+        navy: '#15375D', primary: '#2A7BC4', accent: '#3DC7F4',
+        heroEyebrow: "NYC's Home Water Filtration Company", heroHeading: 'Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.',
+        heroBody: "NYC's water is great at the reservoir, but old mains, aging building pipes, and pre-1961 lead solder stand between it and your glass. Crystalina filters are engineered for exactly that.",
+        heroImage: '/images/hero-bg.webp', announcement: 'Free shipping on orders over $99, delivered anywhere in the five boroughs'
+      }
     };
   }
 
@@ -290,6 +325,13 @@ const Store = (() => {
     saveAdminData(data);
     return item;
   }
+  const getSiteSettings = () => getAdminData().siteSettings;
+  function updateSiteSettings(changes) {
+    const data = getAdminData();
+    data.siteSettings = { ...data.siteSettings, ...changes };
+    saveAdminData(data);
+    return data.siteSettings;
+  }
 
   ensureSeed();
 
@@ -299,6 +341,6 @@ const Store = (() => {
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
     getUsers, currentUser, signUp, signIn, signOut,
     getOrders, placeOrder, updateOrderStatus,
-    getAdminData, updateAdminItem, addAdminItem
+    getAdminData, updateAdminItem, addAdminItem, getSiteSettings, updateSiteSettings
   };
 })();

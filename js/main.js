@@ -130,6 +130,32 @@ function renderHeader(active = '') {
   updateCartBadge();
 }
 
+function applySiteSettings() {
+  if (!Store.getSiteSettings) return;
+  const settings = Store.getSiteSettings();
+  document.documentElement.style.setProperty('--navy-900', settings.navy);
+  document.documentElement.style.setProperty('--navy-800', settings.navy);
+  document.documentElement.style.setProperty('--blue-500', settings.primary);
+  document.documentElement.style.setProperty('--cyan-300', settings.accent);
+
+  const announcement = document.querySelector('.announce-bar > span');
+  if (announcement && announcement.lastChild) announcement.lastChild.textContent = ' ' + settings.announcement;
+  const eyebrow = document.getElementById('homeHeroEyebrow');
+  const heading = document.getElementById('homeHeroHeading');
+  const body = document.getElementById('homeHeroBody');
+  const hero = document.querySelector('.hero');
+  if (eyebrow) eyebrow.textContent = settings.heroEyebrow;
+  if (heading) {
+    heading.replaceChildren();
+    settings.heroHeading.split(/(50 Feet)/).forEach(part => {
+      if (part === '50 Feet') { const accent = document.createElement('em'); accent.textContent = part; heading.append(accent); }
+      else heading.append(document.createTextNode(part));
+    });
+  }
+  if (body) body.textContent = settings.heroBody;
+  if (hero && settings.heroImage) hero.style.setProperty('--hero-image', `url("${settings.heroImage.replace(/"/g, '\\"')}")`);
+}
+
 /* ---------- cart drawer ---------- */
 function renderCartDrawer() {
   const el = document.createElement('div');
@@ -331,6 +357,7 @@ function autoReveal() {
 /* ---------- page boot ---------- */
 function initPage(activeNav = '') {
   renderHeader(activeNav);
+  applySiteSettings();
   renderCartDrawer();
   renderFooter();
   autoReveal();

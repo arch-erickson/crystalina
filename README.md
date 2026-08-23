@@ -21,7 +21,7 @@ npx serve .
 | `checkout.html` | Cart checkout with NYC borough selector, 8.875% sales tax, simulated orders |
 | `signin.html` | Customer sign in / sign up, plus admin mode (`?mode=admin`) |
 | `account.html` | Customer dashboard with order history |
-| `admin.html` | Admin dashboard — stats, product manager (add/edit/delete with image upload), orders, customers |
+| `admin/` | Admin dashboard, commerce, subscriptions, field service, staff, purchasing, leads, marketing, support, content, finance, and settings |
 | `nyc-water.html` | Education page: what's in NYC tap water, cost comparison charts, FAQ |
 | `quiz.html` | 5-question "Find Your Filter" recommender |
 | `about.html` / `contact.html` | Brand story and contact form |
@@ -34,9 +34,12 @@ Instagram / X / Facebook / WhatsApp links, floating WhatsApp button.
 - Email: `admin@crystalinawater.com`
 - Password: `crystalina2026`
 
-In the admin **Products** tab you can add a product with image upload (drag & drop or click),
-name, category, price, compare-at price, stock count, descriptions, and key features.
-New products appear in the shop immediately.
+The admin panel includes browser-persistent demo controls for products, orders, subscriptions,
+filter-replacement schedules, service jobs and quality-control photos, staff, suppliers, leads,
+campaigns, support tickets, content, finance reporting, company details, permissions, and the site
+color palette. Product and landing-page changes appear in the storefront immediately in the same
+browser. A real backend is still required before these controls can be shared across staff or used
+for production operations.
 
 ## First-draft notes (for the next phase)
 
