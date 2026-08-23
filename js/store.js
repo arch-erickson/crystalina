@@ -53,7 +53,7 @@ const Store = (() => {
   function seedProducts() {
     const P = (id, name, category, price, comparePrice, stock, badge, short, description, specs, variant) => ({
       id, name, category, price, comparePrice, stock, badge, short, description, specs,
-      image: placeholder(name, variant),
+      image: `/images/products/${id}.webp`,
       rating: (4.5 + (variant % 5) * 0.1).toFixed(1),
       reviews: 40 + variant * 37
     });
