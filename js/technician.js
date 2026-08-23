@@ -63,16 +63,16 @@
     const file = photoInput.files[0]; if (!file || !pendingPhoto) return;
     if (file.size > 2.5 * 1024 * 1024) { toast('Photo too large, keep it under 2.5 MB'); return; }
     const reader = new FileReader();
-    reader.onload = () => { Store.updateAdminItem('jobs', pendingPhoto.jobId, { [pendingPhoto.field]: reader.result }); pendingPhoto = null; photoInput.value = ''; renderJobs(); toast('Quality-control photo saved'); };
+    reader.onload = () => { const session = Store.currentStaff(); Store.updateAdminItem('jobs', pendingPhoto.jobId, { [pendingPhoto.field]: reader.result, updatedBy: session.id, updatedAt: new Date().toISOString() }); Store.logActivity(session.id, `Uploaded ${pendingPhoto.field === 'beforePhoto' ? 'pre-job' : 'finished-job'} photo`, pendingPhoto.jobId); pendingPhoto = null; photoInput.value = ''; renderJobs(); toast('Quality-control photo saved'); };
     reader.readAsDataURL(file);
   });
 
   window.TechnicianUI = {
-    updateStatus(id, status) { Store.updateAdminItem('jobs', id, { status, updatedBy: Store.currentStaff().id, updatedAt: new Date().toISOString() }); renderJobs(); toast('Job status updated'); },
+    updateStatus(id, status) { const session = Store.currentStaff(); Store.updateAdminItem('jobs', id, { status, updatedBy: session.id, updatedAt: new Date().toISOString() }); Store.logActivity(session.id, `Changed job status to ${status}`, id); renderJobs(); toast('Job status updated'); },
     toggleChecklist(id, index, done) {
       const job = Store.getAdminData().jobs.find(item => item.id === id); if (!job) return;
       const checklist = job.checklist?.length ? job.checklist : defaultChecklist(job); checklist[index].done = done;
-      Store.updateAdminItem('jobs', id, { checklist, checklistDone: checklist.filter(item => item.done).length, checklistTotal: checklist.length, updatedBy: Store.currentStaff().id, updatedAt: new Date().toISOString() }); renderJobs();
+      const session = Store.currentStaff(); Store.updateAdminItem('jobs', id, { checklist, checklistDone: checklist.filter(item => item.done).length, checklistTotal: checklist.length, updatedBy: session.id, updatedAt: new Date().toISOString() }); Store.logActivity(session.id, `${done ? 'Completed' : 'Reopened'} checklist item`, id); renderJobs();
     },
     choosePhoto(jobId, field) { pendingPhoto = { jobId, field }; photoInput.click(); },
     openCustomer(encodedName) {

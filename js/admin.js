@@ -138,6 +138,23 @@
       </div>`;
     profileModal.classList.add('open');
   }
+
+  function openStaffProfile(member) {
+    if (!member) return;
+    const data = Store.getAdminData();
+    const jobs = data.jobs.filter(job => job.technician === member.name);
+    const customers = data.customers.filter(customer => customer.assignedSalesId === member.id);
+    const activity = data.activityLog.filter(item => item.actorId === member.id || jobs.some(job => job.id === item.entity));
+    document.getElementById('profileContent').innerHTML = `<div class="profile-head"><div class="profile-avatar">${member.photo ? `<img src="${member.photo}" alt="${escapeHTML(member.name)}">` : escapeHTML(member.initials || initials(member.name))}</div><div><h2>${escapeHTML(member.name)}</h2><p>${escapeHTML(member.id)} · ${staffRoles(member).map(escapeHTML).join(' · ')}</p></div><div class="profile-actions"><button class="btn btn-sm btn-primary" onclick="AdminUI.chooseStaffPhoto('${member.id}')">${member.photo ? 'Replace Photo' : 'Add Photo'}</button><button class="btn btn-sm btn-outline" onclick="AdminUI.editRecord('staff','${member.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('staff','${member.id}','${encodeURIComponent(member.name)}')">Delete</button></div></div><div class="profile-grid"><section class="profile-section"><h3>Staff Information</h3><ul class="profile-list"><li>Email <strong>${escapeHTML(member.email)}</strong></li><li>Phone <strong>${escapeHTML(member.phone)}</strong></li><li>Coverage <strong>${escapeHTML(member.area)}</strong></li><li>Availability <strong>${escapeHTML(member.availability)}</strong></li><li>Review score <strong>${member.rating}</strong></li></ul></section><section class="profile-section"><h3>Tracked Relationships</h3><ul class="profile-list"><li>Assigned jobs <strong>${jobs.length}</strong></li><li>Customers created / owned <strong>${customers.length}</strong></li><li>Tracked actions <strong>${activity.length}</strong></li></ul></section><section class="profile-section full"><h3>Job &amp; Customer History</h3><ul class="profile-list">${jobs.length ? jobs.map(job => `<li>${escapeHTML(job.id)} · ${escapeHTML(job.type)} · ${customerButton(job.customer)} <strong>${formatDate(job.date)}<br>${escapeHTML(job.status)}</strong></li>`).join('') : customers.length ? customers.map(customer => `<li>Customer created / assigned ${customerButton(customer.name, customer.email)} <strong>${escapeHTML(customer.id)}</strong></li>`).join('') : '<li>No linked jobs or customers <strong>—</strong></li>'}</ul></section><section class="profile-section full"><h3>Employee Activity Log</h3><ul class="profile-list">${activity.length ? activity.map(item => `<li>${escapeHTML(item.action)} <strong>${escapeHTML(item.entity)}<br>${new Date(item.timestamp).toLocaleString()}</strong></li>`).join('') : '<li>No recorded changes yet <strong>—</strong></li>'}</ul></section></div>`;
+    profileModal.classList.add('open');
+  }
+
+  function openSupplierProfile(profile) {
+    if (!profile) return;
+    const orders = Store.getAdminData().suppliers.filter(order => order.supplier === profile.name);
+    document.getElementById('profileContent').innerHTML = `<div class="profile-head"><div class="profile-avatar">${initials(profile.name)}</div><div><h2>${escapeHTML(profile.name)}</h2><p>${escapeHTML(profile.id)} · Supplier profile</p></div><div class="profile-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.editRecord('supplierProfile','${profile.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('supplierProfiles','${profile.id}','${encodeURIComponent(profile.name)}')">Delete</button></div></div><div class="profile-grid"><section class="profile-section"><h3>Supplier Information</h3><ul class="profile-list"><li>Email <strong>${escapeHTML(profile.email)}</strong></li><li>Phone <strong>${escapeHTML(profile.phone)}</strong></li><li>Address <strong>${escapeHTML(profile.address)}</strong></li><li>Status <strong>${escapeHTML(profile.status)}</strong></li></ul></section><section class="profile-section"><h3>Purchasing Terms</h3><ul class="profile-list"><li>Categories <strong>${escapeHTML(profile.categories)}</strong></li><li>Lead time <strong>${escapeHTML(profile.leadTime)}</strong></li><li>Rating <strong>${profile.rating}</strong></li><li>Notes <strong>${escapeHTML(profile.notes)}</strong></li></ul></section><section class="profile-section full"><h3>Purchase Order History</h3><ul class="profile-list">${orders.length ? orders.map(order => `<li>${escapeHTML(order.id)} · ${escapeHTML(order.category)} <strong>${money(Number(order.amount))}<br>${escapeHTML(order.status)}</strong></li>`).join('') : '<li>No purchase orders <strong>—</strong></li>'}</ul></section></div>`;
+    profileModal.classList.add('open');
+  }
   document.getElementById('profileClose').addEventListener('click', () => profileModal.classList.remove('open'));
   profileModal.addEventListener('click', event => { if (event.target === profileModal) profileModal.classList.remove('open'); });
 
@@ -151,6 +168,16 @@
     const values = Object.fromEntries(new FormData(event.currentTarget).entries());
     Store.addNotification(values); closeMessageModal(); profileModal.classList.remove('open'); event.currentTarget.reset();
     toast(values.channel.includes('Email') ? 'Message queued for website and/or email delivery' : 'Website notification sent');
+  });
+
+  let staffPhotoId = null;
+  const staffPhotoInput = document.getElementById('staffPhotoInput');
+  staffPhotoInput.addEventListener('change', () => {
+    const file = staffPhotoInput.files[0]; if (!file || !staffPhotoId) return;
+    if (file.size > 2.5 * 1024 * 1024) { toast('Photo too large, please keep under 2.5 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => { Store.updateAdminItem('staff', staffPhotoId, { photo: reader.result }); const member = Store.getAdminData().staff.find(item => item.id === staffPhotoId); staffPhotoId = null; staffPhotoInput.value = ''; renderStaff(); openStaffProfile(member); toast('Staff photo saved'); };
+    reader.readAsDataURL(file);
   });
 
   /* ---------- operations ---------- */
@@ -207,24 +234,36 @@
     }).join('') || `<tr><td colspan="7">No jobs match this filter.</td></tr>`;
   }
 
+  const staffRoles = staff => staff.roles || [staff.role.includes('Technician') ? 'Technician' : staff.role.includes('Sales') ? 'Sales Associate' : staff.role];
+  let staffFilters = { search: '', role: '', availability: '' };
   function renderStaff() {
-    document.getElementById('staffGrid').innerHTML = Store.getAdminData().staff.map(s => `<article class="staff-card">
-      <div class="staff-card-head"><div class="staff-avatar">${s.initials}</div><div><h3>${s.name}</h3><div class="staff-role">${s.role}</div></div></div>
-      <div class="staff-details"><span><strong>Coverage:</strong> ${s.area}</span><span><strong>Schedule:</strong> <span class="record-status ${statusClass(s.availability)}">${s.availability}</span></span><span>${s.email}<br>${s.phone}</span></div>
-      <div class="staff-metrics"><div class="staff-metric"><strong>${s.rating}</strong><span>Review score</span></div><div class="staff-metric"><strong>${s.jobs}</strong><span>Jobs completed</span></div></div>
-      <button class="btn btn-sm btn-outline btn-block" onclick="AdminUI.editRecord('staff','${s.id}')">Edit Profile &amp; Schedule</button>
-    </article>`).join('');
+    const staff = Store.getAdminData().staff.filter(member => {
+      const haystack = `${member.id} ${member.name} ${member.email}`.toLowerCase();
+      return (!staffFilters.search || haystack.includes(staffFilters.search)) && (!staffFilters.role || staffRoles(member).includes(staffFilters.role)) && (!staffFilters.availability || member.availability === staffFilters.availability);
+    });
+    document.getElementById('staffGrid').innerHTML = staff.map(member => `<article class="staff-card">
+      <div class="staff-card-head"><div class="staff-avatar">${member.photo ? `<img src="${member.photo}" alt="${escapeHTML(member.name)}">` : escapeHTML(member.initials || initials(member.name))}</div><div><button class="entity-link" onclick="AdminUI.openStaffProfile('${member.id}')">${escapeHTML(member.name)}</button><div class="staff-role">${staffRoles(member).map(escapeHTML).join(' · ')} · ${escapeHTML(member.id)}</div></div></div>
+      <div class="staff-details"><span><strong>Coverage:</strong> ${escapeHTML(member.area)}</span><span><strong>Schedule:</strong> <span class="record-status ${statusClass(member.availability)}">${escapeHTML(member.availability)}</span></span><span>${escapeHTML(member.email)}<br>${escapeHTML(member.phone)}</span></div>
+      <div class="staff-metrics"><div class="staff-metric"><strong>${member.rating}</strong><span>Review score</span></div><div class="staff-metric"><strong>${member.jobs}</strong><span>Jobs / records</span></div></div>
+      <div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.openStaffProfile('${member.id}')">View Profile</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('staff','${member.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('staff','${member.id}','${encodeURIComponent(member.name)}')">Delete</button></div>
+    </article>`).join('') || '<div class="admin-panel">No staff match these filters.</div>';
   }
 
+  let supplierFilters = { search: '', status: '' };
+  const supplierButton = name => `<button class="entity-link" onclick="AdminUI.openSupplierByName('${encodeURIComponent(name)}')">${escapeHTML(name)}</button>`;
   function renderSuppliers() {
-    const list = Store.getAdminData().suppliers;
+    const data = Store.getAdminData();
+    const profiles = data.supplierProfiles.filter(profile => !supplierFilters.search || `${profile.name} ${profile.categories}`.toLowerCase().includes(supplierFilters.search));
+    const list = data.suppliers.filter(order => (!supplierFilters.search || `${order.id} ${order.supplier} ${order.category}`.toLowerCase().includes(supplierFilters.search)) && (!supplierFilters.status || order.status === supplierFilters.status));
     document.getElementById('supplierStats').innerHTML =
-      statCard('Open purchase orders', list.filter(p => p.status !== 'Delivered').length, 'awaiting delivery') +
-      statCard('In transit', list.filter(p => p.status === 'In transit').length, 'active shipment') +
-      statCard('Committed spend', money(list.filter(p => p.status !== 'Delivered').reduce((sum, p) => sum + Number(p.amount), 0)), 'open purchase orders');
+      statCard('Active suppliers', data.supplierProfiles.filter(p => p.status === 'Active').length, 'approved vendors') +
+      statCard('Open purchase orders', data.suppliers.filter(p => p.status !== 'Delivered').length, 'awaiting delivery') +
+      statCard('Committed spend', money(data.suppliers.filter(p => p.status !== 'Delivered').reduce((sum, p) => sum + Number(p.amount), 0)), 'open purchase orders');
+    document.getElementById('supplierDirectoryCount').textContent = `${profiles.length} suppliers`;
+    document.querySelector('#supplierProfilesTable tbody').innerHTML = profiles.map(profile => `<tr><td>${supplierButton(profile.name)}<br><small>${escapeHTML(profile.email)} · ${escapeHTML(profile.phone)}</small></td><td>${escapeHTML(profile.categories)}</td><td>${escapeHTML(profile.leadTime)}</td><td>${profile.rating}</td><td><span class="record-status ${statusClass(profile.status)}">${escapeHTML(profile.status)}</span></td><td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.openSupplierProfile('${profile.id}')">View</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('supplierProfile','${profile.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('supplierProfiles','${profile.id}','${encodeURIComponent(profile.name)}')">Delete</button></div></td></tr>`).join('') || '<tr><td colspan="6">No suppliers match this filter.</td></tr>';
     document.querySelector('#suppliersTable tbody').innerHTML = list.map(p => `<tr>
-      <td><strong>${p.id}</strong></td><td><strong>${p.supplier}</strong><br><small>${p.contact}</small></td><td>${p.category}</td><td>${money(p.amount)}</td><td>${formatDate(p.eta)}</td><td><span class="admin-badge">${p.tracking}</span></td>
-      <td><select class="admin-select" onchange="AdminUI.setSupplierStatus('${p.id}',this.value)">${['Draft', 'Confirmed', 'In transit', 'Delayed', 'Delivered'].map(s => `<option ${s === p.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+      <td><strong>${p.id}</strong></td><td>${supplierButton(p.supplier)}<br><small>${p.contact}</small></td><td>${p.category}</td><td>${money(p.amount)}</td><td>${formatDate(p.eta)}</td><td><span class="admin-badge">${p.tracking}</span></td>
+      <td><select class="admin-select" onchange="AdminUI.setSupplierStatus('${p.id}',this.value)">${['Draft', 'Confirmed', 'In transit', 'Delayed', 'Delivered'].map(s => `<option ${s === p.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('supplier','${p.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('suppliers','${p.id}','${encodeURIComponent(p.id)}')">Delete</button></div></td>
     </tr>`).join('');
   }
 
@@ -347,6 +386,14 @@
     ['customerSearch', 'customerDateFrom', 'customerDateTo'].forEach(id => { document.getElementById(id).value = ''; });
     customerFilters = { search: '', from: '', to: '' }; renderCustomers();
   });
+  ['staffSearch', 'staffRoleFilter', 'staffAvailabilityFilter'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    staffFilters = { search: document.getElementById('staffSearch').value.trim().toLowerCase(), role: document.getElementById('staffRoleFilter').value, availability: document.getElementById('staffAvailabilityFilter').value };
+    renderStaff();
+  }));
+  ['supplierSearch', 'supplierStatusFilter'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    supplierFilters = { search: document.getElementById('supplierSearch').value.trim().toLowerCase(), status: document.getElementById('supplierStatusFilter').value };
+    renderSuppliers();
+  }));
 
   document.getElementById('heroContentForm').addEventListener('submit', event => {
     event.preventDefault();
@@ -392,7 +439,10 @@
       ['customer', 'Customer name', 'text'], ['address', 'Service address', 'text'], ['borough', 'Borough', 'select', ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']], ['type', 'Job type', 'select', ['New installation', 'Filter replacement', 'Annual maintenance', 'Repair visit']], ['product', 'Product / system', 'text'], ['requirements', 'Installation requirements', 'text'], ['date', 'Service date', 'date'], ['time', 'Arrival time', 'time'], ['technician', 'Technician', 'select', ['Needs assignment', 'Luis Rivera', 'Amina Patel']], ['status', 'Status', 'select', ['Needs assignment', 'Assigned', 'Confirmed']]
     ] },
     staff: { title: 'Staff Profile', collection: 'staff', prefix: 'STAFF', fields: [
-      ['name', 'Full name', 'text'], ['role', 'Role', 'select', ['Installation Technician', 'Lead Technician', 'Sales Representative']], ['email', 'Work email', 'email'], ['phone', 'Phone', 'tel'], ['area', 'Coverage area', 'text'], ['availability', 'Availability', 'select', ['Available', 'On job', 'Off duty']]
+      ['name', 'Full name', 'text'], ['role', 'Primary role', 'select', ['Technician', 'Sales Associate', 'Manager']], ['email', 'Work email', 'email'], ['phone', 'Phone', 'tel'], ['area', 'Coverage area', 'text'], ['availability', 'Availability', 'select', ['Available', 'On job', 'Off duty']]
+    ] },
+    supplierProfile: { title: 'Supplier Profile', collection: 'supplierProfiles', prefix: 'SUP', fields: [
+      ['name', 'Supplier name', 'text'], ['email', 'Email', 'email'], ['phone', 'Phone', 'tel'], ['address', 'Address', 'text'], ['categories', 'Product categories', 'text'], ['leadTime', 'Typical lead time', 'text'], ['rating', 'Supplier rating', 'number'], ['status', 'Status', 'select', ['Active', 'On hold', 'Inactive']], ['notes', 'Supplier notes', 'text']
     ] },
     supplier: { title: 'Purchase Order', collection: 'suppliers', prefix: 'PO', fields: [
       ['supplier', 'Supplier', 'text'], ['category', 'Product category', 'text'], ['contact', 'Contact email', 'email'], ['amount', 'Order amount', 'number'], ['eta', 'Estimated delivery', 'date'], ['tracking', 'Tracking number', 'text'], ['status', 'Status', 'select', ['Draft', 'Confirmed', 'In transit']]
@@ -438,6 +488,7 @@
     const config = recordConfigs[recordType];
     const values = Object.fromEntries(new FormData(recordForm).entries());
     if (recordType === 'supplier') values.amount = Number(values.amount);
+    if (recordType === 'supplierProfile') values.rating = Number(values.rating);
     if (recordType === 'lead') values.value = Number(values.value);
     if (recordType === 'campaign') { values.sent = Number(values.sent); values.conversion = Number(values.conversion); }
     if (recordType === 'discount') { values.usage = 0; values.limit = Number(values.limit); values.id = values.id.toUpperCase(); }
@@ -446,11 +497,15 @@
     if (recordType === 'customer' && !editingRecordId) Object.assign(values, { products: [], cart: [], installed: [] });
     if (recordType === 'staff') {
       values.initials = values.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
-      if (!editingRecordId) { values.rating = 5; values.jobs = 0; }
+      values.roles = [values.role];
+      if (!editingRecordId) { values.rating = 5; values.jobs = 0; values.photo = ''; }
     }
     if (recordType === 'job' && !editingRecordId) Object.assign(values, { checklist: [{ label: 'Confirm customer and system', done: false }, { label: 'Photograph pre-job condition', done: false }, { label: 'Complete installation requirements', done: false }, { label: 'Pressure and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 5, beforePhoto: '', afterPhoto: '' });
     if (editingRecordId) Store.updateAdminItem(config.collection, editingRecordId, values);
-    else Store.addAdminItem(config.collection, { id: `${config.prefix}-${String(Date.now()).slice(-5)}`, ...values });
+    else {
+      const staffPrefix = recordType === 'staff' ? ({ Technician: 'TEC', 'Sales Associate': 'SAL', Manager: 'MGR' }[values.role] || 'STF') : config.prefix;
+      Store.addAdminItem(config.collection, { id: `${staffPrefix}-${String(Date.now()).slice(-5)}`, ...values });
+    }
     closeRecordModal(); renderAll(); toast(`${config.title} saved`);
   });
 
@@ -600,6 +655,12 @@
     },
     openCustomerByName(encodedName) {
       openCustomerProfile(findCustomerByName(decodeURIComponent(encodedName)));
+    },
+    openStaffProfile(id) { openStaffProfile(Store.getAdminData().staff.find(member => member.id === id)); },
+    chooseStaffPhoto(id) { staffPhotoId = id; staffPhotoInput.click(); },
+    openSupplierProfile(id) { openSupplierProfile(Store.getAdminData().supplierProfiles.find(profile => profile.id === id)); },
+    openSupplierByName(encodedName) {
+      const name = decodeURIComponent(encodedName); openSupplierProfile(Store.getAdminData().supplierProfiles.find(profile => profile.name === name));
     },
     composeMessage(customerId) {
       const customer = Store.getAdminData().customers.find(item => item.id === customerId) || Store.getAdminData().leads.find(item => item.id === customerId);

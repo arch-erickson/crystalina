@@ -155,6 +155,7 @@
         <div><h1>Staff Profiles</h1><p class="admin-subtitle">Technicians and sales representatives, availability, assignments, reviews, and performance.</p></div>
         <button class="btn btn-primary" data-open-record="staff">+ Add Staff Member</button>
       </div>
+      <div class="admin-toolbar"><div class="field compact-field"><label for="staffSearch">Name, email, or employee ID</label><input id="staffSearch" type="search" placeholder="Search staff"></div><div class="field compact-field"><label for="staffRoleFilter">Role</label><select id="staffRoleFilter"><option value="">All roles</option><option>Technician</option><option>Sales Associate</option><option>Manager</option></select></div><div class="field compact-field"><label for="staffAvailabilityFilter">Availability</label><select id="staffAvailabilityFilter"><option value="">Any availability</option><option>Available</option><option>On job</option><option>Off duty</option></select></div></div>
       <div class="staff-grid" id="staffGrid"></div>
     </section>
 
@@ -162,13 +163,18 @@
     <section id="view-suppliers" class="admin-view" style="display:none">
       <div class="admin-head">
         <div><h1>Suppliers &amp; Purchasing</h1><p class="admin-subtitle">Track purchase orders, incoming stock, supplier contacts, and delivery status.</p></div>
-        <button class="btn btn-primary" data-open-record="supplier">+ New Purchase Order</button>
+        <div class="table-actions"><button class="btn btn-outline" data-open-record="supplierProfile">+ Add Supplier</button><button class="btn btn-primary" data-open-record="supplier">+ New Purchase Order</button></div>
       </div>
       <div class="stat-cards admin-stat-cards" id="supplierStats"></div>
+      <div class="admin-toolbar"><div class="field compact-field"><label for="supplierSearch">Supplier, category, or PO</label><input id="supplierSearch" type="search" placeholder="Search purchasing"></div><div class="field compact-field"><label for="supplierStatusFilter">Delivery status</label><select id="supplierStatusFilter"><option value="">All statuses</option><option>Draft</option><option>Confirmed</option><option>In transit</option><option>Delayed</option><option>Delivered</option></select></div></div>
+      <div class="admin-panel table-scroll">
+        <div class="panel-title-row"><h3>Supplier Directory</h3><span class="admin-badge" id="supplierDirectoryCount"></span></div>
+        <table class="admin-table" id="supplierProfilesTable"><thead><tr><th>Supplier</th><th>Categories</th><th>Lead Time</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
+      </div>
       <div class="admin-panel table-scroll">
         <div class="panel-title-row"><h3>Purchase Orders</h3><span class="admin-badge">Live delivery tracker</span></div>
         <table class="admin-table" id="suppliersTable">
-          <thead><tr><th>PO</th><th>Supplier</th><th>Category</th><th>Amount</th><th>ETA</th><th>Tracking</th><th>Status</th></tr></thead>
+          <thead><tr><th>PO</th><th>Supplier</th><th>Category</th><th>Amount</th><th>ETA</th><th>Tracking</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -351,7 +357,7 @@
     <button class="modal-close" id="messageClose" aria-label="Close message composer">&times;</button>
     <h2>Send Customer Message</h2>
     <form id="messageForm">
-      <input type="hidden" id="messageCustomerId" name="customerId">
+  <input type="hidden" id="messageCustomerId" name="customerId">
       <div class="field"><label for="messageChannel">Delivery channel</label><select id="messageChannel" name="channel"><option>Website</option><option>Email</option><option>Website + Email</option></select></div>
       <div class="field"><label for="messageTitle">Subject</label><input id="messageTitle" name="title" required></div>
       <div class="field"><label for="messageBody">Message</label><textarea id="messageBody" name="message" rows="5" required></textarea></div>
@@ -359,6 +365,8 @@
     </form>
   </div>
 </div>
+
+<input type="file" id="staffPhotoInput" accept="image/*" hidden>
 
 <div class="toast" id="toast"></div>
 

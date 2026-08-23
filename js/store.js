@@ -178,6 +178,17 @@ const Store = (() => {
         { id: 'PO-3107', supplier: 'PureFlow Wholesale', category: 'Carbon blocks', contact: 'sales@pureflow.example', amount: 1925, eta: '2026-08-29', status: 'Confirmed', tracking: 'PFW-220419' },
         { id: 'PO-3104', supplier: 'Metro Plumbing Supply', category: 'Installation fittings', contact: 'dispatch@metroplumbing.example', amount: 760, eta: '2026-08-22', status: 'Delivered', tracking: 'MPS-741026' }
       ],
+      supplierProfiles: [
+        { id: 'SUP-401', name: 'AquaCore Components', email: 'orders@aquacore.example', phone: '(800) 555-4101', address: '85 Harbor Industrial Rd, Newark, NJ 07114', categories: 'RO membranes, pressure tanks', leadTime: '5 to 7 business days', rating: 4.8, status: 'Active', notes: 'Primary membrane supplier. Net 30 terms.' },
+        { id: 'SUP-402', name: 'PureFlow Wholesale', email: 'sales@pureflow.example', phone: '(800) 555-4102', address: '19 Commerce Park, Edison, NJ 08817', categories: 'Carbon blocks, sediment filters', leadTime: '3 to 5 business days', rating: 4.6, status: 'Active', notes: 'Preferred replacement-filter wholesaler.' },
+        { id: 'SUP-403', name: 'Metro Plumbing Supply', email: 'dispatch@metroplumbing.example', phone: '(718) 555-4103', address: '4401 Third Ave, Brooklyn, NY 11220', categories: 'Fittings, valves, installation hardware', leadTime: 'Same day NYC delivery', rating: 4.9, status: 'Active', notes: 'Local emergency and same-day installation supplies.' }
+      ],
+      activityLog: [
+        { id: 'ACT-801', actorId: 'TEC-1001', action: 'Completed filter replacement checklist', entity: 'JOB-2076', timestamp: '2026-08-22T16:20:00.000Z' },
+        { id: 'ACT-802', actorId: 'TEC-1002', action: 'Uploaded finished-job photo', entity: 'JOB-2078', timestamp: '2026-08-22T18:05:00.000Z' },
+        { id: 'ACT-803', actorId: 'SAL-2001', action: 'Converted lead and created customer', entity: 'CUS-1003', timestamp: '2026-08-21T14:40:00.000Z' },
+        { id: 'ACT-804', actorId: 'MGR-3001', action: 'Updated purchase-order delivery status', entity: 'PO-3108', timestamp: '2026-08-23T08:10:00.000Z' }
+      ],
       leads: [
         { id: 'LEAD-5028', name: 'Olivia Thompson', email: 'olivia@example.com', source: 'Website quote', interest: 'Whole Home 3-Stage', borough: 'Brooklyn', value: 1299, followUp: '2026-08-24', stage: 'Qualified' },
         { id: 'LEAD-5027', name: 'Ethan Davis', email: 'ethan@example.com', source: 'Referral', interest: 'RO-10 Alkaline', borough: 'Queens', value: 599, followUp: '2026-08-25', stage: 'Quote sent' },
@@ -378,6 +389,9 @@ const Store = (() => {
   function addNotification(notification) {
     return addAdminItem('notifications', { id: 'NOT-' + String(Date.now()).slice(-6), sent: new Date().toISOString(), read: false, ...notification });
   }
+  function logActivity(actorId, action, entity) {
+    return addAdminItem('activityLog', { id: 'ACT-' + String(Date.now()).slice(-6), actorId, action, entity, timestamp: new Date().toISOString() });
+  }
   function getNotificationsForUser(user) {
     if (!user) return [];
     const data = getAdminData();
@@ -411,7 +425,7 @@ const Store = (() => {
     currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
     getOrders, placeOrder, updateOrderStatus,
     getAdminData, updateAdminItem, addAdminItem, deleteAdminItem,
-    addNotification, getNotificationsForUser, markNotificationsRead,
+    addNotification, getNotificationsForUser, markNotificationsRead, logActivity,
     getSiteSettings, updateSiteSettings
   };
 })();
