@@ -127,7 +127,7 @@ h1, h2, h3, h4 { line-height: 1.18; color: var(--navy-800); font-weight: 700; fo
   background-color: var(--navy-900);
 }
 .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(11,30,54,.30), transparent 42%); pointer-events: none; }
-.hero-inner { padding: 72px 0; position: relative; z-index: 1; width: 100%; }
+.hero-inner { padding: 72px 0; position: relative; z-index: 1; }
 .hero-content { max-width: 640px; }
 .hero-content h1, .hero-content .lead { text-shadow: 0 1px 18px rgba(7,20,40,.35); }
 .hero h1 { color: #fff; font-size: clamp(2rem, 4.4vw, 3.2rem); margin: 14px 0 18px; }
