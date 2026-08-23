@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Find Your Filter — Crystalina</title>
+<title>Find Your Filter | Crystalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
@@ -20,7 +20,7 @@
   <section class="page-hero">
     <div class="container">
       <h1>Find Your Perfect Filter</h1>
-      <p>Five quick questions about your NYC home — we'll match you with the right system.</p>
+      <p>Five quick questions about your NYC home, we'll match you with the right system.</p>
     </div>
   </section>
 
@@ -38,26 +38,26 @@
 
   const QUESTIONS = [
     { q: 'Do you rent or own your home?', opts: [
-      { t: '🏢 I rent — no plumbing changes allowed', tag: 'rent' },
-      { t: '🏢 I rent — small installs are okay', tag: 'rent-flex' },
-      { t: '🏠 I own an apartment / co-op / condo', tag: 'own' },
-      { t: '🏘️ I own a brownstone / townhouse / full home', tag: 'house' }]},
+      { ic: 'building', t: 'I rent (no plumbing changes allowed)', tag: 'rent' },
+      { ic: 'building', t: 'I rent (small installs are okay)', tag: 'rent-flex' },
+      { ic: 'home', t: 'I own an apartment, co-op, or condo', tag: 'own' },
+      { ic: 'townhouse', t: 'I own a brownstone, townhouse, or full home', tag: 'house' }]},
     { q: 'How old is your building?', opts: [
-      { t: 'Before 1961 (lead solder era)', tag: 'old' },
-      { t: '1961–1990', tag: 'mid' },
-      { t: 'After 1990', tag: 'new' },
-      { t: 'Not sure', tag: 'old' }]},
+      { ic: 'shield', t: 'Before 1961 (lead solder era)', tag: 'old' },
+      { ic: 'clock', t: '1961 to 1990', tag: 'mid' },
+      { ic: 'check', t: 'After 1990', tag: 'new' },
+      { ic: 'chat', t: "Not sure", tag: 'old' }]},
     { q: "What's your top priority?", opts: [
-      { t: '🥤 Best possible drinking water (lead, PFAS, microplastics)', tag: 'purity' },
-      { t: '🚿 Softer skin & hair in the shower', tag: 'shower' },
-      { t: '🏠 Protecting the whole home & appliances', tag: 'whole' },
-      { t: '💰 Better taste on a budget', tag: 'budget' }]},
+      { ic: 'purity', t: 'Best possible drinking water (lead, PFAS, microplastics)', tag: 'purity' },
+      { ic: 'shower', t: 'Softer skin and hair in the shower', tag: 'shower' },
+      { ic: 'shield', t: 'Protecting the whole home and appliances', tag: 'whole' },
+      { ic: 'tag', t: 'Better taste on a budget', tag: 'budget' }]},
     { q: 'How many people are in your household?', opts: [
-      { t: 'Just me', tag: 'small' }, { t: '2–3 people', tag: 'med' },
-      { t: '4–5 people', tag: 'large' }, { t: '6+', tag: 'large' }]},
+      { ic: 'droplet', t: 'Just me', tag: 'small' }, { ic: 'users', t: '2 to 3 people', tag: 'med' },
+      { ic: 'users', t: '4 to 5 people', tag: 'large' }, { ic: 'users', t: '6 or more', tag: 'large' }]},
     { q: "What's your budget for cleaner water?", opts: [
-      { t: 'Under $50', tag: 'b1' }, { t: '$50 – $200', tag: 'b2' },
-      { t: '$200 – $400', tag: 'b3' }, { t: '$400+', tag: 'b4' }]}
+      { ic: 'tag', t: 'Under $50', tag: 'b1' }, { ic: 'tag', t: '$50 to $200', tag: 'b2' },
+      { ic: 'card', t: '$200 to $400', tag: 'b3' }, { ic: 'sparkle', t: '$400 or more', tag: 'b4' }]}
   ];
 
   const card = document.getElementById('quizCard');
@@ -85,7 +85,7 @@
         <div class="quiz-progress"><div style="width:${step / QUESTIONS.length * 100}%"></div></div>
         <p style="font-size:.8rem;color:var(--muted);font-weight:600;">QUESTION ${step + 1} OF ${QUESTIONS.length}</p>
         <h2 class="quiz-q">${q}</h2>
-        <div class="quiz-opts">${opts.map((o, i) => `<button data-i="${i}">${o.t}</button>`).join('')}</div>
+        <div class="quiz-opts">${opts.map((o, i) => `<button data-i="${i}"><span class="quiz-opt-ic">${svgIcon(o.ic)}</span><span>${o.t}</span></button>`).join('')}</div>
         ${step > 0 ? '<p style="margin-top:20px"><span class="link" id="quizBack">← Back</span></p>' : ''}`;
       card.querySelectorAll('.quiz-opts button').forEach(b =>
         b.addEventListener('click', () => { answers[step] = opts[b.dataset.i].tag; step++; render(); }));
@@ -95,7 +95,7 @@
       const p = Store.getProduct(pickProduct()) || Store.getProducts()[0];
       card.innerHTML = `
         <div class="quiz-progress"><div style="width:100%"></div></div>
-        <p style="font-size:.8rem;color:var(--success);font-weight:700;">✓ YOUR MATCH</p>
+        <p style="font-size:.8rem;color:var(--success);font-weight:700;display:flex;align-items:center;gap:6px;"><span class="ic" style="width:1.1em;height:1.1em">${svgIcon('check')}</span> YOUR MATCH</p>
         <h2 class="quiz-q">We recommend the ${p.name}</h2>
         <div style="display:grid;grid-template-columns:140px 1fr;gap:20px;align-items:center;margin-bottom:22px;">
           <img src="${p.image}" style="border-radius:12px;aspect-ratio:1;object-fit:cover;" alt="${p.name}">
@@ -110,8 +110,8 @@
           <a class="btn btn-outline" href="/product/?id=${p.id}">View Details</a>
           <button class="btn btn-ghost" id="quizRestart">Start Over</button>
         </div>
-        <p style="margin-top:22px;font-size:.84rem;color:var(--muted);">Not sure? <a class="link" href="https://wa.me/19178094803" target="_blank" rel="noopener">Message us on WhatsApp</a> — a real New Yorker will help you pick.</p>`;
-      document.getElementById('quizAdd').addEventListener('click', () => { Store.addToCart(p.id); toast('Added to cart ✓'); openCart(); });
+        <p style="margin-top:22px;font-size:.84rem;color:var(--muted);">Not sure? <a class="link" href="https://wa.me/19178094803" target="_blank" rel="noopener">Message us on WhatsApp</a>, a real New Yorker will help you pick.</p>`;
+      document.getElementById('quizAdd').addEventListener('click', () => { Store.addToCart(p.id); toast('Added to cart'); openCart(); });
       document.getElementById('quizRestart').addEventListener('click', () => { step = 0; answers.length = 0; render(); });
     }
   }

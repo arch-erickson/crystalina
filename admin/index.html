@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Dashboard — Crystalina</title>
+<title>Admin Dashboard | Crystalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
@@ -21,13 +21,13 @@
     <a class="brand" href="/" style="color:#fff">
       <span class="brand-text"><span class="brand-name">CRYSTALINA</span><span class="brand-tag" style="color:var(--cyan-300)">Admin Panel</span></span>
     </a>
-    <button class="side-link active" data-view="overview">📊 Overview</button>
-    <button class="side-link" data-view="products">📦 Products</button>
-    <button class="side-link" data-view="orders">🧾 Orders</button>
-    <button class="side-link" data-view="customers">👥 Customers</button>
+    <button class="side-link active" data-view="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 20h17"/><path d="M6 20v-7M10.5 20V6M15 20v-9M19.5 20V9"/></svg> Overview</button>
+    <button class="side-link" data-view="products"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/></svg> Products</button>
+    <button class="side-link" data-view="orders"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4L6 21z"/><path d="M9 8h6M9 12h5"/></svg> Orders</button>
+    <button class="side-link" data-view="customers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.5" cy="8" r="3"/><path d="M4 20a5.5 5.5 0 0 1 11 0"/><path d="M16.5 6.2a3 3 0 0 1 0 5.6M18.5 20a5.5 5.5 0 0 0-3-5"/></svg> Customers</button>
     <div class="side-foot">
-      <button class="side-link" onclick="location.href='/'">🌐 View Store</button>
-      <button class="side-link" id="adminSignOut">🚪 Sign Out</button>
+      <button class="side-link" onclick="location.href='/'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18"/></svg> View Store</button>
+      <button class="side-link" id="adminSignOut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg> Sign Out</button>
     </div>
   </aside>
 
@@ -40,7 +40,7 @@
       </div>
       <div class="stat-cards" id="statCards"></div>
       <div class="admin-panel">
-        <h3 style="margin-bottom:16px;">⚠️ Low Stock Alerts</h3>
+        <h3 style="margin-bottom:16px;display:flex;align-items:center;gap:8px;"><span class="ic" style="width:20px;height:20px;color:var(--amber);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l8.5 15H3.5z"/><path d="M12 10v4M12 16.6v.2"/></svg></span> Low Stock Alerts</h3>
         <div id="lowStockWrap"></div>
       </div>
       <div class="admin-panel">
@@ -97,7 +97,7 @@
       <div class="field">
         <label>Product image</label>
         <div class="img-drop" id="imgDrop">
-          <div id="imgPreviewWrap"><p>📷 Click to upload or drag &amp; drop<br><small>PNG / JPG — stored locally in this draft</small></p></div>
+          <div id="imgPreviewWrap"><p><span class="ic" style="width:22px;height:22px;color:var(--blue-500);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg></span><br>Click to upload or drag and drop<br><small>PNG or JPG, stored locally in this draft</small></p></div>
         </div>
         <input type="file" id="imgInput" accept="image/*" style="display:none">
       </div>

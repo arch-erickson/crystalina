@@ -1,5 +1,5 @@
 /* ============================================================
-   Crystalina — Admin Dashboard logic
+   Crystalina, Admin Dashboard logic
    ============================================================ */
 
 (() => {
@@ -46,7 +46,7 @@
       ? `<table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>` +
         orders.slice(0, 5).map(o => `<tr><td><strong>${o.id}</strong></td><td>${o.customer.name}</td><td>${money(o.total)}</td>
           <td><span class="status-pill status-${o.status}">${o.status}</span></td></tr>`).join('') + `</tbody></table>`
-      : `<p style="color:var(--muted);font-size:.9rem;">No orders yet — they'll appear here as customers check out.</p>`;
+      : `<p style="color:var(--muted);font-size:.9rem;">No orders yet, they'll appear here as customers check out.</p>`;
   }
 
   /* ---------- products table ---------- */
@@ -59,7 +59,7 @@
         <td>${p.category}</td>
         <td>${money(p.price)}${p.comparePrice ? `<br><small style="color:var(--muted);text-decoration:line-through">${money(p.comparePrice)}</small>` : ''}</td>
         <td class="${p.stock === 0 ? 'out-stock' : p.stock <= 15 ? 'low-stock' : ''}">${p.stock}</td>
-        <td>${p.badge ? `<span class="admin-badge">${p.badge}</span>` : '—'}</td>
+        <td>${p.badge ? `<span class="admin-badge">${p.badge}</span>` : ', '}</td>
         <td><div class="table-actions">
           <button class="btn btn-sm btn-outline" onclick="AdminUI.editProduct('${p.id}')">Edit</button>
           <button class="btn btn-sm btn-danger" onclick="AdminUI.removeProduct('${p.id}')">Delete</button>
@@ -77,7 +77,7 @@
         <td><strong>${o.id}</strong></td>
         <td>${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })}</td>
         <td>${o.customer.name}<br><small style="color:var(--muted)">${o.customer.email}</small></td>
-        <td>${o.customer.borough || '—'}${o.customer.installation ? '<br><small style="color:var(--blue-500)">+ installation</small>' : ''}</td>
+        <td>${o.customer.borough || ', '}${o.customer.installation ? '<br><small style="color:var(--blue-500)">+ installation</small>' : ''}</td>
         <td style="max-width:240px;font-size:.8rem;">${o.items.map(i => `${i.name} × ${i.qty}`).join('<br>')}</td>
         <td><strong>${money(o.total)}</strong></td>
         <td>
@@ -132,12 +132,12 @@
   function renderPreview() {
     previewWrap.innerHTML = imageData
       ? `<img src="${imageData}" alt="preview"><p><small>Click to replace image</small></p>`
-      : `<p>📷 Click to upload or drag &amp; drop<br><small>PNG / JPG — stored locally in this draft</small></p>`;
+      : `<p><span class="ic" style="width:22px;height:22px;color:var(--blue-500);">${svgIcon('camera')}</span><br>Click to upload or drag and drop<br><small>PNG or JPG, stored locally in this draft</small></p>`;
   }
 
   function readImage(file) {
     if (!file || !file.type.startsWith('image/')) return;
-    if (file.size > 2.5 * 1024 * 1024) { toast('Image too large — please keep under 2.5 MB'); return; }
+    if (file.size > 2.5 * 1024 * 1024) { toast('Image too large, please keep under 2.5 MB'); return; }
     const r = new FileReader();
     r.onload = () => { imageData = r.result; renderPreview(); };
     r.readAsDataURL(file);

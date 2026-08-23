@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product — Crystalina</title>
+<title>Product | Crystalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
@@ -47,9 +47,11 @@
       <p style="color:var(--muted); margin:12px 0 24px;">It may have been removed from the catalog.</p>
       <a class="btn btn-primary" href="/shop/">Back to Shop</a></div>`;
   } else {
-    document.title = p.name + ' — Crystalina';
+    document.title = p.name + ' | Crystalina';
     const stockCls = p.stock === 0 ? 'out' : p.stock <= 15 ? 'low' : 'in';
-    const stockMsg = p.stock === 0 ? '✕ Out of stock' : p.stock <= 15 ? `⚠ Low stock — only ${p.stock} left` : '✓ In stock, ships in 1–2 business days';
+    const stockIc = p.stock === 0 ? 'close' : p.stock <= 15 ? 'alert' : 'check';
+    const stockTxt = p.stock === 0 ? 'Out of stock' : p.stock <= 15 ? `Low stock, only ${p.stock} left` : 'In stock, ships in 1 to 2 business days';
+    const stockMsg = `<span class="ic" style="width:1.1em;height:1.1em">${svgIcon(stockIc)}</span> ${stockTxt}`;
     layout.innerHTML = `
       <div class="pd-img"><img src="${p.image}" alt="${p.name}"></div>
       <div>
@@ -74,11 +76,11 @@
             ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
           </button>
         </div>
-        <a href="https://wa.me/19178094803?text=${encodeURIComponent('Hi! I have a question about the ' + p.name)}" target="_blank" rel="noopener" class="btn btn-outline btn-block">💬 Ask us about this product on WhatsApp</a>
+        <a href="https://wa.me/19178094803?text=${encodeURIComponent('Hi! I have a question about the ' + p.name)}" target="_blank" rel="noopener" class="btn btn-outline btn-block">${svgIcon('chat')} Ask us about this product on WhatsApp</a>
         <div class="pd-perks">
-          <span>🚚 Free five-borough delivery on orders over $99</span>
-          <span>🛠️ Professional NYC installation available at checkout</span>
-          <span>↩️ 60-day returns · 1-year warranty</span>
+          <span class="pd-perk">${icon('truck')} Free five-borough delivery on orders over $99</span>
+          <span class="pd-perk">${icon('wrench')} Professional NYC installation available at checkout</span>
+          <span class="pd-perk">${icon('returns')} 60-day returns and 1-year warranty</span>
         </div>
       </div>`;
 
@@ -87,7 +89,7 @@
     document.getElementById('qInc').addEventListener('click', () => { qty = Math.min(qty + 1, Math.max(p.stock, 1)); qVal.textContent = qty; });
     document.getElementById('qDec').addEventListener('click', () => { qty = Math.max(1, qty - 1); qVal.textContent = qty; });
     const addBtn = document.getElementById('addBtn');
-    if (p.stock > 0) addBtn.addEventListener('click', () => { Store.addToCart(p.id, qty); toast('Added to cart ✓'); openCart(); });
+    if (p.stock > 0) addBtn.addEventListener('click', () => { Store.addToCart(p.id, qty); toast('Added to cart'); openCart(); });
 
     const related = Store.getProducts().filter(x => x.id !== p.id && x.category === p.category);
     const fill = Store.getProducts().filter(x => x.id !== p.id && x.category !== p.category);

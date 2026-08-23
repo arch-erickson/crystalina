@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout — Crystalina</title>
+<title>Checkout | Crystalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
@@ -18,7 +18,7 @@
 
 <main>
   <section class="page-hero">
-    <div class="container"><h1>Checkout</h1><p>Secure checkout — this first draft simulates orders locally; payment processing comes next.</p></div>
+    <div class="container"><h1>Checkout</h1><p>Secure checkout, this first draft simulates orders locally; payment processing comes next.</p></div>
   </section>
 
   <section class="section">
@@ -46,13 +46,14 @@
             </div>
             <div class="field"><label>Add professional installation?</label>
               <select id="fInstall">
-                <option value="no">No — I'll install it myself</option>
-                <option value="yes">Yes — contact me to schedule (+$89, billed later)</option>
+                <option value="no">No, I'll install it myself</option>
+                <option value="yes">Yes, contact me to schedule (+$89, billed later)</option>
               </select>
             </div>
             <h3 style="margin:22px 0 14px">Payment</h3>
-            <p style="font-size:.85rem;color:var(--muted);background:var(--ice-50);border:1px dashed var(--silver);border-radius:9px;padding:12px 16px;margin-bottom:16px;">
-              💳 Payment integration (Stripe / PayPal / Apple Pay) will be wired up in the next phase. Placing an order here simulates it for testing.</p>
+            <p style="font-size:.85rem;color:var(--muted);background:var(--ice-50);border:1px solid var(--silver);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;">
+              <span class="ic" style="width:20px;height:20px;flex:none;color:var(--blue-500);margin-top:1px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.4"/><path d="M3 10h18"/></svg></span>
+              <span>Secure payments (Stripe, PayPal, and Apple Pay) will be wired up in the next phase. Placing an order here simulates checkout for testing.</span></p>
             <button type="submit" class="btn btn-primary btn-block">Place Order</button>
           </form>
         </div>
@@ -102,7 +103,7 @@
       </div>`).join('');
     document.getElementById('summaryTotals').innerHTML = `
       <div class="summary-line"><span>Subtotal</span><span>${money(subtotal)}</span></div>
-      <div class="summary-line"><span>Shipping</span><span>${shipping === 0 ? 'FREE 🎉' : money(shipping)}</span></div>
+      <div class="summary-line"><span>Shipping</span><span>${shipping === 0 ? 'FREE' : money(shipping)}</span></div>
       <div class="summary-line"><span>NYC sales tax (8.875%)</span><span>${money(tax)}</span></div>
       <div class="summary-total"><span>Total</span><span>${money(subtotal + shipping + tax)}</span></div>`;
   }
@@ -128,7 +129,7 @@
       <h2>Thank you! Order ${order.id} confirmed.</h2>
       <p style="color:var(--muted);margin:12px 0 8px;">A confirmation email will be sent to <strong>${order.customer.email}</strong>.
       Total charged: <strong>${money(order.total)}</strong>.</p>
-      ${order.customer.installation ? '<p style="color:var(--muted);">🛠️ Our installation team will call you within 1 business day to schedule.</p>' : ''}
+      ${order.customer.installation ? `<p style="color:var(--muted);display:flex;gap:8px;align-items:center;justify-content:center;">${icon('wrench')} Our installation team will call you within 1 business day to schedule.</p>` : ''}
       <div style="display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap;">
         <a href="/shop/" class="btn btn-primary">Continue Shopping</a>
         <a href="/account/" class="btn btn-outline">View My Orders</a>

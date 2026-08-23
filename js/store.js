@@ -1,5 +1,5 @@
 /* ============================================================
-   Crystalina — Data Layer (localStorage-backed, first draft)
+   Crystalina, Data Layer (localStorage-backed, first draft)
    Products, cart, users, sessions, orders.
    ============================================================ */
 
@@ -44,7 +44,7 @@ const Store = (() => {
       <text x="320" y="410" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif"
             font-size="28" font-weight="600" fill="#ffffff" opacity="0.95">${label}</text>
       <text x="320" y="440" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif"
-            font-size="15" fill="#ffffff" opacity="0.6">Placeholder — photo coming soon</text>
+            font-size="15" fill="#ffffff" opacity="0.6">Placeholder, photo coming soon</text>
     </svg>`;
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
@@ -60,8 +60,8 @@ const Store = (() => {
 
     return [
       P('ro-alkaline-10', 'Crystalina RO-10 Alkaline Reverse Osmosis System', 'Reverse Osmosis', 349.99, 429.99, 24, 'Best Seller',
-        '10-stage under-sink RO with remineralization — built for NYC apartments.',
-        'Our flagship 10-stage reverse osmosis system removes up to 99.99% of contaminants commonly found in New York City tap water — including lead from aging building plumbing, chlorine, chloramine, PFAS, and microplastics — then adds back healthy minerals for crisp, alkaline-balanced water. Compact tank design fits under standard NYC apartment sinks.',
+        '10-stage under-sink RO with remineralization, built for NYC apartments.',
+        'Our flagship 10-stage reverse osmosis system removes up to 99.99% of contaminants commonly found in New York City tap water, including lead from aging building plumbing, chlorine, chloramine, PFAS, and microplastics, then adds back healthy minerals for crisp, alkaline-balanced water. Compact tank design fits under standard NYC apartment sinks.',
         ['10 filtration stages', 'Alkaline remineralization', '100 gallons per day', 'Lead, PFAS, chlorine & microplastic reduction', 'Fits under standard sinks', 'Includes designer faucet'], 0),
       P('ro-classic-5', 'Crystalina RO-5 Classic Reverse Osmosis System', 'Reverse Osmosis', 219.99, 279.99, 41, null,
         'Proven 5-stage RO purification at an accessible price.',
@@ -69,14 +69,14 @@ const Store = (() => {
         ['5 filtration stages', '50 gallons per day', 'Quick-connect fittings', '1-year filter life (pre-filters)', 'Includes chrome faucet'], 1),
       P('wh-3stage', 'Crystalina Whole Home 3-Stage Filtration System', 'Whole House', 499.99, 599.99, 12, 'New',
         'Filters every tap, shower, and appliance in your home or brownstone.',
-        'Designed for NYC brownstones, townhouses, and whole-apartment retrofits. Three heavy-duty stages — sediment, KDF, and activated carbon — protect your plumbing and appliances while removing chlorine, rust from old mains, and heavy metals before water reaches a single tap.',
+        'Designed for NYC brownstones, townhouses, and whole-apartment retrofits. Three heavy-duty stages, sediment, KDF, and activated carbon, protect your plumbing and appliances while removing chlorine, rust from old mains, and heavy metals before water reaches a single tap.',
         ['Whole-home coverage', '3 heavy-duty stages', '0.25 micron sediment capture', 'Protects appliances & plumbing', '150,000 gallon capacity'], 2),
       P('ct-luxe', 'Crystalina Countertop Luxe Dispenser', 'Countertop', 179.99, null, 33, null,
         'No installation. Plug in, fill, and drink pure water in minutes.',
-        'Renting in the city? The Countertop Luxe needs zero plumbing. A 4-stage cartridge with UV polishing turns tap water into clean, great-tasting water at the push of a button — perfect for apartments where installations aren\'t allowed.',
+        'Renting in the city? The Countertop Luxe needs zero plumbing. A 4-stage cartridge with UV polishing turns tap water into clean, great-tasting water at the push of a button, perfect for apartments where installations aren\'t allowed.',
         ['Zero installation', '4-stage cartridge + UV', 'Hot, cold & ambient dispensing', '1.5 gallon reservoir', 'Renter friendly'], 3),
       P('shower-12', 'Crystalina VitaShower 12-Stage Shower Filter', 'Shower & Bath', 44.99, 59.99, 87, 'Popular',
-        'Softer skin and hair — removes chlorine right at the showerhead.',
+        'Softer skin and hair, removes chlorine right at the showerhead.',
         'NYC disinfects its water with chlorine, which is great for safety but rough on skin and hair. The VitaShower\'s 12-stage cartridge with KDF-55 and vitamin C reduces chlorine and heavy metals at the point of use. Installs in under 5 minutes, no tools.',
         ['12 filtration stages', 'KDF-55 + Vitamin C', 'Fits all standard showers', '6-month cartridge life', 'Tool-free install'], 4),
       P('faucet-pure', 'Crystalina PureTap Faucet Filter', 'Faucet & Pitcher', 34.99, null, 120, null,
@@ -87,22 +87,22 @@ const Store = (() => {
         'The classic pitcher, upgraded with 7-layer filtration.',
         'A fridge-ready 10-cup pitcher with our 7-layer cartridge: activated coconut carbon, ion exchange resin, and micro-net screens for cleaner, better-tasting water anywhere.',
         ['10-cup capacity', '7-layer cartridge', '40 gallon filter life', 'BPA-free Tritan body'], 1),
-      P('filters-ro-set', 'RO Replacement Filter Set (Stages 1–3)', 'Replacement Filters', 49.99, null, 200, null,
+      P('filters-ro-set', 'RO Replacement Filter Set (Stages 1 to 3)', 'Replacement Filters', 49.99, null, 200, null,
         'Annual pre-filter refresh for RO-5 and RO-10 systems.',
         'Keep your system performing like day one. Includes sediment and dual carbon block pre-filters compatible with all Crystalina RO systems. Replace every 12 months.',
         ['Fits RO-5 & RO-10', 'Sediment + 2 carbon blocks', '12-month service life', 'Tool-free twist design'], 2),
       P('filters-wh-set', 'Whole Home Replacement Set', 'Replacement Filters', 89.99, 109.99, 64, null,
         'Full 3-stage refresh for the Whole Home system.',
-        'Heavy-duty sediment, KDF, and carbon replacements engineered for NYC\'s aging water mains. Replace every 6–12 months depending on usage.',
-        ['Fits Whole Home 3-Stage', 'Sediment + KDF + carbon', '6–12 month service life'], 3),
+        'Heavy-duty sediment, KDF, and carbon replacements engineered for NYC\'s aging water mains. Replace every 6 to 12 months depending on usage.',
+        ['Fits Whole Home 3-Stage', 'Sediment + KDF + carbon', '6 to 12 month service life'], 3),
       P('uv-guard', 'Crystalina UV Guard Add-On', 'Accessories', 119.99, null, 18, null,
         'Ultraviolet sterilization stage for 99.99% microbial protection.',
-        'Add a UV sterilization chamber to any Crystalina RO system for an extra layer of protection against bacteria, viruses, and cysts — peace of mind during city boil advisories and turbidity events.',
+        'Add a UV sterilization chamber to any Crystalina RO system for an extra layer of protection against bacteria, viruses, and cysts, peace of mind during city boil advisories and turbidity events.',
         ['11W UV chamber', '99.99% microbial reduction', 'Fits all Crystalina RO systems', 'Annual lamp replacement'], 4),
       P('tds-meter', 'Digital TDS Water Quality Meter', 'Accessories', 19.99, null, 150, null,
-        'Test your tap and your filtered water — see the difference.',
+        'Test your tap and your filtered water, see the difference.',
         'A pocket digital meter that reads total dissolved solids in seconds. Test your building\'s tap water, then test your Crystalina water and watch the number drop.',
-        ['0–9990 ppm range', 'Auto temperature compensation', 'Includes carry case'], 0),
+        ['0 to 9990 ppm range', 'Auto temperature compensation', 'Includes carry case'], 0),
       P('mineral-drops', 'Crystalina Trace Mineral Drops', 'Accessories', 24.99, null, 75, null,
         'Electrolyte and mineral boost for RO-purified water.',
         'Purification removes the bad and some of the good. Add back magnesium, calcium, and potassium with a few drops per glass for taste and hydration.',
@@ -121,7 +121,7 @@ const Store = (() => {
         id: 'admin-1',
         name: 'Crystalina Admin',
         email: 'admin@crystalinawater.com',
-        password: 'crystalina2026', // demo only — replace with real auth before launch
+        password: 'crystalina2026', // demo only, replace with real auth before launch
         role: 'admin',
         created: new Date().toISOString()
       }]));
