@@ -24,6 +24,9 @@
   document.querySelectorAll('[data-view-jump]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.viewJump)));
   showView(location.hash.slice(1) || 'overview', false);
 
+  const customerButton = (name, email = '') => `<button class="entity-link" onclick="AdminUI.openCustomerByName('${encodeURIComponent(name)}')">${escapeHTML(name)}</button>${email ? `<br><small>${escapeHTML(email)}</small>` : ''}`;
+  const initials = name => name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
+
   /* ---------- overview ---------- */
   function renderOverview() {
     const products = Store.getProducts();
@@ -48,7 +51,7 @@
 
     document.getElementById('recentOrdersWrap').innerHTML = orders.length
       ? `<table class="admin-table"><thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead><tbody>` +
-        orders.slice(0, 5).map(o => `<tr><td><strong>${o.id}</strong></td><td>${o.customer.name}</td><td>${money(o.total)}</td>
+        orders.slice(0, 5).map(o => `<tr><td><strong>${o.id}</strong></td><td>${customerButton(o.customer.name, o.customer.email)}</td><td>${money(o.total)}</td>
           <td><span class="status-pill status-${o.status}">${o.status}</span></td></tr>`).join('') + `</tbody></table>`
       : `<p style="color:var(--muted);font-size:.9rem;">No orders yet, they'll appear here as customers check out.</p>`;
   }
@@ -80,7 +83,7 @@
       <tr>
         <td><strong>${o.id}</strong></td>
         <td>${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })}</td>
-        <td>${o.customer.name}<br><small style="color:var(--muted)">${o.customer.email}</small></td>
+        <td>${customerButton(o.customer.name, o.customer.email)}</td>
         <td>${o.customer.borough || ', '}${o.customer.installation ? '<br><small style="color:var(--blue-500)">+ installation</small>' : ''}</td>
         <td style="max-width:240px;font-size:.8rem;">${o.items.map(i => `${i.name} × ${i.qty}`).join('<br>')}</td>
         <td><strong>${money(o.total)}</strong></td>
@@ -93,17 +96,62 @@
   }
 
   /* ---------- customers table ---------- */
+  let customerFilters = { search: '', from: '', to: '' };
   function renderCustomers() {
-    const orders = Store.getOrders();
-    document.querySelector('#customersTable tbody').innerHTML = Store.getUsers().map(u => `
-      <tr>
-        <td><strong>${u.name}</strong></td>
-        <td>${u.email}</td>
-        <td>${u.role === 'admin' ? '<span class="admin-badge">Admin</span>' : 'Customer'}</td>
-        <td>${new Date(u.created).toLocaleDateString('en-US', { dateStyle: 'medium' })}</td>
-        <td>${orders.filter(o => o.customer.userId === u.id || o.customer.email.toLowerCase() === u.email.toLowerCase()).length}</td>
-      </tr>`).join('');
+    const data = Store.getAdminData();
+    const customers = data.customers.filter(customer => {
+      const haystack = `${customer.name} ${customer.email}`.toLowerCase();
+      return (!customerFilters.search || haystack.includes(customerFilters.search)) && (!customerFilters.from || customer.joined >= customerFilters.from) && (!customerFilters.to || customer.joined <= customerFilters.to);
+    });
+    document.querySelector('#customersTable tbody').innerHTML = customers.map(customer => {
+      const openTickets = data.tickets.filter(ticket => ticket.customer === customer.name && ticket.status !== 'Resolved').length;
+      return `<tr><td>${customerButton(customer.name, customer.email)}<br><small>${escapeHTML(customer.address)}</small></td><td>${escapeHTML(customer.phone)}</td><td>${formatDate(customer.joined)}</td><td>${customer.products.length}</td><td>${openTickets}</td><td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.openCustomerProfile('${customer.id}')">View Profile</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('customer','${customer.id}')">Edit</button></div></td></tr>`;
+    }).join('') || '<tr><td colspan="6">No customers match these filters.</td></tr>';
   }
+
+  function findCustomerByName(name) {
+    const data = Store.getAdminData();
+    const customer = data.customers.find(item => item.name.toLowerCase() === name.toLowerCase());
+    if (customer) return customer;
+    const lead = data.leads.find(item => item.name.toLowerCase() === name.toLowerCase());
+    return lead ? { id: lead.id, name: lead.name, email: lead.email, phone: 'Not provided', joined: lead.followUp, address: `${lead.borough}, NY`, source: lead.source, assignedSalesId: '', products: [], cart: [], installed: [], notes: `Lead interested in ${lead.interest}.` } : null;
+  }
+
+  const profileModal = document.getElementById('profileModal');
+  function openCustomerProfile(customer) {
+    if (!customer) return;
+    const data = Store.getAdminData();
+    const orders = Store.getOrders().filter(order => order.customer.email?.toLowerCase() === customer.email.toLowerCase() || order.customer.name === customer.name);
+    const jobs = data.jobs.filter(job => job.customer === customer.name);
+    const tickets = data.tickets.filter(ticket => ticket.customer === customer.name);
+    const subscriptions = data.subscriptions.filter(subscription => subscription.customer === customer.name);
+    const messages = data.notifications.filter(notification => notification.customerId === customer.id);
+    const photos = jobs.flatMap(job => [{ label: `${job.id} pre-job`, src: job.beforePhoto }, { label: `${job.id} finished job`, src: job.afterPhoto }]);
+    document.getElementById('profileContent').innerHTML = `<div class="profile-head"><div class="profile-avatar">${initials(customer.name)}</div><div><h2>${escapeHTML(customer.name)}</h2><p>${escapeHTML(customer.id)} · Customer since ${formatDate(customer.joined)}</p></div><div class="profile-actions"><button class="btn btn-sm btn-primary" onclick="AdminUI.composeMessage('${customer.id}')">Send Message</button>${customer.id.startsWith('CUS-') ? `<button class="btn btn-sm btn-outline" onclick="AdminUI.editRecord('customer','${customer.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('customers','${customer.id}','${encodeURIComponent(customer.name)}')">Delete</button>` : ''}</div></div>
+      <div class="profile-grid">
+        <section class="profile-section"><h3>Contact &amp; Account</h3><ul class="profile-list"><li>Email <strong>${escapeHTML(customer.email)}</strong></li><li>Phone <strong>${escapeHTML(customer.phone)}</strong></li><li>Address <strong>${escapeHTML(customer.address)}</strong></li><li>Source <strong>${escapeHTML(customer.source)}</strong></li><li>Sales ID <strong>${escapeHTML(customer.assignedSalesId || 'Unassigned')}</strong></li></ul></section>
+        <section class="profile-section"><h3>Products &amp; Current Cart</h3><ul class="profile-list"><li>Products bought <strong>${customer.products.length ? customer.products.map(escapeHTML).join('<br>') : 'None yet'}</strong></li><li>Cart items <strong>${customer.cart.length ? customer.cart.map(escapeHTML).join('<br>') : 'Cart is empty'}</strong></li><li>Orders <strong>${orders.length}</strong></li><li>Subscriptions <strong>${subscriptions.length ? subscriptions.map(item => `${escapeHTML(item.system)} (${escapeHTML(item.status)})`).join('<br>') : 'None'}</strong></li></ul></section>
+        <section class="profile-section full"><h3>Installation &amp; Service Photos</h3><div class="profile-photo-grid">${photos.length ? photos.map(photo => `<div class="profile-photo">${photo.src ? `<img src="${photo.src}" alt="${escapeHTML(photo.label)}">` : `${escapeHTML(photo.label)}<br>No photo uploaded`}</div>`).join('') : '<div class="profile-photo">No installation photos apply to this customer.</div>'}</div></section>
+        <section class="profile-section"><h3>Jobs &amp; Installation History</h3><ul class="profile-list">${jobs.length ? jobs.map(job => `<li>${escapeHTML(job.id)} · ${escapeHTML(job.type)} <strong>${formatDate(job.date)}<br>${escapeHTML(job.status)}</strong></li>`).join('') : '<li>No service jobs <strong>—</strong></li>'}</ul></section>
+        <section class="profile-section"><h3>Feedback &amp; Support</h3><ul class="profile-list">${tickets.length ? tickets.map(ticket => `<li>${escapeHTML(ticket.type)} · ${escapeHTML(ticket.subject)} <strong>${escapeHTML(ticket.status)}</strong></li>`).join('') : '<li>No support tickets <strong>—</strong></li>'}</ul></section>
+        <section class="profile-section full"><h3>Notes &amp; Communication History</h3><p class="admin-subtitle">${escapeHTML(customer.notes || 'No customer notes.')}</p><ul class="profile-list" style="margin-top:12px">${messages.length ? messages.map(message => `<li>${escapeHTML(message.channel)} · ${escapeHTML(message.title)} <strong>${new Date(message.sent).toLocaleDateString()}</strong></li>`).join('') : '<li>No messages sent <strong>—</strong></li>'}</ul></section>
+      </div>`;
+    profileModal.classList.add('open');
+  }
+  document.getElementById('profileClose').addEventListener('click', () => profileModal.classList.remove('open'));
+  profileModal.addEventListener('click', event => { if (event.target === profileModal) profileModal.classList.remove('open'); });
+
+  const messageModal = document.getElementById('messageModal');
+  const closeMessageModal = () => messageModal.classList.remove('open');
+  document.getElementById('messageClose').addEventListener('click', closeMessageModal);
+  document.getElementById('messageCancel').addEventListener('click', closeMessageModal);
+  messageModal.addEventListener('click', event => { if (event.target === messageModal) closeMessageModal(); });
+  document.getElementById('messageForm').addEventListener('submit', event => {
+    event.preventDefault();
+    const values = Object.fromEntries(new FormData(event.currentTarget).entries());
+    Store.addNotification(values); closeMessageModal(); profileModal.classList.remove('open'); event.currentTarget.reset();
+    toast(values.channel.includes('Email') ? 'Message queued for website and/or email delivery' : 'Website notification sent');
+  });
 
   /* ---------- operations ---------- */
   const formatDate = value => new Date(value + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -127,7 +175,7 @@
       statCard('Projected value', money(active.length * 64.99), 'next replacement cycle');
     document.getElementById('replacementCount').textContent = `${active.length} upcoming`;
     document.querySelector('#subscriptionsTable tbody').innerHTML = list.map(s => `<tr>
-      <td><strong>${s.customer}</strong><br><small>${s.email}</small></td>
+      <td>${customerButton(s.customer, s.email)}</td>
       <td>${s.system}</td><td>${s.cadence}</td><td>${formatDate(s.nextDate)}</td><td>${s.replacement}</td>
       <td><span class="record-status ${statusClass(s.status)}">${s.status}</span></td>
       <td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.toggleSubscription('${s.id}')">${s.status === 'Paused' ? 'Resume' : 'Pause'}</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('subscription','${s.id}')">Edit</button></div></td>
@@ -146,7 +194,7 @@
       const pct = Math.round((j.checklistDone / j.checklistTotal) * 100);
       return `<tr>
         <td><strong>${formatDate(j.date)}</strong><br><small>${j.time}</small></td>
-        <td><strong>${j.customer}</strong><br><small>${j.address}, ${j.borough}</small></td>
+        <td>${customerButton(j.customer)}<br><small>${j.address}, ${j.borough}</small></td>
         <td>${j.type}</td>
         <td><select class="admin-select" onchange="AdminUI.assignTechnician('${j.id}',this.value)"><option ${j.technician === 'Needs assignment' ? 'selected' : ''}>Needs assignment</option>${Store.getAdminData().staff.filter(s => s.role.includes('Technician')).map(s => `<option ${s.name === j.technician ? 'selected' : ''}>${s.name}</option>`).join('')}</select></td>
         <td><select class="admin-select" onchange="AdminUI.setJobStatus('${j.id}',this.value)">${['Needs assignment', 'Assigned', 'Confirmed', 'In progress', 'Completed', 'Cancelled'].map(s => `<option ${s === j.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
@@ -188,7 +236,7 @@
     const stages = ['New', 'Qualified', 'Quote sent', 'Won'];
     document.getElementById('leadPipeline').innerHTML = stages.map(stage => `<div class="pipeline-stage"><span>${stage}</span><strong>${leads.filter(l => l.stage === stage).length}</strong></div>`).join('');
     document.querySelector('#leadsTable tbody').innerHTML = leads.map(l => `<tr>
-      <td><strong>${l.name}</strong><br><small>${l.email}</small></td><td>${l.interest}</td><td>${l.source}</td><td>${l.borough}</td><td><strong>${money(Number(l.value))}</strong></td><td>${formatDate(l.followUp)}</td>
+      <td>${customerButton(l.name, l.email)}</td><td>${l.interest}</td><td>${l.source}</td><td>${l.borough}</td><td><strong>${money(Number(l.value))}</strong></td><td>${formatDate(l.followUp)}</td>
       <td><select class="admin-select" onchange="AdminUI.setLeadStage('${l.id}',this.value)">${['New', 'Qualified', 'Quote sent', 'Won', 'Lost'].map(s => `<option ${s === l.stage ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
     </tr>`).join('');
   }
@@ -217,7 +265,7 @@
       statCard('Warranty claims', allTickets.filter(t => t.type === 'Warranty' && t.status !== 'Resolved').length, 'awaiting resolution') +
       statCard('Average response', '1h 18m', 'during business hours');
     document.querySelector('#ticketsTable tbody').innerHTML = tickets.map(t => `<tr>
-      <td><strong>${t.id}</strong><br><small>${t.channel}</small></td><td>${t.customer}</td><td><strong>${t.subject}</strong><br><button class="link-button" onclick="AdminUI.markDemoAction('Conversation history opened')">View notes &amp; history</button></td><td>${t.type}</td><td><span class="record-status ${t.priority === 'High' ? 'is-danger' : t.priority === 'Normal' ? 'is-warning' : ''}">${t.priority}</span></td><td>${formatDate(t.updated)}</td>
+      <td><strong>${t.id}</strong><br><small>${t.channel}</small></td><td>${customerButton(t.customer)}</td><td><strong>${t.subject}</strong><br><button class="link-button" onclick="AdminUI.openCustomerByName('${encodeURIComponent(t.customer)}')">View notes &amp; history</button></td><td>${t.type}</td><td><span class="record-status ${t.priority === 'High' ? 'is-danger' : t.priority === 'Normal' ? 'is-warning' : ''}">${t.priority}</span></td><td>${formatDate(t.updated)}</td>
       <td><select class="admin-select" onchange="AdminUI.setTicketStatus('${t.id}',this.value)">${['Open', 'In progress', 'Waiting on customer', 'Resolved'].map(s => `<option ${s === t.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
     </tr>`).join('') || `<tr><td colspan="7">No tickets match this filter.</td></tr>`;
   }
@@ -288,6 +336,14 @@
     document.querySelectorAll('[data-content-filter]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active'); contentFilter = btn.dataset.contentFilter; renderContent();
   }));
+  ['customerSearch', 'customerDateFrom', 'customerDateTo'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    customerFilters = { search: document.getElementById('customerSearch').value.trim().toLowerCase(), from: document.getElementById('customerDateFrom').value, to: document.getElementById('customerDateTo').value };
+    renderCustomers();
+  }));
+  document.getElementById('clearCustomerFilters').addEventListener('click', () => {
+    ['customerSearch', 'customerDateFrom', 'customerDateTo'].forEach(id => { document.getElementById(id).value = ''; });
+    customerFilters = { search: '', from: '', to: '' }; renderCustomers();
+  });
 
   document.getElementById('heroContentForm').addEventListener('submit', event => {
     event.preventDefault();
@@ -337,6 +393,9 @@
   let recordType = null;
   let editingRecordId = null;
   const recordConfigs = {
+    customer: { title: 'Customer', collection: 'customers', prefix: 'CUS', fields: [
+      ['name', 'Customer name', 'text'], ['email', 'Email', 'email'], ['phone', 'Phone', 'tel'], ['joined', 'Joined date', 'date'], ['address', 'Full address', 'text'], ['source', 'Customer source', 'select', ['Website', 'Sales Associate', 'Referral', 'Water quiz', 'Phone inquiry']], ['assignedSalesId', 'Assigned sales ID', 'text'], ['notes', 'Customer notes', 'text']
+    ] },
     subscription: { title: 'Subscription', collection: 'subscriptions', prefix: 'SUB', fields: [
       ['customer', 'Customer name', 'text'], ['email', 'Email', 'email'], ['system', 'Filtration system', 'text'], ['cadence', 'Renewal cadence', 'select', ['3 months', '6 months', '12 months']], ['nextDate', 'Next renewal', 'date'], ['replacement', 'Replacement kit', 'text'], ['status', 'Status', 'select', ['Active', 'Paused']]
     ] },
@@ -395,6 +454,7 @@
     if (recordType === 'discount') { values.usage = 0; values.limit = Number(values.limit); values.id = values.id.toUpperCase(); }
     if (recordType === 'ticket') values.updated = new Date().toISOString().slice(0, 10);
     if (recordType === 'content') values.updated = new Date().toISOString().slice(0, 10);
+    if (recordType === 'customer' && !editingRecordId) Object.assign(values, { products: [], cart: [], installed: [] });
     if (recordType === 'staff') {
       values.initials = values.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
       if (!editingRecordId) { values.rating = 5; values.jobs = 0; }
@@ -454,6 +514,11 @@
   imgDrop.addEventListener('drop', e => { e.preventDefault(); imgDrop.classList.remove('drag'); readImage(e.dataTransfer.files[0]); });
 
   document.getElementById('addProductBtn').addEventListener('click', () => openModal(null));
+  document.getElementById('deleteAllProductsBtn').addEventListener('click', () => {
+    if (confirm('Delete every product from the catalog? This removes the entire browser-stored product list.')) {
+      Store.deleteAllProducts(); renderAll(); toast('All products deleted');
+    }
+  });
   document.getElementById('modalCancel').addEventListener('click', closeModal);
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
@@ -551,9 +616,28 @@
       const blob = new Blob([rows.map(row => row.join(',')).join('\n')], { type: 'text/csv' });
       const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'crystalina-finance-report.csv'; link.click(); URL.revokeObjectURL(link.href); toast('Finance report exported');
     },
+    openCustomerProfile(id) {
+      openCustomerProfile(Store.getAdminData().customers.find(customer => customer.id === id));
+    },
+    openCustomerByName(encodedName) {
+      openCustomerProfile(findCustomerByName(decodeURIComponent(encodedName)));
+    },
+    composeMessage(customerId) {
+      const customer = Store.getAdminData().customers.find(item => item.id === customerId) || Store.getAdminData().leads.find(item => item.id === customerId);
+      document.getElementById('messageCustomerId').value = customerId;
+      document.getElementById('messageTitle').value = '';
+      document.getElementById('messageBody').value = '';
+      if (customer && !customerId.startsWith('CUS-')) document.getElementById('messageChannel').value = 'Email';
+      messageModal.classList.add('open');
+    },
+    deleteRecord(collection, id, encodedLabel) {
+      const label = decodeURIComponent(encodedLabel);
+      if (!confirm(`Delete ${label}? This removes the browser-stored record.`)) return;
+      Store.deleteAdminItem(collection, id); profileModal.classList.remove('open'); renderAll(); toast(`${label} deleted`);
+    },
     markDemoAction(message) { toast(message); },
     editRecord(type, id) {
-      openRecordModal(type, id);
+      profileModal.classList.remove('open'); openRecordModal(type, id);
     }
   };
 

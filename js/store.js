@@ -127,6 +127,16 @@ const Store = (() => {
         created: new Date().toISOString()
       }]));
     }
+    const users = read(KEYS.users, []);
+    [
+      { id: 'CUS-1001', name: 'Maya Chen', email: 'maya@example.com' },
+      { id: 'CUS-1002', name: 'James Wilson', email: 'james@example.com' },
+      { id: 'CUS-1003', name: 'Sofia Martinez', email: 'sofia@example.com' },
+      { id: 'CUS-1004', name: 'Noah Brown', email: 'noah@example.com' }
+    ].forEach(customer => {
+      if (!users.some(user => user.email === customer.email)) users.push({ ...customer, password: 'customer2026', role: 'customer', created: '2026-03-14T12:00:00.000Z' });
+    });
+    write(KEYS.users, users);
     if (!localStorage.getItem(KEYS.adminData)) {
       localStorage.setItem(KEYS.adminData, JSON.stringify(seedAdminData()));
     }
@@ -139,6 +149,16 @@ const Store = (() => {
         { id: 'SUB-1047', customer: 'James Wilson', email: 'james@example.com', system: 'Whole Home 3-Stage', cadence: '6 months', nextDate: '2026-09-05', replacement: 'Whole Home Set', status: 'Active' },
         { id: 'SUB-1044', customer: 'Sofia Martinez', email: 'sofia@example.com', system: 'RO-5 Classic', cadence: '12 months', nextDate: '2026-09-09', replacement: 'Stages 1 to 3', status: 'Paused' },
         { id: 'SUB-1039', customer: 'Noah Brown', email: 'noah@example.com', system: 'VitaShower', cadence: '6 months', nextDate: '2026-09-12', replacement: 'Shower Cartridge', status: 'Active' }
+      ],
+      customers: [
+        { id: 'CUS-1001', name: 'Maya Chen', email: 'maya@example.com', phone: '(718) 555-0112', joined: '2026-03-14', address: '45-18 21st St, Long Island City, Queens, NY 11101', source: 'Website', assignedSalesId: 'STAFF-03', products: ['RO-10 Alkaline Reverse Osmosis System', 'RO Replacement Filter Set'], cart: ['Digital TDS Water Quality Meter'], installed: [{ product: 'RO-10 Alkaline', date: '2026-03-22', photo: '' }], notes: 'Prefers weekday morning service appointments.' },
+        { id: 'CUS-1002', name: 'James Wilson', email: 'james@example.com', phone: '(212) 555-0168', joined: '2026-04-08', address: '211 W 104th St, Manhattan, NY 10025', source: 'Sales Associate', assignedSalesId: 'STAFF-03', products: ['Whole Home 3-Stage Filtration System'], cart: [], installed: [{ product: 'Whole Home 3-Stage', date: '2026-04-18', photo: '' }], notes: 'Brownstone installation, coordinate building access.' },
+        { id: 'CUS-1003', name: 'Sofia Martinez', email: 'sofia@example.com', phone: '(347) 555-0139', joined: '2026-05-21', address: '78 Prospect Pl, Brooklyn, NY 11217', source: 'Referral', assignedSalesId: 'STAFF-03', products: ['RO-5 Classic Reverse Osmosis System'], cart: ['RO Replacement Filter Set'], installed: [{ product: 'RO-5 Classic', date: '2026-05-29', photo: '' }], notes: 'Annual maintenance plan is currently paused.' },
+        { id: 'CUS-1004', name: 'Noah Brown', email: 'noah@example.com', phone: '(646) 555-0177', joined: '2026-06-11', address: '312 E 149th St, Bronx, NY 10451', source: 'Water quiz', assignedSalesId: 'STAFF-03', products: ['VitaShower 12-Stage Shower Filter'], cart: [], installed: [], notes: 'Contact by email before phone.' }
+      ],
+      notifications: [
+        { id: 'NOT-9001', customerId: 'CUS-1001', title: 'Filter replacement reminder', message: 'Your RO pre-filter replacement is due September 3.', channel: 'Website', sent: '2026-08-23T09:30:00.000Z', read: false },
+        { id: 'NOT-9002', customerId: 'CUS-1003', title: 'Service appointment update', message: 'Your annual maintenance visit is awaiting confirmation.', channel: 'Website', sent: '2026-08-22T14:15:00.000Z', read: false }
       ],
       jobs: [
         { id: 'JOB-2081', customer: 'Maya Chen', address: '45-18 21st St', borough: 'Queens', type: 'Filter replacement', date: '2026-08-25', time: '9:00 AM', technician: 'Luis Rivera', status: 'Confirmed', checklistDone: 1, checklistTotal: 4, beforePhoto: '', afterPhoto: '' },
@@ -232,6 +252,7 @@ const Store = (() => {
     saveProducts(list);
   }
   function deleteProduct(id) { saveProducts(getProducts().filter(p => p.id !== id)); }
+  function deleteAllProducts() { saveProducts([]); }
 
   /* ---------- cart ---------- */
   const getCart = () => read(KEYS.cart, []);
@@ -325,6 +346,29 @@ const Store = (() => {
     saveAdminData(data);
     return item;
   }
+  function deleteAdminItem(collection, id) {
+    const data = getAdminData();
+    data[collection] = (data[collection] || []).filter(item => item.id !== id);
+    saveAdminData(data);
+  }
+  function addNotification(notification) {
+    return addAdminItem('notifications', { id: 'NOT-' + String(Date.now()).slice(-6), sent: new Date().toISOString(), read: false, ...notification });
+  }
+  function getNotificationsForUser(user) {
+    if (!user) return [];
+    const data = getAdminData();
+    const customer = data.customers.find(item => item.id === user.id || item.email.toLowerCase() === user.email.toLowerCase());
+    if (!customer) return [];
+    return data.notifications.filter(item => (item.customerId === customer.id || item.customerId === 'all') && item.channel.includes('Website'));
+  }
+  function markNotificationsRead(user) {
+    if (!user) return;
+    const data = getAdminData();
+    const customer = data.customers.find(item => item.id === user.id || item.email.toLowerCase() === user.email.toLowerCase());
+    if (!customer) return;
+    data.notifications.forEach(item => { if (item.customerId === customer.id || item.customerId === 'all') item.read = true; });
+    saveAdminData(data);
+  }
   const getSiteSettings = () => getAdminData().siteSettings;
   function updateSiteSettings(changes) {
     const data = getAdminData();
@@ -337,10 +381,12 @@ const Store = (() => {
 
   return {
     placeholder,
-    getProducts, getProduct, upsertProduct, deleteProduct,
+    getProducts, getProduct, upsertProduct, deleteProduct, deleteAllProducts,
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
     getUsers, currentUser, signUp, signIn, signOut,
     getOrders, placeOrder, updateOrderStatus,
-    getAdminData, updateAdminItem, addAdminItem, getSiteSettings, updateSiteSettings
+    getAdminData, updateAdminItem, addAdminItem, deleteAdminItem,
+    addNotification, getNotificationsForUser, markNotificationsRead,
+    getSiteSettings, updateSiteSettings
   };
 })();

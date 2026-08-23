@@ -68,7 +68,7 @@
     <section id="view-products" style="display:none">
       <div class="admin-head">
         <h1>Products</h1>
-        <button class="btn btn-primary" id="addProductBtn">+ Add New Product</button>
+        <div class="table-actions"><button class="btn btn-danger" id="deleteAllProductsBtn">Delete All Products</button><button class="btn btn-primary" id="addProductBtn">+ Add New Product</button></div>
       </div>
       <div class="admin-panel" style="overflow-x:auto;">
         <table class="admin-table" id="productsTable">
@@ -92,10 +92,16 @@
 
     <!-- CUSTOMERS -->
     <section id="view-customers" style="display:none">
-      <div class="admin-head"><h1>Customers</h1></div>
+      <div class="admin-head"><div><h1>Customers</h1><p class="admin-subtitle">Search customer records and open a complete profile, purchase, service, cart, and support history.</p></div><button class="btn btn-primary" data-open-record="customer">+ Add Customer</button></div>
+      <div class="admin-toolbar">
+        <div class="field compact-field"><label for="customerSearch">Name or email</label><input id="customerSearch" type="search" placeholder="Search customers"></div>
+        <div class="field compact-field"><label for="customerDateFrom">Joined after</label><input id="customerDateFrom" type="date"></div>
+        <div class="field compact-field"><label for="customerDateTo">Joined before</label><input id="customerDateTo" type="date"></div>
+        <button class="btn btn-sm btn-ghost" id="clearCustomerFilters">Clear Filters</button>
+      </div>
       <div class="admin-panel" style="overflow-x:auto;">
         <table class="admin-table" id="customersTable">
-          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Orders</th></tr></thead>
+          <thead><tr><th>Customer</th><th>Phone</th><th>Joined</th><th>Products</th><th>Open Tickets</th><th>Actions</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -322,6 +328,29 @@
         <button type="button" class="btn btn-ghost" id="recordCancel">Cancel</button>
         <button type="submit" class="btn btn-primary">Save</button>
       </div>
+    </form>
+  </div>
+</div>
+
+<!-- CUSTOMER / ENTITY PROFILE -->
+<div class="modal-overlay profile-overlay" id="profileModal">
+  <div class="modal profile-modal">
+    <button class="modal-close" id="profileClose" aria-label="Close profile">&times;</button>
+    <div id="profileContent"></div>
+  </div>
+</div>
+
+<!-- CUSTOMER COMMUNICATION -->
+<div class="modal-overlay" id="messageModal">
+  <div class="modal">
+    <button class="modal-close" id="messageClose" aria-label="Close message composer">&times;</button>
+    <h2>Send Customer Message</h2>
+    <form id="messageForm">
+      <input type="hidden" id="messageCustomerId" name="customerId">
+      <div class="field"><label for="messageChannel">Delivery channel</label><select id="messageChannel" name="channel"><option>Website</option><option>Email</option><option>Website + Email</option></select></div>
+      <div class="field"><label for="messageTitle">Subject</label><input id="messageTitle" name="title" required></div>
+      <div class="field"><label for="messageBody">Message</label><textarea id="messageBody" name="message" rows="5" required></textarea></div>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" id="messageCancel">Cancel</button><button type="submit" class="btn btn-primary">Send Message</button></div>
     </form>
   </div>
 </div>

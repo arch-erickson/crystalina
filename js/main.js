@@ -3,6 +3,7 @@
    ============================================================ */
 
 const money = n => '$' + n.toFixed(2);
+const escapeHTML = value => String(value ?? '').replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char]);
 
 /* ============================================================
    Icon system, professional stroke line-icons (currentColor).
@@ -94,6 +95,8 @@ const LOGO_LOCKUP = `<img src="/logo-mark.png" class="brand-mark" alt=""><img sr
 /* ---------- header ---------- */
 function renderHeader(active = '') {
   const user = Store.currentUser();
+  const notifications = user && user.role === 'customer' && Store.getNotificationsForUser ? Store.getNotificationsForUser(user) : [];
+  const unreadNotifications = notifications.filter(item => !item.read).length;
   const el = document.createElement('div');
   el.innerHTML = `
   <div class="announce-bar">
@@ -109,6 +112,13 @@ function renderHeader(active = '') {
         ${NAV_LINKS.map(l => `<a href="${l.href}" class="${active === l.href ? 'active' : ''}">${l.label}</a>`).join('')}
       </nav>
       <div class="header-actions">
+        ${user && user.role === 'customer' ? `<div class="notification-wrap">
+          <button class="icon-btn notification-btn" id="notificationBtn" title="Notifications" aria-label="Notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+            <span class="icon-label">Alerts</span>${unreadNotifications ? `<span class="notification-count" id="notificationCount">${unreadNotifications}</span>` : ''}
+          </button>
+          <div class="notification-menu" id="notificationMenu"><div class="notification-menu-head"><strong>Notifications</strong><span>${unreadNotifications} new</span></div>${notifications.length ? notifications.map(item => `<article class="notification-item ${item.read ? '' : 'unread'}"><strong>${escapeHTML(item.title)}</strong><p>${escapeHTML(item.message)}</p><small>${new Date(item.sent).toLocaleDateString('en-US', { dateStyle: 'medium' })}</small></article>`).join('') : '<p class="notification-empty">You have no notifications.</p>'}</div>
+        </div>` : ''}
         <a href="${user ? (user.role === 'admin' ? '/admin/' : '/account/') : '/signin/'}" class="icon-btn" title="${user ? user.name : 'Sign in'}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
           <span class="icon-label">${user ? user.name.split(' ')[0] : 'Sign In'}</span>
@@ -127,6 +137,14 @@ function renderHeader(active = '') {
   document.getElementById('hamburgerBtn').addEventListener('click', () =>
     document.getElementById('mainNav').classList.toggle('open'));
   document.getElementById('cartOpenBtn').addEventListener('click', openCart);
+  const notificationBtn = document.getElementById('notificationBtn');
+  if (notificationBtn) notificationBtn.addEventListener('click', event => {
+    event.stopPropagation();
+    document.getElementById('notificationMenu').classList.toggle('open');
+    Store.markNotificationsRead(user);
+    document.getElementById('notificationCount')?.remove();
+  });
+  document.addEventListener('click', event => { if (!event.target.closest('.notification-wrap')) document.getElementById('notificationMenu')?.classList.remove('open'); });
   updateCartBadge();
 }
 
