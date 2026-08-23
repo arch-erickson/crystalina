@@ -70,6 +70,7 @@
         <h1>Products</h1>
         <div class="table-actions"><button class="btn btn-danger" id="deleteAllProductsBtn">Delete All Products</button><button class="btn btn-primary" id="addProductBtn">+ Add New Product</button></div>
       </div>
+      <div class="admin-toolbar"><div class="field compact-field"><label for="productSearch">Product</label><input id="productSearch" type="search" placeholder="Search catalog"></div><div class="field compact-field"><label for="productCategoryFilter">Category</label><select id="productCategoryFilter"><option value="">All categories</option><option>Reverse Osmosis</option><option>Whole House</option><option>Countertop</option><option>Shower &amp; Bath</option><option>Faucet &amp; Pitcher</option><option>Replacement Filters</option><option>Accessories</option></select></div><div class="field compact-field"><label for="productStockFilter">Stock</label><select id="productStockFilter"><option value="">Any stock level</option><option value="low">Low stock</option><option value="out">Out of stock</option><option value="available">Available</option></select></div></div>
       <div class="admin-panel" style="overflow-x:auto;">
         <table class="admin-table" id="productsTable">
           <thead><tr><th>Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Badge</th><th>Actions</th></tr></thead>
@@ -81,9 +82,10 @@
     <!-- ORDERS -->
     <section id="view-orders" style="display:none">
       <div class="admin-head"><h1>Orders</h1></div>
+      <div class="admin-toolbar"><div class="field compact-field"><label for="orderSearch">Order or customer</label><input id="orderSearch" type="search" placeholder="Search orders"></div><div class="field compact-field"><label for="orderDateFilter">Order date</label><input id="orderDateFilter" type="date"></div><div class="field compact-field"><label for="orderStatusFilter">Status</label><select id="orderStatusFilter"><option value="">All statuses</option><option>Processing</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select></div></div>
       <div class="admin-panel" style="overflow-x:auto;">
         <table class="admin-table" id="ordersTable">
-          <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Borough</th><th>Items</th><th>Total</th><th>Status</th></tr></thead>
+          <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Borough</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody></tbody>
         </table>
         <p id="noOrders" style="color:var(--muted);font-size:.9rem;display:none;">No orders yet. Orders placed at checkout will appear here.</p>
@@ -114,6 +116,7 @@
         <button class="btn btn-primary" data-open-record="subscription">+ New Subscription</button>
       </div>
       <div class="stat-cards admin-stat-cards" id="subscriptionStats"></div>
+      <div class="admin-toolbar"><div class="field compact-field"><label for="subscriptionSearch">Customer or system</label><input id="subscriptionSearch" type="search" placeholder="Search subscriptions"></div><div class="field compact-field"><label for="subscriptionStatusFilter">Status</label><select id="subscriptionStatusFilter"><option value="">All statuses</option><option>Active</option><option>Paused</option></select></div><div class="field compact-field"><label for="subscriptionDateFilter">Renewing by</label><input id="subscriptionDateFilter" type="date"></div></div>
       <div class="admin-callout">
         <div><strong>Replacement route planning</strong><span>Upcoming replacements are grouped by date and borough, ready for a future route-optimization workflow.</span></div>
         <button class="btn btn-sm btn-outline" data-view-jump="service">View Service Schedule</button>
@@ -184,13 +187,14 @@
     <section id="view-leads" class="admin-view" style="display:none">
       <div class="admin-head">
         <div><h1>Leads &amp; Quotes</h1><p class="admin-subtitle">Turn product inquiries and water-assessment requests into scheduled sales follow-ups.</p></div>
-        <button class="btn btn-primary" data-open-record="lead">+ Add Lead</button>
+        <div class="table-actions"><button class="btn btn-ghost" id="exportPendingLeads">Export Pending Emails</button><button class="btn btn-outline" onclick="AdminUI.composeAudience('pendingLeads')">Message Pending Leads</button><button class="btn btn-primary" data-open-record="lead">+ Add Lead</button></div>
       </div>
       <div class="stat-cards admin-stat-cards" id="leadStats"></div>
       <div class="pipeline" id="leadPipeline"></div>
+      <div class="admin-toolbar"><div class="field compact-field"><label for="leadSearch">Lead or product</label><input id="leadSearch" type="search" placeholder="Search leads"></div><div class="field compact-field"><label for="leadStageFilter">Pipeline stage</label><select id="leadStageFilter"><option value="">All stages</option><option>New</option><option>Qualified</option><option>Quote sent</option><option>Won</option><option>Lost</option></select></div><div class="field compact-field"><label for="leadSourceFilter">Source</label><select id="leadSourceFilter"><option value="">All sources</option><option>Website quote</option><option>Water quiz</option><option>Referral</option><option>Phone inquiry</option></select></div></div>
       <div class="admin-panel table-scroll">
         <div class="panel-title-row"><h3>Lead Follow-ups</h3><span class="admin-badge">Sales pipeline</span></div>
-        <table class="admin-table" id="leadsTable"><thead><tr><th>Lead</th><th>Interest</th><th>Source</th><th>Borough</th><th>Estimate</th><th>Follow-up</th><th>Stage</th></tr></thead><tbody></tbody></table>
+        <table class="admin-table" id="leadsTable"><thead><tr><th>Lead</th><th>Interest</th><th>Source</th><th>Borough</th><th>Estimate</th><th>Follow-up</th><th>Stage</th><th>Actions</th></tr></thead><tbody></tbody></table>
       </div>
     </section>
 
@@ -202,10 +206,10 @@
       </div>
       <div class="stat-cards" id="marketingStats"></div>
       <div class="admin-two-col">
-        <div class="admin-panel table-scroll"><div class="panel-title-row"><h3>Campaigns</h3><span class="admin-badge">Email &amp; SMS</span></div><table class="admin-table" id="campaignsTable"><thead><tr><th>Campaign</th><th>Audience</th><th>Sent</th><th>Conversion</th><th>Status</th></tr></thead><tbody></tbody></table></div>
-        <div class="admin-panel table-scroll"><div class="panel-title-row"><h3>Discount Codes</h3><button class="btn btn-sm btn-outline" data-open-record="discount">+ Add Code</button></div><table class="admin-table" id="discountsTable"><thead><tr><th>Code</th><th>Offer</th><th>Usage</th><th>Expires</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+        <div class="admin-panel table-scroll"><div class="panel-title-row"><h3>Campaigns</h3><span class="admin-badge">Email &amp; SMS</span></div><table class="admin-table" id="campaignsTable"><thead><tr><th>Campaign</th><th>Audience</th><th>Sent</th><th>Conversion</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+        <div class="admin-panel table-scroll"><div class="panel-title-row"><h3>Discount Codes</h3><button class="btn btn-sm btn-outline" data-open-record="discount">+ Add Code</button></div><table class="admin-table" id="discountsTable"><thead><tr><th>Code</th><th>Offer</th><th>Usage</th><th>Expires</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
       </div>
-      <div class="admin-callout"><div><strong>23 abandoned carts worth $4,860</strong><span>The automated follow-up sequence is ready for email and SMS provider integration.</span></div><button class="btn btn-sm btn-outline" onclick="AdminUI.markDemoAction('Abandoned-cart follow-up queued')">Queue Follow-up</button></div>
+      <div class="admin-panel table-scroll"><div class="panel-title-row"><div><h3>Abandoned Carts</h3><p class="admin-subtitle">Collect contact details and send automated recovery reminders.</p></div><button class="btn btn-sm btn-outline" onclick="AdminUI.composeAudience('abandonedCarts')">Message All Pending Carts</button></div><table class="admin-table" id="abandonedCartsTable"><thead><tr><th>Customer</th><th>Contact</th><th>Items</th><th>Value</th><th>Updated</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
     </section>
 
     <!-- SUPPORT -->
@@ -217,7 +221,7 @@
       <div class="stat-cards admin-stat-cards" id="supportStats"></div>
       <div class="admin-panel table-scroll">
         <div class="panel-title-row"><h3>Support Queue</h3><div class="filter-pills"><button class="active" data-ticket-filter="all">All</button><button data-ticket-filter="open">Open</button><button data-ticket-filter="warranty">Warranty</button><button data-ticket-filter="returns">Returns</button></div></div>
-        <table class="admin-table" id="ticketsTable"><thead><tr><th>Ticket</th><th>Customer</th><th>Issue</th><th>Type</th><th>Priority</th><th>Last activity</th><th>Status</th></tr></thead><tbody></tbody></table>
+        <table class="admin-table" id="ticketsTable"><thead><tr><th>Ticket</th><th>Customer</th><th>Issue</th><th>Type</th><th>Priority</th><th>Last activity</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table>
       </div>
     </section>
 
@@ -259,6 +263,7 @@
         <div class="admin-panel table-scroll"><div class="panel-title-row"><h3>Sales by Area</h3><span class="admin-badge">All boroughs</span></div><table class="admin-table" id="areaSalesTable"><thead><tr><th>Area</th><th>Orders</th><th>Revenue</th><th>Share</th></tr></thead><tbody></tbody></table></div>
         <div class="admin-panel table-scroll"><div class="panel-title-row"><h3>Sales by Product</h3><span class="admin-badge">Top 5</span></div><table class="admin-table" id="productSalesTable"><thead><tr><th>Product</th><th>Units</th><th>Revenue</th><th>Margin</th></tr></thead><tbody></tbody></table></div>
       </div>
+      <div class="admin-panel table-scroll"><div class="panel-title-row"><div><h3>Marketing Performance</h3><p class="admin-subtitle">Campaign conversion, audience reach, and estimated attributed revenue.</p></div><span class="admin-badge">Marketing + finance</span></div><table class="admin-table" id="marketingFinanceTable"><thead><tr><th>Campaign</th><th>Channel</th><th>Reach</th><th>Conversion</th><th>Estimated Orders</th><th>Attributed Revenue</th></tr></thead><tbody></tbody></table></div>
     </section>
 
     <!-- SETTINGS -->
@@ -364,6 +369,10 @@
       <div class="modal-actions"><button type="button" class="btn btn-ghost" id="messageCancel">Cancel</button><button type="submit" class="btn btn-primary">Send Message</button></div>
     </form>
   </div>
+</div>
+
+<div class="modal-overlay" id="audienceModal">
+  <div class="modal"><button class="modal-close" id="audienceClose" aria-label="Close outreach composer">&times;</button><h2>Automated Outreach</h2><p class="admin-subtitle" id="audienceSummary"></p><form id="audienceForm"><input type="hidden" id="audienceType" name="audience"><div class="field"><label for="audienceChannel">Channels</label><select id="audienceChannel" name="channel"><option>Email</option><option>SMS</option><option>Email + SMS</option><option>Website + Email</option><option>Website + Email + SMS</option></select></div><div class="field"><label for="audienceSubject">Subject</label><input id="audienceSubject" name="subject" required></div><div class="field"><label for="audienceMessage">Automated message</label><textarea id="audienceMessage" name="message" rows="5" required></textarea></div><div class="modal-actions"><button class="btn btn-ghost" id="audienceCancel" type="button">Cancel</button><button class="btn btn-primary" type="submit">Queue Outreach</button></div></form></div>
 </div>
 
 <input type="file" id="staffPhotoInput" accept="image/*" hidden>

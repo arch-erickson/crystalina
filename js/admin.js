@@ -57,9 +57,11 @@
   }
 
   /* ---------- products table ---------- */
+  let productFilters = { search: '', category: '', stock: '' };
   function renderProducts() {
     const tbody = document.querySelector('#productsTable tbody');
-    tbody.innerHTML = Store.getProducts().map(p => `
+    const products = Store.getProducts().filter(product => (!productFilters.search || `${product.name} ${product.short}`.toLowerCase().includes(productFilters.search)) && (!productFilters.category || product.category === productFilters.category) && (!productFilters.stock || productFilters.stock === 'low' && product.stock > 0 && product.stock <= 15 || productFilters.stock === 'out' && product.stock === 0 || productFilters.stock === 'available' && product.stock > 15));
+    tbody.innerHTML = products.map(p => `
       <tr>
         <td><img src="${p.image}" alt=""></td>
         <td style="max-width:280px;"><strong>${p.name}</strong><br><small style="color:var(--muted)">${p.short || ''}</small></td>
@@ -71,14 +73,16 @@
           <button class="btn btn-sm btn-outline" onclick="AdminUI.editProduct('${p.id}')">Edit</button>
           <button class="btn btn-sm btn-danger" onclick="AdminUI.removeProduct('${p.id}')">Delete</button>
         </div></td>
-      </tr>`).join('');
+      </tr>`).join('') || '<tr><td colspan="7">No products match these filters.</td></tr>';
   }
 
   /* ---------- orders table ---------- */
   const STATUSES = ['Processing', 'Shipped', 'Delivered', 'Cancelled'];
+  let orderFilters = { search: '', date: '', status: '' };
   function renderOrders() {
-    const orders = Store.getOrders();
-    document.getElementById('noOrders').style.display = orders.length ? 'none' : 'block';
+    const allOrders = Store.getOrders();
+    const orders = allOrders.filter(order => (!orderFilters.search || `${order.id} ${order.customer.name} ${order.customer.email}`.toLowerCase().includes(orderFilters.search)) && (!orderFilters.date || order.date.slice(0, 10) === orderFilters.date) && (!orderFilters.status || order.status === orderFilters.status));
+    document.getElementById('noOrders').style.display = allOrders.length ? 'none' : 'block';
     document.querySelector('#ordersTable tbody').innerHTML = orders.map(o => `
       <tr>
         <td><strong>${o.id}</strong></td>
@@ -91,8 +95,8 @@
           <select onchange="AdminUI.setStatus('${o.id}', this.value)" style="padding:6px 10px;border:1px solid #d7e2f0;border-radius:8px;">
             ${STATUSES.map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
           </select>
-        </td>
-      </tr>`).join('');
+        </td><td><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteOrder('${o.id}')">Delete</button></td>
+      </tr>`).join('') || (allOrders.length ? '<tr><td colspan="8">No orders match these filters.</td></tr>' : '');
   }
 
   /* ---------- customers table ---------- */
@@ -170,6 +174,25 @@
     toast(values.channel.includes('Email') ? 'Message queued for website and/or email delivery' : 'Website notification sent');
   });
 
+  const audienceModal = document.getElementById('audienceModal');
+  const closeAudienceModal = () => audienceModal.classList.remove('open');
+  document.getElementById('audienceClose').addEventListener('click', closeAudienceModal);
+  document.getElementById('audienceCancel').addEventListener('click', closeAudienceModal);
+  audienceModal.addEventListener('click', event => { if (event.target === audienceModal) closeAudienceModal(); });
+  document.getElementById('audienceForm').addEventListener('submit', event => {
+    event.preventDefault(); const values = Object.fromEntries(new FormData(event.currentTarget).entries()); const data = Store.getAdminData();
+    const recipients = values.audience === 'pendingLeads' ? data.leads.filter(lead => !['Won', 'Lost'].includes(lead.stage)) : values.audience.startsWith('cart:') ? data.abandonedCarts.filter(cart => cart.id === values.audience.split(':')[1]) : data.abandonedCarts.filter(cart => cart.status === 'Pending');
+    Store.addAdminItem('outreach', { id: 'OUT-' + String(Date.now()).slice(-6), audience: values.audience, channel: values.channel, subject: values.subject, message: values.message, recipients: recipients.map(item => item.email), count: recipients.length, created: new Date().toISOString(), status: 'Queued' });
+    if (values.channel.includes('Website')) recipients.filter(item => item.customerId).forEach(item => Store.addNotification({ customerId: item.customerId, channel: values.channel, title: values.subject, message: values.message }));
+    if (values.audience !== 'pendingLeads') recipients.forEach(item => Store.updateAdminItem('abandonedCarts', item.id, { status: 'Contacted' }));
+    closeAudienceModal(); event.currentTarget.reset(); renderMarketing(); toast(`${recipients.length} outreach message(s) queued`);
+  });
+  document.getElementById('exportPendingLeads').addEventListener('click', () => {
+    const pending = Store.getAdminData().leads.filter(lead => !['Won', 'Lost'].includes(lead.stage));
+    const csv = [['Name', 'Email', 'Stage', 'Interest'], ...pending.map(lead => [lead.name, lead.email, lead.stage, lead.interest])].map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); link.download = 'pending-lead-emails.csv'; link.click(); URL.revokeObjectURL(link.href); toast('Pending lead emails exported');
+  });
+
   let staffPhotoId = null;
   const staffPhotoInput = document.getElementById('staffPhotoInput');
   staffPhotoInput.addEventListener('change', () => {
@@ -193,9 +216,11 @@
     return `<div class="stat-card"><div class="sc-label">${label}</div><div class="sc-value">${value}</div><div class="sc-hint">${hint}</div></div>`;
   }
 
+  let subscriptionFilters = { search: '', status: '', date: '' };
   function renderSubscriptions() {
-    const list = Store.getAdminData().subscriptions;
-    const active = list.filter(s => s.status === 'Active');
+    const allSubscriptions = Store.getAdminData().subscriptions;
+    const list = allSubscriptions.filter(subscription => (!subscriptionFilters.search || `${subscription.customer} ${subscription.email} ${subscription.system}`.toLowerCase().includes(subscriptionFilters.search)) && (!subscriptionFilters.status || subscription.status === subscriptionFilters.status) && (!subscriptionFilters.date || subscription.nextDate <= subscriptionFilters.date));
+    const active = allSubscriptions.filter(s => s.status === 'Active');
     document.getElementById('subscriptionStats').innerHTML =
       statCard('Active plans', active.length, `${list.filter(s => s.status === 'Paused').length} currently paused`) +
       statCard('Next 30 days', active.length, 'scheduled renewals') +
@@ -205,7 +230,7 @@
       <td>${customerButton(s.customer, s.email)}</td>
       <td>${s.system}</td><td>${s.cadence}</td><td>${formatDate(s.nextDate)}</td><td>${s.replacement}</td>
       <td><span class="record-status ${statusClass(s.status)}">${s.status}</span></td>
-      <td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.toggleSubscription('${s.id}')">${s.status === 'Paused' ? 'Resume' : 'Pause'}</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('subscription','${s.id}')">Edit</button></div></td>
+      <td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.toggleSubscription('${s.id}')">${s.status === 'Paused' ? 'Resume' : 'Pause'}</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('subscription','${s.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('subscriptions','${s.id}','${encodeURIComponent(s.id)}')">Delete</button></div></td>
     </tr>`).join('');
   }
 
@@ -267,35 +292,39 @@
     </tr>`).join('');
   }
 
+  let leadFilters = { search: '', stage: '', source: '' };
   function renderLeads() {
-    const leads = Store.getAdminData().leads;
-    const open = leads.filter(l => l.stage !== 'Won' && l.stage !== 'Lost');
+    const allLeads = Store.getAdminData().leads;
+    const leads = allLeads.filter(lead => (!leadFilters.search || `${lead.name} ${lead.email} ${lead.interest}`.toLowerCase().includes(leadFilters.search)) && (!leadFilters.stage || lead.stage === leadFilters.stage) && (!leadFilters.source || lead.source === leadFilters.source));
+    const open = allLeads.filter(l => l.stage !== 'Won' && l.stage !== 'Lost');
     const value = open.reduce((sum, lead) => sum + Number(lead.value), 0);
     document.getElementById('leadStats').innerHTML =
       statCard('Open opportunities', open.length, 'active conversations') +
       statCard('Pipeline value', money(value), 'estimated sales') +
       statCard('Follow-ups due', leads.filter(l => l.followUp <= '2026-08-25' && l.stage !== 'Won').length, 'today and overdue');
     const stages = ['New', 'Qualified', 'Quote sent', 'Won'];
-    document.getElementById('leadPipeline').innerHTML = stages.map(stage => `<div class="pipeline-stage"><span>${stage}</span><strong>${leads.filter(l => l.stage === stage).length}</strong></div>`).join('');
+    document.getElementById('leadPipeline').innerHTML = stages.map(stage => `<div class="pipeline-stage"><span>${stage}</span><strong>${allLeads.filter(l => l.stage === stage).length}</strong></div>`).join('');
     document.querySelector('#leadsTable tbody').innerHTML = leads.map(l => `<tr>
       <td>${customerButton(l.name, l.email)}</td><td>${l.interest}</td><td>${l.source}</td><td>${l.borough}</td><td><strong>${money(Number(l.value))}</strong></td><td>${formatDate(l.followUp)}</td>
-      <td><select class="admin-select" onchange="AdminUI.setLeadStage('${l.id}',this.value)">${['New', 'Qualified', 'Quote sent', 'Won', 'Lost'].map(s => `<option ${s === l.stage ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
-    </tr>`).join('');
+      <td><select class="admin-select" onchange="AdminUI.setLeadStage('${l.id}',this.value)">${['New', 'Qualified', 'Quote sent', 'Won', 'Lost'].map(s => `<option ${s === l.stage ? 'selected' : ''}>${s}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('lead','${l.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('leads','${l.id}','${encodeURIComponent(l.name)}')">Delete</button></div></td>
+    </tr>`).join('') || '<tr><td colspan="8">No leads match these filters.</td></tr>';
   }
 
   function renderMarketing() {
     const data = Store.getAdminData();
     const avgConversion = data.campaigns.reduce((sum, c) => sum + Number(c.conversion), 0) / Math.max(data.campaigns.length, 1);
+    const pendingCarts = data.abandonedCarts.filter(cart => cart.status === 'Pending');
     document.getElementById('marketingStats').innerHTML =
       statCard('List size', '2,418', 'email and SMS contacts') +
       statCard('Average conversion', `${avgConversion.toFixed(1)}%`, 'across current campaigns') +
       statCard('Referral sales', money(7260), 'this quarter') +
-      statCard('Abandoned carts', '23', '$4,860 recoverable value');
+      statCard('Abandoned carts', pendingCarts.length, `${money(pendingCarts.reduce((sum, cart) => sum + Number(cart.total), 0))} recoverable value`);
     document.querySelector('#campaignsTable tbody').innerHTML = data.campaigns.map(c => `<tr>
       <td><strong>${c.name}</strong><br><small>${c.channel}</small></td><td>${c.audience}</td><td>${Number(c.sent).toLocaleString()}</td><td><strong>${c.conversion}%</strong></td>
-      <td><select class="admin-select" onchange="AdminUI.setCampaignStatus('${c.id}',this.value)">${['Draft', 'Scheduled', 'Active', 'Paused', 'Completed'].map(s => `<option ${s === c.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+      <td><select class="admin-select" onchange="AdminUI.setCampaignStatus('${c.id}',this.value)">${['Draft', 'Scheduled', 'Active', 'Paused', 'Completed'].map(s => `<option ${s === c.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('campaign','${c.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('campaigns','${c.id}','${encodeURIComponent(c.name)}')">Delete</button></div></td>
     </tr>`).join('');
-    document.querySelector('#discountsTable tbody').innerHTML = data.discounts.map(d => `<tr><td><strong>${d.id}</strong></td><td>${d.type}</td><td>${d.usage}${Number(d.limit) ? ` / ${d.limit}` : ''}</td><td>${formatDate(d.expires)}</td><td><span class="record-status ${statusClass(d.status)}">${d.status}</span></td></tr>`).join('');
+    document.querySelector('#discountsTable tbody').innerHTML = data.discounts.map(d => `<tr><td><strong>${d.id}</strong></td><td>${d.type}</td><td>${d.usage}${Number(d.limit) ? ` / ${d.limit}` : ''}</td><td>${formatDate(d.expires)}</td><td><span class="record-status ${statusClass(d.status)}">${d.status}</span></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('discount','${d.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('discounts','${d.id}','${encodeURIComponent(d.id)}')">Delete</button></div></td></tr>`).join('');
+    document.querySelector('#abandonedCartsTable tbody').innerHTML = data.abandonedCarts.map(cart => `<tr><td>${cart.customerId ? customerButton(cart.customer, cart.email) : `<strong>${escapeHTML(cart.customer)}</strong>`}</td><td>${escapeHTML(cart.email)}<br><small>${escapeHTML(cart.phone || 'No SMS number')}</small></td><td>${cart.items.map(escapeHTML).join('<br>')}</td><td><strong>${money(Number(cart.total))}</strong></td><td>${new Date(cart.updated).toLocaleString()}</td><td><span class="record-status ${cart.status === 'Recovered' ? 'is-success' : cart.status === 'Pending' ? 'is-warning' : ''}">${escapeHTML(cart.status)}</span></td><td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.composeCart('${cart.id}')">Message</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('abandonedCarts','${cart.id}','${encodeURIComponent(cart.id)}')">Delete</button></div></td></tr>`).join('');
   }
 
   let ticketFilter = 'all';
@@ -308,7 +337,7 @@
       statCard('Average response', '1h 18m', 'during business hours');
     document.querySelector('#ticketsTable tbody').innerHTML = tickets.map(t => `<tr>
       <td><strong>${t.id}</strong><br><small>${t.channel}</small></td><td>${customerButton(t.customer)}</td><td><strong>${t.subject}</strong><br><button class="link-button" onclick="AdminUI.openCustomerByName('${encodeURIComponent(t.customer)}')">View notes &amp; history</button></td><td>${t.type}</td><td><span class="record-status ${t.priority === 'High' ? 'is-danger' : t.priority === 'Normal' ? 'is-warning' : ''}">${t.priority}</span></td><td>${formatDate(t.updated)}</td>
-      <td><select class="admin-select" onchange="AdminUI.setTicketStatus('${t.id}',this.value)">${['Open', 'In progress', 'Waiting on customer', 'Resolved'].map(s => `<option ${s === t.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+      <td><select class="admin-select" onchange="AdminUI.setTicketStatus('${t.id}',this.value)">${['Open', 'In progress', 'Waiting on customer', 'Resolved'].map(s => `<option ${s === t.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('ticket','${t.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('tickets','${t.id}','${encodeURIComponent(t.id)}')">Delete</button></div></td>
     </tr>`).join('') || `<tr><td colspan="7">No tickets match this filter.</td></tr>`;
   }
 
@@ -326,7 +355,8 @@
   }
 
   function renderFinance() {
-    const finance = Store.getAdminData().finance;
+    const adminData = Store.getAdminData();
+    const finance = adminData.finance;
     const revenue = finance.months.reduce((sum, month) => sum + month.revenue, 0);
     const costs = finance.months.reduce((sum, month) => sum + month.cost, 0);
     const profit = revenue - costs;
@@ -346,6 +376,8 @@
     document.getElementById('boroughLegend').innerHTML = `<div class="borough-legend">${finance.areas.map(area => `<div><span>${area.name}</span><strong>${Math.round((area.revenue / areaTotal) * 100)}%</strong></div>`).join('')}</div>`;
     document.querySelector('#areaSalesTable tbody').innerHTML = finance.areas.map(area => { const share = Math.round((area.revenue / areaTotal) * 100); return `<tr><td><strong>${area.name}</strong></td><td>${area.orders}</td><td>${money(area.revenue)}</td><td><div class="share-bar"><i style="width:${share}%"></i></div><small>${share}%</small></td></tr>`; }).join('');
     document.querySelector('#productSalesTable tbody').innerHTML = finance.products.map(product => `<tr><td><strong>${product.name}</strong></td><td>${product.units}</td><td>${money(product.revenue)}</td><td>${product.margin}%</td></tr>`).join('');
+    const averageOrder = revenue / orders;
+    document.querySelector('#marketingFinanceTable tbody').innerHTML = adminData.campaigns.map(campaign => { const estimatedOrders = Math.round(Number(campaign.sent) * Number(campaign.conversion) / 100); return `<tr><td><strong>${escapeHTML(campaign.name)}</strong></td><td>${escapeHTML(campaign.channel)}</td><td>${Number(campaign.sent).toLocaleString()}</td><td>${campaign.conversion}%</td><td>${estimatedOrders}</td><td><strong>${money(estimatedOrders * averageOrder)}</strong></td></tr>`; }).join('');
   }
 
   function renderSettings() {
@@ -370,6 +402,15 @@
     serviceFilters = { search: document.getElementById('serviceSearch').value.trim().toLowerCase(), date: document.getElementById('serviceDateFilter').value, borough: document.getElementById('serviceBoroughFilter').value, status: document.getElementById('serviceStatusFilter').value };
     renderService();
   }));
+  ['productSearch', 'productCategoryFilter', 'productStockFilter'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    productFilters = { search: document.getElementById('productSearch').value.trim().toLowerCase(), category: document.getElementById('productCategoryFilter').value, stock: document.getElementById('productStockFilter').value }; renderProducts();
+  }));
+  ['orderSearch', 'orderDateFilter', 'orderStatusFilter'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    orderFilters = { search: document.getElementById('orderSearch').value.trim().toLowerCase(), date: document.getElementById('orderDateFilter').value, status: document.getElementById('orderStatusFilter').value }; renderOrders();
+  }));
+  ['subscriptionSearch', 'subscriptionStatusFilter', 'subscriptionDateFilter'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    subscriptionFilters = { search: document.getElementById('subscriptionSearch').value.trim().toLowerCase(), status: document.getElementById('subscriptionStatusFilter').value, date: document.getElementById('subscriptionDateFilter').value }; renderSubscriptions();
+  }));
   document.querySelectorAll('[data-ticket-filter]').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('[data-ticket-filter]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active'); ticketFilter = btn.dataset.ticketFilter; renderSupport();
@@ -393,6 +434,9 @@
   ['supplierSearch', 'supplierStatusFilter'].forEach(id => document.getElementById(id).addEventListener('input', () => {
     supplierFilters = { search: document.getElementById('supplierSearch').value.trim().toLowerCase(), status: document.getElementById('supplierStatusFilter').value };
     renderSuppliers();
+  }));
+  ['leadSearch', 'leadStageFilter', 'leadSourceFilter'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    leadFilters = { search: document.getElementById('leadSearch').value.trim().toLowerCase(), stage: document.getElementById('leadStageFilter').value, source: document.getElementById('leadSourceFilter').value }; renderLeads();
   }));
 
   document.getElementById('heroContentForm').addEventListener('submit', event => {
@@ -613,6 +657,10 @@
       renderAll();
       toast(`Order ${id} → ${status}`);
     },
+    deleteOrder(id) {
+      if (!confirm(`Delete order ${id}? This removes the browser-stored order record.`)) return;
+      Store.deleteOrder(id); renderAll(); toast(`Order ${id} deleted`);
+    },
     toggleSubscription(id) {
       const item = Store.getAdminData().subscriptions.find(s => s.id === id);
       if (!item) return;
@@ -661,6 +709,14 @@
     openSupplierProfile(id) { openSupplierProfile(Store.getAdminData().supplierProfiles.find(profile => profile.id === id)); },
     openSupplierByName(encodedName) {
       const name = decodeURIComponent(encodedName); openSupplierProfile(Store.getAdminData().supplierProfiles.find(profile => profile.name === name));
+    },
+    composeAudience(type) {
+      const data = Store.getAdminData();
+      const count = type === 'pendingLeads' ? data.leads.filter(lead => !['Won', 'Lost'].includes(lead.stage)).length : data.abandonedCarts.filter(cart => cart.status === 'Pending').length;
+      document.getElementById('audienceType').value = type; document.getElementById('audienceSummary').textContent = `${count} recipient(s) will be included in this automated outreach.`; audienceModal.classList.add('open');
+    },
+    composeCart(id) {
+      document.getElementById('audienceType').value = `cart:${id}`; document.getElementById('audienceSummary').textContent = 'This recovery message will be sent to one abandoned-cart contact.'; audienceModal.classList.add('open');
     },
     composeMessage(customerId) {
       const customer = Store.getAdminData().customers.find(item => item.id === customerId) || Store.getAdminData().leads.find(item => item.id === customerId);

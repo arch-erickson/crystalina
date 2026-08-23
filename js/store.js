@@ -13,6 +13,7 @@ const Store = (() => {
     staffChallenge: 'crystalina_staff_challenge',
     orders: 'crystalina_orders',
     adminData: 'crystalina_admin_data',
+    adminSchema: 'crystalina_admin_schema',
     seedVersion: 'crystalina_seed_v'
   };
   const SEED_VERSION = 3;
@@ -142,6 +143,23 @@ const Store = (() => {
     if (!localStorage.getItem(KEYS.adminData)) {
       localStorage.setItem(KEYS.adminData, JSON.stringify(seedAdminData()));
     }
+    migrateAdminData();
+  }
+
+  function migrateAdminData() {
+    const schema = Number(localStorage.getItem(KEYS.adminSchema) || 0);
+    if (schema >= 2) return;
+    const defaults = seedAdminData();
+    const saved = read(KEYS.adminData, {});
+    ['customers', 'supplierProfiles', 'activityLog', 'abandonedCarts', 'outreach'].forEach(collection => { if (!saved[collection]) saved[collection] = defaults[collection]; });
+    saved.staff = (saved.staff || []).map(member => {
+      const current = defaults.staff.find(item => item.email === member.email);
+      return current ? { ...current, ...member, id: current.id, role: current.role, roles: current.roles, photo: member.photo || current.photo } : member;
+    });
+    defaults.staff.forEach(member => { if (!saved.staff.some(item => item.email === member.email)) saved.staff.push(member); });
+    saved.jobs = (saved.jobs || defaults.jobs).map(job => { const current = defaults.jobs.find(item => item.id === job.id); return current ? { ...current, ...job, checklist: job.checklist?.length ? job.checklist : current.checklist } : job; });
+    write(KEYS.adminData, { ...defaults, ...saved });
+    localStorage.setItem(KEYS.adminSchema, '2');
   }
 
   function seedAdminData() {
@@ -205,6 +223,12 @@ const Store = (() => {
         { id: 'FILTER20', type: '$20 off filters', usage: 47, limit: 150, expires: '2026-10-15', status: 'Active' },
         { id: 'WELCOME10', type: '10% off', usage: 126, limit: 0, expires: '2026-12-31', status: 'Active' }
       ],
+      abandonedCarts: [
+        { id: 'CART-601', customerId: 'CUS-1001', customer: 'Maya Chen', email: 'maya@example.com', phone: '(718) 555-0112', items: ['Digital TDS Water Quality Meter'], total: 19.99, updated: '2026-08-23T12:10:00.000Z', status: 'Pending' },
+        { id: 'CART-602', customerId: 'CUS-1003', customer: 'Sofia Martinez', email: 'sofia@example.com', phone: '(347) 555-0139', items: ['RO Replacement Filter Set'], total: 49.99, updated: '2026-08-22T18:40:00.000Z', status: 'Pending' },
+        { id: 'CART-603', customerId: '', customer: 'Guest checkout', email: 'guest@example.com', phone: '', items: ['Countertop Luxe Dispenser'], total: 179.99, updated: '2026-08-21T16:25:00.000Z', status: 'Contacted' }
+      ],
+      outreach: [],
       tickets: [
         { id: 'TKT-7041', customer: 'Maya Chen', subject: 'Low pressure after filter change', type: 'Troubleshooting', priority: 'High', updated: '2026-08-23', status: 'Open', channel: 'Email' },
         { id: 'TKT-7038', customer: 'James Wilson', subject: 'Warranty claim for faucet', type: 'Warranty', priority: 'Normal', updated: '2026-08-22', status: 'Waiting on customer', channel: 'Chat' },
@@ -362,6 +386,7 @@ const Store = (() => {
     const o = orders.find(o => o.id === id);
     if (o) { o.status = status; write(KEYS.orders, orders); }
   }
+  function deleteOrder(id) { write(KEYS.orders, getOrders().filter(order => order.id !== id)); }
 
   /* ---------- admin operations ---------- */
   function getAdminData() {
@@ -423,7 +448,7 @@ const Store = (() => {
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
     getUsers, currentUser, signUp, signIn, signOut,
     currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
-    getOrders, placeOrder, updateOrderStatus,
+    getOrders, placeOrder, updateOrderStatus, deleteOrder,
     getAdminData, updateAdminItem, addAdminItem, deleteAdminItem,
     addNotification, getNotificationsForUser, markNotificationsRead, logActivity,
     getSiteSettings, updateSiteSettings
