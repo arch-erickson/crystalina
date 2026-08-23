@@ -12,13 +12,17 @@
   });
 
   /* ---------- view switching ---------- */
-  const views = ['overview', 'products', 'orders', 'customers'];
-  document.querySelectorAll('.side-link[data-view]').forEach(btn =>
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.side-link[data-view]').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      views.forEach(v => document.getElementById('view-' + v).style.display = v === btn.dataset.view ? '' : 'none');
-    }));
+  const views = ['overview', 'products', 'orders', 'customers', 'subscriptions', 'service', 'staff', 'suppliers'];
+  function showView(view, updateHash = true) {
+    if (!views.includes(view)) view = 'overview';
+    document.querySelectorAll('.side-link[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+    views.forEach(v => document.getElementById('view-' + v).style.display = v === view ? '' : 'none');
+    if (updateHash) history.replaceState(null, '', '#' + view);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  document.querySelectorAll('.side-link[data-view]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
+  document.querySelectorAll('[data-view-jump]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.viewJump)));
+  showView(location.hash.slice(1) || 'overview', false);
 
   /* ---------- overview ---------- */
   function renderOverview() {
@@ -100,6 +104,151 @@
         <td>${orders.filter(o => o.customer.userId === u.id || o.customer.email.toLowerCase() === u.email.toLowerCase()).length}</td>
       </tr>`).join('');
   }
+
+  /* ---------- operations ---------- */
+  const formatDate = value => new Date(value + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const statusClass = status => {
+    if (['Active', 'Confirmed', 'Completed', 'Delivered', 'Available'].includes(status)) return 'is-success';
+    if (['Paused', 'Needs assignment', 'Delayed'].includes(status)) return 'is-warning';
+    if (['Cancelled'].includes(status)) return 'is-danger';
+    return '';
+  };
+
+  function statCard(label, value, hint) {
+    return `<div class="stat-card"><div class="sc-label">${label}</div><div class="sc-value">${value}</div><div class="sc-hint">${hint}</div></div>`;
+  }
+
+  function renderSubscriptions() {
+    const list = Store.getAdminData().subscriptions;
+    const active = list.filter(s => s.status === 'Active');
+    document.getElementById('subscriptionStats').innerHTML =
+      statCard('Active plans', active.length, `${list.filter(s => s.status === 'Paused').length} currently paused`) +
+      statCard('Next 30 days', active.length, 'scheduled renewals') +
+      statCard('Projected value', money(active.length * 64.99), 'next replacement cycle');
+    document.getElementById('replacementCount').textContent = `${active.length} upcoming`;
+    document.querySelector('#subscriptionsTable tbody').innerHTML = list.map(s => `<tr>
+      <td><strong>${s.customer}</strong><br><small>${s.email}</small></td>
+      <td>${s.system}</td><td>${s.cadence}</td><td>${formatDate(s.nextDate)}</td><td>${s.replacement}</td>
+      <td><span class="record-status ${statusClass(s.status)}">${s.status}</span></td>
+      <td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.toggleSubscription('${s.id}')">${s.status === 'Paused' ? 'Resume' : 'Pause'}</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('subscription','${s.id}')">Edit</button></div></td>
+    </tr>`).join('');
+  }
+
+  let jobFilter = 'all';
+  function renderService() {
+    const allJobs = Store.getAdminData().jobs;
+    const jobs = jobFilter === 'unassigned' ? allJobs.filter(j => j.status === 'Needs assignment') : allJobs;
+    document.getElementById('serviceStats').innerHTML =
+      statCard('Upcoming jobs', allJobs.length, 'across the next 7 days') +
+      statCard('Needs assignment', allJobs.filter(j => j.status === 'Needs assignment').length, 'requires dispatch') +
+      statCard('QC complete', allJobs.filter(j => j.beforePhoto && j.afterPhoto).length, 'before and finish photos');
+    document.querySelector('#jobsTable tbody').innerHTML = jobs.map(j => {
+      const pct = Math.round((j.checklistDone / j.checklistTotal) * 100);
+      return `<tr>
+        <td><strong>${formatDate(j.date)}</strong><br><small>${j.time}</small></td>
+        <td><strong>${j.customer}</strong><br><small>${j.address}, ${j.borough}</small></td>
+        <td>${j.type}</td>
+        <td><select class="admin-select" onchange="AdminUI.assignTechnician('${j.id}',this.value)"><option ${j.technician === 'Needs assignment' ? 'selected' : ''}>Needs assignment</option>${Store.getAdminData().staff.filter(s => s.role.includes('Technician')).map(s => `<option ${s.name === j.technician ? 'selected' : ''}>${s.name}</option>`).join('')}</select></td>
+        <td><select class="admin-select" onchange="AdminUI.setJobStatus('${j.id}',this.value)">${['Needs assignment', 'Assigned', 'Confirmed', 'In progress', 'Completed', 'Cancelled'].map(s => `<option ${s === j.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+        <td><button class="photo-chip" onclick="AdminUI.advanceChecklist('${j.id}')"><span class="progress-compact"><span>${j.checklistDone} of ${j.checklistTotal} complete</span><span class="progress-track"><i style="width:${pct}%"></i></span></span></button></td>
+        <td><div class="photo-actions"><button class="photo-chip ${j.beforePhoto ? 'has-photo' : ''}" onclick="AdminUI.chooseJobPhoto('${j.id}','beforePhoto')">${j.beforePhoto ? 'Pre-job saved' : 'Add pre-job'}</button><button class="photo-chip ${j.afterPhoto ? 'has-photo' : ''}" onclick="AdminUI.chooseJobPhoto('${j.id}','afterPhoto')">${j.afterPhoto ? 'Finish saved' : 'Add finish'}</button></div></td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="7">No jobs match this filter.</td></tr>`;
+  }
+
+  function renderStaff() {
+    document.getElementById('staffGrid').innerHTML = Store.getAdminData().staff.map(s => `<article class="staff-card">
+      <div class="staff-card-head"><div class="staff-avatar">${s.initials}</div><div><h3>${s.name}</h3><div class="staff-role">${s.role}</div></div></div>
+      <div class="staff-details"><span><strong>Coverage:</strong> ${s.area}</span><span><strong>Schedule:</strong> <span class="record-status ${statusClass(s.availability)}">${s.availability}</span></span><span>${s.email}<br>${s.phone}</span></div>
+      <div class="staff-metrics"><div class="staff-metric"><strong>${s.rating}</strong><span>Review score</span></div><div class="staff-metric"><strong>${s.jobs}</strong><span>Jobs completed</span></div></div>
+      <button class="btn btn-sm btn-outline btn-block" onclick="AdminUI.editRecord('staff','${s.id}')">Edit Profile &amp; Schedule</button>
+    </article>`).join('');
+  }
+
+  function renderSuppliers() {
+    const list = Store.getAdminData().suppliers;
+    document.getElementById('supplierStats').innerHTML =
+      statCard('Open purchase orders', list.filter(p => p.status !== 'Delivered').length, 'awaiting delivery') +
+      statCard('In transit', list.filter(p => p.status === 'In transit').length, 'active shipment') +
+      statCard('Committed spend', money(list.filter(p => p.status !== 'Delivered').reduce((sum, p) => sum + Number(p.amount), 0)), 'open purchase orders');
+    document.querySelector('#suppliersTable tbody').innerHTML = list.map(p => `<tr>
+      <td><strong>${p.id}</strong></td><td><strong>${p.supplier}</strong><br><small>${p.contact}</small></td><td>${p.category}</td><td>${money(p.amount)}</td><td>${formatDate(p.eta)}</td><td><span class="admin-badge">${p.tracking}</span></td>
+      <td><select class="admin-select" onchange="AdminUI.setSupplierStatus('${p.id}',this.value)">${['Draft', 'Confirmed', 'In transit', 'Delayed', 'Delivered'].map(s => `<option ${s === p.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+    </tr>`).join('');
+  }
+
+  document.querySelectorAll('[data-job-filter]').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-job-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); jobFilter = btn.dataset.jobFilter; renderService();
+  }));
+
+  let pendingPhoto = null;
+  const jobPhotoInput = document.getElementById('jobPhotoInput');
+  jobPhotoInput.addEventListener('change', () => {
+    const file = jobPhotoInput.files[0];
+    if (!file || !pendingPhoto) return;
+    if (file.size > 2.5 * 1024 * 1024) { toast('Photo too large, please keep under 2.5 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      Store.updateAdminItem('jobs', pendingPhoto.id, { [pendingPhoto.field]: reader.result });
+      pendingPhoto = null; jobPhotoInput.value = ''; renderService(); toast('Quality-control photo saved');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* ---------- reusable record forms ---------- */
+  const recordModal = document.getElementById('recordModal');
+  const recordForm = document.getElementById('recordForm');
+  let recordType = null;
+  let editingRecordId = null;
+  const recordConfigs = {
+    subscription: { title: 'Subscription', collection: 'subscriptions', prefix: 'SUB', fields: [
+      ['customer', 'Customer name', 'text'], ['email', 'Email', 'email'], ['system', 'Filtration system', 'text'], ['cadence', 'Renewal cadence', 'select', ['3 months', '6 months', '12 months']], ['nextDate', 'Next renewal', 'date'], ['replacement', 'Replacement kit', 'text'], ['status', 'Status', 'select', ['Active', 'Paused']]
+    ] },
+    job: { title: 'Service Job', collection: 'jobs', prefix: 'JOB', fields: [
+      ['customer', 'Customer name', 'text'], ['address', 'Service address', 'text'], ['borough', 'Borough', 'select', ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']], ['type', 'Job type', 'select', ['New installation', 'Filter replacement', 'Annual maintenance', 'Repair visit']], ['date', 'Service date', 'date'], ['time', 'Arrival time', 'time'], ['technician', 'Technician', 'select', ['Needs assignment', 'Luis Rivera', 'Amina Patel']], ['status', 'Status', 'select', ['Needs assignment', 'Assigned', 'Confirmed']]
+    ] },
+    staff: { title: 'Staff Profile', collection: 'staff', prefix: 'STAFF', fields: [
+      ['name', 'Full name', 'text'], ['role', 'Role', 'select', ['Installation Technician', 'Lead Technician', 'Sales Representative']], ['email', 'Work email', 'email'], ['phone', 'Phone', 'tel'], ['area', 'Coverage area', 'text'], ['availability', 'Availability', 'select', ['Available', 'On job', 'Off duty']]
+    ] },
+    supplier: { title: 'Purchase Order', collection: 'suppliers', prefix: 'PO', fields: [
+      ['supplier', 'Supplier', 'text'], ['category', 'Product category', 'text'], ['contact', 'Contact email', 'email'], ['amount', 'Order amount', 'number'], ['eta', 'Estimated delivery', 'date'], ['tracking', 'Tracking number', 'text'], ['status', 'Status', 'select', ['Draft', 'Confirmed', 'In transit']]
+    ] }
+  };
+
+  function fieldMarkup(field, value = '') {
+    const [name, label, type, options] = field;
+    if (type === 'select') return `<div class="field"><label for="record-${name}">${label}</label><select id="record-${name}" name="${name}" required>${options.map(option => `<option ${option === value ? 'selected' : ''}>${option}</option>`).join('')}</select></div>`;
+    return `<div class="field"><label for="record-${name}">${label}</label><input id="record-${name}" name="${name}" type="${type}" value="${value || ''}" ${type === 'number' ? 'min="0" step="0.01"' : ''} required></div>`;
+  }
+
+  function openRecordModal(type, id = null) {
+    const config = recordConfigs[type];
+    if (!config) return;
+    recordType = type; editingRecordId = id;
+    const existing = id ? Store.getAdminData()[config.collection].find(item => item.id === id) : null;
+    document.getElementById('recordModalTitle').textContent = `${id ? 'Edit' : 'Add'} ${config.title}`;
+    document.getElementById('recordFields').innerHTML = config.fields.map(field => fieldMarkup(field, existing ? existing[field[0]] : '')).join('');
+    recordModal.classList.add('open');
+  }
+  function closeRecordModal() { recordModal.classList.remove('open'); recordForm.reset(); recordType = null; editingRecordId = null; }
+  document.querySelectorAll('[data-open-record]').forEach(btn => btn.addEventListener('click', () => openRecordModal(btn.dataset.openRecord)));
+  document.getElementById('recordCancel').addEventListener('click', closeRecordModal);
+  recordModal.addEventListener('click', event => { if (event.target === recordModal) closeRecordModal(); });
+  recordForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const config = recordConfigs[recordType];
+    const values = Object.fromEntries(new FormData(recordForm).entries());
+    if (recordType === 'supplier') values.amount = Number(values.amount);
+    if (recordType === 'staff') {
+      values.initials = values.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
+      if (!editingRecordId) { values.rating = 5; values.jobs = 0; }
+    }
+    if (recordType === 'job' && !editingRecordId) Object.assign(values, { checklistDone: 0, checklistTotal: 5, beforePhoto: '', afterPhoto: '' });
+    if (editingRecordId) Store.updateAdminItem(config.collection, editingRecordId, values);
+    else Store.addAdminItem(config.collection, { id: `${config.prefix}-${String(Date.now()).slice(-5)}`, ...values });
+    closeRecordModal(); renderAll(); toast(`${config.title} saved`);
+  });
 
   /* ---------- product modal (add / edit) ---------- */
   const modal = document.getElementById('productModal');
@@ -199,9 +348,41 @@
       Store.updateOrderStatus(id, status);
       renderAll();
       toast(`Order ${id} → ${status}`);
+    },
+    toggleSubscription(id) {
+      const item = Store.getAdminData().subscriptions.find(s => s.id === id);
+      if (!item) return;
+      Store.updateAdminItem('subscriptions', id, { status: item.status === 'Paused' ? 'Active' : 'Paused' });
+      renderSubscriptions(); toast(`Subscription ${item.status === 'Paused' ? 'resumed' : 'paused'}`);
+    },
+    setJobStatus(id, status) {
+      Store.updateAdminItem('jobs', id, { status }); renderService(); toast(`Job ${id} updated`);
+    },
+    assignTechnician(id, technician) {
+      Store.updateAdminItem('jobs', id, { technician, status: technician === 'Needs assignment' ? 'Needs assignment' : 'Assigned' });
+      renderService(); toast(`Technician assignment updated`);
+    },
+    advanceChecklist(id) {
+      const job = Store.getAdminData().jobs.find(j => j.id === id);
+      if (!job) return;
+      const next = job.checklistDone >= job.checklistTotal ? 0 : job.checklistDone + 1;
+      Store.updateAdminItem('jobs', id, { checklistDone: next }); renderService();
+      toast(next === job.checklistTotal ? 'Maintenance checklist completed' : 'Checklist progress saved');
+    },
+    chooseJobPhoto(id, field) {
+      pendingPhoto = { id, field }; jobPhotoInput.click();
+    },
+    setSupplierStatus(id, status) {
+      Store.updateAdminItem('suppliers', id, { status }); renderSuppliers(); toast(`Purchase order ${id} updated`);
+    },
+    editRecord(type, id) {
+      openRecordModal(type, id);
     }
   };
 
-  function renderAll() { renderOverview(); renderProducts(); renderOrders(); renderCustomers(); }
+  function renderAll() {
+    renderOverview(); renderProducts(); renderOrders(); renderCustomers();
+    renderSubscriptions(); renderService(); renderStaff(); renderSuppliers();
+  }
   renderAll();
 })();

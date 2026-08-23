@@ -10,6 +10,7 @@ const Store = (() => {
     users: 'crystalina_users',
     session: 'crystalina_session',
     orders: 'crystalina_orders',
+    adminData: 'crystalina_admin_data',
     seedVersion: 'crystalina_seed_v'
   };
   const SEED_VERSION = 3;
@@ -126,6 +127,35 @@ const Store = (() => {
         created: new Date().toISOString()
       }]));
     }
+    if (!localStorage.getItem(KEYS.adminData)) {
+      localStorage.setItem(KEYS.adminData, JSON.stringify(seedAdminData()));
+    }
+  }
+
+  function seedAdminData() {
+    return {
+      subscriptions: [
+        { id: 'SUB-1048', customer: 'Maya Chen', email: 'maya@example.com', system: 'RO-10 Alkaline', cadence: '6 months', nextDate: '2026-09-03', replacement: 'Stages 1 to 3', status: 'Active' },
+        { id: 'SUB-1047', customer: 'James Wilson', email: 'james@example.com', system: 'Whole Home 3-Stage', cadence: '6 months', nextDate: '2026-09-05', replacement: 'Whole Home Set', status: 'Active' },
+        { id: 'SUB-1044', customer: 'Sofia Martinez', email: 'sofia@example.com', system: 'RO-5 Classic', cadence: '12 months', nextDate: '2026-09-09', replacement: 'Stages 1 to 3', status: 'Paused' },
+        { id: 'SUB-1039', customer: 'Noah Brown', email: 'noah@example.com', system: 'VitaShower', cadence: '6 months', nextDate: '2026-09-12', replacement: 'Shower Cartridge', status: 'Active' }
+      ],
+      jobs: [
+        { id: 'JOB-2081', customer: 'Maya Chen', address: '45-18 21st St', borough: 'Queens', type: 'Filter replacement', date: '2026-08-25', time: '9:00 AM', technician: 'Luis Rivera', status: 'Confirmed', checklistDone: 1, checklistTotal: 4, beforePhoto: '', afterPhoto: '' },
+        { id: 'JOB-2082', customer: 'James Wilson', address: '211 W 104th St', borough: 'Manhattan', type: 'Whole home install', date: '2026-08-25', time: '1:30 PM', technician: 'Amina Patel', status: 'Assigned', checklistDone: 0, checklistTotal: 6, beforePhoto: '', afterPhoto: '' },
+        { id: 'JOB-2083', customer: 'Sofia Martinez', address: '78 Prospect Pl', borough: 'Brooklyn', type: 'Annual maintenance', date: '2026-08-26', time: '10:00 AM', technician: 'Luis Rivera', status: 'Needs assignment', checklistDone: 0, checklistTotal: 5, beforePhoto: '', afterPhoto: '' }
+      ],
+      staff: [
+        { id: 'STAFF-01', name: 'Luis Rivera', role: 'Lead Technician', email: 'luis@crystalina.org', phone: '(917) 555-0142', area: 'Brooklyn, Queens', availability: 'Available', rating: 4.9, jobs: 38, initials: 'LR' },
+        { id: 'STAFF-02', name: 'Amina Patel', role: 'Installation Technician', email: 'amina@crystalina.org', phone: '(917) 555-0188', area: 'Manhattan, Bronx', availability: 'On job', rating: 4.8, jobs: 31, initials: 'AP' },
+        { id: 'STAFF-03', name: 'Marcus Lee', role: 'Sales Representative', email: 'marcus@crystalina.org', phone: '(917) 555-0164', area: 'All boroughs', availability: 'Available', rating: 4.7, jobs: 24, initials: 'ML' }
+      ],
+      suppliers: [
+        { id: 'PO-3108', supplier: 'AquaCore Components', category: 'RO membranes', contact: 'orders@aquacore.example', amount: 2840, eta: '2026-08-27', status: 'In transit', tracking: 'ACX-884120' },
+        { id: 'PO-3107', supplier: 'PureFlow Wholesale', category: 'Carbon blocks', contact: 'sales@pureflow.example', amount: 1925, eta: '2026-08-29', status: 'Confirmed', tracking: 'PFW-220419' },
+        { id: 'PO-3104', supplier: 'Metro Plumbing Supply', category: 'Installation fittings', contact: 'dispatch@metroplumbing.example', amount: 760, eta: '2026-08-22', status: 'Delivered', tracking: 'MPS-741026' }
+      ]
+    };
   }
 
   /* ---------- generic helpers ---------- */
@@ -220,6 +250,25 @@ const Store = (() => {
     if (o) { o.status = status; write(KEYS.orders, orders); }
   }
 
+  /* ---------- admin operations ---------- */
+  function getAdminData() {
+    return { ...seedAdminData(), ...read(KEYS.adminData, {}) };
+  }
+  function saveAdminData(data) { write(KEYS.adminData, data); }
+  function updateAdminItem(collection, id, changes) {
+    const data = getAdminData();
+    const item = (data[collection] || []).find(entry => entry.id === id);
+    if (item) { Object.assign(item, changes); saveAdminData(data); }
+    return item || null;
+  }
+  function addAdminItem(collection, item) {
+    const data = getAdminData();
+    data[collection] = data[collection] || [];
+    data[collection].unshift(item);
+    saveAdminData(data);
+    return item;
+  }
+
   ensureSeed();
 
   return {
@@ -227,6 +276,7 @@ const Store = (() => {
     getProducts, getProduct, upsertProduct, deleteProduct,
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
     getUsers, currentUser, signUp, signIn, signOut,
-    getOrders, placeOrder, updateOrderStatus
+    getOrders, placeOrder, updateOrderStatus,
+    getAdminData, updateAdminItem, addAdminItem
   };
 })();
