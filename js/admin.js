@@ -12,7 +12,7 @@
   });
 
   /* ---------- view switching ---------- */
-  const views = ['overview', 'products', 'orders', 'customers', 'subscriptions', 'service', 'staff', 'suppliers'];
+  const views = ['overview', 'products', 'orders', 'customers', 'subscriptions', 'service', 'staff', 'suppliers', 'leads', 'marketing', 'support'];
   function showView(view, updateHash = true) {
     if (!views.includes(view)) view = 'overview';
     document.querySelectorAll('.side-link[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
@@ -177,9 +177,58 @@
     </tr>`).join('');
   }
 
+  function renderLeads() {
+    const leads = Store.getAdminData().leads;
+    const open = leads.filter(l => l.stage !== 'Won' && l.stage !== 'Lost');
+    const value = open.reduce((sum, lead) => sum + Number(lead.value), 0);
+    document.getElementById('leadStats').innerHTML =
+      statCard('Open opportunities', open.length, 'active conversations') +
+      statCard('Pipeline value', money(value), 'estimated sales') +
+      statCard('Follow-ups due', leads.filter(l => l.followUp <= '2026-08-25' && l.stage !== 'Won').length, 'today and overdue');
+    const stages = ['New', 'Qualified', 'Quote sent', 'Won'];
+    document.getElementById('leadPipeline').innerHTML = stages.map(stage => `<div class="pipeline-stage"><span>${stage}</span><strong>${leads.filter(l => l.stage === stage).length}</strong></div>`).join('');
+    document.querySelector('#leadsTable tbody').innerHTML = leads.map(l => `<tr>
+      <td><strong>${l.name}</strong><br><small>${l.email}</small></td><td>${l.interest}</td><td>${l.source}</td><td>${l.borough}</td><td><strong>${money(Number(l.value))}</strong></td><td>${formatDate(l.followUp)}</td>
+      <td><select class="admin-select" onchange="AdminUI.setLeadStage('${l.id}',this.value)">${['New', 'Qualified', 'Quote sent', 'Won', 'Lost'].map(s => `<option ${s === l.stage ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+    </tr>`).join('');
+  }
+
+  function renderMarketing() {
+    const data = Store.getAdminData();
+    const avgConversion = data.campaigns.reduce((sum, c) => sum + Number(c.conversion), 0) / Math.max(data.campaigns.length, 1);
+    document.getElementById('marketingStats').innerHTML =
+      statCard('List size', '2,418', 'email and SMS contacts') +
+      statCard('Average conversion', `${avgConversion.toFixed(1)}%`, 'across current campaigns') +
+      statCard('Referral sales', money(7260), 'this quarter') +
+      statCard('Abandoned carts', '23', '$4,860 recoverable value');
+    document.querySelector('#campaignsTable tbody').innerHTML = data.campaigns.map(c => `<tr>
+      <td><strong>${c.name}</strong><br><small>${c.channel}</small></td><td>${c.audience}</td><td>${Number(c.sent).toLocaleString()}</td><td><strong>${c.conversion}%</strong></td>
+      <td><select class="admin-select" onchange="AdminUI.setCampaignStatus('${c.id}',this.value)">${['Draft', 'Scheduled', 'Active', 'Paused', 'Completed'].map(s => `<option ${s === c.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+    </tr>`).join('');
+    document.querySelector('#discountsTable tbody').innerHTML = data.discounts.map(d => `<tr><td><strong>${d.id}</strong></td><td>${d.type}</td><td>${d.usage}${Number(d.limit) ? ` / ${d.limit}` : ''}</td><td>${formatDate(d.expires)}</td><td><span class="record-status ${statusClass(d.status)}">${d.status}</span></td></tr>`).join('');
+  }
+
+  let ticketFilter = 'all';
+  function renderSupport() {
+    const allTickets = Store.getAdminData().tickets;
+    const tickets = allTickets.filter(ticket => ticketFilter === 'all' || (ticketFilter === 'open' && ticket.status !== 'Resolved') || (ticketFilter === 'warranty' && ticket.type === 'Warranty') || (ticketFilter === 'returns' && ticket.type === 'Return'));
+    document.getElementById('supportStats').innerHTML =
+      statCard('Open tickets', allTickets.filter(t => t.status !== 'Resolved').length, 'across email and chat') +
+      statCard('Warranty claims', allTickets.filter(t => t.type === 'Warranty' && t.status !== 'Resolved').length, 'awaiting resolution') +
+      statCard('Average response', '1h 18m', 'during business hours');
+    document.querySelector('#ticketsTable tbody').innerHTML = tickets.map(t => `<tr>
+      <td><strong>${t.id}</strong><br><small>${t.channel}</small></td><td>${t.customer}</td><td><strong>${t.subject}</strong><br><button class="link-button" onclick="AdminUI.markDemoAction('Conversation history opened')">View notes &amp; history</button></td><td>${t.type}</td><td><span class="record-status ${t.priority === 'High' ? 'is-danger' : t.priority === 'Normal' ? 'is-warning' : ''}">${t.priority}</span></td><td>${formatDate(t.updated)}</td>
+      <td><select class="admin-select" onchange="AdminUI.setTicketStatus('${t.id}',this.value)">${['Open', 'In progress', 'Waiting on customer', 'Resolved'].map(s => `<option ${s === t.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+    </tr>`).join('') || `<tr><td colspan="7">No tickets match this filter.</td></tr>`;
+  }
+
   document.querySelectorAll('[data-job-filter]').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('[data-job-filter]').forEach(b => b.classList.remove('active'));
     btn.classList.add('active'); jobFilter = btn.dataset.jobFilter; renderService();
+  }));
+  document.querySelectorAll('[data-ticket-filter]').forEach(btn => btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-ticket-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); ticketFilter = btn.dataset.ticketFilter; renderSupport();
   }));
 
   let pendingPhoto = null;
@@ -213,6 +262,18 @@
     ] },
     supplier: { title: 'Purchase Order', collection: 'suppliers', prefix: 'PO', fields: [
       ['supplier', 'Supplier', 'text'], ['category', 'Product category', 'text'], ['contact', 'Contact email', 'email'], ['amount', 'Order amount', 'number'], ['eta', 'Estimated delivery', 'date'], ['tracking', 'Tracking number', 'text'], ['status', 'Status', 'select', ['Draft', 'Confirmed', 'In transit']]
+    ] },
+    lead: { title: 'Lead', collection: 'leads', prefix: 'LEAD', fields: [
+      ['name', 'Customer name', 'text'], ['email', 'Email', 'email'], ['source', 'Lead source', 'select', ['Website quote', 'Water quiz', 'Referral', 'Phone inquiry']], ['interest', 'Product interest', 'text'], ['borough', 'Borough', 'select', ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']], ['value', 'Estimated value', 'number'], ['followUp', 'Follow-up date', 'date'], ['stage', 'Pipeline stage', 'select', ['New', 'Qualified', 'Quote sent', 'Won']]
+    ] },
+    campaign: { title: 'Campaign', collection: 'campaigns', prefix: 'CAM', fields: [
+      ['name', 'Campaign name', 'text'], ['channel', 'Channel', 'select', ['Email', 'SMS', 'Email + SMS']], ['audience', 'Audience list', 'text'], ['sent', 'Contacts', 'number'], ['conversion', 'Conversion goal (%)', 'number'], ['status', 'Status', 'select', ['Draft', 'Scheduled', 'Active']]
+    ] },
+    discount: { title: 'Discount Code', collection: 'discounts', prefix: 'CODE', fields: [
+      ['id', 'Discount code', 'text'], ['type', 'Offer', 'text'], ['limit', 'Usage limit (0 for unlimited)', 'number'], ['expires', 'Expiration date', 'date'], ['status', 'Status', 'select', ['Active', 'Paused']]
+    ] },
+    ticket: { title: 'Support Ticket', collection: 'tickets', prefix: 'TKT', fields: [
+      ['customer', 'Customer', 'text'], ['subject', 'Issue summary', 'text'], ['type', 'Request type', 'select', ['Troubleshooting', 'Warranty', 'Return', 'General question']], ['priority', 'Priority', 'select', ['Low', 'Normal', 'High']], ['channel', 'Channel', 'select', ['Email', 'Chat', 'Phone']], ['status', 'Status', 'select', ['Open', 'In progress', 'Waiting on customer']]
     ] }
   };
 
@@ -240,6 +301,10 @@
     const config = recordConfigs[recordType];
     const values = Object.fromEntries(new FormData(recordForm).entries());
     if (recordType === 'supplier') values.amount = Number(values.amount);
+    if (recordType === 'lead') values.value = Number(values.value);
+    if (recordType === 'campaign') { values.sent = Number(values.sent); values.conversion = Number(values.conversion); }
+    if (recordType === 'discount') { values.usage = 0; values.limit = Number(values.limit); values.id = values.id.toUpperCase(); }
+    if (recordType === 'ticket') values.updated = new Date().toISOString().slice(0, 10);
     if (recordType === 'staff') {
       values.initials = values.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
       if (!editingRecordId) { values.rating = 5; values.jobs = 0; }
@@ -375,6 +440,16 @@
     setSupplierStatus(id, status) {
       Store.updateAdminItem('suppliers', id, { status }); renderSuppliers(); toast(`Purchase order ${id} updated`);
     },
+    setLeadStage(id, stage) {
+      Store.updateAdminItem('leads', id, { stage }); renderLeads(); toast(`Lead moved to ${stage}`);
+    },
+    setCampaignStatus(id, status) {
+      Store.updateAdminItem('campaigns', id, { status }); renderMarketing(); toast(`Campaign status updated`);
+    },
+    setTicketStatus(id, status) {
+      Store.updateAdminItem('tickets', id, { status, updated: new Date().toISOString().slice(0, 10) }); renderSupport(); toast(`Ticket ${id} updated`);
+    },
+    markDemoAction(message) { toast(message); },
     editRecord(type, id) {
       openRecordModal(type, id);
     }
@@ -383,6 +458,7 @@
   function renderAll() {
     renderOverview(); renderProducts(); renderOrders(); renderCustomers();
     renderSubscriptions(); renderService(); renderStaff(); renderSuppliers();
+    renderLeads(); renderMarketing(); renderSupport();
   }
   renderAll();
 })();

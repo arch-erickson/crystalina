@@ -154,6 +154,28 @@ const Store = (() => {
         { id: 'PO-3108', supplier: 'AquaCore Components', category: 'RO membranes', contact: 'orders@aquacore.example', amount: 2840, eta: '2026-08-27', status: 'In transit', tracking: 'ACX-884120' },
         { id: 'PO-3107', supplier: 'PureFlow Wholesale', category: 'Carbon blocks', contact: 'sales@pureflow.example', amount: 1925, eta: '2026-08-29', status: 'Confirmed', tracking: 'PFW-220419' },
         { id: 'PO-3104', supplier: 'Metro Plumbing Supply', category: 'Installation fittings', contact: 'dispatch@metroplumbing.example', amount: 760, eta: '2026-08-22', status: 'Delivered', tracking: 'MPS-741026' }
+      ],
+      leads: [
+        { id: 'LEAD-5028', name: 'Olivia Thompson', email: 'olivia@example.com', source: 'Website quote', interest: 'Whole Home 3-Stage', borough: 'Brooklyn', value: 1299, followUp: '2026-08-24', stage: 'Qualified' },
+        { id: 'LEAD-5027', name: 'Ethan Davis', email: 'ethan@example.com', source: 'Referral', interest: 'RO-10 Alkaline', borough: 'Queens', value: 599, followUp: '2026-08-25', stage: 'Quote sent' },
+        { id: 'LEAD-5024', name: 'Ava Robinson', email: 'ava@example.com', source: 'Water quiz', interest: 'Countertop Luxe', borough: 'Manhattan', value: 180, followUp: '2026-08-26', stage: 'New' },
+        { id: 'LEAD-5018', name: 'Lucas Garcia', email: 'lucas@example.com', source: 'Phone inquiry', interest: 'RO-5 Classic', borough: 'Bronx', value: 420, followUp: '2026-08-23', stage: 'Won' }
+      ],
+      campaigns: [
+        { id: 'CAM-108', name: 'End of Summer Filter Refresh', channel: 'Email + SMS', audience: 'Replacement customers', sent: 1840, conversion: 8.4, status: 'Active' },
+        { id: 'CAM-106', name: 'Brooklyn Brownstone Water Guide', channel: 'Email', audience: 'Brooklyn leads', sent: 624, conversion: 5.9, status: 'Scheduled' },
+        { id: 'CAM-102', name: 'RO-10 Welcome Series', channel: 'Email', audience: 'New subscribers', sent: 392, conversion: 12.1, status: 'Active' }
+      ],
+      discounts: [
+        { id: 'NYCPURE15', type: '15% off', usage: 84, limit: 250, expires: '2026-09-30', status: 'Active' },
+        { id: 'FILTER20', type: '$20 off filters', usage: 47, limit: 150, expires: '2026-10-15', status: 'Active' },
+        { id: 'WELCOME10', type: '10% off', usage: 126, limit: 0, expires: '2026-12-31', status: 'Active' }
+      ],
+      tickets: [
+        { id: 'TKT-7041', customer: 'Maya Chen', subject: 'Low pressure after filter change', type: 'Troubleshooting', priority: 'High', updated: '2026-08-23', status: 'Open', channel: 'Email' },
+        { id: 'TKT-7038', customer: 'James Wilson', subject: 'Warranty claim for faucet', type: 'Warranty', priority: 'Normal', updated: '2026-08-22', status: 'Waiting on customer', channel: 'Chat' },
+        { id: 'TKT-7034', customer: 'Sofia Martinez', subject: 'Return unopened replacement set', type: 'Return', priority: 'Normal', updated: '2026-08-21', status: 'In progress', channel: 'Email' },
+        { id: 'TKT-7029', customer: 'Noah Brown', subject: 'VitaShower installation help', type: 'Troubleshooting', priority: 'Low', updated: '2026-08-20', status: 'Resolved', channel: 'Chat' }
       ]
     };
   }
