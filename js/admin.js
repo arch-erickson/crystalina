@@ -182,10 +182,13 @@
     </tr>`).join('');
   }
 
-  let jobFilter = 'all';
+  let serviceFilters = { search: '', date: '', borough: '', status: '' };
   function renderService() {
     const allJobs = Store.getAdminData().jobs;
-    const jobs = jobFilter === 'unassigned' ? allJobs.filter(j => j.status === 'Needs assignment') : allJobs;
+    const jobs = allJobs.filter(job => {
+      const haystack = `${job.id} ${job.customer} ${job.product || ''} ${job.type}`.toLowerCase();
+      return (!serviceFilters.search || haystack.includes(serviceFilters.search)) && (!serviceFilters.date || job.date === serviceFilters.date) && (!serviceFilters.borough || job.borough === serviceFilters.borough) && (!serviceFilters.status || job.status === serviceFilters.status);
+    });
     document.getElementById('serviceStats').innerHTML =
       statCard('Upcoming jobs', allJobs.length, 'across the next 7 days') +
       statCard('Needs assignment', allJobs.filter(j => j.status === 'Needs assignment').length, 'requires dispatch') +
@@ -195,11 +198,11 @@
       return `<tr>
         <td><strong>${formatDate(j.date)}</strong><br><small>${j.time}</small></td>
         <td>${customerButton(j.customer)}<br><small>${j.address}, ${j.borough}</small></td>
-        <td>${j.type}</td>
-        <td><select class="admin-select" onchange="AdminUI.assignTechnician('${j.id}',this.value)"><option ${j.technician === 'Needs assignment' ? 'selected' : ''}>Needs assignment</option>${Store.getAdminData().staff.filter(s => s.role.includes('Technician')).map(s => `<option ${s.name === j.technician ? 'selected' : ''}>${s.name}</option>`).join('')}</select></td>
-        <td><select class="admin-select" onchange="AdminUI.setJobStatus('${j.id}',this.value)">${['Needs assignment', 'Assigned', 'Confirmed', 'In progress', 'Completed', 'Cancelled'].map(s => `<option ${s === j.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
-        <td><button class="photo-chip" onclick="AdminUI.advanceChecklist('${j.id}')"><span class="progress-compact"><span>${j.checklistDone} of ${j.checklistTotal} complete</span><span class="progress-track"><i style="width:${pct}%"></i></span></span></button></td>
-        <td><div class="photo-actions"><button class="photo-chip ${j.beforePhoto ? 'has-photo' : ''}" onclick="AdminUI.chooseJobPhoto('${j.id}','beforePhoto')">${j.beforePhoto ? 'Pre-job saved' : 'Add pre-job'}</button><button class="photo-chip ${j.afterPhoto ? 'has-photo' : ''}" onclick="AdminUI.chooseJobPhoto('${j.id}','afterPhoto')">${j.afterPhoto ? 'Finish saved' : 'Add finish'}</button></div></td>
+        <td><strong>${escapeHTML(j.product || j.type)}</strong><br><small>${escapeHTML(j.requirements || 'See technician checklist for requirements.')}</small></td>
+        <td><select class="admin-select" onchange="AdminUI.assignTechnician('${j.id}',this.value)"><option ${j.technician === 'Needs assignment' ? 'selected' : ''}>Needs assignment</option>${Store.getAdminData().staff.filter(s => (s.roles || [s.role]).includes('Technician') || s.role.includes('Technician')).map(s => `<option ${s.name === j.technician ? 'selected' : ''}>${s.name}</option>`).join('')}</select></td>
+        <td><span class="record-status ${statusClass(j.status)}">${j.status}</span><br><small>Updated by technician</small></td>
+        <td><div class="progress-compact"><span>${j.checklistDone} of ${j.checklistTotal} checklist items</span><span class="progress-track"><i style="width:${pct}%"></i></span></div><small>${j.beforePhoto && j.afterPhoto ? 'Both photos uploaded' : j.beforePhoto || j.afterPhoto ? '1 of 2 photos' : 'No photos yet'}</small></td>
+        <td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.editRecord('job','${j.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('jobs','${j.id}','${encodeURIComponent(j.id)}')">Delete</button></div></td>
       </tr>`;
     }).join('') || `<tr><td colspan="7">No jobs match this filter.</td></tr>`;
   }
@@ -324,9 +327,9 @@
     [['navyColor', 'navyValue'], ['primaryColor', 'primaryValue'], ['accentColor', 'accentValue']].forEach(([inputId, valueId]) => { document.getElementById(valueId).textContent = document.getElementById(inputId).value.toUpperCase(); });
   }
 
-  document.querySelectorAll('[data-job-filter]').forEach(btn => btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-job-filter]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active'); jobFilter = btn.dataset.jobFilter; renderService();
+  ['serviceSearch', 'serviceDateFilter', 'serviceBoroughFilter', 'serviceStatusFilter'].forEach(id => document.getElementById(id).addEventListener('input', () => {
+    serviceFilters = { search: document.getElementById('serviceSearch').value.trim().toLowerCase(), date: document.getElementById('serviceDateFilter').value, borough: document.getElementById('serviceBoroughFilter').value, status: document.getElementById('serviceStatusFilter').value };
+    renderService();
   }));
   document.querySelectorAll('[data-ticket-filter]').forEach(btn => btn.addEventListener('click', () => {
     document.querySelectorAll('[data-ticket-filter]').forEach(b => b.classList.remove('active'));
@@ -373,20 +376,6 @@
   });
   document.getElementById('exportReportBtn').addEventListener('click', () => AdminUI.exportReport());
 
-  let pendingPhoto = null;
-  const jobPhotoInput = document.getElementById('jobPhotoInput');
-  jobPhotoInput.addEventListener('change', () => {
-    const file = jobPhotoInput.files[0];
-    if (!file || !pendingPhoto) return;
-    if (file.size > 2.5 * 1024 * 1024) { toast('Photo too large, please keep under 2.5 MB'); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      Store.updateAdminItem('jobs', pendingPhoto.id, { [pendingPhoto.field]: reader.result });
-      pendingPhoto = null; jobPhotoInput.value = ''; renderService(); toast('Quality-control photo saved');
-    };
-    reader.readAsDataURL(file);
-  });
-
   /* ---------- reusable record forms ---------- */
   const recordModal = document.getElementById('recordModal');
   const recordForm = document.getElementById('recordForm');
@@ -400,7 +389,7 @@
       ['customer', 'Customer name', 'text'], ['email', 'Email', 'email'], ['system', 'Filtration system', 'text'], ['cadence', 'Renewal cadence', 'select', ['3 months', '6 months', '12 months']], ['nextDate', 'Next renewal', 'date'], ['replacement', 'Replacement kit', 'text'], ['status', 'Status', 'select', ['Active', 'Paused']]
     ] },
     job: { title: 'Service Job', collection: 'jobs', prefix: 'JOB', fields: [
-      ['customer', 'Customer name', 'text'], ['address', 'Service address', 'text'], ['borough', 'Borough', 'select', ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']], ['type', 'Job type', 'select', ['New installation', 'Filter replacement', 'Annual maintenance', 'Repair visit']], ['date', 'Service date', 'date'], ['time', 'Arrival time', 'time'], ['technician', 'Technician', 'select', ['Needs assignment', 'Luis Rivera', 'Amina Patel']], ['status', 'Status', 'select', ['Needs assignment', 'Assigned', 'Confirmed']]
+      ['customer', 'Customer name', 'text'], ['address', 'Service address', 'text'], ['borough', 'Borough', 'select', ['Manhattan', 'Brooklyn', 'Queens', 'Bronx', 'Staten Island']], ['type', 'Job type', 'select', ['New installation', 'Filter replacement', 'Annual maintenance', 'Repair visit']], ['product', 'Product / system', 'text'], ['requirements', 'Installation requirements', 'text'], ['date', 'Service date', 'date'], ['time', 'Arrival time', 'time'], ['technician', 'Technician', 'select', ['Needs assignment', 'Luis Rivera', 'Amina Patel']], ['status', 'Status', 'select', ['Needs assignment', 'Assigned', 'Confirmed']]
     ] },
     staff: { title: 'Staff Profile', collection: 'staff', prefix: 'STAFF', fields: [
       ['name', 'Full name', 'text'], ['role', 'Role', 'select', ['Installation Technician', 'Lead Technician', 'Sales Representative']], ['email', 'Work email', 'email'], ['phone', 'Phone', 'tel'], ['area', 'Coverage area', 'text'], ['availability', 'Availability', 'select', ['Available', 'On job', 'Off duty']]
@@ -459,7 +448,7 @@
       values.initials = values.name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
       if (!editingRecordId) { values.rating = 5; values.jobs = 0; }
     }
-    if (recordType === 'job' && !editingRecordId) Object.assign(values, { checklistDone: 0, checklistTotal: 5, beforePhoto: '', afterPhoto: '' });
+    if (recordType === 'job' && !editingRecordId) Object.assign(values, { checklist: [{ label: 'Confirm customer and system', done: false }, { label: 'Photograph pre-job condition', done: false }, { label: 'Complete installation requirements', done: false }, { label: 'Pressure and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 5, beforePhoto: '', afterPhoto: '' });
     if (editingRecordId) Store.updateAdminItem(config.collection, editingRecordId, values);
     else Store.addAdminItem(config.collection, { id: `${config.prefix}-${String(Date.now()).slice(-5)}`, ...values });
     closeRecordModal(); renderAll(); toast(`${config.title} saved`);
@@ -581,16 +570,6 @@
     assignTechnician(id, technician) {
       Store.updateAdminItem('jobs', id, { technician, status: technician === 'Needs assignment' ? 'Needs assignment' : 'Assigned' });
       renderService(); toast(`Technician assignment updated`);
-    },
-    advanceChecklist(id) {
-      const job = Store.getAdminData().jobs.find(j => j.id === id);
-      if (!job) return;
-      const next = job.checklistDone >= job.checklistTotal ? 0 : job.checklistDone + 1;
-      Store.updateAdminItem('jobs', id, { checklistDone: next }); renderService();
-      toast(next === job.checklistTotal ? 'Maintenance checklist completed' : 'Checklist progress saved');
-    },
-    chooseJobPhoto(id, field) {
-      pendingPhoto = { id, field }; jobPhotoInput.click();
     },
     setSupplierStatus(id, status) {
       Store.updateAdminItem('suppliers', id, { status }); renderSuppliers(); toast(`Purchase order ${id} updated`);

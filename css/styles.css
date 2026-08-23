@@ -490,6 +490,43 @@ body.cart-open { overflow: hidden; }
 .color-control span { color: var(--muted); font-size: .68rem; }
 .color-control code { color: var(--muted); font-size: .72rem; }
 .production-note { border-left: 4px solid var(--amber); }
+
+/* ---------- role portals ---------- */
+.portal-body { background: #f2f6fb; min-height: 100vh; }
+.portal-auth { min-height: 100vh; display: grid; place-items: center; padding: 30px 16px; background: radial-gradient(circle at 20% 10%, var(--ice-100), transparent 34%), #f2f6fb; }
+.portal-auth-card { width: min(460px, 100%); background: #fff; border-radius: 22px; box-shadow: var(--shadow-lg); padding: 34px; }
+.portal-auth-card .brand { margin-bottom: 28px; }
+.portal-auth-card h1 { font-size: 1.7rem; margin-bottom: 8px; }
+.portal-auth-card > p { color: var(--muted); font-size: .88rem; margin-bottom: 22px; }
+.prototype-note { display: grid; gap: 3px; margin-top: 18px; padding: 13px 15px; background: #fff7e8; border: 1px solid #f1d49f; border-radius: var(--radius-sm); color: #855a15; font-size: .76rem; }
+.portal-shell { min-height: 100vh; }
+.portal-header { position: sticky; top: 0; z-index: 80; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 13px max(24px, calc((100vw - 1200px) / 2)); background: rgba(255,255,255,.96); border-bottom: 1px solid #dce7f3; backdrop-filter: blur(10px); }
+.portal-header .brand-mark { width: 42px; height: 42px; }
+.portal-user { display: flex; align-items: center; gap: 15px; text-align: right; }
+.portal-user strong, .portal-user span { display: block; }
+.portal-user strong { color: var(--navy-800); font-size: .82rem; }
+.portal-user span { color: var(--muted); font-size: .68rem; }
+.portal-main { width: min(1200px, 92%); margin: 0 auto; padding: 38px 0 70px; }
+.portal-job-grid { display: grid; gap: 22px; }
+.portal-job-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; }
+.portal-job-head { display: flex; justify-content: space-between; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid #e4ecf6; }
+.portal-job-head h2 { font-size: 1.12rem; margin: 8px 0 3px; }
+.portal-job-head p, .portal-job-head > div:last-child span { display: block; color: var(--muted); font-size: .78rem; }
+.portal-job-head > div:last-child { text-align: right; color: var(--navy-800); font-size: .84rem; }
+.portal-job-info { display: grid; grid-template-columns: .7fr 1.3fr; gap: 12px; margin: 18px 0; }
+.portal-job-info > div { background: var(--ice-50); border-radius: var(--radius-sm); padding: 13px 15px; }
+.portal-job-info span, .portal-job-info strong { display: block; }
+.portal-job-info span { color: var(--muted); font-size: .68rem; text-transform: uppercase; letter-spacing: .05em; }
+.portal-job-info strong { color: var(--ink); font-size: .8rem; margin-top: 3px; }
+.job-checklist { margin-top: 20px; border: 1px solid #e4ecf6; border-radius: var(--radius-sm); padding: 17px; }
+.job-checklist label { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid #eef3fa; color: var(--ink); font-size: .82rem; cursor: pointer; }
+.job-checklist label:last-child { border: 0; }
+.job-checklist input { width: 18px; height: 18px; accent-color: var(--blue-500); flex: none; margin-top: 1px; }
+.job-photo-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+.photo-upload-card { min-height: 120px; display: grid; place-items: center; align-content: center; gap: 3px; overflow: hidden; border: 2px dashed #c9d8e9; border-radius: var(--radius-sm); background: var(--ice-50); color: var(--navy-800); }
+.photo-upload-card span { color: var(--muted); font-size: .7rem; }
+.photo-upload-card.has-photo { grid-template-columns: 90px 1fr; justify-items: start; border-style: solid; padding: 8px; }
+.photo-upload-card img { width: 90px; height: 82px; border-radius: 7px; object-fit: cover; grid-row: 1; }
 .img-drop { border: 2px dashed var(--silver); border-radius: var(--radius-sm); padding: 26px; text-align: center; color: var(--muted); cursor: pointer; transition: all .2s; font-size: .88rem; }
 .img-drop:hover, .img-drop.drag { border-color: var(--blue-500); background: var(--ice-50); }
 .img-drop img { max-height: 130px; margin: 0 auto 10px; border-radius: 8px; }
@@ -634,6 +671,8 @@ body.cart-open { overflow: hidden; }
   .admin-callout { align-items: flex-start; flex-direction: column; }
   .profile-grid { grid-template-columns: 1fr; }
   .profile-section.full { grid-column: auto; }
+  .portal-job-info, .job-photo-controls { grid-template-columns: 1fr; }
+  .portal-header { padding: 12px 16px; }
   .bar-row { grid-template-columns: 100px 1fr 42px; }
   .brand-mark { height: 42px; width: 42px; }
   .brand-wordmark { height: 31px; }

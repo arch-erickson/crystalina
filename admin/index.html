@@ -134,14 +134,19 @@
         <button class="btn btn-primary" data-open-record="job">+ Schedule Job</button>
       </div>
       <div class="stat-cards admin-stat-cards" id="serviceStats"></div>
+      <div class="admin-toolbar">
+        <div class="field compact-field"><label for="serviceSearch">Customer or job</label><input id="serviceSearch" type="search" placeholder="Search schedule"></div>
+        <div class="field compact-field"><label for="serviceDateFilter">Service date</label><input id="serviceDateFilter" type="date"></div>
+        <div class="field compact-field"><label for="serviceBoroughFilter">Borough</label><select id="serviceBoroughFilter"><option value="">All boroughs</option><option>Manhattan</option><option>Brooklyn</option><option>Queens</option><option>Bronx</option><option>Staten Island</option></select></div>
+        <div class="field compact-field"><label for="serviceStatusFilter">Status</label><select id="serviceStatusFilter"><option value="">All statuses</option><option>Needs assignment</option><option>Assigned</option><option>Confirmed</option><option>In progress</option><option>Completed</option></select></div>
+      </div>
       <div class="admin-panel table-scroll">
-        <div class="panel-title-row"><h3>Upcoming Jobs</h3><div class="filter-pills"><button class="active" data-job-filter="all">All</button><button data-job-filter="unassigned">Needs assignment</button></div></div>
+        <div class="panel-title-row"><h3>Upcoming Jobs</h3><span class="admin-badge">Management overview</span></div>
         <table class="admin-table" id="jobsTable">
-          <thead><tr><th>Date &amp; Time</th><th>Customer &amp; Address</th><th>Job</th><th>Technician</th><th>Status</th><th>Checklist</th><th>Quality Photos</th></tr></thead>
+          <thead><tr><th>Date &amp; Time</th><th>Customer &amp; Address</th><th>Product &amp; Requirements</th><th>Technician</th><th>Status</th><th>Technician Progress</th><th>Actions</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
-      <input type="file" id="jobPhotoInput" accept="image/*" hidden>
     </section>
 
     <!-- STAFF -->

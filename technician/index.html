@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Technician Portal | Crystalina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<link rel="icon" href="/favicon.ico?v=4" sizes="any">
+</head>
+<body class="portal-body">
+  <main class="portal-auth" id="portalAuth">
+    <section class="auth-card portal-auth-card">
+      <a class="brand" href="/"><img src="/logo-mark.png" class="brand-mark" alt=""><img src="/logo-text.png" class="brand-wordmark" alt="Crystalina"></a>
+      <span class="eyebrow">Secure Staff Access</span>
+      <h1>Technician Portal</h1>
+      <p>Use the email assigned to your Technician role. A one-time verification code is required.</p>
+      <div class="form-error" id="portalError"></div>
+      <form id="staffEmailForm">
+        <div class="field"><label for="staffEmail">Work email</label><input id="staffEmail" type="email" placeholder="name@crystalina.org" required></div>
+        <button class="btn btn-primary btn-block" type="submit">Send Verification Code</button>
+      </form>
+      <form id="staffCodeForm" hidden>
+        <div class="field"><label for="staffCode">Six-digit verification code</label><input id="staffCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required></div>
+        <button class="btn btn-primary btn-block" type="submit">Verify &amp; Continue</button>
+        <button class="btn btn-ghost btn-block" type="button" id="changeStaffEmail">Use another email</button>
+      </form>
+      <div class="prototype-note" id="prototypeCode" hidden></div>
+    </section>
+  </main>
+
+  <div class="portal-shell" id="portalShell" hidden>
+    <header class="portal-header"><a class="brand" href="/"><img src="/logo-mark.png" class="brand-mark" alt=""><span class="brand-text"><span class="brand-name">CRYSTALINA</span><span class="brand-tag">Technician Portal</span></span></a><div class="portal-user"><div><strong id="portalStaffName"></strong><span id="portalStaffId"></span></div><button class="btn btn-sm btn-outline" id="staffSignOut">Sign Out</button></div></header>
+    <main class="portal-main">
+      <div class="admin-head"><div><span class="eyebrow">Field Operations</span><h1>My Assigned Jobs</h1><p class="admin-subtitle">Customer details, installation requirements, checklists, status updates, and quality-control photos.</p></div><a class="btn btn-sm btn-outline" href="tel:+19178094803">Call Dispatch</a></div>
+      <div class="stat-cards admin-stat-cards" id="technicianStats"></div>
+      <div class="portal-job-grid" id="technicianJobs"></div>
+    </main>
+  </div>
+
+  <div class="modal-overlay profile-overlay" id="technicianCustomerModal"><div class="modal profile-modal"><button class="modal-close" id="technicianCustomerClose" aria-label="Close customer details">&times;</button><div id="technicianCustomerContent"></div></div></div>
+  <input type="file" id="technicianPhotoInput" accept="image/*" hidden>
+  <div class="toast" id="toast"></div>
+  <script src="/js/store.js"></script>
+  <script src="/js/main.js"></script>
+  <script src="/js/technician.js"></script>
+</body>
+</html>
