@@ -154,12 +154,112 @@
     <!-- STAFF -->
     <section id="view-staff" class="admin-view" style="display:none">
       <div class="admin-head">
-        <div><h1>Staff Profiles</h1><p class="admin-subtitle">Technicians and sales representatives, availability, assignments, reviews, and performance.</p></div>
-        <button class="btn btn-primary" data-open-record="staff">+ Add Staff Member</button>
+        <div><h1>Staff</h1><p class="admin-subtitle">Build schedules, resolve staff requests, maintain profiles, review timesheets, and record availability.</p></div>
+        <button class="btn btn-primary" data-open-record="staff">Add Staff Member</button>
       </div>
-      <div class="admin-toolbar"><div class="field compact-field"><label for="staffSearch">Name, email, or employee ID</label><input id="staffSearch" type="search" placeholder="Search staff"></div><div class="field compact-field"><label for="staffRoleFilter">Role</label><select id="staffRoleFilter"><option value="">All roles</option><option>Technician</option><option>Sales Associate</option><option>Manager</option></select></div><div class="field compact-field"><label for="staffAvailabilityFilter">Availability</label><select id="staffAvailabilityFilter"><option value="">Any availability</option><option>Available</option><option>On job</option><option>Off duty</option></select></div></div>
-      <div class="admin-panel staff-scheduler-panel"><div class="panel-title-row"><div><h3>Weekly Staff Scheduler</h3><p class="admin-subtitle">Add any number of people per day, keep shifts tentative, or lock and request staff confirmation.</p></div><div class="table-actions"><div class="field compact-field schedule-week-field"><label for="scheduleWeek">Week of</label><input id="scheduleWeek" type="date"></div><button class="btn btn-outline" id="addScheduleBtn" type="button">+ Add Shift</button><button class="btn btn-primary" id="lockWeekBtn" type="button">Lock Week &amp; Notify</button></div></div><div class="schedule-legend"><span><i class="tentative"></i>Tentative</span><span><i class="awaiting"></i>Awaiting confirmation</span><span><i class="confirmed"></i>Confirmed by staff</span><span><i class="unavailable"></i>Staff unavailable</span></div><div class="weekly-schedule-board" id="weeklyScheduleBoard"></div></div>
-      <div class="staff-grid" id="staffGrid"></div>
+
+      <div class="staff-workspace-tabs" id="staffWorkspaceTabs" role="tablist" aria-label="Staff workspace">
+        <button class="active" id="staffTabSchedule" type="button" role="tab" aria-selected="true" aria-controls="staffPanelSchedule" data-staff-tab="schedule">Schedule</button>
+        <button id="staffTabRequests" type="button" role="tab" aria-selected="false" aria-controls="staffPanelRequests" data-staff-tab="requests">Requests <span id="staffRequestTabCount" aria-label="Pending requests"></span></button>
+        <button id="staffTabDirectory" type="button" role="tab" aria-selected="false" aria-controls="staffPanelDirectory" data-staff-tab="directory">Directory</button>
+        <button id="staffTabTimesheets" type="button" role="tab" aria-selected="false" aria-controls="staffPanelTimesheets" data-staff-tab="timesheets">Timesheets</button>
+        <button id="staffTabAvailability" type="button" role="tab" aria-selected="false" aria-controls="staffPanelAvailability" data-staff-tab="availability">Availability &amp; Time Off</button>
+      </div>
+
+      <section id="staffPanelSchedule" class="staff-workspace-panel" role="tabpanel" aria-labelledby="staffTabSchedule" tabindex="0">
+        <div class="admin-panel staff-scheduler-panel">
+          <div class="panel-title-row">
+            <div><h2>Staff Scheduler</h2><p class="admin-subtitle">Assign shifts by person and role, review coverage, then publish changes for staff confirmation.</p></div>
+            <div class="table-actions">
+              <button class="btn btn-outline" id="copyScheduleWeekBtn" type="button">Copy Previous Week</button>
+              <button class="btn btn-outline" id="addScheduleBtn" type="button">Add Shift</button>
+              <button class="btn btn-primary" id="lockWeekBtn" type="button">Publish &amp; Notify <span id="unpublishedShiftCount" aria-label="Unpublished changes"></span></button>
+            </div>
+          </div>
+          <div class="admin-toolbar schedule-toolbar" aria-label="Schedule controls">
+            <div class="table-actions schedule-date-navigation" aria-label="Week navigation">
+              <button class="btn btn-sm btn-ghost" id="schedulePreviousWeekBtn" type="button">Previous</button>
+              <button class="btn btn-sm btn-outline" id="scheduleTodayBtn" type="button">Today</button>
+              <button class="btn btn-sm btn-ghost" id="scheduleNextWeekBtn" type="button">Next</button>
+            </div>
+            <div class="field compact-field schedule-week-field"><label for="scheduleWeek">Week of</label><input id="scheduleWeek" type="date"></div>
+            <div class="field compact-field"><label for="scheduleRoleFilter">Role</label><select id="scheduleRoleFilter"><option value="">All roles</option><option>Technician</option><option>Sales Associate</option><option>Manager</option></select></div>
+            <div class="field compact-field"><label for="scheduleStaffFilter">Staff member</label><select id="scheduleStaffFilter"><option value="">All staff</option></select></div>
+            <div class="field compact-field"><label for="scheduleStatusFilter">Response</label><select id="scheduleStatusFilter"><option value="">All responses</option><option value="Tentative">Draft</option><option value="Awaiting staff confirmation">Awaiting response</option><option value="Confirmed by staff">Accepted</option><option value="Declined">Declined</option><option value="Change requested">Change requested</option></select></div>
+          </div>
+          <div class="schedule-legend" aria-label="Schedule status legend"><span><i class="tentative"></i>Draft</span><span><i class="awaiting"></i>Awaiting response</span><span><i class="confirmed"></i>Accepted</span><span><i class="unavailable"></i>Unavailable or conflict</span></div>
+          <div class="schedule-coverage-summary" id="scheduleCoverageSummary" aria-live="polite"></div>
+          <div class="weekly-schedule-board" id="weeklyScheduleBoard" role="grid" aria-label="Weekly staff schedule by employee and day" tabindex="0"></div>
+        </div>
+      </section>
+
+      <section id="staffPanelRequests" class="staff-workspace-panel" role="tabpanel" aria-labelledby="staffTabRequests" tabindex="0" hidden>
+        <div class="admin-panel table-scroll">
+          <div class="panel-title-row"><div><h2>Schedule Requests</h2><p class="admin-subtitle">Review declines and requested shift changes without replacing the published schedule until a decision is recorded.</p></div><span class="admin-badge" id="scheduleRequestCount">0 pending</span></div>
+          <div class="admin-toolbar">
+            <div class="field compact-field"><label for="scheduleRequestSearch">Staff member</label><input id="scheduleRequestSearch" type="search" placeholder="Search name or employee ID"></div>
+            <div class="field compact-field"><label for="scheduleRequestTypeFilter">Request type</label><select id="scheduleRequestTypeFilter"><option value="">All request types</option><option value="change">Shift change</option><option value="decline">Declined shift</option><option value="time-off">Time off</option></select></div>
+            <div class="field compact-field"><label for="scheduleRequestStatusFilter">Status</label><select id="scheduleRequestStatusFilter"><option value="pending">Pending review</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="">All statuses</option></select></div>
+          </div>
+          <table class="admin-table" id="scheduleRequestsTable">
+            <caption class="sr-only">Staff schedule and time-off requests</caption>
+            <thead><tr><th scope="col">Staff member</th><th scope="col">Request</th><th scope="col">Current schedule</th><th scope="col">Proposed change</th><th scope="col">Submitted</th><th scope="col">Status</th><th scope="col">Actions</th></tr></thead>
+            <tbody id="scheduleRequestsBody"></tbody>
+          </table>
+          <p id="scheduleRequestsEmpty" class="admin-subtitle" role="status">No requests match the selected filters.</p>
+        </div>
+      </section>
+
+      <section id="staffPanelDirectory" class="staff-workspace-panel" role="tabpanel" aria-labelledby="staffTabDirectory" tabindex="0" hidden>
+        <div class="admin-toolbar"><div class="field compact-field"><label for="staffSearch">Name, email, or employee ID</label><input id="staffSearch" type="search" placeholder="Search staff"></div><div class="field compact-field"><label for="staffRoleFilter">Role</label><select id="staffRoleFilter"><option value="">All roles</option><option>Technician</option><option>Sales Associate</option><option>Manager</option></select></div><div class="field compact-field"><label for="staffAvailabilityFilter">Availability</label><select id="staffAvailabilityFilter"><option value="">Any availability</option><option>Available</option><option>On job</option><option>Off duty</option></select></div></div>
+        <div class="staff-grid" id="staffGrid"></div>
+      </section>
+
+      <section id="staffPanelTimesheets" class="staff-workspace-panel" role="tabpanel" aria-labelledby="staffTabTimesheets" tabindex="0" hidden>
+        <div class="admin-panel table-scroll">
+          <div class="panel-title-row">
+            <div><h2>Timesheets</h2><p class="admin-subtitle">Review recorded hours by pay period, resolve missing entries, and preserve approval history.</p></div>
+            <div class="table-actions"><button class="btn btn-outline" id="exportTimesheetsBtn" type="button">Export CSV</button></div>
+          </div>
+          <div class="admin-toolbar" aria-label="Timesheet filters">
+            <div class="table-actions" aria-label="Pay period navigation"><button class="btn btn-sm btn-ghost" id="timesheetPreviousPeriodBtn" type="button">Previous</button><button class="btn btn-sm btn-outline" id="timesheetCurrentPeriodBtn" type="button">Current Period</button><button class="btn btn-sm btn-ghost" id="timesheetNextPeriodBtn" type="button">Next</button></div>
+            <div class="field compact-field"><label for="timesheetPeriodStart">Period start</label><input id="timesheetPeriodStart" type="date"></div>
+            <div class="field compact-field"><label for="timesheetPeriodEnd">Period end</label><input id="timesheetPeriodEnd" type="date"></div>
+            <div class="field compact-field"><label for="timesheetStaffFilter">Staff member</label><select id="timesheetStaffFilter"><option value="">All staff</option></select></div>
+            <div class="field compact-field"><label for="timesheetRoleFilter">Role</label><select id="timesheetRoleFilter"><option value="">All roles</option><option>Technician</option><option>Sales Associate</option><option>Manager</option></select></div>
+            <div class="field compact-field"><label for="timesheetStatusFilter">Approval status</label><select id="timesheetStatusFilter"><option value="">All statuses</option><option value="draft">Draft</option><option value="submitted">Submitted</option><option value="correction_requested">Correction requested</option><option value="approved">Approved</option></select></div>
+          </div>
+          <div class="stat-cards admin-stat-cards" id="timesheetStats" aria-live="polite">
+            <div class="stat-card"><div class="sc-label">Pending approval</div><div class="sc-value" id="timesheetPendingCount">0</div></div>
+            <div class="stat-card"><div class="sc-label">Missing entries</div><div class="sc-value" id="timesheetMissingCount">0</div></div>
+            <div class="stat-card"><div class="sc-label">Overtime warnings</div><div class="sc-value" id="timesheetOvertimeCount">0</div></div>
+            <div class="stat-card"><div class="sc-label">Approved hours</div><div class="sc-value" id="timesheetApprovedHours">0</div></div>
+          </div>
+          <table class="admin-table" id="timesheetsTable">
+            <caption class="sr-only">Staff timesheets for the selected pay period</caption>
+            <thead><tr><th scope="col">Staff member</th><th scope="col">Role</th><th scope="col">Scheduled</th><th scope="col">Recorded</th><th scope="col">Breaks</th><th scope="col">Variance</th><th scope="col">Status</th><th scope="col">Actions</th></tr></thead>
+            <tbody id="timesheetsTableBody"></tbody>
+          </table>
+          <p id="timesheetsEmpty" class="admin-subtitle" role="status">No timesheets match the selected pay period and filters.</p>
+        </div>
+      </section>
+
+      <section id="staffPanelAvailability" class="staff-workspace-panel" role="tabpanel" aria-labelledby="staffTabAvailability" tabindex="0" hidden>
+        <div class="panel-title-row">
+          <div><h2>Availability &amp; Time Off</h2><p class="admin-subtitle">Record when staff cannot work and review requests before publishing schedules.</p></div>
+          <div class="table-actions"><button class="btn btn-outline" id="addUnavailableTimeBtn" type="button">+ Add Unavailable Time</button><button class="btn btn-primary" id="addTimeOffBtn" type="button">+ Add Time Off</button></div>
+        </div>
+        <div class="admin-toolbar">
+          <div class="field compact-field"><label for="staffAvailabilitySearch">Staff member</label><input id="staffAvailabilitySearch" type="search" placeholder="Search name or employee ID"></div>
+          <div class="field compact-field"><label for="staffAvailabilityDateFilter">Date</label><input id="staffAvailabilityDateFilter" type="date"></div>
+          <div class="field compact-field"><label for="staffAvailabilityTypeFilter">Record type</label><select id="staffAvailabilityTypeFilter"><option value="">All records</option><option value="unavailable">Unavailable time</option><option value="time-off">Time off</option></select></div>
+          <div class="field compact-field"><label for="staffAvailabilityStatusFilter">Status</label><select id="staffAvailabilityStatusFilter"><option value="">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div>
+        </div>
+        <div class="admin-two-col">
+          <div class="admin-panel table-scroll"><div class="panel-title-row"><div><h3>Unavailable Time</h3><p class="admin-subtitle">Recurring availability and one-time scheduling conflicts.</p></div></div><table class="admin-table" id="staffAvailabilityTable"><caption class="sr-only">Staff unavailable time</caption><thead><tr><th scope="col">Staff member</th><th scope="col">Date and time</th><th scope="col">Repeats</th><th scope="col">Reason</th><th scope="col">Actions</th></tr></thead><tbody id="staffAvailabilityTableBody"></tbody></table><p id="staffAvailabilityEmpty" class="admin-subtitle" role="status">No unavailable time matches the selected filters.</p></div>
+          <div class="admin-panel table-scroll"><div class="panel-title-row"><div><h3>Time-off Requests</h3><p class="admin-subtitle">Approve or reject requests before they affect published coverage.</p></div><span class="admin-badge" id="timeOffPendingCount">0 pending</span></div><table class="admin-table" id="staffTimeOffTable"><caption class="sr-only">Staff time-off requests</caption><thead><tr><th scope="col">Staff member</th><th scope="col">Dates</th><th scope="col">Type</th><th scope="col">Status</th><th scope="col">Actions</th></tr></thead><tbody id="staffTimeOffTableBody"></tbody></table><p id="staffTimeOffEmpty" class="admin-subtitle" role="status">No time-off requests match the selected filters.</p></div>
+        </div>
+      </section>
     </section>
 
     <!-- SUPPLIERS -->
@@ -407,8 +507,90 @@
   <div class="modal"><button class="modal-close" id="sectionClose" aria-label="Close section editor">&times;</button><h2 id="sectionModalTitle">Edit Page Section</h2><form id="sectionForm"><input type="hidden" id="sectionId" name="id"><div class="field"><label for="sectionType">Section layout</label><select id="sectionType" name="type"><option>Custom Section</option><option>Best Sellers</option><option>Testimonials</option><option>Call to Action</option><option>Split Feature</option><option>Category Grid</option><option>Product Feature</option><option>Water Facts</option><option>Process</option></select></div><div class="field"><label for="sectionLabel">Admin layer name</label><input id="sectionLabel" name="label" required></div><div class="field"><label for="sectionEyebrow">Eyebrow</label><input id="sectionEyebrow" name="eyebrow"></div><div class="field"><label for="sectionHeading">Heading</label><input id="sectionHeading" name="heading" required></div><div class="field"><label for="sectionBody">Supporting text</label><textarea id="sectionBody" name="body" rows="4"></textarea></div><label class="section-enabled"><input id="sectionEnabled" name="enabled" type="checkbox"> Show this section on the landing page</label><div class="field" id="sectionProductsField"><label>Products shown in Best Sellers</label><div class="section-product-options" id="sectionProductOptions"></div></div><div class="modal-actions"><button type="button" class="btn btn-ghost" id="sectionCancel">Cancel</button><button type="submit" class="btn btn-primary">Save Section</button></div></form></div>
 </div>
 
-<div class="modal-overlay" id="staffScheduleModal">
-  <div class="modal"><button class="modal-close" id="staffScheduleClose" aria-label="Close schedule editor">&times;</button><h2 id="staffScheduleTitle">Add Staff Shift</h2><form id="staffScheduleForm"><input type="hidden" id="staffScheduleId"><div class="field"><label for="scheduleStaffId">Staff member</label><select id="scheduleStaffId" required></select></div><div class="field-row"><div class="field"><label for="scheduleDate">Date</label><input id="scheduleDate" type="date" required></div><div class="field"><label for="scheduleState">Schedule state</label><select id="scheduleState"><option value="Tentative">Tentative</option><option value="Awaiting staff confirmation">Lock &amp; request confirmation</option></select></div></div><div class="field-row"><div class="field"><label for="scheduleStart">Start time</label><input id="scheduleStart" type="time" value="09:00" required></div><div class="field"><label for="scheduleEnd">End time</label><input id="scheduleEnd" type="time" value="17:00" required></div></div><div class="field"><label for="scheduleNotes">Shift notes</label><textarea id="scheduleNotes" rows="3" placeholder="Coverage area, assigned route, showroom, or other notes"></textarea></div><div class="schedule-conflict-warning" id="scheduleConflictWarning" hidden><strong>Availability warning</strong><span>This staff member marked this day unavailable. You can still schedule them, but the conflict will remain visible.</span></div><div class="form-error" id="scheduleError"></div><div class="modal-actions"><button type="button" class="btn btn-ghost" id="staffScheduleCancel">Cancel</button><button type="submit" class="btn btn-primary">Save Shift</button></div></form></div>
+<div class="modal-overlay" id="staffScheduleModal" role="dialog" aria-modal="true" aria-labelledby="staffScheduleTitle">
+  <div class="modal">
+    <button class="modal-close" id="staffScheduleClose" aria-label="Close shift editor">&times;</button>
+    <h2 id="staffScheduleTitle">Add Staff Shift</h2>
+    <p class="admin-subtitle">Create a draft shift or publish it immediately for staff response.</p>
+    <form id="staffScheduleForm">
+      <input type="hidden" id="staffScheduleId">
+      <div class="field"><label for="scheduleStaffId">Staff member</label><select id="scheduleStaffId"></select><small class="field-help">Leave unassigned to create an open shift.</small></div>
+      <div class="field-row"><div class="field"><label for="scheduleRole">Role for this shift</label><select id="scheduleRole" required><option value="">Select role</option><option>Technician</option><option>Sales Associate</option><option>Manager</option></select></div><div class="field"><label for="scheduleLocation">Location or coverage area</label><input id="scheduleLocation" placeholder="Showroom, borough, or route"></div></div>
+      <div class="field-row"><div class="field"><label for="scheduleDate">Date</label><input id="scheduleDate" type="date" required></div><div class="field"><label for="scheduleState">Schedule state</label><select id="scheduleState"><option value="Tentative">Draft</option><option value="Awaiting staff confirmation">Publish and request response</option></select></div></div>
+      <div class="field-row"><div class="field"><label for="scheduleStart">Start time</label><input id="scheduleStart" type="time" value="09:00" required></div><div class="field"><label for="scheduleEnd">End time</label><input id="scheduleEnd" type="time" value="17:00" required></div><div class="field"><label for="scheduleBreakMinutes">Unpaid break</label><select id="scheduleBreakMinutes"><option value="0">No break</option><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="45">45 minutes</option><option value="60">60 minutes</option></select></div></div>
+      <fieldset class="field"><legend>Repeat shift</legend><label class="section-enabled"><input id="scheduleRepeatEnabled" type="checkbox"> Repeat on selected weekdays</label><div class="table-actions" id="scheduleRepeatDays" aria-label="Repeat on weekdays"><label><input type="checkbox" name="scheduleRepeatDay" value="1"> Monday</label><label><input type="checkbox" name="scheduleRepeatDay" value="2"> Tuesday</label><label><input type="checkbox" name="scheduleRepeatDay" value="3"> Wednesday</label><label><input type="checkbox" name="scheduleRepeatDay" value="4"> Thursday</label><label><input type="checkbox" name="scheduleRepeatDay" value="5"> Friday</label><label><input type="checkbox" name="scheduleRepeatDay" value="6"> Saturday</label><label><input type="checkbox" name="scheduleRepeatDay" value="0"> Sunday</label></div><div class="field"><label for="scheduleRepeatUntil">Repeat through</label><input id="scheduleRepeatUntil" type="date"></div></fieldset>
+      <div class="field"><label for="scheduleNotes">Shift notes</label><textarea id="scheduleNotes" rows="3" placeholder="Coverage area, assigned route, showroom, or other notes"></textarea></div>
+      <div class="schedule-conflict-warning" id="scheduleConflictWarning" role="alert" hidden><strong>Scheduling conflict</strong><span>This staff member is unavailable or has an overlapping shift. Review the conflict before saving.</span></div>
+      <div class="form-error" id="scheduleError" role="alert" aria-live="assertive"></div>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" id="staffScheduleCancel">Cancel</button><button type="submit" class="btn btn-primary" id="staffScheduleSave">Save Shift</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="scheduleChangeRequestModal" role="dialog" aria-modal="true" aria-labelledby="scheduleChangeRequestTitle">
+  <div class="modal">
+    <button class="modal-close" id="scheduleChangeRequestClose" type="button" aria-label="Close schedule request review">&times;</button>
+    <h2 id="scheduleChangeRequestTitle">Review Schedule Request</h2>
+    <form id="scheduleChangeRequestForm">
+      <input type="hidden" id="scheduleChangeRequestId">
+      <div class="admin-callout"><div><strong>Current published shift</strong><span id="scheduleChangeCurrentSummary">No shift selected.</span></div></div>
+      <div class="field-row"><div class="field"><label for="scheduleChangeDate">Requested date</label><input id="scheduleChangeDate" type="date" required></div><div class="field"><label for="scheduleChangeStart">Requested start</label><input id="scheduleChangeStart" type="time" required></div><div class="field"><label for="scheduleChangeEnd">Requested end</label><input id="scheduleChangeEnd" type="time" required></div></div>
+      <div class="field"><label for="scheduleChangeReason">Staff member's reason</label><textarea id="scheduleChangeReason" rows="3" readonly></textarea></div>
+      <div class="field"><label for="scheduleChangeAdminNote">Decision note</label><textarea id="scheduleChangeAdminNote" rows="3" placeholder="Optional note recorded with the decision"></textarea></div>
+      <div class="form-error" id="scheduleChangeRequestError" role="alert" aria-live="assertive"></div>
+      <div class="modal-actions"><button class="btn btn-ghost" id="scheduleChangeContactBtn" type="button">Contact Staff</button><button class="btn btn-danger" id="scheduleChangeRejectBtn" type="button">Reject Request</button><button class="btn btn-primary" id="scheduleChangeApproveBtn" type="submit">Approve Change</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="staffUnavailableModal" role="dialog" aria-modal="true" aria-labelledby="staffUnavailableTitle">
+  <div class="modal">
+    <button class="modal-close" id="staffUnavailableClose" type="button" aria-label="Close unavailable time editor">&times;</button>
+    <h2 id="staffUnavailableTitle">Add Unavailable Time</h2>
+    <form id="staffUnavailableForm">
+      <input type="hidden" id="staffUnavailableId">
+      <div class="field"><label for="staffUnavailableStaffId">Staff member</label><select id="staffUnavailableStaffId" required></select></div>
+      <div class="field-row"><div class="field"><label for="staffUnavailableStartDate">Start date</label><input id="staffUnavailableStartDate" type="date" required></div><div class="field"><label for="staffUnavailableStartTime">Start time</label><input id="staffUnavailableStartTime" type="time"></div></div>
+      <div class="field-row"><div class="field"><label for="staffUnavailableEndDate">End date</label><input id="staffUnavailableEndDate" type="date" required></div><div class="field"><label for="staffUnavailableEndTime">End time</label><input id="staffUnavailableEndTime" type="time"></div></div>
+      <label class="section-enabled"><input id="staffUnavailableAllDay" type="checkbox"> Unavailable all day</label>
+      <div class="field"><label for="staffUnavailableRepeat">Repeats</label><select id="staffUnavailableRepeat"><option value="none">Does not repeat</option><option value="weekly">Weekly</option><option value="weekdays">Every weekday</option></select></div>
+      <div class="field"><label for="staffUnavailableReason">Reason</label><textarea id="staffUnavailableReason" rows="3" placeholder="Optional scheduling note"></textarea></div>
+      <div class="form-error" id="staffUnavailableError" role="alert" aria-live="assertive"></div>
+      <div class="modal-actions"><button class="btn btn-ghost" id="staffUnavailableCancel" type="button">Cancel</button><button class="btn btn-primary" type="submit">Save Unavailable Time</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="staffTimeOffModal" role="dialog" aria-modal="true" aria-labelledby="staffTimeOffTitle">
+  <div class="modal">
+    <button class="modal-close" id="staffTimeOffClose" type="button" aria-label="Close time-off editor">&times;</button>
+    <h2 id="staffTimeOffTitle">Add or Review Time Off</h2>
+    <form id="staffTimeOffForm">
+      <input type="hidden" id="staffTimeOffId">
+      <div class="field"><label for="staffTimeOffStaffId">Staff member</label><select id="staffTimeOffStaffId" required></select></div>
+      <div class="field-row"><div class="field"><label for="staffTimeOffStartDate">First day</label><input id="staffTimeOffStartDate" type="date" required></div><div class="field"><label for="staffTimeOffEndDate">Last day</label><input id="staffTimeOffEndDate" type="date" required></div></div>
+      <div class="field-row"><div class="field"><label for="staffTimeOffType">Time-off type</label><select id="staffTimeOffType" required><option value="vacation">Vacation</option><option value="sick">Sick</option><option value="personal">Personal</option><option value="unpaid">Unpaid</option><option value="other">Other</option></select></div><div class="field"><label for="staffTimeOffStatus">Request status</label><select id="staffTimeOffStatus"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div></div>
+      <div class="field"><label for="staffTimeOffReason">Staff note</label><textarea id="staffTimeOffReason" rows="3"></textarea></div>
+      <div class="field"><label for="staffTimeOffAdminNote">Admin note</label><textarea id="staffTimeOffAdminNote" rows="3" placeholder="Optional note recorded with the decision"></textarea></div>
+      <div class="form-error" id="staffTimeOffError" role="alert" aria-live="assertive"></div>
+      <div class="modal-actions"><button class="btn btn-ghost" id="staffTimeOffCancel" type="button">Cancel</button><button class="btn btn-primary" type="submit">Save Time Off</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="timesheetReviewModal" role="dialog" aria-modal="true" aria-labelledby="timesheetReviewTitle">
+  <div class="modal profile-modal">
+    <button class="modal-close" id="timesheetReviewClose" type="button" aria-label="Close timesheet review">&times;</button>
+    <h2 id="timesheetReviewTitle">Review Timesheet</h2>
+    <form id="timesheetReviewForm">
+      <input type="hidden" id="timesheetReviewId">
+      <div class="profile-head" id="timesheetReviewStaffSummary"></div>
+      <div class="admin-panel table-scroll"><table class="admin-table" id="timesheetEntriesTable"><caption class="sr-only">Daily entries for the selected timesheet</caption><thead><tr><th scope="col">Date</th><th scope="col">Clock in</th><th scope="col">Clock out</th><th scope="col">Break</th><th scope="col">Recorded hours</th><th scope="col">Scheduled hours</th><th scope="col">Notes</th></tr></thead><tbody id="timesheetEntriesBody"></tbody></table></div>
+      <div class="field"><label for="timesheetReviewNote">Review note</label><textarea id="timesheetReviewNote" rows="3" placeholder="Required when requesting a correction"></textarea></div>
+      <div class="form-error" id="timesheetReviewError" role="alert" aria-live="assertive"></div>
+      <div class="modal-actions"><button class="btn btn-ghost" id="timesheetReviewCancel" type="button">Close</button><button class="btn btn-danger" id="timesheetCorrectionBtn" type="button">Request Correction</button><button class="btn btn-primary" id="timesheetApproveBtn" type="submit">Approve Timesheet</button></div>
+    </form>
+  </div>
 </div>
 
 <input type="file" id="staffPhotoInput" accept="image/*" hidden>
@@ -422,6 +604,7 @@
 <script src="/js/vendor/qrcode-generator.js"></script>
 <script src="/js/admin.js"></script>
 <script src="/js/qr-admin.js"></script>
+<script src="/js/schedule-domain.js"></script>
 <script src="/js/admin-schedule.js"></script>
 </body>
 </html>

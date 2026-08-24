@@ -23,7 +23,7 @@
         <button class="btn btn-primary btn-block" type="submit">Send Verification Code</button>
       </form>
       <form id="staffCodeForm" hidden>
-        <div class="field"><label for="staffCode">Six-digit verification code</label><input id="staffCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required></div>
+        <div class="field"><label for="staffCode">Eight-digit verification code</label><input id="staffCode" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" placeholder="00000000" required></div>
         <button class="btn btn-primary btn-block" type="submit">Verify &amp; Continue</button>
         <button class="btn btn-ghost btn-block" type="button" id="changeStaffEmail">Use another email</button>
       </form>
@@ -68,6 +68,7 @@
   <script src="/js/role-switcher.js"></script>
   <script src="/js/vendor/leaflet/leaflet.js"></script>
   <script src="/js/technician.js"></script>
+  <script src="/js/schedule-domain.js"></script>
   <script src="/js/staff-schedule.js"></script>
   <script src="/js/technician-route.js"></script>
 </body>

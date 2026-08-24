@@ -24,6 +24,30 @@ window.CrystalinaAuth = (async () => {
     };
   }
 
+  async function staffDirectory() {
+    const [{ data: profiles, error: profileError }, { data: roleRows, error: roleError }] = await Promise.all([
+      client.from('profiles').select('id, full_name'),
+      client.from('user_roles').select('user_id, role')
+    ]);
+    if (profileError) throw profileError;
+    if (roleError) throw roleError;
+    const rolesByUser = (roleRows || []).reduce((map, row) => {
+      if (!map.has(row.user_id)) map.set(row.user_id, []);
+      map.get(row.user_id).push(row.role);
+      return map;
+    }, new Map());
+    return (profiles || []).map(profile => {
+      const roles = rolesByUser.get(profile.id) || [];
+      const workforceRoles = roles.filter(role => ['admin', 'manager', 'technician', 'sales'].includes(role));
+      return {
+        id: profile.id,
+        name: profile.full_name || `Staff ${profile.id.slice(0, 8)}`,
+        roles: workforceRoles,
+        role: workforceRoles.includes('manager') || workforceRoles.includes('admin') ? 'Manager' : workforceRoles.includes('technician') ? 'Technician' : workforceRoles.includes('sales') ? 'Sales Associate' : 'Staff'
+      };
+    }).filter(member => member.roles.length);
+  }
+
   return {
     async sendCode(email, { allowSignup = false } = {}) {
       const { error } = await client.auth.signInWithOtp({
@@ -46,6 +70,7 @@ window.CrystalinaAuth = (async () => {
     async signOut() {
       const { error } = await client.auth.signOut({ scope: 'local' });
       if (error) throw error;
-    }
+    },
+    staffDirectory
   };
 })();

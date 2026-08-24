@@ -37,7 +37,9 @@ const Store = (() => {
   function emptyAdminData() {
     return {
       subscriptions: [], customers: [], notifications: [], jobs: [], staff: [], staffSchedules: [],
-      staffAvailability: [], staffNotifications: [], suppliers: [], supplierProfiles: [], activityLog: [],
+      shiftAssignments: [], shiftChangeRequests: [], staffAvailability: [], staffTimeOffRequests: [],
+      staffNotifications: [], timeEntries: [], timesheetSubmissions: [], schedulePublishBatches: [],
+      suppliers: [], supplierProfiles: [], activityLog: [],
       leads: [], campaigns: [], discounts: [], abandonedCarts: [], outreach: [], qrCodes: [], tickets: [],
       content: [], pageSections: [], roles: [], finance: { months: [], areas: [], products: [] }, siteSettings: siteSettings()
     };
@@ -126,6 +128,12 @@ const Store = (() => {
   function markStaffNotificationsRead(staffId) {
     const data = getAdminData(); data.staffNotifications.forEach(item => { if (item.staffId === staffId) item.read = true; }); saveAdminData(data);
   }
+  function markStaffNotificationRead(staffId, notificationId) {
+    const data = getAdminData();
+    const item = data.staffNotifications.find(entry => entry.id === notificationId && entry.staffId === staffId);
+    if (item) { item.read = true; item.readAt = new Date().toISOString(); saveAdminData(data); }
+    return item || null;
+  }
   const logActivity = (actorId, action, entity) => addAdminItem('activityLog', { id: `ACT-${Date.now()}`, actorId, action, entity, timestamp: new Date().toISOString() });
   function getNotificationsForUser(user) {
     if (!user) return [];
@@ -148,6 +156,6 @@ const Store = (() => {
     getUsers, currentUser, setCurrentUser, signUp, signIn, signOut, currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
     getOrders, placeOrder, updateOrderStatus, deleteOrder, getAdminData, updateAdminItem, addAdminItem, deleteAdminItem,
     saveAdminCollection, addNotification, getNotificationsForUser, markNotificationsRead, addStaffNotification,
-    getStaffNotifications, markStaffNotificationsRead, logActivity, getSiteSettings, updateSiteSettings
+    getStaffNotifications, markStaffNotificationsRead, markStaffNotificationRead, logActivity, getSiteSettings, updateSiteSettings
   };
 })();
