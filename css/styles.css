@@ -385,6 +385,11 @@ body.cart-open { overflow: hidden; }
 .admin-shell { display: grid; grid-template-columns: 272px minmax(0, 1fr); min-height: 100vh; }
 .admin-side { position: sticky; top: 0; height: 100vh; overflow-y: auto; background: var(--navy-900); color: #b8cbe6; padding: 26px 18px; display: flex; flex-direction: column; gap: 4px; }
 .admin-side .brand { margin-bottom: 26px; }
+.admin-side .admin-brand { gap: 10px; padding: 2px 4px; }
+.admin-side .admin-brand .brand-mark { width: 46px; height: 46px; }
+.admin-side .admin-brand-copy { min-width: 0; display: grid; gap: 4px; }
+.admin-side .admin-brand .brand-wordmark { width: min(150px, 100%); height: auto; }
+.admin-side .admin-brand .brand-tag { color: var(--cyan-300); letter-spacing: .18em; }
 .admin-side .brand-name { color: #fff; }
 .side-group { color: #6f8eb2; font-size: .65rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin: 17px 14px 4px; }
 .admin-side button.side-link { width: 100%; display: flex; align-items: center; gap: 10px; background: none; border: none; color: #b8cbe6; padding: 10px 14px; border-radius: 10px; font-size: .86rem; font-weight: 500; text-align: left; }
