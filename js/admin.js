@@ -364,6 +364,20 @@
   function renderFinance() {
     const adminData = Store.getAdminData();
     const finance = adminData.finance;
+    if (!finance.months.length) {
+      document.getElementById('financeStats').innerHTML =
+        statCard('Revenue', money(0), 'No data yet') +
+        statCard('Gross profit', money(0), 'No data yet') +
+        statCard('Orders', '0', 'No data yet') +
+        statCard('Outstanding invoices', money(0), 'No data yet');
+      document.getElementById('revenueChart').innerHTML = '<p class="empty-state">No revenue data yet.</p>';
+      document.querySelector('#boroughDonut span').innerHTML = `${money(0)}<small>Total sales</small>`;
+      document.getElementById('boroughLegend').innerHTML = '<p class="empty-state">No area sales data yet.</p>';
+      document.querySelector('#areaSalesTable tbody').innerHTML = '<tr><td colspan="4">No sales data yet.</td></tr>';
+      document.querySelector('#productSalesTable tbody').innerHTML = '<tr><td colspan="4">No product sales data yet.</td></tr>';
+      document.querySelector('#marketingFinanceTable tbody').innerHTML = '<tr><td colspan="6">No campaign data yet.</td></tr>';
+      return;
+    }
     const revenue = finance.months.reduce((sum, month) => sum + month.revenue, 0);
     const costs = finance.months.reduce((sum, month) => sum + month.cost, 0);
     const profit = revenue - costs;
