@@ -20,7 +20,7 @@
   <div class="auth-wrap">
     <div class="auth-card">
       <h1 id="authTitle">Welcome back</h1>
-      <p class="auth-sub" id="authSub">Enter your email and we’ll send a six-digit verification code.</p>
+      <p class="auth-sub" id="authSub">Enter your email and we’ll send an eight-digit verification code.</p>
       <div class="auth-tabs" id="customerTabs">
         <button id="tabSignin" class="active">Sign In</button>
         <button id="tabSignup">Create Account</button>
@@ -36,9 +36,13 @@
       </form>
 
       <form id="codeForm" hidden>
-        <div class="field"><label for="aCode">Six-digit verification code</label><input id="aCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="123456"></div>
-        <button type="submit" class="btn btn-primary btn-block">Verify &amp; Continue</button>
-        <button type="button" class="btn btn-ghost btn-block" id="changeEmail">Use another email</button>
+        <div class="field"><label for="aCode">Eight-digit verification code</label><input id="aCode" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" autocomplete="one-time-code" required placeholder="12345678"></div>
+        <p class="verification-help" id="codeStatus" role="status" aria-live="polite">Codes expire after 60 seconds.</p>
+        <div class="code-actions">
+          <button type="submit" class="btn btn-primary btn-block">Verify &amp; Continue</button>
+          <button type="button" class="btn btn-outline btn-block" id="resendCode" disabled>Resend Verification Code in 60s</button>
+          <button type="button" class="btn btn-ghost btn-block" id="changeEmail">Use another email</button>
+        </div>
       </form>
 
       <p class="auth-alt" id="modeToggle">Crystalina staff? <button type="button" class="link auth-mode-link" id="staffLink">Staff sign in →</button></p>
@@ -56,11 +60,35 @@
   let mode = 'signin';
   let staffMode = new URLSearchParams(location.search).get('mode') === 'staff';
   let pendingEmail = '';
+  let pendingAllowSignup = false;
+  let pendingStaffMode = staffMode;
+  let resendTimer = null;
+  let resendDeadline = 0;
   const staffRoutes = { admin: '/admin/', manager: '/manager/', technician: '/technician/', sales: '/sales/' };
   const staffRolePriority = ['admin', 'manager', 'technician', 'sales'];
 
   const el = id => document.getElementById(id);
   const err = el('authError');
+
+  function updateResendState() {
+    const remaining = Math.max(0, Math.ceil((resendDeadline - Date.now()) / 1000));
+    el('resendCode').disabled = remaining > 0;
+    el('resendCode').textContent = remaining > 0 ? `Resend Verification Code in ${remaining}s` : 'Resend Verification Code';
+    if (!remaining && resendTimer) { clearInterval(resendTimer); resendTimer = null; }
+  }
+
+  function startResendTimer(message = 'Verification code sent. It expires after 60 seconds.') {
+    if (resendTimer) clearInterval(resendTimer);
+    resendDeadline = Date.now() + 60000;
+    el('codeStatus').textContent = message;
+    updateResendState();
+    resendTimer = setInterval(updateResendState, 250);
+  }
+
+  function stopResendTimer() {
+    if (resendTimer) clearInterval(resendTimer);
+    resendTimer = null; resendDeadline = 0;
+  }
 
   function refresh() {
     el('tabSignin').classList.toggle('active', mode === 'signin');
@@ -69,7 +97,7 @@
     el('authTitle').textContent = staffMode ? 'Staff sign in' : (mode === 'signin' ? 'Welcome back' : 'Create your account');
     el('authSub').textContent = staffMode
       ? 'Enter your staff email. We’ll detect your assigned dashboards after verification.'
-      : (mode === 'signin' ? 'Enter your email and we’ll send a six-digit verification code.' : 'Create an account with a six-digit verification code sent to your email.');
+      : (mode === 'signin' ? 'Enter your email and we’ll send an eight-digit verification code.' : 'Create an account with an eight-digit verification code sent to your email.');
     el('modeToggle').innerHTML = staffMode
       ? 'Customer? <button type="button" class="link auth-mode-link" id="staffLink">Back to customer sign in →</button>'
       : 'Crystalina staff? <button type="button" class="link auth-mode-link" id="staffLink">Staff sign in →</button>';
@@ -85,12 +113,15 @@
     e.preventDefault();
     err.classList.remove('show');
     pendingEmail = el('aEmail').value.trim();
+    pendingAllowSignup = !staffMode && mode === 'signup';
+    pendingStaffMode = staffMode;
     const submit = el('authSubmit');
     try {
       const auth = await window.CrystalinaAuth;
       submit.disabled = true; submit.textContent = 'Sending code…';
-      await auth.sendCode(pendingEmail, { allowSignup: !staffMode && mode === 'signup' });
-      el('authForm').hidden = true; el('codeForm').hidden = false; el('aCode').focus();
+      await auth.sendCode(pendingEmail, { allowSignup: pendingAllowSignup });
+      el('authForm').hidden = true; el('codeForm').hidden = false; el('modeToggle').hidden = true;
+      startResendTimer(); el('aCode').focus();
     } catch (error) { err.textContent = error.message || 'Unable to send a verification code.'; err.classList.add('show'); }
     finally { submit.disabled = false; submit.textContent = 'Send verification code'; }
   });
@@ -100,7 +131,7 @@
     try {
       const auth = await window.CrystalinaAuth;
       const user = await auth.verifyCode(pendingEmail, el('aCode').value.trim());
-      if (staffMode) {
+      if (pendingStaffMode) {
         const primaryRole = staffRolePriority.find(role => user.roles.includes(role));
         if (!primaryRole) { await auth.signOut(); throw new Error('This account does not have staff dashboard access. Contact a Crystalina administrator.'); }
         Store.setCurrentUser(user);
@@ -108,7 +139,23 @@
       } else { Store.setCurrentUser(user); location.href = '/account/'; }
     } catch (error) { err.textContent = error.message || 'That verification code is invalid or expired.'; err.classList.add('show'); }
   });
-  el('changeEmail').addEventListener('click', () => { el('codeForm').hidden = true; el('authForm').hidden = false; el('aCode').value = ''; });
+  el('resendCode').addEventListener('click', async () => {
+    if (Date.now() < resendDeadline) return;
+    err.classList.remove('show');
+    const button = el('resendCode');
+    try {
+      button.disabled = true; button.textContent = 'Sending New Code…';
+      const auth = await window.CrystalinaAuth;
+      await auth.sendCode(pendingEmail, { allowSignup: pendingAllowSignup });
+      el('aCode').value = '';
+      startResendTimer('A new verification code was sent. It expires after 60 seconds.');
+      el('aCode').focus();
+    } catch (error) { err.textContent = error.message || 'Unable to resend the verification code.'; err.classList.add('show'); updateResendState(); }
+  });
+  el('changeEmail').addEventListener('click', () => {
+    stopResendTimer(); el('codeForm').hidden = true; el('authForm').hidden = false;
+    el('modeToggle').hidden = false; el('aCode').value = ''; el('aEmail').focus();
+  });
 
   refresh();
 </script>
