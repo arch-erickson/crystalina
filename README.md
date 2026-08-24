@@ -35,14 +35,14 @@ Instagram / X / Facebook / WhatsApp links, floating WhatsApp button.
 ## Store operations
 
 The browser-only demo catalog, accounts, staff records, orders, and admin metrics have been removed.
-Supabase-backed authentication, inventory, orders, and role-based administration are being introduced next.
+The manufacturer-backed catalog is versioned in `js/product-catalog.js` and mirrored in Supabase with explicit compatibility and bundle relationships. Cart and checkout persistence remain browser-local for now.
 
 ## First-draft notes (for the next phase)
 
-- All data (products, cart, users, orders) lives in `localStorage` — swap for a real backend + database.
+- Published products and filter relationships are in Supabase; cart and simulated orders still live in `localStorage`.
 - Auth is demo-grade (plaintext, client-side). Replace with real authentication before launch.
 - Checkout simulates orders; wire up Stripe/PayPal next.
-- Product and lifestyle images are placeholders (branded SVGs + stock photos) — replace with real photography.
+- The four purchased filtration systems use actual Crystalina product photos. Remaining lifestyle and legacy catalog media should be reviewed before launch.
 - NYC water statistics are illustrative first-draft figures; verify against NYC DEP reports and lab data before publishing claims.
 - Contact: phone/WhatsApp (917) 809-4803, info@crystalina.org, New York City, NY.
 - Socials: Instagram/X @crystalinawater, Facebook profile 61591728311575, LinkedIn company/crystalina-water.
