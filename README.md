@@ -41,8 +41,9 @@ The admin panel includes browser-persistent demo controls for products, orders, 
 filter-replacement schedules, service-job management, staff, suppliers, leads,
 campaigns, support tickets, content, finance reporting, company details, permissions, and the site
 color palette. It also includes customer/staff/supplier profile overlays, bulk outreach, a landing-page
-layer editor, and multi-role employee assignments. Product and landing-page changes appear in the
-storefront immediately in the same browser.
+layer editor, multi-role employee assignments, and a local QR generator with standard, minimal,
+serial-number, Crystalina-logo, and discount-code designs. Product and landing-page changes appear
+in the storefront immediately in the same browser.
 
 ## Demo staff access
 

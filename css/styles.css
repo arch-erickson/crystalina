@@ -518,6 +518,33 @@ body.cart-open { overflow: hidden; }
 .role-check { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; color: var(--muted); font-size: .72rem; }
 [hidden] { display: none !important; }
 
+/* ---------- admin QR generator ---------- */
+.qr-builder-grid { display: grid; grid-template-columns: minmax(440px, 1.15fr) minmax(330px, .85fr); gap: 22px; align-items: start; }
+.qr-type-field { border: 0; margin: 0 0 20px; padding: 0; }
+.qr-type-field legend { margin-bottom: 9px; color: var(--ink); font-size: .78rem; font-weight: 600; }
+.qr-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.qr-type-grid label { position: relative; display: flex; align-items: flex-start; min-height: 78px; padding: 13px; border: 1px solid #d7e2f0; border-radius: var(--radius-sm); background: #fff; cursor: pointer; transition: border-color .2s, background .2s, box-shadow .2s; }
+.qr-type-grid label:last-child { grid-column: 1 / -1; }
+.qr-type-grid label:has(input:checked) { border-color: var(--blue-500); background: var(--ice-50); box-shadow: 0 0 0 2px rgba(42,123,196,.1); }
+.qr-type-grid input { position: absolute; opacity: 0; pointer-events: none; }
+.qr-type-grid strong, .qr-type-grid small { display: block; }
+.qr-type-grid strong { color: var(--navy-800); font-size: .8rem; }
+.qr-type-grid small { margin-top: 4px; color: var(--muted); font-size: .68rem; line-height: 1.35; }
+.field-help { display: block; margin-top: 5px; color: var(--muted); font-size: .68rem; }
+.field-action { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.qr-color-field { display: flex; align-items: center; gap: 10px; min-height: 45px; padding: 5px 9px; border: 1px solid #d7e2f0; border-radius: 8px; }
+.qr-color-field input { width: 38px; height: 32px; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.qr-color-field code { color: var(--muted); font-size: .72rem; }
+.qr-preview-panel { position: sticky; top: 24px; }
+.qr-preview-stage { position: relative; width: min(100%, 520px); aspect-ratio: 1; display: grid; place-items: center; margin: 8px auto 18px; overflow: hidden; border: 1px solid #dce7f3; border-radius: 18px; background: repeating-conic-gradient(#f5f8fc 0 25%, #fff 0 50%) 50% / 20px 20px; }
+.qr-preview-stage canvas { display: none; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.qr-preview-stage.has-code canvas { display: block; }
+.qr-preview-stage.has-code .qr-preview-empty { display: none; }
+.qr-preview-empty { width: 70%; color: var(--muted); font-size: .82rem; line-height: 1.6; text-align: center; }
+.qr-scan-note { margin-top: 11px; color: var(--muted); font-size: .68rem; line-height: 1.45; text-align: center; }
+.qr-destination { display: block; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.qr-design-chip { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; background: var(--ice-100); color: var(--navy-700); font-size: .68rem; font-weight: 700; white-space: nowrap; }
+
 /* ---------- role portals ---------- */
 .portal-body { background: #f2f6fb; min-height: 100vh; }
 .portal-auth { min-height: 100vh; display: grid; place-items: center; padding: 30px 16px; background: radial-gradient(circle at 20% 10%, var(--ice-100), transparent 34%), #f2f6fb; }
@@ -666,6 +693,8 @@ body.cart-open { overflow: hidden; }
   .staff-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-two-col { grid-template-columns: 1fr; }
   .content-layout, .report-grid { grid-template-columns: 1fr; }
+  .qr-builder-grid { grid-template-columns: 1fr; }
+  .qr-preview-panel { position: static; }
   .content-layer { grid-template-columns: 64px 1fr auto; }
   .layer-actions { grid-column: 2 / -1; justify-content: flex-start; }
 }
@@ -706,6 +735,8 @@ body.cart-open { overflow: hidden; }
   .brand-mark { height: 42px; width: 42px; }
   .brand-wordmark { height: 31px; }
   .brand { gap: 8px; }
+  .qr-type-grid { grid-template-columns: 1fr; }
+  .qr-type-grid label:last-child { grid-column: auto; }
   .content-layer { grid-template-columns: 54px 1fr; }
   .layer-toggle { grid-column: 2; }
   .layer-actions { grid-column: 1 / -1; }

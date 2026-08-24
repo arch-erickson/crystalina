@@ -43,6 +43,7 @@
     <button class="side-link" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1z"/></svg> Settings</button>
     <div class="side-foot">
       <button class="side-link" onclick="location.href='/'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18"/></svg> View Store</button>
+      <button class="side-link" data-view="qrcodes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h3v3h-3zM19 14h2v7h-7v-2M17 17h4"/><path d="M5.5 5.5h2v2h-2zM16.5 5.5h2v2h-2zM5.5 16.5h2v2h-2z"/></svg> QR Code Generator</button>
       <button class="side-link" id="adminSignOut"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4"/><path d="M10 8l-4 4 4 4M6 12h9"/></svg> Sign Out</button>
     </div>
   </aside>
@@ -211,6 +212,34 @@
         <div class="admin-panel table-scroll"><div class="panel-title-row"><h3>Discount Codes</h3><button class="btn btn-sm btn-outline" data-open-record="discount">+ Add Code</button></div><table class="admin-table" id="discountsTable"><thead><tr><th>Code</th><th>Offer</th><th>Usage</th><th>Expires</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
       </div>
       <div class="admin-panel table-scroll"><div class="panel-title-row"><div><h3>Abandoned Carts</h3><p class="admin-subtitle">Collect contact details and send automated recovery reminders.</p></div><button class="btn btn-sm btn-outline" onclick="AdminUI.composeAudience('abandonedCarts')">Message All Pending Carts</button></div><table class="admin-table" id="abandonedCartsTable"><thead><tr><th>Customer</th><th>Contact</th><th>Items</th><th>Value</th><th>Updated</th><th>Status</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+    </section>
+
+    <!-- QR CODE GENERATOR -->
+    <section id="view-qrcodes" class="admin-view" style="display:none">
+      <div class="admin-head"><div><h1>QR Code Generator</h1><p class="admin-subtitle">Create downloadable Crystalina QR codes without sending customer or campaign data to an outside QR service.</p></div><div class="table-actions"><span class="admin-badge">Local generator</span><button class="btn btn-primary" type="button" id="qrNewBtn">+ New QR Code</button></div></div>
+      <div class="qr-builder-grid">
+        <form class="admin-panel qr-form" id="qrForm">
+          <input type="hidden" id="qrEditingId">
+          <div class="field"><label for="qrName">QR name</label><input id="qrName" placeholder="September filter promotion" required></div>
+          <fieldset class="qr-type-field"><legend>QR design</legend><div class="qr-type-grid">
+            <label><input type="radio" name="qrType" value="standard" checked><span><strong>Standard QR</strong><small>Classic high-contrast square design</small></span></label>
+            <label><input type="radio" name="qrType" value="minimal"><span><strong>Minimalistic</strong><small>Clean rounded module treatment</small></span></label>
+            <label><input type="radio" name="qrType" value="serial"><span><strong>QR + Serial Number</strong><small>Asset or installation identification</small></span></label>
+            <label><input type="radio" name="qrType" value="logo"><span><strong>QR + Crystalina Logo</strong><small>Branded center logo with high correction</small></span></label>
+            <label><input type="radio" name="qrType" value="discount"><span><strong>QR + Discount Code</strong><small>Promotion-ready code card</small></span></label>
+          </div></fieldset>
+          <div class="field"><label for="qrPayload">Destination URL or encoded text</label><textarea id="qrPayload" rows="3" placeholder="https://crystalina.org/shop/" required></textarea><small class="field-help" id="qrPayloadHelp">This is what phones open or display after scanning.</small></div>
+          <div class="field qr-conditional" id="qrSerialField" hidden><label for="qrSerial">Serial number</label><div class="field-action"><input id="qrSerial" placeholder="CRY-2026-00001"><button class="btn btn-sm btn-outline" type="button" id="generateSerialBtn">Generate</button></div></div>
+          <div class="field qr-conditional" id="qrDiscountField" hidden><label for="qrDiscount">Discount code</label><select id="qrDiscount"></select></div>
+          <div class="field-row"><div class="field"><label for="qrSize">Download size</label><select id="qrSize"><option value="320">320 px</option><option value="480" selected>480 px</option><option value="640">640 px</option><option value="960">960 px</option></select></div><div class="field"><label for="qrFileType">File format</label><select id="qrFileType"><option value="png">PNG</option></select></div></div>
+          <div class="field-row"><div class="field"><label for="qrForeground">QR color</label><div class="qr-color-field"><input type="color" id="qrForeground" value="#15375d"><code id="qrForegroundValue">#15375D</code></div></div><div class="field"><label for="qrBackground">Background</label><div class="qr-color-field"><input type="color" id="qrBackground" value="#ffffff"><code id="qrBackgroundValue">#FFFFFF</code></div></div></div>
+          <div class="form-error" id="qrError"></div>
+          <div class="table-actions"><button class="btn btn-outline" type="button" id="qrPreviewBtn">Generate Preview</button><button class="btn btn-primary" type="submit" id="qrSaveBtn">Save QR Code</button></div>
+        </form>
+        <div class="admin-panel qr-preview-panel"><div class="panel-title-row"><div><h3>Live Preview</h3><p class="admin-subtitle" id="qrPreviewMeta">Choose a design and generate your code.</p></div><span class="admin-badge" id="qrScanBadge">Ready to scan</span></div><div class="qr-preview-stage" id="qrPreviewStage"><canvas id="qrCanvas" width="480" height="480" aria-label="Generated QR code preview"></canvas><div class="qr-preview-empty" id="qrPreviewEmpty">Your generated QR code will appear here.</div></div><button class="btn btn-primary btn-block" type="button" id="qrDownloadBtn" disabled>Download PNG</button><p class="qr-scan-note">Always test a downloaded code with multiple phones before printing it at large scale.</p></div>
+      </div>
+      <div class="admin-panel table-scroll"><div class="panel-title-row"><div><h3>Saved QR Codes</h3><p class="admin-subtitle">Reopen, download, edit, or delete previously generated designs.</p></div><span class="admin-badge" id="qrSavedCount">0 saved</span></div><table class="admin-table" id="qrCodesTable"><thead><tr><th>Name</th><th>Design</th><th>Destination</th><th>Serial / Discount</th><th>Created</th><th>Scans</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+      <div class="admin-callout production-note"><div><strong>Scan analytics require the backend</strong><span>QR images work now. Accurate scan counts will use Crystalina redirect links after Vercel and Supabase are connected.</span></div></div>
     </section>
 
     <!-- SUPPORT -->
@@ -386,6 +415,8 @@
 
 <script src="/js/store.js"></script>
 <script src="/js/main.js"></script>
+<script src="/js/vendor/qrcode-generator.js"></script>
 <script src="/js/admin.js"></script>
+<script src="/js/qr-admin.js"></script>
 </body>
 </html>

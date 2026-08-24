@@ -148,10 +148,10 @@ const Store = (() => {
 
   function migrateAdminData() {
     const schema = Number(localStorage.getItem(KEYS.adminSchema) || 0);
-    if (schema >= 4) return;
+    if (schema >= 5) return;
     const defaults = seedAdminData();
     const saved = read(KEYS.adminData, {});
-    ['customers', 'supplierProfiles', 'activityLog', 'abandonedCarts', 'outreach', 'pageSections'].forEach(collection => { if (!saved[collection]) saved[collection] = defaults[collection]; });
+    ['customers', 'supplierProfiles', 'activityLog', 'abandonedCarts', 'outreach', 'pageSections', 'qrCodes'].forEach(collection => { if (!saved[collection]) saved[collection] = defaults[collection]; });
     saved.staff = (saved.staff || []).map(member => {
       const current = defaults.staff.find(item => item.email === member.email);
       return current ? { ...current, ...member, id: current.id, roles: member.roles?.length ? member.roles : current.roles, photo: member.photo || current.photo } : member;
@@ -160,7 +160,7 @@ const Store = (() => {
     saved.jobs = (saved.jobs || defaults.jobs).map(job => { const current = defaults.jobs.find(item => item.id === job.id); return current ? { ...current, ...job, checklist: job.checklist?.length ? job.checklist : current.checklist } : job; });
     saved.pageSections = (saved.pageSections || defaults.pageSections).map(section => section.id === 'best-sellers' ? { ...section, products: (section.products || []).map(id => ({ 'whole-house-3': 'wh-3stage', 'countertop-luxe': 'ct-luxe' }[id] || id)) } : section);
     write(KEYS.adminData, { ...defaults, ...saved });
-    localStorage.setItem(KEYS.adminSchema, '4');
+    localStorage.setItem(KEYS.adminSchema, '5');
   }
 
   function seedAdminData() {
@@ -230,6 +230,7 @@ const Store = (() => {
         { id: 'CART-603', customerId: '', customer: 'Guest checkout', email: 'guest@example.com', phone: '', items: ['Countertop Luxe Dispenser'], total: 179.99, updated: '2026-08-21T16:25:00.000Z', status: 'Contacted' }
       ],
       outreach: [],
+      qrCodes: [],
       tickets: [
         { id: 'TKT-7041', customer: 'Maya Chen', subject: 'Low pressure after filter change', type: 'Troubleshooting', priority: 'High', updated: '2026-08-23', status: 'Open', channel: 'Email' },
         { id: 'TKT-7038', customer: 'James Wilson', subject: 'Warranty claim for faucet', type: 'Warranty', priority: 'Normal', updated: '2026-08-22', status: 'Waiting on customer', channel: 'Chat' },

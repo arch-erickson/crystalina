@@ -12,12 +12,13 @@
   });
 
   /* ---------- view switching ---------- */
-  const views = ['overview', 'products', 'orders', 'customers', 'subscriptions', 'service', 'staff', 'suppliers', 'leads', 'marketing', 'support', 'content', 'finance', 'settings'];
+  const views = ['overview', 'products', 'orders', 'customers', 'subscriptions', 'service', 'staff', 'suppliers', 'leads', 'marketing', 'qrcodes', 'support', 'content', 'finance', 'settings'];
   function showView(view, updateHash = true) {
     if (!views.includes(view)) view = 'overview';
     document.querySelectorAll('.side-link[data-view]').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
     views.forEach(v => document.getElementById('view-' + v).style.display = v === view ? '' : 'none');
     if (updateHash) history.replaceState(null, '', '#' + view);
+    if (view === 'qrcodes') window.QRAdminUI?.render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   document.querySelectorAll('.side-link[data-view]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
@@ -826,6 +827,7 @@
     renderSubscriptions(); renderService(); renderStaff(); renderSuppliers();
     renderLeads(); renderMarketing(); renderSupport();
     renderContent(); renderFinance(); renderSettings();
+    window.QRAdminUI?.render();
   }
   renderAll();
 })();
