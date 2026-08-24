@@ -11,9 +11,11 @@ const Store = (() => {
     staffChallenge: 'crystalina_staff_challenge', orders: 'crystalina_orders',
     adminData: 'crystalina_admin_data', dataVersion: 'crystalina_data_version'
   };
-  const DATA_VERSION = 'empty-operational-data-v1';
+  const DATA_VERSION = 'manufacturer-catalog-v1';
   const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
   const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
+  const catalog = () => window.CrystalinaProductCatalog || { products: [], compatibilities: [], bundleItems: [] };
+  const catalogProducts = () => catalog().products.map(product => ({ ...product }));
 
   function placeholder(label, variant = 0) {
     const palettes = [['#0B2A5B', '#1E7BE0'], ['#123C7A', '#3FA9F5'], ['#0E3163', '#2196F3']];
@@ -49,12 +51,21 @@ const Store = (() => {
     if (localStorage.getItem(KEYS.dataVersion) === DATA_VERSION) return;
     [KEYS.products, KEYS.cart, KEYS.users, KEYS.session, KEYS.staffSession, KEYS.staffChallenge, KEYS.orders, KEYS.adminData]
       .forEach(key => localStorage.removeItem(key));
-    write(KEYS.products, []); write(KEYS.users, []); write(KEYS.orders, []); write(KEYS.adminData, emptyAdminData());
+    write(KEYS.products, catalogProducts()); write(KEYS.users, []); write(KEYS.orders, []); write(KEYS.adminData, emptyAdminData());
     localStorage.setItem(KEYS.dataVersion, DATA_VERSION);
   }
 
-  const getProducts = () => read(KEYS.products, []);
+  const getProducts = () => read(KEYS.products, catalogProducts());
   const getProduct = id => getProducts().find(product => product.id === id);
+  const getBundlesForSystem = systemId => getProducts().filter(product => product.productKind === 'filter_bundle' && (product.compatibleSystemIds || []).includes(systemId));
+  const getBundleComponents = bundleId => catalog().bundleItems
+    .filter(item => item.bundleId === bundleId)
+    .map(item => ({ ...item, product: getProduct(item.componentId) }))
+    .filter(item => item.product);
+  const getCompatibleFilters = systemId => catalog().compatibilities
+    .filter(item => item.systemId === systemId)
+    .map(item => ({ ...item, product: getProduct(item.replacementId) }))
+    .filter(item => item.product);
   const saveProducts = products => write(KEYS.products, products);
   function upsertProduct(product) {
     const products = getProducts(); const index = products.findIndex(item => item.id === product.id);
@@ -151,7 +162,8 @@ const Store = (() => {
 
   clearLegacyDemoData();
   return {
-    placeholder, getProducts, getProduct, upsertProduct, deleteProduct, deleteAllProducts,
+    placeholder, getProducts, getProduct, getBundlesForSystem, getBundleComponents, getCompatibleFilters,
+    upsertProduct, deleteProduct, deleteAllProducts,
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
     getUsers, currentUser, setCurrentUser, signUp, signIn, signOut, currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
     getOrders, placeOrder, updateOrderStatus, deleteOrder, getAdminData, updateAdminItem, addAdminItem, deleteAdminItem,
