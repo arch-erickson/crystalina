@@ -11,7 +11,7 @@
       short: 'Black-frame 600 GPD reverse osmosis system with alkaline finishing and LED-UVC treatment.',
       description: 'A customized high-flow system for larger households and higher daily demand. This Crystalina configuration pairs three serviceable prefilter housings with a 600 GPD RO membrane, alkaline finishing media, real-time monitoring, and a long-life LED-UVC treatment module.',
       specs: ['Manufacturer-rated 600 GPD purified-water capacity', '1-micron sediment and activated-carbon prefiltration', '600 GPD reverse osmosis membrane', 'Weak-alkaline finishing cartridge', 'LED-UVC treatment module', 'Two pressure gauges and digital monitoring panel'],
-      installationMinutes: 120, image: '/images/products/h5-600-uv.webp', rating: '0.0', reviews: 0
+      installationMinutes: 120, image: '/images/products/h5-600-uv-studio.webp', rating: '0.0', reviews: 0
     },
     {
       id: 'c1000000-0000-4000-8000-000000000002', slug: 'f5-600-uv-alkaline', sku: 'CRY-F5-600-UV',
@@ -20,7 +20,7 @@
       short: 'Open-frame 600 GPD RO system with alkaline finishing, polishing carbon, and LED-UVC treatment.',
       description: 'A fully equipped F5-600 configuration with three front-access prefilters, a high-output membrane, taste-polishing carbon, alkaline finishing media, and a mercury-free LED-UVC module. The open layout keeps routine cartridge changes accessible.',
       specs: ['Manufacturer-rated 600 GPD purified-water capacity', 'Three front-access prefilter housings', '600 GPD reverse osmosis membrane', 'T33 taste-polishing carbon cartridge', 'Weak-alkaline finishing cartridge', 'LED-UVC treatment module'],
-      installationMinutes: 120, image: '/images/products/f5-600-uv.webp', rating: '0.0', reviews: 0
+      installationMinutes: 120, image: '/images/products/f5-600-uv-studio.webp', rating: '0.0', reviews: 0
     },
     {
       id: 'c1000000-0000-4000-8000-000000000003', slug: 'x2a-600-smart-tankless', sku: 'CRY-X2A-600',
@@ -29,7 +29,7 @@
       short: 'Enclosed tankless 600 GPD system with real-time TDS monitoring and three-cartridge service.',
       description: 'The compact X2A places its FSA prefilter, 600 GPD RO membrane, and ACM finishing cartridge inside a clean enclosed cabinet. A front display provides real-time TDS monitoring, while the three physical replacement cartridges simplify scheduled service.',
       specs: ['Manufacturer-rated 600 GPD configuration', '0.0001-micron manufacturer-rated RO filtration', 'Real-time TDS monitoring display', 'FSA 3-in-1 prefilter cartridge', 'ACM 2-in-1 finishing cartridge', 'Compact 478 x 161 x 410 mm cabinet'],
-      installationMinutes: 90, image: '/images/products/x2a-600.webp', rating: '0.0', reviews: 0
+      installationMinutes: 90, image: '/images/products/x2a-600-studio.webp', rating: '0.0', reviews: 0
     },
     {
       id: 'c1000000-0000-4000-8000-000000000004', slug: 'w5-400-alkaline', sku: 'CRY-W5-400-ALK',
@@ -38,7 +38,7 @@
       short: 'Non-electric 400 GPD RO rack with polishing carbon and weak-alkaline finishing media.',
       description: 'This customized W5-400 configuration operates without a booster pump or powered controls. It combines three transparent front housings with a 400 GPD membrane, a T33 polishing cartridge, and weak-alkaline finishing media.',
       specs: ['Manufacturer-rated 400 GPD nominal capacity', 'Non-electric operation', 'Three transparent front filter housings', '400 GPD reverse osmosis membrane', 'T33 taste-polishing carbon cartridge', 'Weak-alkaline finishing cartridge'],
-      installationMinutes: 90, image: '/images/products/w5-400-alkaline.webp', rating: '0.0', reviews: 0
+      installationMinutes: 90, image: '/images/products/w5-400-alkaline-studio.webp', rating: '0.0', reviews: 0
     },
     {
       id: 'c2000000-0000-4000-8000-000000000001', slug: 'ppf-02-sediment-cartridge', sku: 'PPF-02',

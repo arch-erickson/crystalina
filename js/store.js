@@ -12,7 +12,7 @@ const Store = (() => {
     adminData: 'crystalina_admin_data', dataVersion: 'crystalina_data_version',
     catalogSeedCount: 'crystalina_catalog_seed_count'
   };
-  const DATA_VERSION = 'manufacturer-catalog-v2';
+  const DATA_VERSION = 'manufacturer-catalog-v3';
   const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
   const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
   const catalog = () => window.CrystalinaProductCatalog || { products: [], compatibilities: [], bundleItems: [] };

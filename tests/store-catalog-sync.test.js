@@ -29,10 +29,10 @@ function loadStore(localStorage) {
   return context.__Store;
 }
 
-test('the v2 catalog upgrade repairs an empty v1 catalog without clearing the cart', () => {
+test('the v3 catalog upgrade repairs an empty v2 catalog without clearing the cart', () => {
   const cart = [{ id: catalog.products[0].id, qty: 1 }];
   const localStorage = storage({
-    crystalina_data_version: 'manufacturer-catalog-v1',
+    crystalina_data_version: 'manufacturer-catalog-v2',
     crystalina_products: '[]',
     crystalina_cart: JSON.stringify(cart)
   });
@@ -40,7 +40,7 @@ test('the v2 catalog upgrade repairs an empty v1 catalog without clearing the ca
   const store = loadStore(localStorage);
   assert.equal(store.getProducts().length, catalog.products.length);
   assert.equal(JSON.stringify(store.getCart()), JSON.stringify(cart));
-  assert.equal(localStorage.getItem('crystalina_data_version'), 'manufacturer-catalog-v2');
+  assert.equal(localStorage.getItem('crystalina_data_version'), 'manufacturer-catalog-v3');
   assert.equal(localStorage.getItem('crystalina_catalog_seed_count'), String(catalog.products.length));
 });
 
