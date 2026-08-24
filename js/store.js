@@ -9,9 +9,10 @@ const Store = (() => {
     products: 'crystalina_products', cart: 'crystalina_cart', users: 'crystalina_users',
     session: 'crystalina_session', staffSession: 'crystalina_staff_session',
     staffChallenge: 'crystalina_staff_challenge', orders: 'crystalina_orders',
-    adminData: 'crystalina_admin_data', dataVersion: 'crystalina_data_version'
+    adminData: 'crystalina_admin_data', dataVersion: 'crystalina_data_version',
+    catalogSeedCount: 'crystalina_catalog_seed_count'
   };
-  const DATA_VERSION = 'manufacturer-catalog-v1';
+  const DATA_VERSION = 'manufacturer-catalog-v2';
   const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
   const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
   const catalog = () => window.CrystalinaProductCatalog || { products: [], compatibilities: [], bundleItems: [] };
@@ -47,12 +48,18 @@ const Store = (() => {
     };
   }
 
-  function clearLegacyDemoData() {
-    if (localStorage.getItem(KEYS.dataVersion) === DATA_VERSION) return;
-    [KEYS.products, KEYS.cart, KEYS.users, KEYS.session, KEYS.staffSession, KEYS.staffChallenge, KEYS.orders, KEYS.adminData]
-      .forEach(key => localStorage.removeItem(key));
-    write(KEYS.products, catalogProducts()); write(KEYS.users, []); write(KEYS.orders, []); write(KEYS.adminData, emptyAdminData());
+  function syncManufacturerCatalog() {
+    const seededProducts = catalogProducts();
+    const storedVersion = localStorage.getItem(KEYS.dataVersion);
+    const recordedSeedCount = Number(localStorage.getItem(KEYS.catalogSeedCount) || 0);
+    const storedProducts = read(KEYS.products, []);
+    const needsVersionUpgrade = storedVersion !== DATA_VERSION;
+    const needsFailedSeedRepair = storedVersion === DATA_VERSION && storedProducts.length === 0 && recordedSeedCount === 0 && seededProducts.length > 0;
+    if (!needsVersionUpgrade && !needsFailedSeedRepair) return;
+
+    write(KEYS.products, seededProducts);
     localStorage.setItem(KEYS.dataVersion, DATA_VERSION);
+    localStorage.setItem(KEYS.catalogSeedCount, String(seededProducts.length));
   }
 
   const getProducts = () => read(KEYS.products, catalogProducts());
@@ -160,7 +167,7 @@ const Store = (() => {
   const getSiteSettings = () => getAdminData().siteSettings;
   function updateSiteSettings(changes) { const data = getAdminData(); data.siteSettings = { ...data.siteSettings, ...changes }; saveAdminData(data); return data.siteSettings; }
 
-  clearLegacyDemoData();
+  syncManufacturerCatalog();
   return {
     placeholder, getProducts, getProduct, getBundlesForSystem, getBundleComponents, getCompatibleFilters,
     upsertProduct, deleteProduct, deleteAllProducts,
