@@ -57,6 +57,7 @@ const Store = (() => {
   function seedProducts() {
     const P = (id, name, category, price, comparePrice, stock, badge, short, description, specs, variant) => ({
       id, name, category, price, comparePrice, stock, badge, short, description, specs,
+      installationMinutes: 30,
       image: `/images/products/${id}.webp`,
       rating: (4.5 + (variant % 5) * 0.1).toFixed(1),
       reviews: 40 + variant * 37
@@ -120,6 +121,8 @@ const Store = (() => {
       localStorage.setItem(KEYS.products, JSON.stringify(seedProducts()));
       localStorage.setItem(KEYS.seedVersion, String(SEED_VERSION));
     }
+    const products = read(KEYS.products, []);
+    if (products.some(product => !product.installationMinutes)) write(KEYS.products, products.map(product => ({ installationMinutes: 30, ...product })));
     if (!localStorage.getItem(KEYS.users)) {
       localStorage.setItem(KEYS.users, JSON.stringify([{
         id: 'admin-1',
@@ -148,19 +151,21 @@ const Store = (() => {
 
   function migrateAdminData() {
     const schema = Number(localStorage.getItem(KEYS.adminSchema) || 0);
-    if (schema >= 5) return;
+    if (schema >= 7) return;
     const defaults = seedAdminData();
     const saved = read(KEYS.adminData, {});
-    ['customers', 'supplierProfiles', 'activityLog', 'abandonedCarts', 'outreach', 'pageSections', 'qrCodes'].forEach(collection => { if (!saved[collection]) saved[collection] = defaults[collection]; });
+    ['customers', 'supplierProfiles', 'activityLog', 'abandonedCarts', 'outreach', 'pageSections', 'qrCodes', 'staffSchedules', 'staffAvailability', 'staffNotifications'].forEach(collection => { if (!saved[collection]) saved[collection] = defaults[collection]; });
     saved.staff = (saved.staff || []).map(member => {
       const current = defaults.staff.find(item => item.email === member.email);
       return current ? { ...current, ...member, id: current.id, roles: member.roles?.length ? member.roles : current.roles, photo: member.photo || current.photo } : member;
     });
     defaults.staff.forEach(member => { if (!saved.staff.some(item => item.email === member.email)) saved.staff.push(member); });
+    saved.customers = (saved.customers || defaults.customers).map(customer => { const current = defaults.customers.find(item => item.id === customer.id); return current ? { ...current, ...customer, lat: customer.lat || current.lat, lon: customer.lon || current.lon } : customer; });
     saved.jobs = (saved.jobs || defaults.jobs).map(job => { const current = defaults.jobs.find(item => item.id === job.id); return current ? { ...current, ...job, checklist: job.checklist?.length ? job.checklist : current.checklist } : job; });
+    defaults.jobs.forEach(job => { if (!saved.jobs.some(item => item.id === job.id)) saved.jobs.push(job); });
     saved.pageSections = (saved.pageSections || defaults.pageSections).map(section => section.id === 'best-sellers' ? { ...section, products: (section.products || []).map(id => ({ 'whole-house-3': 'wh-3stage', 'countertop-luxe': 'ct-luxe' }[id] || id)) } : section);
     write(KEYS.adminData, { ...defaults, ...saved });
-    localStorage.setItem(KEYS.adminSchema, '5');
+    localStorage.setItem(KEYS.adminSchema, '7');
   }
 
   function seedAdminData() {
@@ -172,25 +177,38 @@ const Store = (() => {
         { id: 'SUB-1039', customer: 'Noah Brown', email: 'noah@example.com', system: 'VitaShower', cadence: '6 months', nextDate: '2026-09-12', replacement: 'Shower Cartridge', status: 'Active' }
       ],
       customers: [
-        { id: 'CUS-1001', name: 'Maya Chen', email: 'maya@example.com', phone: '(718) 555-0112', joined: '2026-03-14', address: '45-18 21st St, Long Island City, Queens, NY 11101', source: 'Website', assignedSalesId: 'SAL-2001', products: ['RO-10 Alkaline Reverse Osmosis System', 'RO Replacement Filter Set'], cart: ['Digital TDS Water Quality Meter'], installed: [{ product: 'RO-10 Alkaline', date: '2026-03-22', photo: '' }], notes: 'Prefers weekday morning service appointments.' },
-        { id: 'CUS-1002', name: 'James Wilson', email: 'james@example.com', phone: '(212) 555-0168', joined: '2026-04-08', address: '211 W 104th St, Manhattan, NY 10025', source: 'Sales Associate', assignedSalesId: 'SAL-2001', products: ['Whole Home 3-Stage Filtration System'], cart: [], installed: [{ product: 'Whole Home 3-Stage', date: '2026-04-18', photo: '' }], notes: 'Brownstone installation, coordinate building access.' },
-        { id: 'CUS-1003', name: 'Sofia Martinez', email: 'sofia@example.com', phone: '(347) 555-0139', joined: '2026-05-21', address: '78 Prospect Pl, Brooklyn, NY 11217', source: 'Referral', assignedSalesId: 'SAL-2001', products: ['RO-5 Classic Reverse Osmosis System'], cart: ['RO Replacement Filter Set'], installed: [{ product: 'RO-5 Classic', date: '2026-05-29', photo: '' }], notes: 'Annual maintenance plan is currently paused.' },
-        { id: 'CUS-1004', name: 'Noah Brown', email: 'noah@example.com', phone: '(646) 555-0177', joined: '2026-06-11', address: '312 E 149th St, Bronx, NY 10451', source: 'Water quiz', assignedSalesId: 'SAL-2001', products: ['VitaShower 12-Stage Shower Filter'], cart: [], installed: [], notes: 'Contact by email before phone.' }
+        { id: 'CUS-1001', name: 'Maya Chen', email: 'maya@example.com', phone: '(718) 555-0112', joined: '2026-03-14', address: '45-18 21st St, Long Island City, Queens, NY 11101', lat: 40.7487, lon: -73.9484, source: 'Website', assignedSalesId: 'SAL-2001', products: ['RO-10 Alkaline Reverse Osmosis System', 'RO Replacement Filter Set'], cart: ['Digital TDS Water Quality Meter'], installed: [{ product: 'RO-10 Alkaline', date: '2026-03-22', photo: '' }], notes: 'Prefers weekday morning service appointments.' },
+        { id: 'CUS-1002', name: 'James Wilson', email: 'james@example.com', phone: '(212) 555-0168', joined: '2026-04-08', address: '211 W 104th St, Manhattan, NY 10025', lat: 40.8004, lon: -73.9673, source: 'Sales Associate', assignedSalesId: 'SAL-2001', products: ['Whole Home 3-Stage Filtration System'], cart: [], installed: [{ product: 'Whole Home 3-Stage', date: '2026-04-18', photo: '' }], notes: 'Brownstone installation, coordinate building access.' },
+        { id: 'CUS-1003', name: 'Sofia Martinez', email: 'sofia@example.com', phone: '(347) 555-0139', joined: '2026-05-21', address: '78 Prospect Pl, Brooklyn, NY 11217', lat: 40.6772, lon: -73.9745, source: 'Referral', assignedSalesId: 'SAL-2001', products: ['RO-5 Classic Reverse Osmosis System'], cart: ['RO Replacement Filter Set'], installed: [{ product: 'RO-5 Classic', date: '2026-05-29', photo: '' }], notes: 'Annual maintenance plan is currently paused.' },
+        { id: 'CUS-1004', name: 'Noah Brown', email: 'noah@example.com', phone: '(646) 555-0177', joined: '2026-06-11', address: '312 E 149th St, Bronx, NY 10451', lat: 40.8172, lon: -73.9228, source: 'Water quiz', assignedSalesId: 'SAL-2001', products: ['VitaShower 12-Stage Shower Filter'], cart: [], installed: [], notes: 'Contact by email before phone.' }
       ],
       notifications: [
         { id: 'NOT-9001', customerId: 'CUS-1001', title: 'Filter replacement reminder', message: 'Your RO pre-filter replacement is due September 3.', channel: 'Website', sent: '2026-08-23T09:30:00.000Z', read: false },
         { id: 'NOT-9002', customerId: 'CUS-1003', title: 'Service appointment update', message: 'Your annual maintenance visit is awaiting confirmation.', channel: 'Website', sent: '2026-08-22T14:15:00.000Z', read: false }
       ],
       jobs: [
-        { id: 'JOB-2081', customer: 'Maya Chen', address: '45-18 21st St', borough: 'Queens', type: 'Filter replacement', product: 'RO-10 Alkaline', date: '2026-08-25', time: '9:00 AM', technician: 'Luis Rivera', status: 'Confirmed', requirements: 'Replace stages 1 to 3, test pressure and TDS, inspect all fittings.', checklist: [{ label: 'Confirm customer and system', done: true }, { label: 'Photograph pre-job condition', done: false }, { label: 'Replace filter stages 1 to 3', done: false }, { label: 'Pressure and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 1, checklistTotal: 5, beforePhoto: '', afterPhoto: '' },
-        { id: 'JOB-2082', customer: 'James Wilson', address: '211 W 104th St', borough: 'Manhattan', type: 'Whole home install', product: 'Whole Home 3-Stage', date: '2026-08-25', time: '1:30 PM', technician: 'Amina Patel', status: 'Assigned', requirements: 'Basement utility-room installation. Confirm building shutoff and protect finished flooring.', checklist: [{ label: 'Verify building access and shutoff', done: false }, { label: 'Photograph pre-job plumbing', done: false }, { label: 'Mount three-stage system', done: false }, { label: 'Connect bypass and fittings', done: false }, { label: 'Flush and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 6, beforePhoto: '', afterPhoto: '' },
-        { id: 'JOB-2083', customer: 'Sofia Martinez', address: '78 Prospect Pl', borough: 'Brooklyn', type: 'Annual maintenance', product: 'RO-5 Classic', date: '2026-08-26', time: '10:00 AM', technician: 'Needs assignment', status: 'Needs assignment', requirements: 'Annual inspection, sanitize tank, replace pre-filters, and record final TDS.', checklist: [{ label: 'Confirm system model', done: false }, { label: 'Photograph pre-job condition', done: false }, { label: 'Sanitize tank and replace filters', done: false }, { label: 'Record final TDS', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 5, beforePhoto: '', afterPhoto: '' }
+        { id: 'JOB-2081', customerId: 'CUS-1001', customer: 'Maya Chen', address: '45-18 21st St, Long Island City, Queens, NY 11101', lat: 40.7487, lon: -73.9484, borough: 'Queens', type: 'Filter replacement', product: 'RO-10 Alkaline', installationMinutes: 30, date: '2026-08-25', time: '9:00 AM', technician: 'Luis Rivera', status: 'Confirmed', requirements: 'Replace stages 1 to 3, test pressure and TDS, inspect all fittings.', checklist: [{ label: 'Confirm customer and system', done: true }, { label: 'Photograph pre-job condition', done: false }, { label: 'Replace filter stages 1 to 3', done: false }, { label: 'Pressure and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 1, checklistTotal: 5, beforePhoto: '', afterPhoto: '' },
+        { id: 'JOB-2082', customerId: 'CUS-1002', customer: 'James Wilson', address: '211 W 104th St, Manhattan, NY 10025', lat: 40.8004, lon: -73.9673, borough: 'Manhattan', type: 'Whole home install', product: 'Whole Home 3-Stage', installationMinutes: 60, date: '2026-08-25', time: '1:30 PM', technician: 'Amina Patel', status: 'Assigned', requirements: 'Basement utility-room installation. Confirm building shutoff and protect finished flooring.', checklist: [{ label: 'Verify building access and shutoff', done: false }, { label: 'Photograph pre-job plumbing', done: false }, { label: 'Mount three-stage system', done: false }, { label: 'Connect bypass and fittings', done: false }, { label: 'Flush and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 6, beforePhoto: '', afterPhoto: '' },
+        { id: 'JOB-2083', customerId: 'CUS-1003', customer: 'Sofia Martinez', address: '78 Prospect Pl, Brooklyn, NY 11217', lat: 40.6772, lon: -73.9745, borough: 'Brooklyn', type: 'Annual maintenance', product: 'RO-5 Classic', installationMinutes: 45, date: '2026-08-26', time: '10:00 AM', technician: 'Needs assignment', status: 'Needs assignment', requirements: 'Annual inspection, sanitize tank, replace pre-filters, and record final TDS.', checklist: [{ label: 'Confirm system model', done: false }, { label: 'Photograph pre-job condition', done: false }, { label: 'Sanitize tank and replace filters', done: false }, { label: 'Record final TDS', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 5, beforePhoto: '', afterPhoto: '' },
+        { id: 'JOB-2084', customerId: 'CUS-1004', customer: 'Noah Brown', address: '312 E 149th St, Bronx, NY 10451', lat: 40.8172, lon: -73.9228, borough: 'Bronx', type: 'New installation', product: 'VitaShower 12-Stage', installationMinutes: 30, date: '2026-08-25', time: '11:00 AM', technician: 'Luis Rivera', status: 'Assigned', requirements: 'Install shower filter, check seals, and demonstrate cartridge replacement.', checklist: [{ label: 'Confirm product and fixture', done: false }, { label: 'Photograph pre-job condition', done: false }, { label: 'Install and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 4, beforePhoto: '', afterPhoto: '' },
+        { id: 'JOB-2085', customerId: 'CUS-1003', customer: 'Sofia Martinez', address: '78 Prospect Pl, Brooklyn, NY 11217', lat: 40.6772, lon: -73.9745, borough: 'Brooklyn', type: 'Product delivery', product: 'RO Replacement Filter Set', installationMinutes: 15, date: '2026-08-25', time: '2:30 PM', technician: 'Luis Rivera', status: 'Assigned', requirements: 'Deliver sealed replacement set and verify the customer received the correct model.', checklist: [{ label: 'Confirm customer and product', done: false }, { label: 'Verify sealed package', done: false }, { label: 'Record delivery confirmation', done: false }], checklistDone: 0, checklistTotal: 3, beforePhoto: '', afterPhoto: '' }
       ],
       staff: [
         { id: 'TEC-1001', name: 'Luis Rivera', role: 'Technician', roles: ['Technician'], email: 'luis@crystalina.org', phone: '(917) 555-0142', area: 'Brooklyn, Queens', availability: 'Available', rating: 4.9, jobs: 38, initials: 'LR', photo: '' },
         { id: 'TEC-1002', name: 'Amina Patel', role: 'Technician', roles: ['Technician'], email: 'amina@crystalina.org', phone: '(917) 555-0188', area: 'Manhattan, Bronx', availability: 'On job', rating: 4.8, jobs: 31, initials: 'AP', photo: '' },
         { id: 'SAL-2001', name: 'Marcus Lee', role: 'Sales Associate', roles: ['Sales Associate'], email: 'marcus@crystalina.org', phone: '(917) 555-0164', area: 'All boroughs', availability: 'Available', rating: 4.7, jobs: 24, initials: 'ML', photo: '' },
         { id: 'MGR-3001', name: 'Jordan Kim', role: 'Manager', roles: ['Manager'], email: 'jordan@crystalina.org', phone: '(917) 555-0195', area: 'All boroughs', availability: 'Available', rating: 4.9, jobs: 42, initials: 'JK', photo: '' }
+      ],
+      staffSchedules: [
+        { id: 'SCH-1001', staffId: 'TEC-1001', date: '2026-08-25', start: '08:30', end: '17:00', status: 'Confirmed by staff', notes: 'Queens and Bronx route', createdBy: 'admin-1', updated: '2026-08-23T13:00:00.000Z' },
+        { id: 'SCH-1002', staffId: 'TEC-1002', date: '2026-08-25', start: '09:00', end: '17:30', status: 'Awaiting staff confirmation', notes: 'Manhattan installations', createdBy: 'admin-1', updated: '2026-08-23T13:05:00.000Z' },
+        { id: 'SCH-1003', staffId: 'SAL-2001', date: '2026-08-26', start: '10:00', end: '18:00', status: 'Tentative', notes: 'Showroom and follow-ups', createdBy: 'admin-1', updated: '2026-08-23T13:10:00.000Z' }
+      ],
+      staffAvailability: [
+        { id: 'AVL-1001', staffId: 'TEC-1002', date: '2026-08-27', reason: 'Personal appointment', created: '2026-08-22T14:00:00.000Z' }
+      ],
+      staffNotifications: [
+        { id: 'SNOT-1001', staffId: 'TEC-1002', title: 'Weekly schedule needs confirmation', message: 'Your Tuesday schedule is locked and awaiting confirmation.', scheduleId: 'SCH-1002', sent: '2026-08-23T13:05:00.000Z', read: false }
       ],
       suppliers: [
         { id: 'PO-3108', supplier: 'AquaCore Components', category: 'RO membranes', contact: 'orders@aquacore.example', amount: 2840, eta: '2026-08-27', status: 'In transit', tracking: 'ACX-884120' },
@@ -434,6 +452,15 @@ const Store = (() => {
   function addNotification(notification) {
     return addAdminItem('notifications', { id: 'NOT-' + String(Date.now()).slice(-6), sent: new Date().toISOString(), read: false, ...notification });
   }
+  function addStaffNotification(notification) {
+    return addAdminItem('staffNotifications', { id: 'SNOT-' + String(Date.now()).slice(-6), sent: new Date().toISOString(), read: false, ...notification });
+  }
+  function getStaffNotifications(staffId) { return getAdminData().staffNotifications.filter(item => item.staffId === staffId); }
+  function markStaffNotificationsRead(staffId) {
+    const data = getAdminData();
+    data.staffNotifications.forEach(item => { if (item.staffId === staffId) item.read = true; });
+    saveAdminData(data);
+  }
   function logActivity(actorId, action, entity) {
     return addAdminItem('activityLog', { id: 'ACT-' + String(Date.now()).slice(-6), actorId, action, entity, timestamp: new Date().toISOString() });
   }
@@ -470,7 +497,8 @@ const Store = (() => {
     currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
     getOrders, placeOrder, updateOrderStatus, deleteOrder,
     getAdminData, updateAdminItem, addAdminItem, deleteAdminItem, saveAdminCollection,
-    addNotification, getNotificationsForUser, markNotificationsRead, logActivity,
+    addNotification, getNotificationsForUser, markNotificationsRead,
+    addStaffNotification, getStaffNotifications, markStaffNotificationsRead, logActivity,
     getSiteSettings, updateSiteSettings
   };
 })();

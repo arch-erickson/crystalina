@@ -19,6 +19,7 @@
     views.forEach(v => document.getElementById('view-' + v).style.display = v === view ? '' : 'none');
     if (updateHash) history.replaceState(null, '', '#' + view);
     if (view === 'qrcodes') window.QRAdminUI?.render();
+    if (view === 'staff') window.AdminScheduleUI?.render();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
   document.querySelectorAll('.side-link[data-view]').forEach(btn => btn.addEventListener('click', () => showView(btn.dataset.view)));
@@ -69,12 +70,13 @@
         <td>${p.category}</td>
         <td>${money(p.price)}${p.comparePrice ? `<br><small style="color:var(--muted);text-decoration:line-through">${money(p.comparePrice)}</small>` : ''}</td>
         <td class="${p.stock === 0 ? 'out-stock' : p.stock <= 15 ? 'low-stock' : ''}">${p.stock}</td>
+        <td>${p.installationMinutes || 30} min</td>
         <td>${p.badge ? `<span class="admin-badge">${p.badge}</span>` : ', '}</td>
         <td><div class="table-actions">
           <button class="btn btn-sm btn-outline" onclick="AdminUI.editProduct('${p.id}')">Edit</button>
           <button class="btn btn-sm btn-danger" onclick="AdminUI.removeProduct('${p.id}')">Delete</button>
         </div></td>
-      </tr>`).join('') || '<tr><td colspan="7">No products match these filters.</td></tr>';
+      </tr>`).join('') || '<tr><td colspan="8">No products match these filters.</td></tr>';
   }
 
   /* ---------- orders table ---------- */
@@ -620,6 +622,7 @@
     document.getElementById('pPrice').value = prod ? prod.price : '';
     document.getElementById('pCompare').value = prod && prod.comparePrice ? prod.comparePrice : '';
     document.getElementById('pStock').value = prod ? prod.stock : '';
+    document.getElementById('pInstallTime').value = String(prod?.installationMinutes || 30);
     document.getElementById('pShort').value = prod ? prod.short : '';
     document.getElementById('pDesc').value = prod ? prod.description : '';
     document.getElementById('pSpecs').value = prod && prod.specs ? prod.specs.join('\n') : '';
@@ -675,6 +678,7 @@
       category: document.getElementById('pCat').value,
       badge: document.getElementById('pBadge').value || null,
       price, comparePrice: compare, stock,
+      installationMinutes: Number(document.getElementById('pInstallTime').value),
       short: document.getElementById('pShort').value.trim(),
       description: document.getElementById('pDesc').value.trim(),
       specs: document.getElementById('pSpecs').value.split('\n').map(s => s.trim()).filter(Boolean),
@@ -828,6 +832,7 @@
     renderLeads(); renderMarketing(); renderSupport();
     renderContent(); renderFinance(); renderSettings();
     window.QRAdminUI?.render();
+    window.AdminScheduleUI?.render();
   }
   renderAll();
 })();

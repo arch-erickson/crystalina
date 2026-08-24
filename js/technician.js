@@ -27,6 +27,8 @@
     document.getElementById('portalStaffName').textContent = session.name;
     document.getElementById('portalStaffId').textContent = session.id;
     renderJobs(session);
+    window.dispatchEvent(new CustomEvent('staff-session-ready'));
+    window.dispatchEvent(new CustomEvent('technician-session-ready'));
   }
 
   emailForm.addEventListener('submit', event => {
