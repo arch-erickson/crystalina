@@ -19,8 +19,7 @@
 
   function showError(message) { error.textContent = message; error.classList.toggle('show', Boolean(message)); }
   function sessionIsValid(session) {
-    const member = session && Store.getAdminData().staff.find(item => item.id === session.id);
-    return Boolean(member && (member.roles || [member.role]).includes(REQUIRED_ROLE) && session.activeRole === REQUIRED_ROLE);
+    return Boolean(session?.roles?.includes('technician'));
   }
   function showPortal(session) {
     auth.hidden = true; shell.hidden = false;
@@ -87,6 +86,6 @@
     }
   };
 
-  const existing = Store.currentStaff();
-  if (sessionIsValid(existing)) showPortal(existing);
+  const existing = Store.currentUser();
+  if (sessionIsValid(existing)) showPortal(existing); else location.replace('/signin/?mode=staff&role=technician');
 })();

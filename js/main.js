@@ -368,7 +368,7 @@ function renderFooter() {
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
       <span>© ${new Date().getFullYear()} Crystalina Water Co. All rights reserved. Proudly serving the five boroughs.</span>
-      <span class="footer-links"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="#">Shipping &amp; Returns</a> · <a href="/signin/?mode=admin">Admin</a></span>
+      <span class="footer-links"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="#">Shipping &amp; Returns</a> · <a href="/signin/?mode=staff">Staff sign in</a></span>
     </div>
   </div>`;
   document.body.appendChild(el);

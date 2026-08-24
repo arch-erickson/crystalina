@@ -85,6 +85,7 @@ const Store = (() => {
 
   const getUsers = () => read(KEYS.users, []);
   const currentUser = () => read(KEYS.session, null);
+  const setCurrentUser = user => write(KEYS.session, user);
   const currentStaff = () => read(KEYS.staffSession, null);
   const unavailableAuth = () => ({ ok: false, error: 'Secure sign-in is being configured. Please check back shortly.' });
   const signUp = unavailableAuth;
@@ -144,7 +145,7 @@ const Store = (() => {
   return {
     placeholder, getProducts, getProduct, upsertProduct, deleteProduct, deleteAllProducts,
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
-    getUsers, currentUser, signUp, signIn, signOut, currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
+    getUsers, currentUser, setCurrentUser, signUp, signIn, signOut, currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
     getOrders, placeOrder, updateOrderStatus, deleteOrder, getAdminData, updateAdminItem, addAdminItem, deleteAdminItem,
     saveAdminCollection, addNotification, getNotificationsForUser, markNotificationsRead, addStaffNotification,
     getStaffNotifications, markStaffNotificationsRead, logActivity, getSiteSettings, updateSiteSettings

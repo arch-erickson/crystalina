@@ -4,7 +4,7 @@
 
 (() => {
   const user = Store.currentUser();
-  if (!user || user.role !== 'admin') { location.href = '/signin/?mode=admin'; return; }
+  if (!user || !user.roles?.includes('admin')) { location.href = '/signin/?mode=staff&role=admin'; return; }
   document.getElementById('adminWho').textContent = 'Signed in as ' + user.name;
 
   document.getElementById('adminSignOut').addEventListener('click', () => {
