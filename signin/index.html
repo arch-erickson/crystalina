@@ -25,27 +25,23 @@
         <button id="tabSignin" class="active">Sign In</button>
         <button id="tabSignup">Create Account</button>
       </div>
-      <div class="form-error" id="authError"></div>
+      <div class="form-error" id="authError" role="alert" aria-live="polite"></div>
 
       <form id="authForm">
         <div class="field">
-          <label>Email</label>
+          <label for="aEmail">Email</label>
           <input id="aEmail" type="email" required placeholder="you@example.com">
         </div>
         <button type="submit" class="btn btn-primary btn-block" id="authSubmit">Send Verification Code</button>
       </form>
 
       <form id="codeForm" hidden>
-        <div class="field"><label>Six-digit verification code</label><input id="aCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="123456"></div>
+        <div class="field"><label for="aCode">Six-digit verification code</label><input id="aCode" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="123456"></div>
         <button type="submit" class="btn btn-primary btn-block">Verify &amp; Continue</button>
         <button type="button" class="btn btn-ghost btn-block" id="changeEmail">Use another email</button>
       </form>
 
-      <div class="staff-role-picker" id="staffPicker" hidden>
-        <h2>Staff sign in</h2><p>Choose the dashboard you need. One verification code signs you into any role assigned to your account.</p>
-        <div class="staff-role-options"><button type="button" data-role="admin">Admin</button><button type="button" data-role="manager">Manager</button><button type="button" data-role="technician">Technician</button><button type="button" data-role="sales">Sales</button></div>
-      </div>
-      <p class="auth-alt" id="modeToggle">Crystalina staff? <span class="link" id="staffLink">Staff sign in →</span></p>
+      <p class="auth-alt" id="modeToggle">Crystalina staff? <button type="button" class="link auth-mode-link" id="staffLink">Staff sign in →</button></p>
 
     </div>
   </div>
@@ -59,8 +55,9 @@
 
   let mode = 'signin';
   let staffMode = new URLSearchParams(location.search).get('mode') === 'staff';
-  let requestedRole = new URLSearchParams(location.search).get('role') || '';
   let pendingEmail = '';
+  const staffRoutes = { admin: '/admin/', manager: '/manager/', technician: '/technician/', sales: '/sales/' };
+  const staffRolePriority = ['admin', 'manager', 'technician', 'sales'];
 
   const el = id => document.getElementById(id);
   const err = el('authError');
@@ -71,14 +68,13 @@
     el('authSubmit').textContent = 'Send verification code';
     el('authTitle').textContent = staffMode ? 'Staff sign in' : (mode === 'signin' ? 'Welcome back' : 'Create your account');
     el('authSub').textContent = staffMode
-      ? (requestedRole ? `Verify your email to open the ${requestedRole} dashboard.` : 'Choose a staff dashboard, then we’ll email a six-digit verification code.')
+      ? 'Enter your staff email. We’ll detect your assigned dashboards after verification.'
       : (mode === 'signin' ? 'Enter your email and we’ll send a six-digit verification code.' : 'Create an account with a six-digit verification code sent to your email.');
     el('modeToggle').innerHTML = staffMode
-      ? 'Customer? <span class="link" id="staffLink">Back to customer sign in →</span>'
-      : 'Crystalina staff? <span class="link" id="staffLink">Staff sign in →</span>';
-    document.getElementById('staffLink').addEventListener('click', () => { staffMode = !staffMode; if (staffMode) mode = 'signin'; requestedRole = ''; refresh(); });
+      ? 'Customer? <button type="button" class="link auth-mode-link" id="staffLink">Back to customer sign in →</button>'
+      : 'Crystalina staff? <button type="button" class="link auth-mode-link" id="staffLink">Staff sign in →</button>';
+    document.getElementById('staffLink').addEventListener('click', () => { staffMode = !staffMode; if (staffMode) mode = 'signin'; refresh(); });
     el('customerTabs').style.display = staffMode ? 'none' : '';
-    el('staffPicker').hidden = !staffMode || Boolean(requestedRole);
     err.classList.remove('show');
   }
 
@@ -89,12 +85,14 @@
     e.preventDefault();
     err.classList.remove('show');
     pendingEmail = el('aEmail').value.trim();
+    const submit = el('authSubmit');
     try {
       const auth = await window.CrystalinaAuth;
-      if (staffMode && !requestedRole) throw new Error('Choose the staff dashboard you need first.');
+      submit.disabled = true; submit.textContent = 'Sending code…';
       await auth.sendCode(pendingEmail, { allowSignup: !staffMode && mode === 'signup' });
       el('authForm').hidden = true; el('codeForm').hidden = false; el('aCode').focus();
     } catch (error) { err.textContent = error.message || 'Unable to send a verification code.'; err.classList.add('show'); }
+    finally { submit.disabled = false; submit.textContent = 'Send verification code'; }
   });
 
   el('codeForm').addEventListener('submit', async e => {
@@ -103,14 +101,14 @@
       const auth = await window.CrystalinaAuth;
       const user = await auth.verifyCode(pendingEmail, el('aCode').value.trim());
       if (staffMode) {
-        if (!user.roles.includes(requestedRole)) { await auth.signOut(); throw new Error(`This account does not have ${requestedRole} access.`); }
+        const primaryRole = staffRolePriority.find(role => user.roles.includes(role));
+        if (!primaryRole) { await auth.signOut(); throw new Error('This account does not have staff dashboard access. Contact a Crystalina administrator.'); }
         Store.setCurrentUser(user);
-        location.href = { admin: '/admin/', manager: '/manager/', technician: '/technician/', sales: '/sales/' }[requestedRole];
+        location.href = staffRoutes[primaryRole];
       } else { Store.setCurrentUser(user); location.href = '/account/'; }
     } catch (error) { err.textContent = error.message || 'That verification code is invalid or expired.'; err.classList.add('show'); }
   });
   el('changeEmail').addEventListener('click', () => { el('codeForm').hidden = true; el('authForm').hidden = false; el('aCode').value = ''; });
-  document.querySelectorAll('[data-role]').forEach(button => button.addEventListener('click', () => { requestedRole = button.dataset.role; refresh(); el('aEmail').focus(); }));
 
   refresh();
 </script>
