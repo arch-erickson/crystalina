@@ -32,28 +32,10 @@ npx serve .
 Shared pieces: sticky header with slide-out cart drawer (Express Water–style), footer with
 Instagram / X / Facebook / WhatsApp links, floating WhatsApp button.
 
-## Demo admin login
+## Store operations
 
-- Email: `admin@crystalinawater.com`
-- Password: `crystalina2026`
-
-The admin panel includes browser-persistent demo controls for products, orders, subscriptions,
-filter-replacement schedules, service-job management, staff, suppliers, leads,
-campaigns, support tickets, content, finance reporting, company details, permissions, and the site
-color palette. It also includes customer/staff/supplier profile overlays, bulk outreach, a landing-page
-layer editor, multi-role employee assignments, and a local QR generator with standard, minimal,
-serial-number, Crystalina-logo, and discount-code designs. Product and landing-page changes appear
-in the storefront immediately in the same browser.
-
-## Demo staff access
-
-- Technician: `luis@crystalina.org` or `amina@crystalina.org`
-- Manager: `jordan@crystalina.org`
-- Sales Associate: `marcus@crystalina.org`
-- Prototype verification code for each role page: `246810`
-
-These role pages and verification codes are interface prototypes. A real backend, email-code delivery,
-shared database, secure sessions, and server-side permission checks are required before production use.
+The browser-only demo catalog, accounts, staff records, orders, and admin metrics have been removed.
+Supabase-backed authentication, inventory, orders, and role-based administration are being introduced next.
 
 ## First-draft notes (for the next phase)
 

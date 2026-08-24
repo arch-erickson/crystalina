@@ -1,504 +1,152 @@
 /* ============================================================
-   Crystalina, Data Layer (localStorage-backed, first draft)
-   Products, cart, users, sessions, orders.
+   Crystalina, temporary local state during the Supabase migration
+   Operational records are deliberately empty. Browser storage is only
+   used for a shopper's cart until the Supabase data layer is connected.
    ============================================================ */
 
 const Store = (() => {
   const KEYS = {
-    products: 'crystalina_products',
-    cart: 'crystalina_cart',
-    users: 'crystalina_users',
-    session: 'crystalina_session',
-    staffSession: 'crystalina_staff_session',
-    staffChallenge: 'crystalina_staff_challenge',
-    orders: 'crystalina_orders',
-    adminData: 'crystalina_admin_data',
-    adminSchema: 'crystalina_admin_schema',
-    seedVersion: 'crystalina_seed_v'
+    products: 'crystalina_products', cart: 'crystalina_cart', users: 'crystalina_users',
+    session: 'crystalina_session', staffSession: 'crystalina_staff_session',
+    staffChallenge: 'crystalina_staff_challenge', orders: 'crystalina_orders',
+    adminData: 'crystalina_admin_data', dataVersion: 'crystalina_data_version'
   };
-  const SEED_VERSION = 3;
+  const DATA_VERSION = 'empty-operational-data-v1';
+  const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
+  const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
 
-  /* ---------- SVG placeholder image generator ---------- */
-  // Generates a branded placeholder (gradient + droplet + label).
-  // Real product photos will replace these later.
   function placeholder(label, variant = 0) {
-    const palettes = [
-      ['#0B2A5B', '#1E7BE0'],
-      ['#123C7A', '#3FA9F5'],
-      ['#0E3163', '#2196F3'],
-      ['#0B2A5B', '#48C6EF'],
-      ['#14468C', '#1E7BE0']
-    ];
-    const [c1, c2] = palettes[variant % palettes.length];
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/>
-        </linearGradient>
-        <linearGradient id="d" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#BFE3FF"/><stop offset="1" stop-color="#FFFFFF"/>
-        </linearGradient>
-      </defs>
-      <rect width="640" height="480" fill="url(#g)"/>
-      <circle cx="540" cy="80" r="140" fill="#ffffff" opacity="0.06"/>
-      <circle cx="80" cy="420" r="180" fill="#ffffff" opacity="0.05"/>
-      <path d="M320 120 C 320 120, 250 220, 250 280 A 70 70 0 0 0 390 280 C 390 220, 320 120, 320 120 Z"
-            fill="url(#d)" opacity="0.92"/>
-      <ellipse cx="298" cy="262" rx="14" ry="26" fill="#ffffff" opacity="0.85" transform="rotate(-18 298 262)"/>
-      <text x="320" y="410" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif"
-            font-size="28" font-weight="600" fill="#ffffff" opacity="0.95">${label}</text>
-      <text x="320" y="440" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif"
-            font-size="15" fill="#ffffff" opacity="0.6">Placeholder, photo coming soon</text>
-    </svg>`;
+    const palettes = [['#0B2A5B', '#1E7BE0'], ['#123C7A', '#3FA9F5'], ['#0E3163', '#2196F3']];
+    const [start, end] = palettes[variant % palettes.length];
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${start}"/><stop offset="1" stop-color="${end}"/></linearGradient></defs><rect width="640" height="480" fill="url(#g)"/><path d="M320 120S250 220 250 280a70 70 0 0 0 140 0c0-60-70-160-70-160Z" fill="#fff" opacity=".9"/><text x="320" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#fff">${label}</text></svg>`;
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
 
-  /* ---------- Seed catalog ---------- */
-  function seedProducts() {
-    const P = (id, name, category, price, comparePrice, stock, badge, short, description, specs, variant) => ({
-      id, name, category, price, comparePrice, stock, badge, short, description, specs,
-      installationMinutes: 30,
-      image: `/images/products/${id}.webp`,
-      rating: (4.5 + (variant % 5) * 0.1).toFixed(1),
-      reviews: 40 + variant * 37
-    });
-
-    return [
-      P('ro-alkaline-10', 'Crystalina RO-10 Alkaline Reverse Osmosis System', 'Reverse Osmosis', 349.99, 429.99, 24, 'Best Seller',
-        '10-stage under-sink RO with remineralization, built for NYC apartments.',
-        'Our flagship 10-stage reverse osmosis system removes up to 99.99% of contaminants commonly found in New York City tap water, including lead from aging building plumbing, chlorine, chloramine, PFAS, and microplastics, then adds back healthy minerals for crisp, alkaline-balanced water. Compact tank design fits under standard NYC apartment sinks.',
-        ['10 filtration stages', 'Alkaline remineralization', '100 gallons per day', 'Lead, PFAS, chlorine & microplastic reduction', 'Fits under standard sinks', 'Includes designer faucet'], 0),
-      P('ro-classic-5', 'Crystalina RO-5 Classic Reverse Osmosis System', 'Reverse Osmosis', 219.99, 279.99, 41, null,
-        'Proven 5-stage RO purification at an accessible price.',
-        'The RO-5 Classic delivers the same core purification trusted in millions of homes: sediment, dual carbon, RO membrane, and polishing post-carbon. Everything you need to turn NYC tap into bottle-quality water, without the bottles.',
-        ['5 filtration stages', '50 gallons per day', 'Quick-connect fittings', '1-year filter life (pre-filters)', 'Includes chrome faucet'], 1),
-      P('wh-3stage', 'Crystalina Whole Home 3-Stage Filtration System', 'Whole House', 499.99, 599.99, 12, 'New',
-        'Filters every tap, shower, and appliance in your home or brownstone.',
-        'Designed for NYC brownstones, townhouses, and whole-apartment retrofits. Three heavy-duty stages, sediment, KDF, and activated carbon, protect your plumbing and appliances while removing chlorine, rust from old mains, and heavy metals before water reaches a single tap.',
-        ['Whole-home coverage', '3 heavy-duty stages', '0.25 micron sediment capture', 'Protects appliances & plumbing', '150,000 gallon capacity'], 2),
-      P('ct-luxe', 'Crystalina Countertop Luxe Dispenser', 'Countertop', 179.99, null, 33, null,
-        'No installation. Plug in, fill, and drink pure water in minutes.',
-        'Renting in the city? The Countertop Luxe needs zero plumbing. A 4-stage cartridge with UV polishing turns tap water into clean, great-tasting water at the push of a button, perfect for apartments where installations aren\'t allowed.',
-        ['Zero installation', '4-stage cartridge + UV', 'Hot, cold & ambient dispensing', '1.5 gallon reservoir', 'Renter friendly'], 3),
-      P('shower-12', 'Crystalina VitaShower 12-Stage Shower Filter', 'Shower & Bath', 44.99, 59.99, 87, 'Popular',
-        'Softer skin and hair, removes chlorine right at the showerhead.',
-        'NYC disinfects its water with chlorine, which is great for safety but rough on skin and hair. The VitaShower\'s 12-stage cartridge with KDF-55 and vitamin C reduces chlorine and heavy metals at the point of use. Installs in under 5 minutes, no tools.',
-        ['12 filtration stages', 'KDF-55 + Vitamin C', 'Fits all standard showers', '6-month cartridge life', 'Tool-free install'], 4),
-      P('faucet-pure', 'Crystalina PureTap Faucet Filter', 'Faucet & Pitcher', 34.99, null, 120, null,
-        'Twist-on faucet filtration for instant cleaner water.',
-        'The fastest way to upgrade your tap. The PureTap twists onto any standard kitchen faucet and reduces lead, chlorine taste, and sediment with a switchable filtered/unfiltered lever.',
-        ['Tool-free install', 'Lead & chlorine reduction', '200 gallon cartridge', 'Filtered/unfiltered switch'], 0),
-      P('pitcher-glacier', 'Crystalina Glacier 10-Cup Filter Pitcher', 'Faucet & Pitcher', 29.99, 39.99, 96, null,
-        'The classic pitcher, upgraded with 7-layer filtration.',
-        'A fridge-ready 10-cup pitcher with our 7-layer cartridge: activated coconut carbon, ion exchange resin, and micro-net screens for cleaner, better-tasting water anywhere.',
-        ['10-cup capacity', '7-layer cartridge', '40 gallon filter life', 'BPA-free Tritan body'], 1),
-      P('filters-ro-set', 'RO Replacement Filter Set (Stages 1 to 3)', 'Replacement Filters', 49.99, null, 200, null,
-        'Annual pre-filter refresh for RO-5 and RO-10 systems.',
-        'Keep your system performing like day one. Includes sediment and dual carbon block pre-filters compatible with all Crystalina RO systems. Replace every 12 months.',
-        ['Fits RO-5 & RO-10', 'Sediment + 2 carbon blocks', '12-month service life', 'Tool-free twist design'], 2),
-      P('filters-wh-set', 'Whole Home Replacement Set', 'Replacement Filters', 89.99, 109.99, 64, null,
-        'Full 3-stage refresh for the Whole Home system.',
-        'Heavy-duty sediment, KDF, and carbon replacements engineered for NYC\'s aging water mains. Replace every 6 to 12 months depending on usage.',
-        ['Fits Whole Home 3-Stage', 'Sediment + KDF + carbon', '6 to 12 month service life'], 3),
-      P('uv-guard', 'Crystalina UV Guard Add-On', 'Accessories', 119.99, null, 18, null,
-        'Ultraviolet sterilization stage for 99.99% microbial protection.',
-        'Add a UV sterilization chamber to any Crystalina RO system for an extra layer of protection against bacteria, viruses, and cysts, peace of mind during city boil advisories and turbidity events.',
-        ['11W UV chamber', '99.99% microbial reduction', 'Fits all Crystalina RO systems', 'Annual lamp replacement'], 4),
-      P('tds-meter', 'Digital TDS Water Quality Meter', 'Accessories', 19.99, null, 150, null,
-        'Test your tap and your filtered water, see the difference.',
-        'A pocket digital meter that reads total dissolved solids in seconds. Test your building\'s tap water, then test your Crystalina water and watch the number drop.',
-        ['0 to 9990 ppm range', 'Auto temperature compensation', 'Includes carry case'], 0),
-      P('mineral-drops', 'Crystalina Trace Mineral Drops', 'Accessories', 24.99, null, 75, null,
-        'Electrolyte and mineral boost for RO-purified water.',
-        'Purification removes the bad and some of the good. Add back magnesium, calcium, and potassium with a few drops per glass for taste and hydration.',
-        ['76 trace minerals', '4 oz / ~200 servings', 'Unflavored'], 1)
-    ];
-  }
-
-  function ensureSeed() {
-    const v = Number(localStorage.getItem(KEYS.seedVersion) || 0);
-    if (v < SEED_VERSION || !localStorage.getItem(KEYS.products)) {
-      localStorage.setItem(KEYS.products, JSON.stringify(seedProducts()));
-      localStorage.setItem(KEYS.seedVersion, String(SEED_VERSION));
-    }
-    const products = read(KEYS.products, []);
-    if (products.some(product => !product.installationMinutes)) write(KEYS.products, products.map(product => ({ installationMinutes: 30, ...product })));
-    if (!localStorage.getItem(KEYS.users)) {
-      localStorage.setItem(KEYS.users, JSON.stringify([{
-        id: 'admin-1',
-        name: 'Crystalina Admin',
-        email: 'admin@crystalinawater.com',
-        password: 'crystalina2026', // demo only, replace with real auth before launch
-        role: 'admin',
-        created: new Date().toISOString()
-      }]));
-    }
-    const users = read(KEYS.users, []);
-    [
-      { id: 'CUS-1001', name: 'Maya Chen', email: 'maya@example.com' },
-      { id: 'CUS-1002', name: 'James Wilson', email: 'james@example.com' },
-      { id: 'CUS-1003', name: 'Sofia Martinez', email: 'sofia@example.com' },
-      { id: 'CUS-1004', name: 'Noah Brown', email: 'noah@example.com' }
-    ].forEach(customer => {
-      if (!users.some(user => user.email === customer.email)) users.push({ ...customer, password: 'customer2026', role: 'customer', created: '2026-03-14T12:00:00.000Z' });
-    });
-    write(KEYS.users, users);
-    if (!localStorage.getItem(KEYS.adminData)) {
-      localStorage.setItem(KEYS.adminData, JSON.stringify(seedAdminData()));
-    }
-    migrateAdminData();
-  }
-
-  function migrateAdminData() {
-    const schema = Number(localStorage.getItem(KEYS.adminSchema) || 0);
-    if (schema >= 7) return;
-    const defaults = seedAdminData();
-    const saved = read(KEYS.adminData, {});
-    ['customers', 'supplierProfiles', 'activityLog', 'abandonedCarts', 'outreach', 'pageSections', 'qrCodes', 'staffSchedules', 'staffAvailability', 'staffNotifications'].forEach(collection => { if (!saved[collection]) saved[collection] = defaults[collection]; });
-    saved.staff = (saved.staff || []).map(member => {
-      const current = defaults.staff.find(item => item.email === member.email);
-      return current ? { ...current, ...member, id: current.id, roles: member.roles?.length ? member.roles : current.roles, photo: member.photo || current.photo } : member;
-    });
-    defaults.staff.forEach(member => { if (!saved.staff.some(item => item.email === member.email)) saved.staff.push(member); });
-    saved.customers = (saved.customers || defaults.customers).map(customer => { const current = defaults.customers.find(item => item.id === customer.id); return current ? { ...current, ...customer, lat: customer.lat || current.lat, lon: customer.lon || current.lon } : customer; });
-    saved.jobs = (saved.jobs || defaults.jobs).map(job => { const current = defaults.jobs.find(item => item.id === job.id); return current ? { ...current, ...job, checklist: job.checklist?.length ? job.checklist : current.checklist } : job; });
-    defaults.jobs.forEach(job => { if (!saved.jobs.some(item => item.id === job.id)) saved.jobs.push(job); });
-    saved.pageSections = (saved.pageSections || defaults.pageSections).map(section => section.id === 'best-sellers' ? { ...section, products: (section.products || []).map(id => ({ 'whole-house-3': 'wh-3stage', 'countertop-luxe': 'ct-luxe' }[id] || id)) } : section);
-    write(KEYS.adminData, { ...defaults, ...saved });
-    localStorage.setItem(KEYS.adminSchema, '7');
-  }
-
-  function seedAdminData() {
+  function siteSettings() {
     return {
-      subscriptions: [
-        { id: 'SUB-1048', customer: 'Maya Chen', email: 'maya@example.com', system: 'RO-10 Alkaline', cadence: '6 months', nextDate: '2026-09-03', replacement: 'Stages 1 to 3', status: 'Active' },
-        { id: 'SUB-1047', customer: 'James Wilson', email: 'james@example.com', system: 'Whole Home 3-Stage', cadence: '6 months', nextDate: '2026-09-05', replacement: 'Whole Home Set', status: 'Active' },
-        { id: 'SUB-1044', customer: 'Sofia Martinez', email: 'sofia@example.com', system: 'RO-5 Classic', cadence: '12 months', nextDate: '2026-09-09', replacement: 'Stages 1 to 3', status: 'Paused' },
-        { id: 'SUB-1039', customer: 'Noah Brown', email: 'noah@example.com', system: 'VitaShower', cadence: '6 months', nextDate: '2026-09-12', replacement: 'Shower Cartridge', status: 'Active' }
-      ],
-      customers: [
-        { id: 'CUS-1001', name: 'Maya Chen', email: 'maya@example.com', phone: '(718) 555-0112', joined: '2026-03-14', address: '45-18 21st St, Long Island City, Queens, NY 11101', lat: 40.7487, lon: -73.9484, source: 'Website', assignedSalesId: 'SAL-2001', products: ['RO-10 Alkaline Reverse Osmosis System', 'RO Replacement Filter Set'], cart: ['Digital TDS Water Quality Meter'], installed: [{ product: 'RO-10 Alkaline', date: '2026-03-22', photo: '' }], notes: 'Prefers weekday morning service appointments.' },
-        { id: 'CUS-1002', name: 'James Wilson', email: 'james@example.com', phone: '(212) 555-0168', joined: '2026-04-08', address: '211 W 104th St, Manhattan, NY 10025', lat: 40.8004, lon: -73.9673, source: 'Sales Associate', assignedSalesId: 'SAL-2001', products: ['Whole Home 3-Stage Filtration System'], cart: [], installed: [{ product: 'Whole Home 3-Stage', date: '2026-04-18', photo: '' }], notes: 'Brownstone installation, coordinate building access.' },
-        { id: 'CUS-1003', name: 'Sofia Martinez', email: 'sofia@example.com', phone: '(347) 555-0139', joined: '2026-05-21', address: '78 Prospect Pl, Brooklyn, NY 11217', lat: 40.6772, lon: -73.9745, source: 'Referral', assignedSalesId: 'SAL-2001', products: ['RO-5 Classic Reverse Osmosis System'], cart: ['RO Replacement Filter Set'], installed: [{ product: 'RO-5 Classic', date: '2026-05-29', photo: '' }], notes: 'Annual maintenance plan is currently paused.' },
-        { id: 'CUS-1004', name: 'Noah Brown', email: 'noah@example.com', phone: '(646) 555-0177', joined: '2026-06-11', address: '312 E 149th St, Bronx, NY 10451', lat: 40.8172, lon: -73.9228, source: 'Water quiz', assignedSalesId: 'SAL-2001', products: ['VitaShower 12-Stage Shower Filter'], cart: [], installed: [], notes: 'Contact by email before phone.' }
-      ],
-      notifications: [
-        { id: 'NOT-9001', customerId: 'CUS-1001', title: 'Filter replacement reminder', message: 'Your RO pre-filter replacement is due September 3.', channel: 'Website', sent: '2026-08-23T09:30:00.000Z', read: false },
-        { id: 'NOT-9002', customerId: 'CUS-1003', title: 'Service appointment update', message: 'Your annual maintenance visit is awaiting confirmation.', channel: 'Website', sent: '2026-08-22T14:15:00.000Z', read: false }
-      ],
-      jobs: [
-        { id: 'JOB-2081', customerId: 'CUS-1001', customer: 'Maya Chen', address: '45-18 21st St, Long Island City, Queens, NY 11101', lat: 40.7487, lon: -73.9484, borough: 'Queens', type: 'Filter replacement', product: 'RO-10 Alkaline', installationMinutes: 30, date: '2026-08-25', time: '9:00 AM', technician: 'Luis Rivera', status: 'Confirmed', requirements: 'Replace stages 1 to 3, test pressure and TDS, inspect all fittings.', checklist: [{ label: 'Confirm customer and system', done: true }, { label: 'Photograph pre-job condition', done: false }, { label: 'Replace filter stages 1 to 3', done: false }, { label: 'Pressure and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 1, checklistTotal: 5, beforePhoto: '', afterPhoto: '' },
-        { id: 'JOB-2082', customerId: 'CUS-1002', customer: 'James Wilson', address: '211 W 104th St, Manhattan, NY 10025', lat: 40.8004, lon: -73.9673, borough: 'Manhattan', type: 'Whole home install', product: 'Whole Home 3-Stage', installationMinutes: 60, date: '2026-08-25', time: '1:30 PM', technician: 'Amina Patel', status: 'Assigned', requirements: 'Basement utility-room installation. Confirm building shutoff and protect finished flooring.', checklist: [{ label: 'Verify building access and shutoff', done: false }, { label: 'Photograph pre-job plumbing', done: false }, { label: 'Mount three-stage system', done: false }, { label: 'Connect bypass and fittings', done: false }, { label: 'Flush and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 6, beforePhoto: '', afterPhoto: '' },
-        { id: 'JOB-2083', customerId: 'CUS-1003', customer: 'Sofia Martinez', address: '78 Prospect Pl, Brooklyn, NY 11217', lat: 40.6772, lon: -73.9745, borough: 'Brooklyn', type: 'Annual maintenance', product: 'RO-5 Classic', installationMinutes: 45, date: '2026-08-26', time: '10:00 AM', technician: 'Needs assignment', status: 'Needs assignment', requirements: 'Annual inspection, sanitize tank, replace pre-filters, and record final TDS.', checklist: [{ label: 'Confirm system model', done: false }, { label: 'Photograph pre-job condition', done: false }, { label: 'Sanitize tank and replace filters', done: false }, { label: 'Record final TDS', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 5, beforePhoto: '', afterPhoto: '' },
-        { id: 'JOB-2084', customerId: 'CUS-1004', customer: 'Noah Brown', address: '312 E 149th St, Bronx, NY 10451', lat: 40.8172, lon: -73.9228, borough: 'Bronx', type: 'New installation', product: 'VitaShower 12-Stage', installationMinutes: 30, date: '2026-08-25', time: '11:00 AM', technician: 'Luis Rivera', status: 'Assigned', requirements: 'Install shower filter, check seals, and demonstrate cartridge replacement.', checklist: [{ label: 'Confirm product and fixture', done: false }, { label: 'Photograph pre-job condition', done: false }, { label: 'Install and leak test', done: false }, { label: 'Record finished-job photo', done: false }], checklistDone: 0, checklistTotal: 4, beforePhoto: '', afterPhoto: '' },
-        { id: 'JOB-2085', customerId: 'CUS-1003', customer: 'Sofia Martinez', address: '78 Prospect Pl, Brooklyn, NY 11217', lat: 40.6772, lon: -73.9745, borough: 'Brooklyn', type: 'Product delivery', product: 'RO Replacement Filter Set', installationMinutes: 15, date: '2026-08-25', time: '2:30 PM', technician: 'Luis Rivera', status: 'Assigned', requirements: 'Deliver sealed replacement set and verify the customer received the correct model.', checklist: [{ label: 'Confirm customer and product', done: false }, { label: 'Verify sealed package', done: false }, { label: 'Record delivery confirmation', done: false }], checklistDone: 0, checklistTotal: 3, beforePhoto: '', afterPhoto: '' }
-      ],
-      staff: [
-        { id: 'TEC-1001', name: 'Luis Rivera', role: 'Technician', roles: ['Technician'], email: 'luis@crystalina.org', phone: '(917) 555-0142', area: 'Brooklyn, Queens', availability: 'Available', rating: 4.9, jobs: 38, initials: 'LR', photo: '' },
-        { id: 'TEC-1002', name: 'Amina Patel', role: 'Technician', roles: ['Technician'], email: 'amina@crystalina.org', phone: '(917) 555-0188', area: 'Manhattan, Bronx', availability: 'On job', rating: 4.8, jobs: 31, initials: 'AP', photo: '' },
-        { id: 'SAL-2001', name: 'Marcus Lee', role: 'Sales Associate', roles: ['Sales Associate'], email: 'marcus@crystalina.org', phone: '(917) 555-0164', area: 'All boroughs', availability: 'Available', rating: 4.7, jobs: 24, initials: 'ML', photo: '' },
-        { id: 'MGR-3001', name: 'Jordan Kim', role: 'Manager', roles: ['Manager'], email: 'jordan@crystalina.org', phone: '(917) 555-0195', area: 'All boroughs', availability: 'Available', rating: 4.9, jobs: 42, initials: 'JK', photo: '' }
-      ],
-      staffSchedules: [
-        { id: 'SCH-1001', staffId: 'TEC-1001', date: '2026-08-25', start: '08:30', end: '17:00', status: 'Confirmed by staff', notes: 'Queens and Bronx route', createdBy: 'admin-1', updated: '2026-08-23T13:00:00.000Z' },
-        { id: 'SCH-1002', staffId: 'TEC-1002', date: '2026-08-25', start: '09:00', end: '17:30', status: 'Awaiting staff confirmation', notes: 'Manhattan installations', createdBy: 'admin-1', updated: '2026-08-23T13:05:00.000Z' },
-        { id: 'SCH-1003', staffId: 'SAL-2001', date: '2026-08-26', start: '10:00', end: '18:00', status: 'Tentative', notes: 'Showroom and follow-ups', createdBy: 'admin-1', updated: '2026-08-23T13:10:00.000Z' }
-      ],
-      staffAvailability: [
-        { id: 'AVL-1001', staffId: 'TEC-1002', date: '2026-08-27', reason: 'Personal appointment', created: '2026-08-22T14:00:00.000Z' }
-      ],
-      staffNotifications: [
-        { id: 'SNOT-1001', staffId: 'TEC-1002', title: 'Weekly schedule needs confirmation', message: 'Your Tuesday schedule is locked and awaiting confirmation.', scheduleId: 'SCH-1002', sent: '2026-08-23T13:05:00.000Z', read: false }
-      ],
-      suppliers: [
-        { id: 'PO-3108', supplier: 'AquaCore Components', category: 'RO membranes', contact: 'orders@aquacore.example', amount: 2840, eta: '2026-08-27', status: 'In transit', tracking: 'ACX-884120' },
-        { id: 'PO-3107', supplier: 'PureFlow Wholesale', category: 'Carbon blocks', contact: 'sales@pureflow.example', amount: 1925, eta: '2026-08-29', status: 'Confirmed', tracking: 'PFW-220419' },
-        { id: 'PO-3104', supplier: 'Metro Plumbing Supply', category: 'Installation fittings', contact: 'dispatch@metroplumbing.example', amount: 760, eta: '2026-08-22', status: 'Delivered', tracking: 'MPS-741026' }
-      ],
-      supplierProfiles: [
-        { id: 'SUP-401', name: 'AquaCore Components', email: 'orders@aquacore.example', phone: '(800) 555-4101', address: '85 Harbor Industrial Rd, Newark, NJ 07114', categories: 'RO membranes, pressure tanks', leadTime: '5 to 7 business days', rating: 4.8, status: 'Active', notes: 'Primary membrane supplier. Net 30 terms.' },
-        { id: 'SUP-402', name: 'PureFlow Wholesale', email: 'sales@pureflow.example', phone: '(800) 555-4102', address: '19 Commerce Park, Edison, NJ 08817', categories: 'Carbon blocks, sediment filters', leadTime: '3 to 5 business days', rating: 4.6, status: 'Active', notes: 'Preferred replacement-filter wholesaler.' },
-        { id: 'SUP-403', name: 'Metro Plumbing Supply', email: 'dispatch@metroplumbing.example', phone: '(718) 555-4103', address: '4401 Third Ave, Brooklyn, NY 11220', categories: 'Fittings, valves, installation hardware', leadTime: 'Same day NYC delivery', rating: 4.9, status: 'Active', notes: 'Local emergency and same-day installation supplies.' }
-      ],
-      activityLog: [
-        { id: 'ACT-801', actorId: 'TEC-1001', action: 'Completed filter replacement checklist', entity: 'JOB-2076', timestamp: '2026-08-22T16:20:00.000Z' },
-        { id: 'ACT-802', actorId: 'TEC-1002', action: 'Uploaded finished-job photo', entity: 'JOB-2078', timestamp: '2026-08-22T18:05:00.000Z' },
-        { id: 'ACT-803', actorId: 'SAL-2001', action: 'Converted lead and created customer', entity: 'CUS-1003', timestamp: '2026-08-21T14:40:00.000Z' },
-        { id: 'ACT-804', actorId: 'MGR-3001', action: 'Updated purchase-order delivery status', entity: 'PO-3108', timestamp: '2026-08-23T08:10:00.000Z' }
-      ],
-      leads: [
-        { id: 'LEAD-5028', name: 'Olivia Thompson', email: 'olivia@example.com', source: 'Website quote', interest: 'Whole Home 3-Stage', borough: 'Brooklyn', value: 1299, followUp: '2026-08-24', stage: 'Qualified' },
-        { id: 'LEAD-5027', name: 'Ethan Davis', email: 'ethan@example.com', source: 'Referral', interest: 'RO-10 Alkaline', borough: 'Queens', value: 599, followUp: '2026-08-25', stage: 'Quote sent' },
-        { id: 'LEAD-5024', name: 'Ava Robinson', email: 'ava@example.com', source: 'Water quiz', interest: 'Countertop Luxe', borough: 'Manhattan', value: 180, followUp: '2026-08-26', stage: 'New' },
-        { id: 'LEAD-5018', name: 'Lucas Garcia', email: 'lucas@example.com', source: 'Phone inquiry', interest: 'RO-5 Classic', borough: 'Bronx', value: 420, followUp: '2026-08-23', stage: 'Won' }
-      ],
-      campaigns: [
-        { id: 'CAM-108', name: 'End of Summer Filter Refresh', channel: 'Email + SMS', audience: 'Replacement customers', sent: 1840, conversion: 8.4, status: 'Active' },
-        { id: 'CAM-106', name: 'Brooklyn Brownstone Water Guide', channel: 'Email', audience: 'Brooklyn leads', sent: 624, conversion: 5.9, status: 'Scheduled' },
-        { id: 'CAM-102', name: 'RO-10 Welcome Series', channel: 'Email', audience: 'New subscribers', sent: 392, conversion: 12.1, status: 'Active' }
-      ],
-      discounts: [
-        { id: 'NYCPURE15', type: '15% off', usage: 84, limit: 250, expires: '2026-09-30', status: 'Active' },
-        { id: 'FILTER20', type: '$20 off filters', usage: 47, limit: 150, expires: '2026-10-15', status: 'Active' },
-        { id: 'WELCOME10', type: '10% off', usage: 126, limit: 0, expires: '2026-12-31', status: 'Active' }
-      ],
-      abandonedCarts: [
-        { id: 'CART-601', customerId: 'CUS-1001', customer: 'Maya Chen', email: 'maya@example.com', phone: '(718) 555-0112', items: ['Digital TDS Water Quality Meter'], total: 19.99, updated: '2026-08-23T12:10:00.000Z', status: 'Pending' },
-        { id: 'CART-602', customerId: 'CUS-1003', customer: 'Sofia Martinez', email: 'sofia@example.com', phone: '(347) 555-0139', items: ['RO Replacement Filter Set'], total: 49.99, updated: '2026-08-22T18:40:00.000Z', status: 'Pending' },
-        { id: 'CART-603', customerId: '', customer: 'Guest checkout', email: 'guest@example.com', phone: '', items: ['Countertop Luxe Dispenser'], total: 179.99, updated: '2026-08-21T16:25:00.000Z', status: 'Contacted' }
-      ],
-      outreach: [],
-      qrCodes: [],
-      tickets: [
-        { id: 'TKT-7041', customer: 'Maya Chen', subject: 'Low pressure after filter change', type: 'Troubleshooting', priority: 'High', updated: '2026-08-23', status: 'Open', channel: 'Email' },
-        { id: 'TKT-7038', customer: 'James Wilson', subject: 'Warranty claim for faucet', type: 'Warranty', priority: 'Normal', updated: '2026-08-22', status: 'Waiting on customer', channel: 'Chat' },
-        { id: 'TKT-7034', customer: 'Sofia Martinez', subject: 'Return unopened replacement set', type: 'Return', priority: 'Normal', updated: '2026-08-21', status: 'In progress', channel: 'Email' },
-        { id: 'TKT-7029', customer: 'Noah Brown', subject: 'VitaShower installation help', type: 'Troubleshooting', priority: 'Low', updated: '2026-08-20', status: 'Resolved', channel: 'Chat' }
-      ],
-      finance: {
-        months: [
-          { month: 'Mar', revenue: 18400, cost: 10950, orders: 52 }, { month: 'Apr', revenue: 21300, cost: 12400, orders: 61 },
-          { month: 'May', revenue: 19800, cost: 11600, orders: 58 }, { month: 'Jun', revenue: 24900, cost: 13950, orders: 73 },
-          { month: 'Jul', revenue: 28700, cost: 15800, orders: 84 }, { month: 'Aug', revenue: 32600, cost: 17400, orders: 96 }
-        ],
-        areas: [
-          { name: 'Brooklyn', revenue: 42600, orders: 118 }, { name: 'Queens', revenue: 36700, orders: 104 }, { name: 'Manhattan', revenue: 31900, orders: 82 },
-          { name: 'Bronx', revenue: 17400, orders: 49 }, { name: 'Staten Island', revenue: 7100, orders: 21 }
-        ],
-        products: [
-          { name: 'RO-10 Alkaline', units: 94, revenue: 32899, margin: 48 }, { name: 'Whole Home 3-Stage', units: 41, revenue: 20499, margin: 43 },
-          { name: 'RO-5 Classic', units: 72, revenue: 15839, margin: 46 }, { name: 'Replacement Filter Sets', units: 186, revenue: 10972, margin: 55 },
-          { name: 'Countertop Luxe', units: 57, revenue: 10259, margin: 44 }
-        ]
-      },
-      content: [
-        { id: 'CNT-301', type: 'FAQ', title: 'How often should I replace my filters?', placement: 'Contact / FAQ', updated: '2026-08-18', status: 'Published' },
-        { id: 'CNT-298', type: 'Promotion', title: 'Free NYC delivery over $99', placement: 'Announcement bar', updated: '2026-08-15', status: 'Published' },
-        { id: 'CNT-294', type: 'Banner', title: 'Find the right filter for your building', placement: 'Shop landing page', updated: '2026-08-12', status: 'Draft' },
-        { id: 'CNT-287', type: 'Review', title: 'Maya C. review, RO-10 installation', placement: 'Home testimonials', updated: '2026-08-05', status: 'Needs approval' }
-      ],
-      pageSections: [
-        { id: 'hero', type: 'Hero', label: 'Hero', eyebrow: "NYC's Home Water Filtration Company", heading: 'Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.', body: "NYC's water is great at the reservoir, but old mains, aging building pipes, and pre-1961 lead solder stand between it and your glass. Crystalina filters are engineered for exactly that.", enabled: true, products: [] },
-        { id: 'trust', type: 'Trust Bar', label: 'Trust & service promises', eyebrow: '', heading: 'Tested. Delivered. Supported locally.', body: 'Standards, delivery, warranty, and installation assurances.', enabled: true, products: [] },
-        { id: 'categories', type: 'Category Grid', label: 'Shop by category', eyebrow: 'Shop By Category', heading: 'The Right Filter for Every NYC Home', body: "Studio apartment or four-story brownstone, there's a Crystalina system built for your space.", enabled: true, products: [] },
-        { id: 'anatomy', type: 'Product Feature', label: 'RO-10 product anatomy', eyebrow: 'Inside the Flagship', heading: 'The RO-10, Component by Component', body: 'Ten precision stages stand between New York City tap water and your glass.', enabled: true, products: [] },
-        { id: 'best-sellers', type: 'Best Sellers', label: 'Best Sellers', eyebrow: 'Customer Favorites', heading: 'Best Sellers in the Five Boroughs', body: 'The systems New Yorkers order most, from Astoria to Bay Ridge.', enabled: true, products: ['ro-alkaline-10', 'wh-3stage', 'ro-classic-5', 'ct-luxe'] },
-        { id: 'water-facts', type: 'Water Facts', label: 'NYC water facts', eyebrow: 'Know Your Water', heading: "NYC Water Is Famous. It's Also Complicated.", body: "The city's supply is well-treated at the source; the risks come from the journey to your faucet.", enabled: true, products: [] },
-        { id: 'process', type: 'Process', label: 'How it works', eyebrow: 'Simple By Design', heading: 'From Tap to Crystal Clear in 4 Steps', body: 'Find the right system, install it, and keep it performing with timely replacements.', enabled: true, products: [] },
-        { id: 'why-crystalina', type: 'Split Feature', label: 'Why Crystalina', eyebrow: 'Why Crystalina', heading: 'Built for the City. Backed for Life in It.', body: "Crystalina systems are selected for the realities of New York City homes and plumbing.", enabled: true, products: [] },
-        { id: 'testimonials', type: 'Testimonials', label: 'What Our Neighbors Are Saying', eyebrow: 'Real NYC Homes', heading: 'What Our Neighbors Are Saying', body: 'Customer stories from homes across the five boroughs.', enabled: true, products: [] },
-        { id: 'cta', type: 'Call to Action', label: 'Find your system', eyebrow: '', heading: 'Not Sure Which System Fits Your Home?', body: "Answer 5 quick questions and we'll match you to the right filter.", enabled: true, products: [] }
-      ],
-      roles: [
-        { id: 'ROLE-1', role: 'Administrator', members: 1, permissions: 'Full access' },
-        { id: 'ROLE-2', role: 'Operations Manager', members: 1, permissions: 'Orders, customers, service, inventory' },
-        { id: 'ROLE-3', role: 'Technician', members: 2, permissions: 'Assigned jobs, checklists, photos' },
-        { id: 'ROLE-4', role: 'Sales Representative', members: 1, permissions: 'Leads, quotes, customer notes' }
-      ],
-      siteSettings: {
-        companyName: 'Crystalina Water Co.', email: 'info@crystalina.org', phone: '(917) 809-4803', address: 'New York City, NY, USA', hours: 'Monday to Saturday, 8am to 7pm ET',
-        navy: '#15375D', primary: '#2A7BC4', accent: '#3DC7F4',
-        heroEyebrow: "NYC's Home Water Filtration Company", heroHeading: 'Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.',
-        heroBody: "NYC's water is great at the reservoir, but old mains, aging building pipes, and pre-1961 lead solder stand between it and your glass. Crystalina filters are engineered for exactly that.",
-        heroImage: '/images/hero-bg.webp', announcement: 'Free shipping on orders over $99, delivered anywhere in the five boroughs'
-      }
+      companyName: 'Crystalina Water Co.', email: 'info@crystalina.org', phone: '(917) 809-4803',
+      address: 'New York City, NY, USA', hours: 'Monday to Saturday, 8am to 7pm ET',
+      navy: '#15375D', primary: '#2A7BC4', accent: '#3DC7F4',
+      heroEyebrow: "NYC's Home Water Filtration Company",
+      heroHeading: 'Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.',
+      heroBody: "NYC's water is great at the reservoir, but old mains, aging building pipes, and pre-1961 lead solder stand between it and your glass. Crystalina filters are engineered for exactly that.",
+      heroImage: '/images/hero-bg.webp', announcement: 'Free shipping on orders over $99, delivered anywhere in the five boroughs'
     };
   }
 
-  /* ---------- generic helpers ---------- */
-  const read = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
-  const write = (k, v) => localStorage.setItem(k, JSON.stringify(v));
-
-  /* ---------- products ---------- */
-  const getProducts = () => read(KEYS.products, []);
-  const getProduct = id => getProducts().find(p => p.id === id);
-  const saveProducts = list => write(KEYS.products, list);
-
-  function upsertProduct(prod) {
-    const list = getProducts();
-    const i = list.findIndex(p => p.id === prod.id);
-    if (i >= 0) list[i] = { ...list[i], ...prod };
-    else list.unshift({ rating: '5.0', reviews: 0, ...prod });
-    saveProducts(list);
+  function emptyAdminData() {
+    return {
+      subscriptions: [], customers: [], notifications: [], jobs: [], staff: [], staffSchedules: [],
+      staffAvailability: [], staffNotifications: [], suppliers: [], supplierProfiles: [], activityLog: [],
+      leads: [], campaigns: [], discounts: [], abandonedCarts: [], outreach: [], qrCodes: [], tickets: [],
+      content: [], pageSections: [], roles: [], finance: { months: [], areas: [], products: [] }, siteSettings: siteSettings()
+    };
   }
-  function deleteProduct(id) { saveProducts(getProducts().filter(p => p.id !== id)); }
-  function deleteAllProducts() { saveProducts([]); }
 
-  /* ---------- cart ---------- */
+  function clearLegacyDemoData() {
+    if (localStorage.getItem(KEYS.dataVersion) === DATA_VERSION) return;
+    [KEYS.products, KEYS.cart, KEYS.users, KEYS.session, KEYS.staffSession, KEYS.staffChallenge, KEYS.orders, KEYS.adminData]
+      .forEach(key => localStorage.removeItem(key));
+    write(KEYS.products, []); write(KEYS.users, []); write(KEYS.orders, []); write(KEYS.adminData, emptyAdminData());
+    localStorage.setItem(KEYS.dataVersion, DATA_VERSION);
+  }
+
+  const getProducts = () => read(KEYS.products, []);
+  const getProduct = id => getProducts().find(product => product.id === id);
+  const saveProducts = products => write(KEYS.products, products);
+  function upsertProduct(product) {
+    const products = getProducts(); const index = products.findIndex(item => item.id === product.id);
+    if (index >= 0) products[index] = { ...products[index], ...product };
+    else products.unshift({ rating: '0.0', reviews: 0, ...product });
+    saveProducts(products);
+  }
+  const deleteProduct = id => saveProducts(getProducts().filter(product => product.id !== id));
+  const deleteAllProducts = () => saveProducts([]);
+
   const getCart = () => read(KEYS.cart, []);
-  const setCart = c => { write(KEYS.cart, c); document.dispatchEvent(new CustomEvent('cart:changed')); };
-
+  function setCart(cart) { write(KEYS.cart, cart); document.dispatchEvent(new CustomEvent('cart:changed')); }
   function addToCart(id, qty = 1) {
-    const cart = getCart();
-    const item = cart.find(i => i.id === id);
+    if (!getProduct(id)) return;
+    const cart = getCart(); const item = cart.find(entry => entry.id === id);
     if (item) item.qty += qty; else cart.push({ id, qty });
     setCart(cart);
   }
   function updateQty(id, qty) {
-    let cart = getCart();
-    if (qty <= 0) cart = cart.filter(i => i.id !== id);
-    else { const it = cart.find(i => i.id === id); if (it) it.qty = qty; }
-    setCart(cart);
+    const cart = getCart(); const item = cart.find(entry => entry.id === id);
+    if (!item) return;
+    if (qty <= 0) setCart(cart.filter(entry => entry.id !== id)); else { item.qty = qty; setCart(cart); }
   }
   const clearCart = () => setCart([]);
-  const cartCount = () => getCart().reduce((n, i) => n + i.qty, 0);
+  const cartCount = () => getCart().reduce((count, item) => count + item.qty, 0);
   function cartDetails() {
-    const items = getCart().map(i => ({ ...i, product: getProduct(i.id) })).filter(i => i.product);
-    const subtotal = items.reduce((s, i) => s + i.product.price * i.qty, 0);
-    return { items, subtotal };
+    const items = getCart().map(item => ({ ...item, product: getProduct(item.id) })).filter(item => item.product);
+    return { items, subtotal: items.reduce((sum, item) => sum + item.product.price * item.qty, 0) };
   }
 
-  /* ---------- auth ---------- */
   const getUsers = () => read(KEYS.users, []);
   const currentUser = () => read(KEYS.session, null);
-
-  function signUp(name, email, password) {
-    const users = getUsers();
-    if (users.some(u => u.email.toLowerCase() === email.toLowerCase()))
-      return { ok: false, error: 'An account with this email already exists.' };
-    const user = { id: 'u-' + Date.now(), name, email, password, role: 'customer', created: new Date().toISOString() };
-    users.push(user); write(KEYS.users, users);
-    return signIn(email, password);
-  }
-  function signIn(email, password) {
-    const u = getUsers().find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
-    if (!u) return { ok: false, error: 'Invalid email or password.' };
-    const session = { id: u.id, name: u.name, email: u.email, role: u.role };
-    write(KEYS.session, session);
-    return { ok: true, user: session };
-  }
-  function signOut() { localStorage.removeItem(KEYS.session); }
-
-  /* ---------- staff portal authentication prototype ---------- */
-  const staffRoles = staff => staff.roles || [staff.role.includes('Technician') ? 'Technician' : staff.role.includes('Sales') ? 'Sales Associate' : staff.role];
   const currentStaff = () => read(KEYS.staffSession, null);
-  function requestStaffCode(email, requiredRole) {
-    const staff = getAdminData().staff.find(member => member.email.toLowerCase() === email.toLowerCase());
-    if (!staff || !staffRoles(staff).includes(requiredRole)) return { ok: false, error: `This email is not assigned the ${requiredRole} role.` };
-    const challenge = { staffId: staff.id, email: staff.email, requiredRole, code: '246810', expires: Date.now() + 10 * 60 * 1000 };
-    write(KEYS.staffChallenge, challenge);
-    return { ok: true, demoCode: challenge.code };
-  }
-  function verifyStaffCode(email, code, requiredRole) {
-    const challenge = read(KEYS.staffChallenge, null);
-    if (!challenge || challenge.email.toLowerCase() !== email.toLowerCase() || challenge.requiredRole !== requiredRole || challenge.code !== code || challenge.expires < Date.now()) return { ok: false, error: 'That verification code is invalid or expired.' };
-    const staff = getAdminData().staff.find(member => member.id === challenge.staffId);
-    if (!staff || !staffRoles(staff).includes(requiredRole)) return { ok: false, error: 'This role is no longer assigned to the account.' };
-    const session = { id: staff.id, name: staff.name, email: staff.email, roles: staffRoles(staff), activeRole: requiredRole };
-    write(KEYS.staffSession, session); localStorage.removeItem(KEYS.staffChallenge);
-    return { ok: true, staff: session };
-  }
-  function staffSignOut() { localStorage.removeItem(KEYS.staffSession); localStorage.removeItem(KEYS.staffChallenge); }
+  const unavailableAuth = () => ({ ok: false, error: 'Secure sign-in is being configured. Please check back shortly.' });
+  const signUp = unavailableAuth;
+  const signIn = unavailableAuth;
+  const signOut = () => localStorage.removeItem(KEYS.session);
+  const requestStaffCode = () => ({ ok: false, error: 'Staff sign-in is being configured securely.' });
+  const verifyStaffCode = () => ({ ok: false, error: 'Staff sign-in is being configured securely.' });
+  const staffSignOut = () => localStorage.removeItem(KEYS.staffSession);
 
-  /* ---------- orders ---------- */
   const getOrders = () => read(KEYS.orders, []);
-  function placeOrder(customer) {
-    const { items, subtotal } = cartDetails();
-    if (!items.length) return null;
-    const shipping = subtotal >= 99 ? 0 : 9.99;
-    const tax = subtotal * 0.08875; // NYC sales tax
-    const order = {
-      id: 'CW-' + String(Date.now()).slice(-7),
-      date: new Date().toISOString(),
-      customer,
-      items: items.map(i => ({ id: i.id, name: i.product.name, price: i.product.price, qty: i.qty })),
-      subtotal, shipping, tax, total: subtotal + shipping + tax,
-      status: 'Processing'
-    };
-    const orders = getOrders(); orders.unshift(order); write(KEYS.orders, orders);
-    // decrement stock
-    const products = getProducts();
-    items.forEach(i => { const p = products.find(p => p.id === i.id); if (p) p.stock = Math.max(0, p.stock - i.qty); });
-    saveProducts(products);
-    clearCart();
-    return order;
-  }
+  const placeOrder = () => null;
   function updateOrderStatus(id, status) {
-    const orders = getOrders();
-    const o = orders.find(o => o.id === id);
-    if (o) { o.status = status; write(KEYS.orders, orders); }
+    const orders = getOrders(); const order = orders.find(item => item.id === id);
+    if (order) { order.status = status; write(KEYS.orders, orders); }
   }
-  function deleteOrder(id) { write(KEYS.orders, getOrders().filter(order => order.id !== id)); }
+  const deleteOrder = id => write(KEYS.orders, getOrders().filter(order => order.id !== id));
 
-  /* ---------- admin operations ---------- */
   function getAdminData() {
-    return { ...seedAdminData(), ...read(KEYS.adminData, {}) };
+    const saved = read(KEYS.adminData, {}); const defaults = emptyAdminData();
+    return { ...defaults, ...saved, finance: { ...defaults.finance, ...(saved.finance || {}) }, siteSettings: { ...siteSettings(), ...(saved.siteSettings || {}) } };
   }
-  function saveAdminData(data) { write(KEYS.adminData, data); }
+  const saveAdminData = data => write(KEYS.adminData, data);
   function updateAdminItem(collection, id, changes) {
-    const data = getAdminData();
-    const item = (data[collection] || []).find(entry => entry.id === id);
+    const data = getAdminData(); const item = (data[collection] || []).find(entry => entry.id === id);
     if (item) { Object.assign(item, changes); saveAdminData(data); }
     return item || null;
   }
   function addAdminItem(collection, item) {
-    const data = getAdminData();
-    data[collection] = data[collection] || [];
-    data[collection].unshift(item);
-    saveAdminData(data);
-    return item;
+    const data = getAdminData(); data[collection] = data[collection] || []; data[collection].unshift(item); saveAdminData(data); return item;
   }
   function deleteAdminItem(collection, id) {
-    const data = getAdminData();
-    data[collection] = (data[collection] || []).filter(item => item.id !== id);
-    saveAdminData(data);
+    const data = getAdminData(); data[collection] = (data[collection] || []).filter(item => item.id !== id); saveAdminData(data);
   }
-  function saveAdminCollection(collection, items) {
-    const data = getAdminData();
-    data[collection] = items;
-    saveAdminData(data);
-    return items;
-  }
-  function addNotification(notification) {
-    return addAdminItem('notifications', { id: 'NOT-' + String(Date.now()).slice(-6), sent: new Date().toISOString(), read: false, ...notification });
-  }
-  function addStaffNotification(notification) {
-    return addAdminItem('staffNotifications', { id: 'SNOT-' + String(Date.now()).slice(-6), sent: new Date().toISOString(), read: false, ...notification });
-  }
-  function getStaffNotifications(staffId) { return getAdminData().staffNotifications.filter(item => item.staffId === staffId); }
+  function saveAdminCollection(collection, items) { const data = getAdminData(); data[collection] = items; saveAdminData(data); return items; }
+  const addNotification = notification => addAdminItem('notifications', { id: `NOT-${Date.now()}`, sent: new Date().toISOString(), read: false, ...notification });
+  const addStaffNotification = notification => addAdminItem('staffNotifications', { id: `SNOT-${Date.now()}`, sent: new Date().toISOString(), read: false, ...notification });
+  const getStaffNotifications = staffId => getAdminData().staffNotifications.filter(item => item.staffId === staffId);
   function markStaffNotificationsRead(staffId) {
-    const data = getAdminData();
-    data.staffNotifications.forEach(item => { if (item.staffId === staffId) item.read = true; });
-    saveAdminData(data);
+    const data = getAdminData(); data.staffNotifications.forEach(item => { if (item.staffId === staffId) item.read = true; }); saveAdminData(data);
   }
-  function logActivity(actorId, action, entity) {
-    return addAdminItem('activityLog', { id: 'ACT-' + String(Date.now()).slice(-6), actorId, action, entity, timestamp: new Date().toISOString() });
-  }
+  const logActivity = (actorId, action, entity) => addAdminItem('activityLog', { id: `ACT-${Date.now()}`, actorId, action, entity, timestamp: new Date().toISOString() });
   function getNotificationsForUser(user) {
     if (!user) return [];
-    const data = getAdminData();
-    const customer = data.customers.find(item => item.id === user.id || item.email.toLowerCase() === user.email.toLowerCase());
-    if (!customer) return [];
-    return data.notifications.filter(item => (item.customerId === customer.id || item.customerId === 'all') && item.channel.includes('Website'));
+    const data = getAdminData(); const customer = data.customers.find(item => item.id === user.id || item.email?.toLowerCase() === user.email?.toLowerCase());
+    return customer ? data.notifications.filter(item => item.customerId === customer.id || item.customerId === 'all') : [];
   }
   function markNotificationsRead(user) {
     if (!user) return;
-    const data = getAdminData();
-    const customer = data.customers.find(item => item.id === user.id || item.email.toLowerCase() === user.email.toLowerCase());
+    const data = getAdminData(); const customer = data.customers.find(item => item.id === user.id || item.email?.toLowerCase() === user.email?.toLowerCase());
     if (!customer) return;
-    data.notifications.forEach(item => { if (item.customerId === customer.id || item.customerId === 'all') item.read = true; });
-    saveAdminData(data);
+    data.notifications.forEach(item => { if (item.customerId === customer.id || item.customerId === 'all') item.read = true; }); saveAdminData(data);
   }
   const getSiteSettings = () => getAdminData().siteSettings;
-  function updateSiteSettings(changes) {
-    const data = getAdminData();
-    data.siteSettings = { ...data.siteSettings, ...changes };
-    saveAdminData(data);
-    return data.siteSettings;
-  }
+  function updateSiteSettings(changes) { const data = getAdminData(); data.siteSettings = { ...data.siteSettings, ...changes }; saveAdminData(data); return data.siteSettings; }
 
-  ensureSeed();
-
+  clearLegacyDemoData();
   return {
-    placeholder,
-    getProducts, getProduct, upsertProduct, deleteProduct, deleteAllProducts,
+    placeholder, getProducts, getProduct, upsertProduct, deleteProduct, deleteAllProducts,
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
-    getUsers, currentUser, signUp, signIn, signOut,
-    currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
-    getOrders, placeOrder, updateOrderStatus, deleteOrder,
-    getAdminData, updateAdminItem, addAdminItem, deleteAdminItem, saveAdminCollection,
-    addNotification, getNotificationsForUser, markNotificationsRead,
-    addStaffNotification, getStaffNotifications, markStaffNotificationsRead, logActivity,
-    getSiteSettings, updateSiteSettings
+    getUsers, currentUser, signUp, signIn, signOut, currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
+    getOrders, placeOrder, updateOrderStatus, deleteOrder, getAdminData, updateAdminItem, addAdminItem, deleteAdminItem,
+    saveAdminCollection, addNotification, getNotificationsForUser, markNotificationsRead, addStaffNotification,
+    getStaffNotifications, markStaffNotificationsRead, logActivity, getSiteSettings, updateSiteSettings
   };
 })();

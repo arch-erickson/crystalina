@@ -45,11 +45,6 @@
 
       <p class="auth-alt" id="modeToggle">Store administrator? <span class="link" id="adminLink">Admin sign in →</span></p>
 
-      <div class="demo-creds" id="demoCreds" style="display:none">
-        <strong>Demo admin credentials (first draft only):</strong><br>
-        Email: admin@crystalinawater.com<br>
-        Password: crystalina2026
-      </div>
     </div>
   </div>
 </main>
@@ -75,7 +70,6 @@
     el('authSub').textContent = adminMode
       ? 'Restricted area, Crystalina staff only.'
       : (mode === 'signin' ? 'Sign in to track orders and manage filter reminders.' : 'Join the Crystalina Club for order tracking and filter reminders.');
-    el('demoCreds').style.display = adminMode ? '' : 'none';
     el('modeToggle').innerHTML = adminMode
       ? 'Customer? <span class="link" id="adminLink">Back to customer sign in →</span>'
       : 'Store administrator? <span class="link" id="adminLink">Admin sign in →</span>';
