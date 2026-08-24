@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/js/vendor/leaflet/leaflet.css">
 <link rel="icon" href="/favicon.ico?v=4" sizes="any">
 </head>
 <body class="portal-body">
@@ -35,6 +36,25 @@
     <main class="portal-main">
       <div class="admin-head"><div><span class="eyebrow">Field Operations</span><h1>My Assigned Jobs</h1><p class="admin-subtitle">Customer details, installation requirements, checklists, status updates, and quality-control photos.</p></div><a class="btn btn-sm btn-outline" href="tel:+19178094803">Call Dispatch</a></div>
       <div class="stat-cards admin-stat-cards" id="technicianStats"></div>
+      <section class="technician-route-planner" id="technicianRoutePlanner">
+        <div class="route-planner-topbar">
+          <div><span class="eyebrow">Daily Route Planner</span><h2>Build the fastest field route</h2><p>Choose today’s customers, then optimize the driving order. Installation stops stay at the top of the selection list and service time is included in every ETA.</p></div>
+          <div class="route-planner-controls"><label><span>Service date</span><input id="routeDate" type="date"></label><label><span>Start time</span><input id="routeStartTime" type="time" value="08:30"></label><button class="btn btn-primary" id="optimizeRouteBtn" type="button">Optimize Route</button></div>
+        </div>
+        <div class="route-workspace">
+          <aside class="route-stop-panel">
+            <div class="route-stop-toolbar"><div><strong>Stops</strong><span id="routeSelectedCount">0 selected</span></div><button type="button" id="selectInstallationStops">Select installations</button></div>
+            <div class="route-job-list" id="routeJobList"></div>
+            <p class="route-service-note">Travel order uses the open-source OSRM routing engine. Service durations are added to projected arrival and finish times.</p>
+          </aside>
+          <div class="route-map-shell">
+            <div id="technicianMap" class="technician-map" aria-label="Technician route map"></div>
+            <div class="route-map-status" id="routeMapStatus">Select at least two stops to optimize a route.</div>
+            <div class="route-summary" id="routeSummary" hidden></div>
+          </div>
+        </div>
+        <div class="route-itinerary" id="routeItinerary" hidden></div>
+      </section>
       <div class="portal-job-grid" id="technicianJobs"></div>
     </main>
   </div>
@@ -44,7 +64,9 @@
   <div class="toast" id="toast"></div>
   <script src="/js/store.js"></script>
   <script src="/js/main.js"></script>
+  <script src="/js/vendor/leaflet/leaflet.js"></script>
   <script src="/js/technician.js"></script>
   <script src="/js/staff-schedule.js"></script>
+  <script src="/js/technician-route.js"></script>
 </body>
 </html>
