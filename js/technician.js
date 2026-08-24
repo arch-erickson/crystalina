@@ -46,7 +46,7 @@
     showPortal(result.staff);
   });
   document.getElementById('changeStaffEmail').addEventListener('click', () => { codeForm.hidden = true; emailForm.hidden = false; document.getElementById('prototypeCode').hidden = true; showError(''); });
-  document.getElementById('staffSignOut').addEventListener('click', () => { Store.staffSignOut(); location.reload(); });
+  document.getElementById('staffSignOut').addEventListener('click', async () => { try { const authClient = await window.CrystalinaAuth; await authClient.signOut(); } finally { Store.signOut(); Store.staffSignOut(); location.href = '/signin/?mode=staff'; } });
 
   function renderJobs(session = Store.currentStaff()) {
     const data = Store.getAdminData();
@@ -87,5 +87,5 @@
   };
 
   const existing = Store.currentUser();
-  if (sessionIsValid(existing)) showPortal(existing); else location.replace('/signin/?mode=staff&role=technician');
+  if (sessionIsValid(existing)) showPortal(existing); else location.replace('/signin/?mode=staff');
 })();

@@ -4,11 +4,12 @@
 
 (() => {
   const user = Store.currentUser();
-  if (!user || !user.roles?.includes('admin')) { location.href = '/signin/?mode=staff&role=admin'; return; }
+  if (!user || !user.roles?.includes('admin')) { location.href = '/signin/?mode=staff'; return; }
   document.getElementById('adminWho').textContent = 'Signed in as ' + user.name;
 
-  document.getElementById('adminSignOut').addEventListener('click', () => {
-    Store.signOut(); location.href = '/';
+  document.getElementById('adminSignOut').addEventListener('click', async () => {
+    try { const auth = await window.CrystalinaAuth; await auth.signOut(); }
+    finally { Store.signOut(); Store.staffSignOut(); location.href = '/signin/?mode=staff'; }
   });
 
   /* ---------- view switching ---------- */

@@ -43,6 +43,9 @@ window.CrystalinaAuth = (async () => {
       const { data: { user } } = await client.auth.getUser();
       return user ? accountFor(user) : null;
     },
-    signOut: () => client.auth.signOut()
+    async signOut() {
+      const { error } = await client.auth.signOut({ scope: 'local' });
+      if (error) throw error;
+    }
   };
 })();
