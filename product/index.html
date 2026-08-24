@@ -32,6 +32,7 @@
   </section>
 </main>
 
+<script src="/js/product-catalog.js"></script>
 <script src="/js/store.js"></script>
 <script src="/js/main.js"></script>
 <script>
@@ -48,6 +49,32 @@
       <a class="btn btn-primary" href="/shop/">Back to Shop</a></div>`;
   } else {
     document.title = p.name + ' | Crystalina';
+    const completeSets = Store.getBundlesForSystem(p.id);
+    const bundleComponents = p.productKind === 'filter_bundle' ? Store.getBundleComponents(p.id) : [];
+    const completeSetMarkup = completeSets.map(bundle => `
+      <aside class="pd-bundle-panel" aria-labelledby="bundle-${bundle.id}">
+        <img class="pd-bundle-image" src="${bundle.image}" alt="${bundle.name}">
+        <div class="pd-bundle-content">
+          <span class="pd-bundle-label">Complete set for ${p.modelCode}</span>
+          <h3 id="bundle-${bundle.id}">${bundle.name}</h3>
+          <p>${bundle.short}</p>
+          <p class="pd-fit-note">Membrane connector fit is verified against the installed cartridge before fulfillment.</p>
+          <ul class="pd-bundle-list">${bundle.specs.map(item => `<li>${item}</li>`).join('')}</ul>
+          <div class="pd-bundle-footer">
+            <div><strong>${money(bundle.price)}</strong>${bundle.comparePrice ? `<span>${money(bundle.comparePrice)}</span>` : ''}<small>Placeholder price</small></div>
+            <div class="pd-bundle-actions">
+              <a class="btn btn-outline btn-sm" href="/product/?id=${bundle.id}">View complete set</a>
+              <button class="btn btn-primary btn-sm bundle-add" data-id="${bundle.id}" aria-label="${bundle.stock === 0 ? `${bundle.name} is currently unavailable` : `Add ${bundle.name} to cart`}" ${bundle.stock === 0 ? 'disabled' : ''}>${bundle.stock === 0 ? 'Currently unavailable' : 'Add complete set'}</button>
+            </div>
+          </div>
+        </div>
+      </aside>`).join('');
+    const componentMarkup = bundleComponents.length ? `
+      <section class="pd-bundle-components" aria-labelledby="bundleContentsHeading">
+        <h3 id="bundleContentsHeading">Included replacement cartridges</h3>
+        <p>This set is matched to the pictured Crystalina configuration.</p>
+        <ul>${bundleComponents.map(item => `<li><span>${item.quantity} x</span><a href="/product/?id=${item.product.id}">${item.product.name}</a></li>`).join('')}</ul>
+      </section>` : '';
     const stockCls = p.stock === 0 ? 'out' : p.stock <= 15 ? 'low' : 'in';
     const stockIc = p.stock === 0 ? 'close' : p.stock <= 15 ? 'alert' : 'check';
     const stockTxt = p.stock === 0 ? 'Out of stock' : p.stock <= 15 ? `Low stock, only ${p.stock} left` : 'In stock, ships in 1 to 2 business days';
@@ -62,15 +89,18 @@
           <span class="pd-price">${money(p.price)}</span>
           ${p.comparePrice ? `<span class="pd-compare">${money(p.comparePrice)}</span>` : ''}
         </div>
+        ${p.priceIsPlaceholder ? '<p class="pd-price-note">Placeholder price. Update before launch.</p>' : ''}
         <div class="pd-stock ${stockCls}">${stockMsg}</div>
         <p class="pd-desc">${p.description}</p>
         <div class="pd-specs">
           <h4>Key Features</h4>
           <ul class="checklist">${(p.specs || []).map(s => `<li>${s}</li>`).join('')}</ul>
         </div>
+        ${completeSetMarkup}
+        ${componentMarkup}
         <div class="pd-qtyrow">
           <div class="qty-picker">
-            <button id="qDec">−</button><span id="qVal">1</span><button id="qInc">+</button>
+            <button id="qDec" aria-label="Decrease quantity">−</button><span id="qVal" aria-live="polite">1</span><button id="qInc" aria-label="Increase quantity">+</button>
           </div>
           <button class="btn btn-primary" style="flex:1" id="addBtn" ${p.stock === 0 ? 'disabled' : ''}>
             ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
@@ -90,6 +120,11 @@
     document.getElementById('qDec').addEventListener('click', () => { qty = Math.max(1, qty - 1); qVal.textContent = qty; });
     const addBtn = document.getElementById('addBtn');
     if (p.stock > 0) addBtn.addEventListener('click', () => { Store.addToCart(p.id, qty); toast('Added to cart'); openCart(); });
+    document.querySelectorAll('.bundle-add:not([disabled])').forEach(button => button.addEventListener('click', () => {
+      Store.addToCart(button.dataset.id);
+      toast('Complete set added to cart');
+      openCart();
+    }));
 
     const related = Store.getProducts().filter(x => x.id !== p.id && x.category === p.category);
     const fill = Store.getProducts().filter(x => x.id !== p.id && x.category !== p.category);
