@@ -393,7 +393,6 @@ function productCard(p) {
         <span class="pc-price">${money(p.price)}</span>
         ${p.comparePrice ? `<span class="pc-compare">${money(p.comparePrice)}</span>` : ''}
       </div>
-      ${p.priceIsPlaceholder ? '<span class="pc-price-note">Placeholder price</span>' : ''}
       <button class="btn btn-primary btn-block pc-add" data-id="${p.id}" aria-label="${p.stock === 0 ? `${p.name} is out of stock` : `Add ${p.name} to cart`}" ${p.stock === 0 ? 'disabled' : ''}>
         ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
       </button>

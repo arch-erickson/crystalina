@@ -6,7 +6,7 @@
 <title>Admin Dashboard | Crystalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css?v=20260825-product-editorial">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=4">
@@ -420,44 +420,83 @@
   </main>
 </div>
 
-<!-- PRODUCT MODAL -->
-<div class="modal-overlay" id="productModal">
-  <div class="modal">
-    <h2 id="modalTitle">Add New Product</h2>
-    <div class="form-error" id="prodError"></div>
+<!-- PRODUCT EDITOR -->
+<div class="modal-overlay product-editor-overlay" id="productModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="productEditorIntro">
+  <div class="modal product-editor-modal">
+    <header class="product-editor-head">
+      <div><span class="eyebrow">Catalog management</span><h2 id="modalTitle">Add New Product</h2><p id="productEditorIntro">Organize storefront content, specifications, compatible filters, service details, and media in one record.</p></div>
+      <button class="modal-close" id="modalClose" type="button" aria-label="Close product editor">&times;</button>
+    </header>
+    <div class="form-error" id="prodError" role="alert" aria-live="assertive"></div>
     <form id="productForm">
-      <div class="field">
-        <label>Product image</label>
-        <div class="img-drop" id="imgDrop">
-          <div id="imgPreviewWrap"><p><span class="ic" style="width:22px;height:22px;color:var(--blue-500);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg></span><br>Click to upload or drag and drop<br><small>PNG or JPG, stored locally in this draft</small></p></div>
+      <section class="product-editor-section" aria-labelledby="productMediaHeading">
+        <div class="product-editor-section-head"><div><h3 id="productMediaHeading">Product media</h3><p>Add up to eight photos. The first image is the primary storefront image.</p></div><span class="section-status" id="mediaCount">0 / 8</span></div>
+        <div class="img-drop" id="imgDrop" role="button" tabindex="0" aria-controls="imgInput">
+          <div id="imgPreviewWrap"><p><span class="ic" style="width:22px;height:22px;color:var(--blue-500);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.2"/></svg></span><br>Add product photos<br><small>PNG, JPG, or WebP · drag and drop or browse</small></p></div>
         </div>
-        <input type="file" id="imgInput" accept="image/*" style="display:none">
-      </div>
-      <div class="field"><label>Product name *</label><input id="pName" required placeholder="Crystalina RO-7 Compact System"></div>
-      <div class="field-row">
-        <div class="field"><label>Category *</label>
-          <select id="pCat">
-            <option>Reverse Osmosis</option><option>Whole House</option><option>Countertop</option>
-            <option>Shower &amp; Bath</option><option>Faucet &amp; Pitcher</option>
-            <option>Replacement Filters</option><option>Accessories</option>
-          </select>
+        <input type="file" id="imgInput" accept="image/png,image/jpeg,image/webp" multiple hidden>
+        <div class="product-media-grid" id="productMediaGrid" aria-live="polite"></div>
+      </section>
+
+      <section class="product-editor-section" aria-labelledby="productBasicsHeading">
+        <div class="product-editor-section-head"><div><h3 id="productBasicsHeading">Product basics</h3><p>Core storefront and internal catalog information.</p></div></div>
+        <div class="field"><label for="pName">Product name *</label><input id="pName" required placeholder="Crystalina RO-7 Compact System"></div>
+        <div class="field-row">
+          <div class="field"><label for="pSku">SKU</label><input id="pSku" placeholder="CRY-RO7-WHT"></div>
+          <div class="field"><label for="pModel">Model number</label><input id="pModel" placeholder="RO7-600"></div>
         </div>
-        <div class="field"><label>Badge (optional)</label>
-          <select id="pBadge"><option value="">None</option><option>Best Seller</option><option>New</option><option>Popular</option><option>Sale</option></select>
+        <div class="field-row">
+          <div class="field"><label for="pCat">Category *</label><select id="pCat"><option>Reverse Osmosis</option><option>Whole House</option><option>Countertop</option><option>Shower &amp; Bath</option><option>Faucet &amp; Pitcher</option><option>Replacement Filters</option><option>Accessories</option></select></div>
+          <div class="field"><label for="pStatus">Storefront status</label><select id="pStatus"><option value="active">Active</option><option value="draft">Draft</option><option value="archived">Archived</option></select></div>
         </div>
-      </div>
-      <div class="field-row">
-        <div class="field"><label>Price (USD) *</label><input id="pPrice" type="number" min="0" step="0.01" required placeholder="199.99"></div>
-        <div class="field"><label>Compare-at price (optional)</label><input id="pCompare" type="number" min="0" step="0.01" placeholder="249.99"></div>
-      </div>
-      <div class="field-row"><div class="field"><label># In stock *</label><input id="pStock" type="number" min="0" step="1" required placeholder="25"></div><div class="field"><label for="pInstallTime">Default installation time</label><select id="pInstallTime"><option value="15">15 minutes</option><option value="30" selected>30 minutes</option><option value="45">45 minutes</option><option value="60">1 hour</option></select></div></div>
-      <div class="field"><label>Short description (product cards) *</label><input id="pShort" required maxlength="120" placeholder="One-line summary shown in the shop grid"></div>
-      <div class="field"><label>Full description *</label><textarea id="pDesc" rows="4" required placeholder="Full product story shown on the product page"></textarea></div>
-      <div class="field"><label>Key features (one per line)</label><textarea id="pSpecs" rows="3" placeholder="10 filtration stages&#10;100 gallons per day&#10;Includes designer faucet"></textarea></div>
-      <div class="modal-actions">
-        <button type="button" class="btn btn-ghost" id="modalCancel">Cancel</button>
-        <button type="submit" class="btn btn-primary" id="modalSave">Save Product</button>
-      </div>
+        <div class="field-row">
+          <div class="field"><label for="pBadge">Badge</label><select id="pBadge"><option value="">None</option><option>Best Seller</option><option>New Arrival</option><option>Smart System</option><option>No Electricity</option><option>Popular</option><option>Sale</option></select></div>
+          <div class="field"><label for="pInstallTime">Default installation time</label><select id="pInstallTime"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="45">45 minutes</option><option value="60">1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option><option value="180">3 hours</option></select></div>
+        </div>
+      </section>
+
+      <section class="product-editor-section" aria-labelledby="productCommerceHeading">
+        <div class="product-editor-section-head"><div><h3 id="productCommerceHeading">Pricing &amp; inventory</h3><p>Customer price, merchandising comparison, and stock controls.</p></div></div>
+        <div class="field-row"><div class="field"><label for="pPrice">Price (USD) *</label><input id="pPrice" type="number" min="0" step="0.01" required placeholder="199.99"></div><div class="field"><label for="pCompare">Compare-at price</label><input id="pCompare" type="number" min="0" step="0.01" placeholder="249.99"></div></div>
+        <div class="field-row"><div class="field"><label for="pCost">Cost per item</label><input id="pCost" type="number" min="0" step="0.01" placeholder="Internal only"></div><div class="field"><label for="pStock">Quantity in stock *</label><input id="pStock" type="number" min="0" step="1" required placeholder="25"></div></div>
+      </section>
+
+      <section class="product-editor-section" aria-labelledby="productContentHeading">
+        <div class="product-editor-section-head"><div><h3 id="productContentHeading">Storefront content</h3><p>Write the concise card summary first, then the complete product story.</p></div></div>
+        <div class="field"><label for="pShort">Short description *</label><input id="pShort" required maxlength="160" placeholder="One-line summary shown in the shop grid"><small class="field-help">Maximum 160 characters.</small></div>
+        <div class="field"><label for="pDesc">Full description *</label><textarea id="pDesc" rows="6" required placeholder="Explain the use case, filtration approach, ownership experience, and what is included."></textarea></div>
+        <div class="product-editor-section-head compact"><div><h4>Key features</h4><p>Add one customer-facing benefit per row. Features can be reordered later without rewriting the description.</p></div><button class="btn btn-sm btn-outline" type="button" id="addFeatureBtn">+ Add feature</button></div>
+        <div class="feature-list" id="featureRows"></div>
+      </section>
+
+      <section class="product-editor-section category-fields" id="systemProductFields" aria-labelledby="systemDetailsHeading">
+        <div class="product-editor-section-head"><div><h3 id="systemDetailsHeading">Water system specifications</h3><p>Standard details customers use to compare reverse-osmosis, countertop, and whole-house systems.</p></div><span class="section-status">Category preset</span></div>
+        <div class="field-row"><div class="field"><label for="pSystemStyle">System design</label><select id="pSystemStyle"><option value="">Select design</option><option>Open frame</option><option>Tankless</option><option>Traditional tank</option><option>Countertop</option><option>Whole house</option></select></div><div class="field"><label for="pGpd">Rated capacity (GPD)</label><input id="pGpd" type="number" min="0" step="1" placeholder="600"></div></div>
+        <div class="field-row"><div class="field"><label for="pStages">Filtration stages</label><input id="pStages" type="number" min="1" step="1" placeholder="7"></div><div class="field"><label for="pDrainRatio">Pure-to-drain ratio</label><input id="pDrainRatio" placeholder="2:1"></div></div>
+        <div class="field-row"><div class="field"><label for="pPower">Power requirement</label><select id="pPower"><option value="">Select</option><option>None</option><option>Standard outlet</option><option>Hardwired</option></select></div><div class="field"><label for="pVoltage">Voltage</label><input id="pVoltage" placeholder="110–120V AC"></div></div>
+        <div class="field-row"><div class="field"><label for="pPressure">Recommended inlet pressure</label><input id="pPressure" placeholder="40–80 psi"></div><div class="field"><label for="pDimensions">Product dimensions</label><input id="pDimensions" placeholder="W × D × H, inches"></div></div>
+        <div class="field"><label for="pWeight">Product weight</label><input id="pWeight" placeholder="25 lb"></div>
+        <div class="tag-editor"><label for="pFilterTagInput">Required filter-type tags</label><p>Systems automatically recommend replacement filters that share at least one of these tags.</p><div class="tag-editor-control"><input id="pFilterTagInput" list="filterTagSuggestions" placeholder="For example: ro-600-gpd"><button class="btn btn-sm btn-outline" type="button" id="addFilterTagBtn">Add tag</button></div><div class="tag-list" id="filterTagList"></div></div>
+      </section>
+
+      <section class="product-editor-section category-fields" id="filterProductFields" aria-labelledby="filterDetailsHeading">
+        <div class="product-editor-section-head"><div><h3 id="filterDetailsHeading">Replacement filter specifications</h3><p>Identify the filter once; matching RO systems will recommend it automatically.</p></div><span class="section-status">Category preset</span></div>
+        <div class="field-row"><div class="field"><label for="pFilterType">Filter type</label><select id="pFilterType"><option value="">Select type</option><option>Sediment</option><option>Activated carbon</option><option>RO membrane</option><option>Alkaline / remineralization</option><option>UV / UVC</option><option>Composite prefilter</option><option>Post-carbon polishing</option><option>Complete filter set</option></select></div><div class="field"><label for="pFilterMedia">Filter media</label><input id="pFilterMedia" placeholder="PP cotton, coconut-shell carbon…"></div></div>
+        <div class="field-row"><div class="field"><label for="pMicron">Micron rating</label><input id="pMicron" type="number" min="0" step="0.0001" placeholder="1"></div><div class="field"><label for="pMembraneGpd">Membrane capacity (GPD)</label><input id="pMembraneGpd" type="number" min="0" step="1" placeholder="600"></div></div>
+        <div class="field-row"><div class="field"><label for="pServiceLife">Recommended life (months)</label><input id="pServiceLife" type="number" min="1" step="1" placeholder="12"></div><div class="field"><label for="pCapacityGallons">Rated capacity (gallons)</label><input id="pCapacityGallons" type="number" min="0" step="1" placeholder="1100"></div></div>
+        <div class="field-row"><div class="field"><label for="pFilterDimensions">Filter dimensions</label><input id="pFilterDimensions" placeholder="10 × 2.5 in"></div><div class="field"><label for="pConnector">Connector / housing fit</label><input id="pConnector" placeholder="1/4-in quick connect"></div></div>
+        <div class="tag-editor"><label for="pReplacementTagInput">Filter-type tags</label><p>Add reusable identifiers such as <strong>ppf-02</strong>, <strong>acm-10</strong>, or <strong>ro-600-gpd</strong>. Matching systems recommend this filter.</p><div class="tag-editor-control"><input id="pReplacementTagInput" list="filterTagSuggestions" placeholder="Type a filter tag"><button class="btn btn-sm btn-outline" type="button" id="addReplacementTagBtn">Add tag</button></div><div class="tag-list" id="replacementTagList"></div></div>
+      </section>
+
+      <section class="product-editor-section" aria-labelledby="productSupportHeading">
+        <div class="product-editor-section-head"><div><h3 id="productSupportHeading">Warranty, certification &amp; support</h3><p>Ownership details commonly published by established water-filtration sellers.</p></div></div>
+        <div class="field-row"><div class="field"><label for="pWarrantyMonths">Warranty term (months)</label><input id="pWarrantyMonths" type="number" min="0" step="1" placeholder="24"></div><div class="field"><label for="pReturnDays">Return window (days)</label><input id="pReturnDays" type="number" min="0" step="1" placeholder="30"></div></div>
+        <div class="field-row"><div class="field"><label for="pCertifications">Certifications</label><input id="pCertifications" placeholder="NSF/ANSI 42, 58, 372"></div><div class="field"><label for="pManualUrl">Manual or specification sheet URL</label><input id="pManualUrl" type="url" placeholder="https://…"></div></div>
+        <div class="field"><label for="pWarrantyNotes">Warranty &amp; service notes</label><textarea id="pWarrantyNotes" rows="3" placeholder="Coverage, exclusions, registration requirements, and support details."></textarea></div>
+      </section>
+
+      <datalist id="filterTagSuggestions"><option value="ppf-02"><option value="acm-10"><option value="x2a-fsa"><option value="x2a-acm"><option value="ro-400-gpd"><option value="ro-600-gpd"><option value="t33"><option value="mfc-ph"><option value="led-uvc"></datalist>
+      <div class="modal-actions product-editor-actions"><button type="button" class="btn btn-ghost" id="modalCancel">Cancel</button><button type="submit" class="btn btn-primary" id="modalSave">Save Product</button></div>
     </form>
   </div>
 </div>
@@ -597,13 +636,13 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="/js/product-catalog.js"></script>
-<script src="/js/store.js"></script>
-<script src="/js/main.js"></script>
+<script src="/js/product-catalog.js?v=20260825-product-editorial"></script>
+<script src="/js/store.js?v=20260825-product-editorial"></script>
+<script src="/js/main.js?v=20260825-product-editorial"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/role-switcher.js"></script>
 <script src="/js/vendor/qrcode-generator.js"></script>
-<script src="/js/admin.js"></script>
+<script src="/js/admin.js?v=20260825-product-editorial"></script>
 <script src="/js/qr-admin.js"></script>
 <script src="/js/schedule-domain.js"></script>
 <script src="/js/admin-schedule.js"></script>

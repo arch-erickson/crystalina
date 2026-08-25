@@ -625,48 +625,187 @@
   const imgDrop = document.getElementById('imgDrop');
   const imgInput = document.getElementById('imgInput');
   const previewWrap = document.getElementById('imgPreviewWrap');
+  const mediaGrid = document.getElementById('productMediaGrid');
+  const featureRows = document.getElementById('featureRows');
   let editingId = null;
-  let imageData = null;
+  let productImages = [];
+  let featureItems = [];
+  let systemFilterTags = [];
+  let replacementFilterTags = [];
+
+  const productFieldIds = [
+    'pName', 'pSku', 'pModel', 'pCat', 'pStatus', 'pBadge', 'pInstallTime', 'pPrice', 'pCompare', 'pCost', 'pStock',
+    'pShort', 'pDesc', 'pSystemStyle', 'pGpd', 'pStages', 'pDrainRatio', 'pPower', 'pVoltage', 'pPressure', 'pDimensions',
+    'pWeight', 'pFilterType', 'pFilterMedia', 'pMicron', 'pMembraneGpd', 'pServiceLife', 'pCapacityGallons',
+    'pFilterDimensions', 'pConnector', 'pWarrantyMonths', 'pReturnDays', 'pCertifications', 'pManualUrl', 'pWarrantyNotes'
+  ];
+  const escapeMarkup = value => String(value || '').replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[character]));
+  const valueOf = id => document.getElementById(id).value.trim();
+  const numberOrNull = id => {
+    const value = valueOf(id);
+    return value === '' ? null : Number(value);
+  };
+  const setProductField = (id, value = '') => { document.getElementById(id).value = value ?? ''; };
+  const normalizedTag = value => value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  function renderMediaGallery() {
+    document.getElementById('mediaCount').textContent = `${productImages.length} / 8`;
+    previewWrap.innerHTML = `<p><span class="ic" style="width:22px;height:22px;color:var(--blue-500);">${svgIcon('camera')}</span><br>${productImages.length ? 'Add more product photos' : 'Add product photos'}<br><small>PNG, JPG, or WebP · drag and drop or browse</small></p>`;
+    mediaGrid.innerHTML = productImages.map((image, index) => `<article class="product-media-item${index === 0 ? ' is-primary' : ''}"><img src="${escapeMarkup(image)}" alt="Product media ${index + 1}"><div><strong>${index === 0 ? 'Primary image' : `Image ${index + 1}`}</strong><span>${index === 0 ? 'Shown first on the storefront' : 'Additional gallery view'}</span></div><div class="product-media-actions">${index === 0 ? '' : `<button type="button" data-media-action="primary" data-index="${index}">Set primary</button>`}<button type="button" data-media-action="remove" data-index="${index}" aria-label="Remove image ${index + 1}">Remove</button></div></article>`).join('');
+  }
+
+  function renderFeatureRows() {
+    if (!featureItems.length) featureItems = [''];
+    featureRows.innerHTML = featureItems.map((feature, index) => `<div class="feature-row"><span aria-hidden="true">${index + 1}</span><label class="sr-only" for="productFeature-${index}">Feature ${index + 1}</label><input id="productFeature-${index}" value="${escapeMarkup(feature)}" placeholder="For example: 600 GPD high-flow membrane" data-feature-index="${index}"><button type="button" data-feature-remove="${index}" aria-label="Remove feature ${index + 1}">&times;</button></div>`).join('');
+  }
+
+  function renderTagList(targetId, tags, label) {
+    document.getElementById(targetId).innerHTML = tags.length
+      ? tags.map(tag => `<button type="button" class="tag-chip" data-tag-list="${targetId}" data-tag="${escapeMarkup(tag)}" aria-label="Remove ${label} ${escapeMarkup(tag)}">${escapeMarkup(tag)} <span aria-hidden="true">&times;</span></button>`).join('')
+      : `<span class="tag-empty">No tags added yet.</span>`;
+  }
+
+  function renderProductTags() {
+    renderTagList('filterTagList', systemFilterTags, 'required filter tag');
+    renderTagList('replacementTagList', replacementFilterTags, 'filter tag');
+  }
+
+  function addTag(inputId, collectionName) {
+    const input = document.getElementById(inputId);
+    const tag = normalizedTag(input.value);
+    if (!tag) return;
+    const collection = collectionName === 'system' ? systemFilterTags : replacementFilterTags;
+    if (!collection.includes(tag)) collection.push(tag);
+    input.value = '';
+    renderProductTags();
+    input.focus();
+  }
+
+  function updateCategoryFields() {
+    const category = document.getElementById('pCat').value;
+    document.getElementById('systemProductFields').hidden = !['Reverse Osmosis', 'Whole House', 'Countertop'].includes(category);
+    document.getElementById('filterProductFields').hidden = category !== 'Replacement Filters';
+  }
 
   function openModal(prod) {
     editingId = prod ? prod.id : null;
-    imageData = prod ? prod.image : null;
+    productImages = prod?.images?.length ? [...prod.images] : (prod?.image ? [prod.image] : []);
+    featureItems = prod?.specs?.length ? [...prod.specs] : [''];
+    systemFilterTags = [...(prod?.requiredFilterTypes || [])];
+    replacementFilterTags = [...(prod?.filterTypeTags || [])];
     document.getElementById('modalTitle').textContent = prod ? 'Edit Product' : 'Add New Product';
-    document.getElementById('pName').value = prod ? prod.name : '';
-    document.getElementById('pCat').value = prod ? prod.category : 'Reverse Osmosis';
-    document.getElementById('pBadge').value = prod && prod.badge ? prod.badge : '';
-    document.getElementById('pPrice').value = prod ? prod.price : '';
-    document.getElementById('pCompare').value = prod && prod.comparePrice ? prod.comparePrice : '';
-    document.getElementById('pStock').value = prod ? prod.stock : '';
-    document.getElementById('pInstallTime').value = String(prod?.installationMinutes || 30);
-    document.getElementById('pShort').value = prod ? prod.short : '';
-    document.getElementById('pDesc').value = prod ? prod.description : '';
-    document.getElementById('pSpecs').value = prod && prod.specs ? prod.specs.join('\n') : '';
-    renderPreview();
+    setProductField('pName', prod?.name);
+    setProductField('pSku', prod?.sku);
+    setProductField('pModel', prod?.model);
+    setProductField('pCat', prod?.category || 'Reverse Osmosis');
+    setProductField('pStatus', prod?.status || 'active');
+    setProductField('pBadge', prod?.badge);
+    setProductField('pPrice', prod?.price);
+    setProductField('pCompare', prod?.comparePrice);
+    setProductField('pCost', prod?.cost);
+    setProductField('pStock', prod?.stock);
+    setProductField('pInstallTime', String(prod?.installationMinutes || 30));
+    setProductField('pShort', prod?.short);
+    setProductField('pDesc', prod?.description);
+    setProductField('pSystemStyle', prod?.systemStyle);
+    setProductField('pGpd', prod?.gpd);
+    setProductField('pStages', prod?.filtrationStages);
+    setProductField('pDrainRatio', prod?.pureToDrainRatio);
+    setProductField('pPower', prod?.powerRequirement);
+    setProductField('pVoltage', prod?.voltage);
+    setProductField('pPressure', prod?.inletPressure);
+    setProductField('pDimensions', prod?.dimensions);
+    setProductField('pWeight', prod?.weight);
+    setProductField('pFilterType', prod?.filterType);
+    setProductField('pFilterMedia', prod?.filterMedia);
+    setProductField('pMicron', prod?.micronRating);
+    setProductField('pMembraneGpd', prod?.membraneGpd);
+    setProductField('pServiceLife', prod?.serviceLifeMonths);
+    setProductField('pCapacityGallons', prod?.capacityGallons);
+    setProductField('pFilterDimensions', prod?.filterDimensions);
+    setProductField('pConnector', prod?.connectorSize);
+    setProductField('pWarrantyMonths', prod?.warrantyMonths);
+    setProductField('pReturnDays', prod?.returnWindowDays);
+    setProductField('pCertifications', (prod?.certifications || []).join(', '));
+    setProductField('pManualUrl', prod?.manualUrl);
+    setProductField('pWarrantyNotes', prod?.warrantyNotes);
+    renderMediaGallery();
+    renderFeatureRows();
+    renderProductTags();
+    updateCategoryFields();
     document.getElementById('prodError').classList.remove('show');
     modal.classList.add('open');
+    document.body.classList.add('modal-open');
+    window.setTimeout(() => document.getElementById('pName').focus(), 0);
   }
-  function closeModal() { modal.classList.remove('open'); form.reset(); imageData = null; editingId = null; }
-
-  function renderPreview() {
-    previewWrap.innerHTML = imageData
-      ? `<img src="${imageData}" alt="preview"><p><small>Click to replace image</small></p>`
-      : `<p><span class="ic" style="width:22px;height:22px;color:var(--blue-500);">${svgIcon('camera')}</span><br>Click to upload or drag and drop<br><small>PNG or JPG, stored locally in this draft</small></p>`;
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.classList.remove('modal-open');
+    form.reset();
+    productFieldIds.forEach(id => { const field = document.getElementById(id); if (field) field.value = ''; });
+    productImages = []; featureItems = []; systemFilterTags = []; replacementFilterTags = []; editingId = null;
   }
 
-  function readImage(file) {
-    if (!file || !file.type.startsWith('image/')) return;
-    if (file.size > 2.5 * 1024 * 1024) { toast('Image too large, please keep under 2.5 MB'); return; }
-    const r = new FileReader();
-    r.onload = () => { imageData = r.result; renderPreview(); };
-    r.readAsDataURL(file);
+  async function readImages(files) {
+    const availableSlots = Math.max(0, 8 - productImages.length);
+    const accepted = [...files].filter(file => file.type.startsWith('image/')).slice(0, availableSlots);
+    if (!accepted.length) { if (!availableSlots) toast('This product already has eight photos'); return; }
+    const oversized = accepted.find(file => file.size > 2.5 * 1024 * 1024);
+    if (oversized) { toast(`${oversized.name} is over 2.5 MB`); return; }
+    const additions = await Promise.all(accepted.map(file => new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    })));
+    productImages.push(...additions);
+    renderMediaGallery();
   }
 
   imgDrop.addEventListener('click', () => imgInput.click());
-  imgInput.addEventListener('change', () => readImage(imgInput.files[0]));
+  imgDrop.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); imgInput.click(); } });
+  imgInput.addEventListener('change', async () => { await readImages(imgInput.files); imgInput.value = ''; });
   imgDrop.addEventListener('dragover', e => { e.preventDefault(); imgDrop.classList.add('drag'); });
   imgDrop.addEventListener('dragleave', () => imgDrop.classList.remove('drag'));
-  imgDrop.addEventListener('drop', e => { e.preventDefault(); imgDrop.classList.remove('drag'); readImage(e.dataTransfer.files[0]); });
+  imgDrop.addEventListener('drop', async e => { e.preventDefault(); imgDrop.classList.remove('drag'); await readImages(e.dataTransfer.files); });
+  mediaGrid.addEventListener('click', event => {
+    const button = event.target.closest('[data-media-action]');
+    if (!button) return;
+    const index = Number(button.dataset.index);
+    if (button.dataset.mediaAction === 'remove') productImages.splice(index, 1);
+    if (button.dataset.mediaAction === 'primary' && productImages[index]) productImages.unshift(productImages.splice(index, 1)[0]);
+    renderMediaGallery();
+  });
+  featureRows.addEventListener('input', event => {
+    if (!event.target.matches('[data-feature-index]')) return;
+    featureItems[Number(event.target.dataset.featureIndex)] = event.target.value;
+  });
+  featureRows.addEventListener('click', event => {
+    const button = event.target.closest('[data-feature-remove]');
+    if (!button) return;
+    featureItems.splice(Number(button.dataset.featureRemove), 1);
+    renderFeatureRows();
+  });
+  document.getElementById('addFeatureBtn').addEventListener('click', () => {
+    featureItems.push(''); renderFeatureRows();
+    [...featureRows.querySelectorAll('[data-feature-index]')].at(-1)?.focus();
+  });
+  document.getElementById('pCat').addEventListener('change', updateCategoryFields);
+  document.getElementById('addFilterTagBtn').addEventListener('click', () => addTag('pFilterTagInput', 'system'));
+  document.getElementById('addReplacementTagBtn').addEventListener('click', () => addTag('pReplacementTagInput', 'replacement'));
+  ['pFilterTagInput', 'pReplacementTagInput'].forEach(id => document.getElementById(id).addEventListener('keydown', event => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    addTag(id, id === 'pFilterTagInput' ? 'system' : 'replacement');
+  }));
+  modal.addEventListener('click', event => {
+    const chip = event.target.closest('[data-tag-list]');
+    if (!chip) return;
+    const collection = chip.dataset.tagList === 'filterTagList' ? systemFilterTags : replacementFilterTags;
+    const index = collection.indexOf(chip.dataset.tag);
+    if (index >= 0) collection.splice(index, 1);
+    renderProductTags();
+  });
 
   document.getElementById('addProductBtn').addEventListener('click', () => openModal(null));
   document.getElementById('deleteAllProductsBtn').addEventListener('click', () => {
@@ -675,34 +814,52 @@
     }
   });
   document.getElementById('modalCancel').addEventListener('click', closeModal);
-  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  modal.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { event.preventDefault(); closeModal(); return; }
+    if (event.key !== 'Tab') return;
+    const focusable = [...modal.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]')].filter(element => !element.closest('[hidden]'));
+    const first = focusable[0]; const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+  });
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    const name = document.getElementById('pName').value.trim();
-    const price = parseFloat(document.getElementById('pPrice').value);
-    const stock = parseInt(document.getElementById('pStock').value, 10);
-    const compare = parseFloat(document.getElementById('pCompare').value) || null;
+    const name = valueOf('pName');
+    const price = Number(valueOf('pPrice'));
+    const stock = Number(valueOf('pStock'));
+    const compare = numberOrNull('pCompare');
     const err = document.getElementById('prodError');
     if (compare && compare <= price) {
       err.textContent = 'Compare-at price should be higher than the sale price.';
       err.classList.add('show'); return;
     }
+    const category = valueOf('pCat');
+    const existing = editingId ? Store.getProduct(editingId) : null;
+    const wasEditing = Boolean(editingId);
     const id = editingId || ('p-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') + '-' + Date.now().toString(36));
     Store.upsertProduct({
       id, name,
-      category: document.getElementById('pCat').value,
-      badge: document.getElementById('pBadge').value || null,
+      sku: valueOf('pSku'), model: valueOf('pModel'), category, status: valueOf('pStatus'),
+      productKind: ['Reverse Osmosis', 'Whole House', 'Countertop'].includes(category) ? 'system' : (category === 'Replacement Filters' ? (existing?.productKind === 'filter_bundle' ? 'filter_bundle' : 'replacement_filter') : (existing?.productKind || 'product')),
+      badge: valueOf('pBadge') || null,
       price, comparePrice: compare, stock,
-      installationMinutes: Number(document.getElementById('pInstallTime').value),
-      short: document.getElementById('pShort').value.trim(),
-      description: document.getElementById('pDesc').value.trim(),
-      specs: document.getElementById('pSpecs').value.split('\n').map(s => s.trim()).filter(Boolean),
-      image: imageData || Store.placeholder(name, Math.floor(Math.random() * 5))
+      cost: numberOrNull('pCost'), installationMinutes: Number(valueOf('pInstallTime')),
+      short: valueOf('pShort'), description: valueOf('pDesc'), specs: featureItems.map(item => item.trim()).filter(Boolean),
+      image: productImages[0] || Store.placeholder(name, Math.floor(Math.random() * 5)), images: [...productImages],
+      systemStyle: valueOf('pSystemStyle'), gpd: numberOrNull('pGpd'), filtrationStages: numberOrNull('pStages'), pureToDrainRatio: valueOf('pDrainRatio'),
+      powerRequirement: valueOf('pPower'), voltage: valueOf('pVoltage'), inletPressure: valueOf('pPressure'), dimensions: valueOf('pDimensions'), weight: valueOf('pWeight'),
+      requiredFilterTypes: ['Reverse Osmosis', 'Whole House', 'Countertop'].includes(category) ? [...systemFilterTags] : [],
+      filterType: valueOf('pFilterType'), filterMedia: valueOf('pFilterMedia'), micronRating: numberOrNull('pMicron'), membraneGpd: numberOrNull('pMembraneGpd'),
+      serviceLifeMonths: numberOrNull('pServiceLife'), capacityGallons: numberOrNull('pCapacityGallons'), filterDimensions: valueOf('pFilterDimensions'), connectorSize: valueOf('pConnector'),
+      filterTypeTags: category === 'Replacement Filters' ? [...replacementFilterTags] : [],
+      warrantyMonths: numberOrNull('pWarrantyMonths'), returnWindowDays: numberOrNull('pReturnDays'),
+      certifications: valueOf('pCertifications').split(',').map(item => item.trim()).filter(Boolean), manualUrl: valueOf('pManualUrl'), warrantyNotes: valueOf('pWarrantyNotes')
     });
     closeModal();
     renderAll();
-    toast(editingId ? 'Product updated ✓' : 'Product added ✓');
+    toast(wasEditing ? 'Product updated ✓' : 'Product added ✓');
   });
 
   /* ---------- exposed handlers ---------- */

@@ -6,7 +6,7 @@
 <title>Product | Crystalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css">
+<link rel="stylesheet" href="/css/styles.css?v=20260825-product-editorial">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=4">
@@ -32,9 +32,9 @@
   </section>
 </main>
 
-<script src="/js/product-catalog.js"></script>
-<script src="/js/store.js"></script>
-<script src="/js/main.js"></script>
+<script src="/js/product-catalog.js?v=20260825-product-editorial"></script>
+<script src="/js/store.js?v=20260825-product-editorial"></script>
+<script src="/js/main.js?v=20260825-product-editorial"></script>
 <script>
   initPage('/shop/');
 
@@ -61,7 +61,7 @@
           <p class="pd-fit-note">Membrane connector fit is verified against the installed cartridge before fulfillment.</p>
           <ul class="pd-bundle-list">${bundle.specs.map(item => `<li>${item}</li>`).join('')}</ul>
           <div class="pd-bundle-footer">
-            <div><strong>${money(bundle.price)}</strong>${bundle.comparePrice ? `<span>${money(bundle.comparePrice)}</span>` : ''}<small>Placeholder price</small></div>
+            <div><strong>${money(bundle.price)}</strong>${bundle.comparePrice ? `<span>${money(bundle.comparePrice)}</span>` : ''}</div>
             <div class="pd-bundle-actions">
               <a class="btn btn-outline btn-sm" href="/product/?id=${bundle.id}">View complete set</a>
               <button class="btn btn-primary btn-sm bundle-add" data-id="${bundle.id}" aria-label="${bundle.stock === 0 ? `${bundle.name} is currently unavailable` : `Add ${bundle.name} to cart`}" ${bundle.stock === 0 ? 'disabled' : ''}>${bundle.stock === 0 ? 'Currently unavailable' : 'Add complete set'}</button>
@@ -89,7 +89,6 @@
           <span class="pd-price">${money(p.price)}</span>
           ${p.comparePrice ? `<span class="pd-compare">${money(p.comparePrice)}</span>` : ''}
         </div>
-        ${p.priceIsPlaceholder ? '<p class="pd-price-note">Placeholder price. Update before launch.</p>' : ''}
         <div class="pd-stock ${stockCls}">${stockMsg}</div>
         <p class="pd-desc">${p.description}</p>
         <div class="pd-specs">
