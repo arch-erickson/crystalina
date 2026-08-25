@@ -12,7 +12,7 @@ const Store = (() => {
     adminData: 'crystalina_admin_data', dataVersion: 'crystalina_data_version',
     catalogSeedCount: 'crystalina_catalog_seed_count'
   };
-  const DATA_VERSION = 'manufacturer-catalog-v4';
+  const DATA_VERSION = 'manufacturer-catalog-v5';
   const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
   const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
   const catalog = () => window.CrystalinaProductCatalog || { products: [], compatibilities: [], bundleItems: [] };
@@ -69,10 +69,20 @@ const Store = (() => {
     .filter(item => item.bundleId === bundleId)
     .map(item => ({ ...item, product: getProduct(item.componentId) }))
     .filter(item => item.product);
-  const getCompatibleFilters = systemId => catalog().compatibilities
-    .filter(item => item.systemId === systemId)
-    .map(item => ({ ...item, product: getProduct(item.replacementId) }))
-    .filter(item => item.product);
+  const getCompatibleFilters = systemId => {
+    const products = getProducts();
+    const system = products.find(product => product.id === systemId);
+    const expectedTags = new Set(system?.requiredFilterTypes || []);
+    const mapped = catalog().compatibilities
+      .filter(item => item.systemId === systemId)
+      .map(item => ({ ...item, product: products.find(product => product.id === item.replacementId) }))
+      .filter(item => item.product);
+    const mappedIds = new Set(mapped.map(item => item.product.id));
+    const tagMatches = expectedTags.size ? products
+      .filter(product => product.productKind === 'replacement_filter' && !mappedIds.has(product.id) && (product.filterTypeTags || []).some(tag => expectedTags.has(tag)))
+      .map(product => ({ systemId, replacementId: product.id, stageCode: 'Matched', quantity: 1, replacementIntervalDays: product.serviceLifeMonths ? product.serviceLifeMonths * 30 : null, product })) : [];
+    return [...mapped, ...tagMatches];
+  };
   const saveProducts = products => write(KEYS.products, products);
   function upsertProduct(product) {
     const products = getProducts(); const index = products.findIndex(item => item.id === product.id);

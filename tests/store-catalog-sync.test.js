@@ -29,10 +29,10 @@ function loadStore(localStorage) {
   return context.__Store;
 }
 
-test('the v4 catalog upgrade repairs an empty v3 catalog without clearing the cart', () => {
+test('the v5 catalog upgrade repairs an empty v4 catalog without clearing the cart', () => {
   const cart = [{ id: catalog.products[0].id, qty: 1 }];
   const localStorage = storage({
-    crystalina_data_version: 'manufacturer-catalog-v3',
+    crystalina_data_version: 'manufacturer-catalog-v4',
     crystalina_products: '[]',
     crystalina_cart: JSON.stringify(cart)
   });
@@ -40,8 +40,21 @@ test('the v4 catalog upgrade repairs an empty v3 catalog without clearing the ca
   const store = loadStore(localStorage);
   assert.equal(store.getProducts().length, catalog.products.length);
   assert.equal(JSON.stringify(store.getCart()), JSON.stringify(cart));
-  assert.equal(localStorage.getItem('crystalina_data_version'), 'manufacturer-catalog-v4');
+  assert.equal(localStorage.getItem('crystalina_data_version'), 'manufacturer-catalog-v5');
   assert.equal(localStorage.getItem('crystalina_catalog_seed_count'), String(catalog.products.length));
+});
+
+test('matching filter-type tags recommend an admin-created replacement filter', () => {
+  const localStorage = storage();
+  const store = loadStore(localStorage);
+  const system = catalog.products[0];
+  store.upsertProduct({
+    id: 'custom-filter', name: 'Custom PPF Filter', category: 'Replacement Filters',
+    productKind: 'replacement_filter', filterTypeTags: ['ppf-02'], price: 20, stock: 1
+  });
+
+  const matches = store.getCompatibleFilters(system.id);
+  assert.equal(matches.some(item => item.product.id === 'custom-filter'), true);
 });
 
 test('an intentional admin delete-all remains empty after a reload', () => {
