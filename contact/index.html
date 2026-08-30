@@ -49,7 +49,7 @@
           </div>
           <div class="field"><label>Message *</label><textarea rows="5" required id="cMsg" placeholder="Tell us about your building, your water, or your order…"></textarea></div>
           <button class="btn btn-primary btn-block" type="submit">Send Message</button>
-          <p style="font-size:.76rem;color:var(--muted);margin-top:12px;">This first draft stores messages locally for testing, email delivery will be connected next phase.</p>
+          <p style="font-size:.76rem;color:var(--muted);margin-top:12px;">We reply within one business day. For anything urgent, call or WhatsApp (917) 809-4803.</p>
         </form>
         <div id="contactDone" style="display:none;text-align:center;padding:30px 0;">
           <div class="big-check" style="width:64px;height:64px;font-size:1.8rem;border-radius:50%;background:var(--success);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">✓</div>
@@ -62,24 +62,55 @@
 </main>
 
 <script src="/js/product-catalog.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/data-remote.js"></script>
 <script src="/js/store.js"></script>
 <script src="/js/main.js"></script>
 <script>
   initPage('/contact/');
-  document.getElementById('contactForm').addEventListener('submit', e => {
+  const contactForm = document.getElementById('contactForm');
+  const contactBtn = contactForm.querySelector('button[type="submit"]');
+
+  function contactError(message) {
+    let box = document.getElementById('contactError');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'contactError';
+      box.className = 'form-error';
+      contactForm.prepend(box);
+    }
+    box.textContent = message;
+    box.classList.add('show');
+  }
+
+  contactForm.addEventListener('submit', async e => {
     e.preventDefault();
-    const msgs = JSON.parse(localStorage.getItem('crystalina_messages') || '[]');
-    msgs.unshift({
-      date: new Date().toISOString(),
-      name: document.getElementById('cName').value,
-      email: document.getElementById('cEmail').value,
-      phone: document.getElementById('cPhone').value,
-      topic: document.getElementById('cTopic').value,
-      message: document.getElementById('cMsg').value
-    });
-    localStorage.setItem('crystalina_messages', JSON.stringify(msgs));
-    document.getElementById('contactForm').style.display = 'none';
-    document.getElementById('contactDone').style.display = 'block';
+    const existing = document.getElementById('contactError');
+    if (existing) existing.classList.remove('show');
+    contactBtn.disabled = true;
+    contactBtn.textContent = 'Sending...';
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: document.getElementById('cName').value,
+          email: document.getElementById('cEmail').value,
+          phone: document.getElementById('cPhone').value,
+          topic: document.getElementById('cTopic').value,
+          message: document.getElementById('cMsg').value,
+          turnstileToken: window.turnstile?.getResponse?.()
+        })
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || 'We could not send your message.');
+      contactForm.style.display = 'none';
+      document.getElementById('contactDone').style.display = 'block';
+    } catch (error) {
+      contactError(error.message + ' You can also call or WhatsApp (917) 809-4803.');
+      contactBtn.disabled = false;
+      contactBtn.textContent = 'Send Message';
+    }
   });
 </script>
 </body>

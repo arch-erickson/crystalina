@@ -1,0 +1,8 @@
+{
+  "name": "crystalina",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Crystalina water filtration storefront. Static pages plus Vercel serverless functions.",
+  "type": "module",
+  "engines": { "node": ">=18" }
+}

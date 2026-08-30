@@ -32,6 +32,8 @@
 </main>
 
 <script src="/js/product-catalog.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/data-remote.js"></script>
 <script src="/js/store.js"></script>
 <script src="/js/main.js"></script>
 <script>
@@ -65,18 +67,68 @@
   let step = 0;
   const answers = [];
 
+  /* Catalog-driven matching.
+     Nothing here is hard-coded to a product id: every recommendation is scored
+     from live catalog attributes, so new products are eligible the moment they
+     are published in Supabase, and retired products simply stop scoring. */
+  const BUDGET_CEILINGS = { b1: 50, b2: 200, b3: 400, b4: Infinity };
+
+  function budgetCeiling() {
+    const tag = answers.find(a => BUDGET_CEILINGS[a] !== undefined);
+    return tag ? BUDGET_CEILINGS[tag] : Infinity;
+  }
+
+  function textOf(product) {
+    return [product.name, product.short, product.category, (product.specs || []).join(' ')]
+      .join(' ').toLowerCase();
+  }
+
+  function scoreProduct(product, has, ceiling) {
+    // Only recommend something a shopper can actually buy.
+    if (product.published === false) return -1;
+    if (product.productKind === 'replacement_filter') return -1;
+    if (typeof product.stock === 'number' && product.stock <= 0) return -1;
+
+    const text = textOf(product);
+    let score = 1;
+
+    // Budget: reward a fit, penalise (without excluding) an overshoot.
+    if (product.price <= ceiling) score += 6;
+    else if (ceiling !== Infinity) score -= Math.min(6, (product.price - ceiling) / Math.max(ceiling, 1) * 4);
+
+    // Stated priority.
+    if (has('shower') && /shower|bath/.test(text)) score += 8;
+    if (has('whole') && /whole|house|home system/.test(text)) score += 8;
+    if (has('purity') && /(reverse osmosis|ro|uv|alkaline|membrane)/.test(text)) score += 6;
+    if (has('budget')) score += Math.max(0, 4 - product.price / 250);
+
+    // Housing type.
+    if ((has('rent') || has('rent-flex')) && /countertop|pitcher|faucet|no installation|tankless/.test(text)) score += 5;
+    if (has('rent') && (product.installationMinutes || 0) > 60) score -= 4;
+    if (has('house') && /whole|high-flow|600/.test(text)) score += 3;
+
+    // Building age: older plumbing benefits from the most thorough treatment.
+    if (has('old') && /(reverse osmosis|uv|membrane)/.test(text)) score += 3;
+
+    // Household size favours higher throughput.
+    if (has('large') && /(600|high-flow|tankless)/.test(text)) score += 3;
+    if (has('small') && /(400|compact)/.test(text)) score += 2;
+
+    // Prefer complete systems over accessories when a system is wanted.
+    if (product.productKind === 'system') score += 2;
+    if (product.productKind === 'filter_bundle' && !has('budget')) score -= 2;
+
+    return score;
+  }
+
   function pickProduct() {
     const has = t => answers.includes(t);
-    if (has('shower')) return 'shower-12';
-    if (has('whole') || (has('house') && !has('b1') && !has('b2'))) return 'wh-3stage';
-    if (has('budget') && has('b1')) return 'faucet-pure';
-    if (has('rent') && (has('b1'))) return 'pitcher-glacier';
-    if (has('rent')) return 'ct-luxe';
-    if (has('b1')) return 'faucet-pure';
-    if (has('b2')) return 'ro-classic-5';
-    if (has('purity') && (has('b4') || has('b3'))) return 'ro-alkaline-10';
-    if (has('b3') || has('b4')) return 'ro-alkaline-10';
-    return 'ro-classic-5';
+    const ceiling = budgetCeiling();
+    const ranked = Store.getProducts()
+      .map(product => ({ product, score: scoreProduct(product, has, ceiling) }))
+      .filter(entry => entry.score >= 0)
+      .sort((a, b) => b.score - a.score || a.product.price - b.product.price);
+    return ranked.length ? ranked[0].product : null;
   }
 
   function render() {
@@ -93,30 +145,38 @@
       const back = document.getElementById('quizBack');
       if (back) back.addEventListener('click', () => { step--; answers.length = step; render(); });
     } else {
-      const p = Store.getProduct(pickProduct()) || Store.getProducts()[0];
+      const p = pickProduct() || Store.getProducts()[0];
+      // Be straight with the shopper when the closest match is above the
+      // budget they picked, rather than quietly recommending past it.
+      const ceiling = budgetCeiling();
+      const overBudget = p && ceiling !== Infinity && p.price > ceiling;
+      if (!p) { card.innerHTML = '<h2 class="quiz-q">Our catalog is loading</h2><p style="color:var(--muted)">Please refresh in a moment, or <a class="link" href="/shop/">browse all systems</a>.</p>'; return; }
       card.innerHTML = `
         <div class="quiz-progress"><div style="width:100%"></div></div>
         <p style="font-size:.8rem;color:var(--success);font-weight:700;display:flex;align-items:center;gap:6px;"><span class="ic" style="width:1.1em;height:1.1em">${svgIcon('check')}</span> YOUR MATCH</p>
-        <h2 class="quiz-q">We recommend the ${p.name}</h2>
+        <h2 class="quiz-q">We recommend the ${escapeHTML(p.name)}</h2>
         <div style="display:grid;grid-template-columns:140px 1fr;gap:20px;align-items:center;margin-bottom:22px;">
-          <img src="${p.image}" style="border-radius:12px;aspect-ratio:1;object-fit:cover;" alt="${p.name}">
+          <img src="${escapeHTML(p.image)}" style="border-radius:12px;aspect-ratio:1;object-fit:cover;" alt="${escapeHTML(p.name)}">
           <div>
-            <p style="color:var(--muted);font-size:.92rem;">${p.short}</p>
+            <p style="color:var(--muted);font-size:.92rem;">${escapeHTML(p.short)}</p>
             <p style="font-size:1.3rem;font-weight:800;color:var(--navy-800);margin-top:8px;">${money(p.price)}
               ${p.comparePrice ? `<span style="font-size:.9rem;color:var(--muted);text-decoration:line-through;font-weight:500;"> ${money(p.comparePrice)}</span>` : ''}</p>
           </div>
         </div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">
           <button class="btn btn-primary" id="quizAdd">Add to Cart</button>
-          <a class="btn btn-outline" href="/product/?id=${p.id}">View Details</a>
+          <a class="btn btn-outline" href="/product/?id=${encodeURIComponent(p.id)}">View Details</a>
           <button class="btn btn-ghost" id="quizRestart">Start Over</button>
         </div>
+        ${overBudget ? `<p style="margin-top:18px;font-size:.85rem;background:var(--ice-50);border:1px solid var(--silver);border-radius:10px;padding:12px 14px;color:var(--muted);">This is the closest match we stock today, though it sits above your stated budget. <a class="link" href="/shop/">Browse everything</a> or ask us about payment options.</p>` : ''}
         <p style="margin-top:22px;font-size:.84rem;color:var(--muted);">Not sure? <a class="link" href="https://wa.me/19178094803" target="_blank" rel="noopener">Message us on WhatsApp</a>, a real New Yorker will help you pick.</p>`;
       document.getElementById('quizAdd').addEventListener('click', () => { Store.addToCart(p.id); toast('Added to cart'); openCart(); });
       document.getElementById('quizRestart').addEventListener('click', () => { step = 0; answers.length = 0; render(); });
     }
   }
   render();
+  // Re-run the match when the live Supabase catalog lands.
+  document.addEventListener('catalog:changed', () => { if (step >= QUESTIONS.length) render(); });
 </script>
 </body>
 </html>

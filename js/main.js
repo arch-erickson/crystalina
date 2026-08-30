@@ -3,7 +3,8 @@
    ============================================================ */
 
 const money = n => '$' + n.toFixed(2);
-const escapeHTML = value => String(value ?? '').replace(/[&<>"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char]);
+const escapeHTML = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+if (typeof window !== 'undefined') window.escapeHTML = escapeHTML;
 
 /* ============================================================
    Icon system, professional stroke line-icons (currentColor).
@@ -273,9 +274,9 @@ function renderCartItems() {
   } else {
     wrap.innerHTML = items.map(i => `
       <div class="cart-item">
-        <img src="${i.product.image}" alt="${i.product.name}">
+        <img src="${escapeHTML(i.product.image)}" alt="${escapeHTML(i.product.name)}">
         <div class="ci-info">
-          <a href="/product/?id=${i.id}" class="ci-name">${i.product.name}</a>
+          <a href="/product/?id=${encodeURIComponent(i.id)}" class="ci-name">${escapeHTML(i.product.name)}</a>
           <div class="ci-price">${money(i.product.price)}</div>
           <div class="ci-qty">
             <button data-act="dec" data-id="${i.id}">−</button>
@@ -321,7 +322,7 @@ function renderFooter() {
         <h3>Join the Crystalina Club</h3>
         <p>Filter change reminders, NYC water quality alerts, and members-only pricing.</p>
       </div>
-      <form class="newsletter" onsubmit="event.preventDefault(); toast('Thanks for subscribing! (demo)'); this.reset();">
+      <form class="newsletter" id="newsletterForm">
         <input type="email" placeholder="Your email address" required>
         <button class="btn btn-accent" type="submit">Subscribe</button>
       </form>
@@ -379,21 +380,21 @@ function productCard(p) {
   const off = p.comparePrice ? Math.round((1 - p.price / p.comparePrice) * 100) : 0;
   return `
   <div class="product-card reveal">
-    <a href="/product/?id=${p.id}" class="pc-img">
-      <img src="${p.image}" alt="${p.name}" loading="lazy">
-      ${p.badge ? `<span class="pc-badge">${p.badge}</span>` : ''}
+    <a href="/product/?id=${encodeURIComponent(p.id)}" class="pc-img">
+      <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy">
+      ${p.badge ? `<span class="pc-badge">${escapeHTML(p.badge)}</span>` : ''}
       ${off ? `<span class="pc-off">-${off}%</span>` : ''}
       ${p.stock === 0 ? `<span class="pc-soldout">Sold Out</span>` : ''}
     </a>
     <div class="pc-body">
-      <span class="pc-cat">${p.category}</span>
-      <a href="/product/?id=${p.id}" class="pc-name">${p.name}</a>
+      <span class="pc-cat">${escapeHTML(p.category)}</span>
+      <a href="/product/?id=${encodeURIComponent(p.id)}" class="pc-name">${escapeHTML(p.name)}</a>
       <div class="pc-rating">★ ${p.rating} <span>(${p.reviews})</span></div>
       <div class="pc-prices">
         <span class="pc-price">${money(p.price)}</span>
         ${p.comparePrice ? `<span class="pc-compare">${money(p.comparePrice)}</span>` : ''}
       </div>
-      <button class="btn btn-primary btn-block pc-add" data-id="${p.id}" aria-label="${p.stock === 0 ? `${p.name} is out of stock` : `Add ${p.name} to cart`}" ${p.stock === 0 ? 'disabled' : ''}>
+      <button class="btn btn-primary btn-block pc-add" data-id="${escapeHTML(p.id)}" aria-label="${p.stock === 0 ? `${escapeHTML(p.name)} is out of stock` : `Add ${escapeHTML(p.name)} to cart`}" ${p.stock === 0 ? 'disabled' : ''}>
         ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
       </button>
     </div>
@@ -416,6 +417,35 @@ function autoReveal() {
     .forEach(sel => document.querySelectorAll(sel).forEach(el => el.classList.add('reveal')));
 }
 
+/* Subscribe through /api/newsletter. */
+function bindNewsletter() {
+  const form = document.getElementById('newsletterForm');
+  if (!form || form.dataset.bound) return;
+  form.dataset.bound = '1';
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const input = form.querySelector('input[type="email"]');
+    const button = form.querySelector('button');
+    const email = input.value.trim();
+    button.disabled = true;
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, turnstileToken: window.turnstile?.getResponse?.() })
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || 'Subscription failed.');
+      toast('You are on the list. Welcome to the Crystalina Club.');
+      form.reset();
+    } catch (error) {
+      toast(error.message);
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
 /* ---------- page boot ---------- */
 function initPage(activeNav = '') {
   renderHeader(activeNav);
@@ -424,4 +454,7 @@ function initPage(activeNav = '') {
   renderFooter();
   autoReveal();
   requestAnimationFrame(() => initReveal());
+  bindNewsletter();
+  // Refresh pricing, stock and publication state from Supabase.
+  if (Store.hydrateFromSupabase) Store.hydrateFromSupabase();
 }

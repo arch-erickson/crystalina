@@ -177,9 +177,33 @@ const Store = (() => {
   const getSiteSettings = () => getAdminData().siteSettings;
   function updateSiteSettings(changes) { const data = getAdminData(); data.siteSettings = { ...data.siteSettings, ...changes }; saveAdminData(data); return data.siteSettings; }
 
+
+  /* ---------- Supabase hydration ----------
+     Pricing, stock and publication state are authoritative in Supabase.
+     Serve the cached catalog immediately so first paint is instant, then
+     refresh from the database and notify listeners so views can re-render. */
+  let hydrated = false;
+  async function hydrateFromSupabase({ force = false } = {}) {
+    if (hydrated && !force) return getProducts();
+    if (!window.CrystalinaData) return getProducts();
+    try {
+      const { products, source } = await window.CrystalinaData.loadProducts({ force });
+      if (source === "supabase" && products.length) {
+        write(KEYS.products, products);
+        hydrated = true;
+        document.dispatchEvent(new CustomEvent("catalog:changed", { detail: { source, count: products.length } }));
+      }
+      return getProducts();
+    } catch (error) {
+      console.warn("[Crystalina] Catalog hydration failed; serving cached catalog.", error);
+      return getProducts();
+    }
+  }
+  const isHydrated = () => hydrated;
+
   syncManufacturerCatalog();
   return {
-    placeholder, getProducts, getProduct, getBundlesForSystem, getBundleComponents, getCompatibleFilters,
+    placeholder, hydrateFromSupabase, isHydrated, getProducts, getProduct, getBundlesForSystem, getBundleComponents, getCompatibleFilters,
     upsertProduct, deleteProduct, deleteAllProducts,
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
     getUsers, currentUser, setCurrentUser, signUp, signIn, signOut, currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,

@@ -40,6 +40,8 @@
 </main>
 
 <script src="/js/product-catalog.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/data-remote.js"></script>
 <script src="/js/store.js"></script>
 <script src="/js/main.js"></script>
 <script>
@@ -54,18 +56,36 @@
   document.getElementById('acctEmail').textContent = user.email;
   document.getElementById('signOutBtn').addEventListener('click', () => { Store.signOut(); location.href = '/'; });
 
-  const mine = Store.getOrders().filter(o => o.customer.userId === user.id || o.customer.email.toLowerCase() === user.email.toLowerCase());
-  document.getElementById('ordersWrap').innerHTML = mine.length
-    ? mine.map(o => `
-      <div class="order-card">
-        <div class="order-head">
-          <strong>Order ${o.id}</strong>
-          <span class="status-pill status-${o.status}">${o.status}</span>
-        </div>
-        <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;">${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })} · ${o.items.reduce((n,i)=>n+i.qty,0)} item(s) · ${money(o.total)}</div>
-        <div style="font-size:.84rem;">${o.items.map(i => `${i.name} × ${i.qty}`).join('<br>')}</div>
-      </div>`).join('')
-    : `<p style="color:var(--muted);font-size:.9rem;">No orders yet. <a href="/shop/" class="link">Start shopping →</a></p>`;
+  const ordersWrap = document.getElementById('ordersWrap');
+  const emptyState = '<p style="color:var(--muted);font-size:.9rem;">No orders yet. <a href="/shop/" class="link">Start shopping →</a></p>';
+
+  const STATUS_LABELS = {
+    pending_payment: 'Pending payment', paid: 'Paid', processing: 'Processing',
+    shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded'
+  };
+
+  /* Orders come from Supabase and are scoped to this customer by RLS. */
+  async function renderOrders() {
+    ordersWrap.innerHTML = '<p style="color:var(--muted);font-size:.9rem;">Loading your orders...</p>';
+    try {
+      const orders = await window.CrystalinaData.myOrders();
+      if (!orders.length) { ordersWrap.innerHTML = emptyState; return; }
+      ordersWrap.innerHTML = orders.map(o => `
+        <div class="order-card">
+          <div class="order-head">
+            <strong>Order ${escapeHTML(o.id)}</strong>
+            <span class="status-pill status-${escapeHTML(o.status)}">${escapeHTML(STATUS_LABELS[o.status] || o.status)}</span>
+          </div>
+          <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;">${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })} &middot; ${o.items.reduce((n, i) => n + i.qty, 0)} item(s) &middot; ${money(o.total)}</div>
+          <div style="font-size:.84rem;">${o.items.map(i => `${escapeHTML(i.name)} &times; ${i.qty}`).join('<br>')}</div>
+        </div>`).join('');
+    } catch (error) {
+      console.error('[account] order load failed', error);
+      ordersWrap.innerHTML = '<p style="color:var(--muted);font-size:.9rem;">We could not load your orders just now. Please refresh, or contact us if it continues.</p>';
+    }
+  }
+  renderOrders();
+
 </script>
 </body>
 </html>
