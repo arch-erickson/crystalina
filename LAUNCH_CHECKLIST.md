@@ -162,3 +162,26 @@ To bring them up:
    `RESEND_API_KEY` and `TURNSTILE_SECRET_KEY` are server-only.
 4. Deploy to a preview URL and test the contact form and newsletter first.
 5. Cut `crystalina.org` over from GitHub Pages once the preview passes.
+
+---
+
+## Storefront configuration and content editor (in progress)
+
+Done
+- [x] Merchandising order: systems before replacement filters on Shop and Best Sellers
+- [x] Flagship section is data-driven and features the H5-600, price read from the catalog
+- [x] Content editor mirrors the ten real homepage sections and can publish to Supabase
+- [x] Section image, button label/link and featured-product picker
+- [x] Schema for stage options, faucet upgrades, display order and site content
+- [x] create_order prices stage options and faucet upgrades server-side
+
+Still to do
+- [ ] Product page: stage-count selector and faucet-upgrade selector with live price
+- [ ] Cart lines keyed by configuration so one product can be added in two builds
+- [ ] Admin product editor: manage stage options and set the default faucet
+- [ ] Seed faucet products and set each system's default faucet
+- [ ] Editor coverage for repeatable items (trust bar, category tiles, testimonials,
+      water-facts figures, process steps) as editable lists
+- [ ] Move uploaded images to Supabase Storage; data URLs will exhaust localStorage
+- [ ] Footer should read company details from site settings (already stored, never used)
+- [ ] Free-shipping threshold is duplicated in three places; promote to site settings
