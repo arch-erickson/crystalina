@@ -182,7 +182,11 @@ function applyPageSections() {
   if (!main || !sections.length) return;
   const configuredIds = new Set(sections.map(section => section.id));
   main.querySelectorAll('[data-home-section]').forEach(section => {
-    if (!configuredIds.has(section.dataset.homeSection)) section.hidden = true;
+    // Hide only what the editor explicitly disabled. A section that is simply
+    // absent from the stack stays visible, so adding one custom layer can never
+    // blank out the rest of the homepage.
+    const config = sections.find(entry => entry.id === section.dataset.homeSection);
+    if (config && config.enabled === false) section.hidden = true;
   });
   sections.forEach(config => {
     let section = main.querySelector(`[data-home-section="${CSS.escape(config.id)}"]`);
@@ -374,6 +378,39 @@ function renderFooter() {
   </div>`;
   document.body.appendChild(el);
 }
+
+/* ------------------------------------------------------------
+   Canonical merchandising order.
+   Complete systems lead, then the faucets that upgrade them, then the
+   consumables. Anything new falls in after the known categories rather
+   than jumping to the front, so the storefront order stays predictable
+   as the catalog grows.
+   ------------------------------------------------------------ */
+const CATEGORY_RANK = [
+  'Reverse Osmosis', 'Whole House', 'Countertop', 'Faucets',
+  'Shower & Bath', 'Faucet & Pitcher', 'Accessories', 'Replacement Filters'
+];
+const KIND_RANK = { system: 0, faucet: 1, filter_bundle: 2, replacement_filter: 3 };
+
+function categoryRank(product) {
+  const index = CATEGORY_RANK.indexOf(product.category);
+  return index === -1 ? CATEGORY_RANK.length : index;
+}
+
+/* Default storefront ordering: systems first, then by category, then name. */
+function sortForDisplay(products) {
+  return products.slice().sort((a, b) => {
+    const kind = (KIND_RANK[a.productKind] ?? 9) - (KIND_RANK[b.productKind] ?? 9);
+    if (kind) return kind;
+    const cat = categoryRank(a) - categoryRank(b);
+    if (cat) return cat;
+    if (a.displayOrder != null && b.displayOrder != null && a.displayOrder !== b.displayOrder) {
+      return a.displayOrder - b.displayOrder;
+    }
+    return String(a.name).localeCompare(String(b.name));
+  });
+}
+if (typeof window !== 'undefined') { window.sortForDisplay = sortForDisplay; window.CATEGORY_RANK = CATEGORY_RANK; }
 
 /* ---------- product card ---------- */
 function productCard(p) {

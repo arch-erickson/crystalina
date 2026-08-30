@@ -286,32 +286,82 @@
   initPage('/');
 
   // Featured products: use the admin selection, then fall back to top products.
-  const selectedFeatured = Store.getAdminData().pageSections?.find(section => section.id === 'best-sellers')?.products || [];
-  const featuredFallback = Store.getProducts().slice().sort((a, b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0) || b.reviews - a.reviews);
-  const featured = (selectedFeatured.length ? selectedFeatured.map(id => Store.getProduct(id)).filter(Boolean) : featuredFallback).slice(0, 4);
-  document.getElementById('featuredGrid').innerHTML = featured.map(productCard).join('');
-  bindAddButtons();
+  /* Best sellers: the admin selection wins, otherwise systems lead. */
+  function renderFeatured() {
+    const grid = document.getElementById('featuredGrid');
+    if (!grid) return;
+    const section = Store.getAdminData().pageSections?.find(item => item.id === 'best-sellers') || {};
+    const picked = (section.products || []).map(id => Store.getProduct(id)).filter(Boolean);
+    const fallback = sortForDisplay(Store.getProducts())
+      .sort((a, b) => ((b.stock > 0) - (a.stock > 0)));
+    const featured = (picked.length ? picked : fallback).slice(0, 4);
+    grid.innerHTML = featured.map(productCard).join('');
+    bindAddButtons(grid);
+  }
+  renderFeatured();
 
-  // Exploded RO-10 anatomy: numbered component breakdown
-  const STAGES = [
-    { ic: 'funnel', h: 'Sediment Pre-Filter', p: 'Traps rust, sand, and grit shed by century-old city mains before it reaches the finer stages.' },
-    { ic: 'leaf', h: 'Dual Carbon Blocks', p: 'Strip chlorine, chloramine, and the pool-like taste and odor NYC uses to disinfect.' },
-    { ic: 'shield', h: 'Reverse Osmosis Membrane', p: 'The 0.0001-micron core that rejects lead, PFAS, fluoride, and microplastics.' },
-    { ic: 'purity', h: 'Alkaline Remineralization', p: 'Adds calcium, magnesium, and potassium back for crisp, balanced, great-tasting water.' },
-    { ic: 'box', h: 'Pressurized Reserve Tank', p: 'Stores purified water so a full glass is ready the moment you lift the faucet.' },
-    { ic: 'droplet', h: 'Lead-Free Designer Faucet', p: 'Brushed, solid-metal faucet included, sized to fit a standard NYC apartment sink.' }
+
+  /* Flagship anatomy. The featured product, its price and its artwork all come
+     from the catalog and the content editor, so nothing here goes stale when a
+     price changes in the Products screen. */
+  const H5_600_ID = 'c1000000-0000-4000-8000-000000000001';
+
+  const DEFAULT_STAGES = [
+    { ic: 'funnel', h: 'Sediment Pre-Filter', p: 'Traps rust, sand and grit shed by century-old city mains before it reaches the finer stages.' },
+    { ic: 'leaf', h: 'Activated Carbon Block', p: 'Strips chlorine, chloramine and the pool-like taste and odour NYC uses to disinfect.' },
+    { ic: 'shield', h: '600 GPD RO Membrane', p: 'The high-flow core that rejects lead, PFAS, fluoride and microplastics.' },
+    { ic: 'purity', h: 'Alkaline Remineralization', p: 'Adds calcium, magnesium and potassium back for crisp, balanced, great-tasting water.' },
+    { ic: 'sparkle', h: 'LED-UVC Treatment', p: 'A mercury-free ultraviolet module for a final pass against bacteria and viruses.' },
+    { ic: 'chart', h: 'Digital Monitoring Panel', p: 'Two pressure gauges and a live readout so you always know how the system is performing.' }
   ];
-  document.getElementById('anatomyStages').innerHTML = STAGES.map((s, i) => `
-    <div class="stage reveal">
-      <div class="stage-num">${String(i + 1).padStart(2, '0')}</div>
-      <div><h4>${s.h}</h4><p>${s.p}</p></div>
-    </div>`).join('') + `
-    <div class="anatomy-cta reveal">
-      <span class="anatomy-price">$349.99 <small>$429.99</small></span>
-      <a href="/product/?id=ro-alkaline-10" class="btn btn-primary">${svgIcon('arrowRight')} View the RO-10</a>
-      <button class="btn btn-outline anatomy-add" data-id="ro-alkaline-10">Add to Cart</button>
-    </div>`;
-  document.querySelector('.anatomy-add').addEventListener('click', () => { Store.addToCart('ro-alkaline-10'); toast('Added to cart'); openCart(); });
+
+  function renderAnatomy() {
+    const wrap = document.getElementById('anatomyStages');
+    if (!wrap) return;
+    const section = Store.getAdminData().pageSections?.find(item => item.id === 'anatomy') || {};
+    const product = Store.getProduct(section.featuredProductId || H5_600_ID)
+      || Store.getProducts().find(item => item.productKind === 'system');
+    if (!product) { wrap.innerHTML = ''; return; }
+
+    // Prefer stages written in the editor, then the product's own specs.
+    const stages = (Array.isArray(section.items) && section.items.length)
+      ? section.items.map(item => ({ ic: item.icon || 'droplet', h: item.heading, p: item.body }))
+      : (Array.isArray(product.specs) && product.specs.length >= 4
+          ? product.specs.slice(0, 6).map((spec, i) => ({ ic: DEFAULT_STAGES[i]?.ic || 'droplet', h: spec, p: '' }))
+          : DEFAULT_STAGES);
+
+    const heading = document.querySelector('[data-home-section="anatomy"] .section-head h2');
+    if (heading && !section.heading) heading.textContent = product.name + ', Component by Component';
+    const badge = document.querySelector('.anatomy-badge');
+    if (badge) badge.textContent = product.name;
+    const figure = document.querySelector('.anatomy-figure img');
+    if (figure) {
+      figure.src = section.image || '/images/h5-600-exploded.webp';
+      figure.alt = 'Exploded view of the ' + product.name + ' showing each filtration stage and component';
+      figure.onerror = function () { this.onerror = null; this.src = product.image; };
+    }
+
+    wrap.innerHTML = stages.map((stage, i) => `
+      <div class="stage reveal">
+        <div class="stage-num">${String(i + 1).padStart(2, '0')}</div>
+        <div><h4>${escapeHTML(stage.h)}</h4>${stage.p ? `<p>${escapeHTML(stage.p)}</p>` : ''}</div>
+      </div>`).join('') + `
+      <div class="anatomy-cta reveal">
+        <span class="anatomy-price">${money(product.price)}${product.comparePrice ? ` <small>${money(product.comparePrice)}</small>` : ''}</span>
+        <a href="/product/?id=${encodeURIComponent(product.id)}" class="btn btn-primary">${svgIcon('arrowRight')} View the ${escapeHTML(product.modelCode || product.name)}</a>
+        ${product.stock > 0 ? `<button class="btn btn-outline anatomy-add" data-id="${escapeHTML(product.id)}">Add to Cart</button>` : ''}
+      </div>`;
+
+    const addBtn = wrap.querySelector('.anatomy-add');
+    if (addBtn) addBtn.addEventListener('click', () => {
+      Store.addToCart(product.id); toast('Added to cart'); openCart();
+    });
+    if (window.initReveal) initReveal(wrap);
+  }
+  renderAnatomy();
+
+  // Repaint once the live Supabase catalog replaces the cached one.
+  document.addEventListener('catalog:changed', () => { renderFeatured(); renderAnatomy(); });
 
   // Decorative quote marks on testimonials
   document.querySelectorAll('.testi').forEach(t => t.insertAdjacentHTML('afterbegin', '<span class="quote-mark">&ldquo;</span>'));

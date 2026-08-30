@@ -38,7 +38,17 @@ export default async function handler(req, res) {
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
       return json(res, 400, { error: 'Invalid quantity.' });
     }
-    cleanItems.push({ productId, quantity });
+    // Optional configuration. Ids only: the database recomputes every price.
+    const line = { productId, quantity };
+    if (item?.stageOptionId) {
+      if (!UUID_RE.test(String(item.stageOptionId))) return json(res, 400, { error: 'Unrecognised configuration.' });
+      line.stageOptionId = String(item.stageOptionId);
+    }
+    if (item?.faucetId) {
+      if (!UUID_RE.test(String(item.faucetId))) return json(res, 400, { error: 'Unrecognised faucet.' });
+      line.faucetId = String(item.faucetId);
+    }
+    cleanItems.push(line);
   }
 
   const a = body.shippingAddress || {};

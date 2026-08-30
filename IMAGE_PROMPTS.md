@@ -95,3 +95,41 @@ navy/cyan/silver hardware. Load each into the Admin dashboard product image fiel
 - For **3–12**, replace the `https://images.unsplash.com/...` `src` on the relevant page with the
   local `/images/...` path (keep the existing `onerror` fallback).
 - For **13**, upload via the Admin dashboard, or set the `image` field in `js/store.js`.
+
+---
+
+## 14. H5-600 exploded flagship view (`/images/h5-600-exploded.webp`)
+
+Replaces the generic RO-10 artwork in the homepage "Inside the Flagship" section.
+This one intentionally sits **outside** the blue brand palette: it is a technical
+cutaway, so a neutral studio look reads as more credible than brand colour.
+
+- **Size:** 1400 x 1600 (portrait), **transparent background**.
+- **Reference images already in the repo** (match the real hardware, do not invent a
+  different product): `/images/products/h5-600-uv-transparent.webp`,
+  `h5-600-uv-studio.webp`, `h5-600-uv-editorial.webp`, `h5-600-uv.webp`.
+- **The real H5-600 hardware:** a black powder-coated open frame holding three
+  vertical clear-and-steel prefilter housings side by side, two round analogue
+  pressure gauges and a small digital monitoring panel across the top rail, a
+  horizontal cylindrical 600 GPD RO membrane housing, and a black LED-UVC module
+  mounted along the top.
+
+- **Prompt:** "Technical exploded view of a black-frame high-flow reverse osmosis
+  water purification system, components separated vertically with clean thin grey
+  leader lines and generous spacing between parts: at the top a black cylindrical
+  LED-UVC sterilization module, below it a horizontal stainless reverse osmosis
+  membrane housing, then three vertical cartridge filters side by side (a white
+  pleated sediment cartridge, a black activated carbon block, and a mineral
+  alkaline cartridge), then the black powder-coated steel mounting frame with two
+  round pressure gauges and a small digital display panel, and at the bottom a
+  brushed stainless faucet. Neutral studio lighting, soft realistic shadows,
+  matte black and brushed steel and white materials, subtle grey and amber
+  accents, industrial product design render, isolated on a transparent
+  background, sharp focus, high detail."
+
+- **Negative prompt:** `text, watermark, logo, letters, brand names, blue tint,
+  heavy colour grading, cluttered background, duplicated parts, floating debris,
+  low-res, jpeg artifacts`
+
+- **Note:** keep the vertical stack order top-to-bottom so it reads as the water
+  path, and keep the silhouette narrow so it sits beside the numbered stage list.

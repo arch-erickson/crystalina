@@ -12,7 +12,7 @@ const Store = (() => {
     adminData: 'crystalina_admin_data', dataVersion: 'crystalina_data_version',
     catalogSeedCount: 'crystalina_catalog_seed_count'
   };
-  const DATA_VERSION = 'manufacturer-catalog-v5';
+  const DATA_VERSION = 'manufacturer-catalog-v6';
   const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
   const write = (key, value) => localStorage.setItem(key, JSON.stringify(value));
   const catalog = () => window.CrystalinaProductCatalog || { products: [], compatibilities: [], bundleItems: [] };
@@ -37,6 +37,24 @@ const Store = (() => {
     };
   }
 
+  /* The landing page as an ordered stack. Ids match the data-home-section
+     attributes in index.html, so reordering, hiding and editing a layer here
+     acts on the real section rather than a detached record. */
+  function defaultPageSections() {
+    return [
+      { id: 'hero', type: 'Hero', label: 'Hero', eyebrow: "NYC's Home Water Filtration Company", heading: 'Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.', body: "NYC's water is great at the reservoir, but old mains, aging building pipes, and pre-1961 lead solder stand between it and your glass. Crystalina filters are engineered for exactly that.", image: '/images/hero-bg.webp', enabled: true, locked: true },
+      { id: 'trust', type: 'Trust Bar', label: 'Trust bar', heading: '', body: '', enabled: true, locked: true },
+      { id: 'categories', type: 'Category Grid', label: 'Shop by category', eyebrow: 'Shop By Category', heading: 'The Right Filter for Every NYC Home', body: "Studio apartment or four-story brownstone, there's a Crystalina system built for your space.", enabled: true },
+      { id: 'anatomy', type: 'Product Feature', label: 'Inside the flagship', eyebrow: 'Inside the Flagship', heading: '', body: '', enabled: true, featuredProductId: '', image: '' },
+      { id: 'best-sellers', type: 'Best Sellers', label: 'Best sellers', eyebrow: 'Customer Favorites', heading: 'Best Sellers in the Five Boroughs', body: 'The systems New Yorkers order most, from Astoria to Bay Ridge.', enabled: true, products: [] },
+      { id: 'water-facts', type: 'Water Facts', label: 'NYC water facts', eyebrow: 'Know Your Water', heading: "NYC Water Is Famous. It's Also Complicated.", body: 'The city supply is well treated at the source; the risks come from the journey to your faucet.', enabled: true },
+      { id: 'process', type: 'Process', label: 'How it works', eyebrow: 'Simple By Design', heading: 'From Tap to Crystal Clear in 4 Steps', body: '', enabled: true },
+      { id: 'why-crystalina', type: 'Split Feature', label: 'Why Crystalina', eyebrow: 'Why Crystalina', heading: 'Built for the City. Backed for Life in It.', body: '', image: '/images/lifestyle-hydration.webp', enabled: true },
+      { id: 'testimonials', type: 'Testimonials', label: 'Customer reviews', eyebrow: 'Real NYC Homes', heading: 'What Our Neighbors Are Saying', body: '', enabled: true },
+      { id: 'cta', type: 'Call to Action', label: 'Closing call to action', heading: 'Not Sure Which System Fits Your Home?', body: "Answer 5 quick questions and we'll match you to the right filter, or message us on WhatsApp for a human answer.", enabled: true }
+    ];
+  }
+
   function emptyAdminData() {
     return {
       subscriptions: [], customers: [], notifications: [], jobs: [], staff: [], staffSchedules: [],
@@ -44,7 +62,7 @@ const Store = (() => {
       staffNotifications: [], timeEntries: [], timesheetSubmissions: [], schedulePublishBatches: [],
       suppliers: [], supplierProfiles: [], activityLog: [],
       leads: [], campaigns: [], discounts: [], abandonedCarts: [], outreach: [], qrCodes: [], tickets: [],
-      content: [], pageSections: [], roles: [], finance: { months: [], areas: [], products: [] }, siteSettings: siteSettings()
+      content: [], pageSections: defaultPageSections(), roles: [], finance: { months: [], areas: [], products: [] }, siteSettings: siteSettings()
     };
   }
 
@@ -135,6 +153,7 @@ const Store = (() => {
 
   function getAdminData() {
     const saved = read(KEYS.adminData, {}); const defaults = emptyAdminData();
+    if (!Array.isArray(saved.pageSections) || !saved.pageSections.length) saved.pageSections = defaults.pageSections;
     return { ...defaults, ...saved, finance: { ...defaults.finance, ...(saved.finance || {}) }, siteSettings: { ...siteSettings(), ...(saved.siteSettings || {}) } };
   }
   const saveAdminData = data => write(KEYS.adminData, data);

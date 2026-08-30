@@ -103,7 +103,11 @@ window.CrystalinaData = (() => {
         ...(session ? { Authorization: `Bearer ${session.access_token}` } : {})
       },
       body: JSON.stringify({
-        items: items.map(item => ({ productId: item.id, quantity: item.qty })),
+        items: items.map(item => ({
+          productId: item.id, quantity: item.qty,
+          ...(item.stageOptionId ? { stageOptionId: item.stageOptionId } : {}),
+          ...(item.faucetId ? { faucetId: item.faucetId } : {})
+        })),
         shippingAddress, installationRequested, turnstileToken
       })
     });
