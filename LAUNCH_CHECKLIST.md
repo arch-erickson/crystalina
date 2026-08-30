@@ -54,12 +54,14 @@ Legend: `[x]` done · `[ ]` to do · **!** demo-only placeholder that MUST be re
 ### Finish the Supabase migration (the current blocker)
 `js/store.js` still says *"temporary local state during the Supabase migration."* Auth and the
 workforce tools are on Supabase; **the storefront data layer is not yet.**
-- [ ] **!** Move **products** from the local catalog seed into Supabase, so admin edits are real and visible to every visitor
-- [ ] **!** Write **orders** to Supabase (currently the operational arrays are deliberately empty)
-- [ ] **!** Authoritative **inventory / stock counts** server-side
-- [ ] **!** Customer records persisted server-side
+- [x] Products now read from Supabase on every page (`js/data-remote.js`), bundled catalog kept as offline fallback
+- [x] Order pipeline built: `create_order` RPC + `/api/orders/create`. **Checkout UI stays disabled until Stripe is connected** (see Payments)
+- [x] Inventory is server-authoritative: `create_order` validates and decrements stock inside one transaction
+- [ ] **!** Set real stock levels: all 13 filters and bundles currently sit at 0 in Supabase
+- [x] Customer orders persist server-side and render on `/account/` under RLS
 - [ ] Retire the legacy `Store` auth stubs (`signUp`/`signIn` return "being configured") now that `CrystalinaAuth` is live
 - [ ] Extend `CrystalinaAuth` beyond `/signin/` to the pages that still rely on local session state
+- [ ] **Deploy to Vercel**: `/api` functions cannot run on GitHub Pages, so forms and orders stay inert until the cutover
 
 ### Payments (nothing built yet)
 - [ ] Payment processor: **Stripe** recommended (covers Apple/Google Pay); PayPal optional
@@ -72,10 +74,13 @@ workforce tools are on Supabase; **the storefront data layer is not yet.**
 ### Security
 - [ ] Server-side admin/role protection verified end to end (RLS covers data; confirm no client-only gates remain)
 - [ ] Password reset and email verification flows
-- [ ] Rate limiting / brute-force protection on sign-in
-- [ ] Bot protection on forms (Cloudflare Turnstile or hCaptcha)
-- [ ] Input sanitization review: user-entered text is injected as HTML in several render paths (XSS risk)
-- [ ] Confirm no secrets or service-role keys reach client-side code
+- [x] Per-IP rate limiting on every `/api` endpoint (in-process; add Vercel KV or WAF for hard guarantees)
+- [ ] Rate limiting on Supabase sign-in itself (configure in the Supabase dashboard)
+- [x] Turnstile verification wired into all `/api` endpoints (enforced once `TURNSTILE_SECRET_KEY` is set)
+- [ ] Add the Turnstile widget to the contact, newsletter and checkout forms
+- [x] Escaped the cart and product-card render paths; hardened `escapeHTML` to cover single quotes
+- [ ] Sweep the remaining dashboard render paths (`manager/`, `sales/`, `admin/`) for unescaped interpolation
+- [x] Verified: browser code carries only the publishable key; service-role lives behind `/api`
 
 ### Legal (required to sell)
 - [ ] Business registration / LLC + NY sales tax permit
@@ -96,9 +101,10 @@ workforce tools are on Supabase; **the storefront data layer is not yet.**
 - [ ] Confirm business contact details are final (phone, email, address, hours)
 
 ### Forms & communication
-- [ ] **!** Contact form does not send anything yet (no Formspree/EmailJS/backend action)
-- [ ] Newsletter signup connected to an email platform (Mailchimp / Klaviyo / Beehiiv)
-- [ ] Automated order and shipping confirmation emails
+- [x] Contact form posts to `/api/contact`: stored in Supabase and emailed to the team (needs `RESEND_API_KEY`)
+- [x] Newsletter posts to `/api/newsletter` and stores subscribers in Supabase (idempotent)
+- [x] Order confirmation email sends on successful order creation
+- [ ] Shipping/dispatch notification emails
 - [ ] Test phone, WhatsApp, and every social link end to end
 
 ### SEO & growth
@@ -138,3 +144,21 @@ workforce tools are on Supabase; **the storefront data layer is not yet.**
 5. **Forms**: contact and newsletter actually delivering.
 6. **SEO and analytics**: Google Business Profile, Open Graph, GA4/Plausible.
 7. **Polish**: 404, accessibility, performance, cross-browser testing.
+
+---
+
+## Deployment gate (read before testing forms or orders)
+
+`/api` holds the server boundary: order creation, the contact form, and the
+newsletter. **GitHub Pages cannot execute those functions**, so they return 404
+on the current host and the forms will report a failure. They come alive on the
+Vercel deploy described in `docs/SUPABASE_VERCEL_SETUP.md`.
+
+To bring them up:
+1. Apply `supabase/migrations/20260830120000_orders_rpc_and_inbound_forms.sql`
+   to the Supabase project.
+2. Import the repo into Vercel (Framework Preset `Other`, no build command).
+3. Set the environment variables from `.env.example`. `SUPABASE_SERVICE_ROLE_KEY`,
+   `RESEND_API_KEY` and `TURNSTILE_SECRET_KEY` are server-only.
+4. Deploy to a preview URL and test the contact form and newsletter first.
+5. Cut `crystalina.org` over from GitHub Pages once the preview passes.
