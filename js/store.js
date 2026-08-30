@@ -220,9 +220,41 @@ const Store = (() => {
   }
   const isHydrated = () => hydrated;
 
+  /* ---------- site content hydration ----------
+     Page layout and site settings are published to Supabase so every visitor
+     sees what staff edit. The local copy is a cache and an offline fallback. */
+  let contentHydrated = false;
+  async function hydrateSiteContent({ force = false } = {}) {
+    if (contentHydrated && !force) return;
+    if (!window.CrystalinaData?.loadSiteContent) return;
+    const remote = await window.CrystalinaData.loadSiteContent();
+    if (!remote) return;
+    const data = getAdminData();
+    let changed = false;
+    if (Array.isArray(remote.pageSections) && remote.pageSections.length) {
+      data.pageSections = remote.pageSections; changed = true;
+    }
+    if (remote.siteSettings && typeof remote.siteSettings === 'object') {
+      data.siteSettings = { ...data.siteSettings, ...remote.siteSettings }; changed = true;
+    }
+    if (changed) { saveAdminData(data); document.dispatchEvent(new CustomEvent('content:changed')); }
+    contentHydrated = true;
+  }
+
+  /* Publish the current page layout and settings for all visitors. */
+  async function publishSiteContent() {
+    if (!window.CrystalinaData?.saveSiteContent) {
+      return { ok: false, error: 'Publishing is unavailable in this browser.' };
+    }
+    const data = getAdminData();
+    const sections = await window.CrystalinaData.saveSiteContent('pageSections', data.pageSections);
+    if (!sections.ok) return sections;
+    return window.CrystalinaData.saveSiteContent('siteSettings', data.siteSettings);
+  }
+
   syncManufacturerCatalog();
   return {
-    placeholder, hydrateFromSupabase, isHydrated, getProducts, getProduct, getBundlesForSystem, getBundleComponents, getCompatibleFilters,
+    placeholder, hydrateFromSupabase, isHydrated, hydrateSiteContent, publishSiteContent, getProducts, getProduct, getBundlesForSystem, getBundleComponents, getCompatibleFilters,
     upsertProduct, deleteProduct, deleteAllProducts,
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
     getUsers, currentUser, setCurrentUser, signUp, signIn, signOut, currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,

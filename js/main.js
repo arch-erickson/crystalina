@@ -494,4 +494,8 @@ function initPage(activeNav = '') {
   bindNewsletter();
   // Refresh pricing, stock and publication state from Supabase.
   if (Store.hydrateFromSupabase) Store.hydrateFromSupabase();
+  // Pull published page layout and site settings, then repaint.
+  if (Store.hydrateSiteContent) {
+    Store.hydrateSiteContent().then(() => { applySiteSettings(); applyPageSections(); });
+  }
 }

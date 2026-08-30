@@ -116,5 +116,43 @@ window.CrystalinaData = (() => {
     return body.order;
   }
 
-  return { loadProducts, myOrders, createOrder, mapRow };
+  /* ---------------------------------------------------------------
+     Site content. Everything the admin edits in "Content & Website"
+     lives in the site_content table so real visitors see it. Public
+     read is open; only admin and manager roles may write.
+     --------------------------------------------------------------- */
+  const CONTENT_KEYS = ['pageSections', 'siteSettings'];
+
+  async function loadSiteContent() {
+    try {
+      const rows = await SB.restGet('site_content?select=key,value');
+      const out = {};
+      (rows || []).forEach(row => { out[row.key] = row.value; });
+      return out;
+    } catch (error) {
+      console.warn('[Crystalina] Site content unavailable; using local copy.', error);
+      return null;
+    }
+  }
+
+  /* Upsert one content block. Returns false when the signed-in user is not
+     allowed to publish, so the caller can explain rather than fail silently. */
+  async function saveSiteContent(key, value) {
+    if (!CONTENT_KEYS.includes(key)) throw new Error('Unknown content key: ' + key);
+    const supabase = await SB.client();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return { ok: false, error: 'Sign in as an administrator to publish changes.' };
+    const { error } = await supabase
+      .from('site_content')
+      .upsert({ key, value, updated_at: new Date().toISOString(), updated_by: session.user.id },
+              { onConflict: 'key' });
+    if (error) {
+      return { ok: false, error: /row-level security/i.test(error.message)
+        ? 'Your account does not have permission to publish website changes.'
+        : error.message };
+    }
+    return { ok: true };
+  }
+
+  return { loadProducts, myOrders, createOrder, mapRow, loadSiteContent, saveSiteContent };
 })();

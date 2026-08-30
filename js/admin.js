@@ -486,7 +486,11 @@
   const sectionModal = document.getElementById('sectionModal');
   const sectionForm = document.getElementById('sectionForm');
   const sectionType = document.getElementById('sectionType');
-  function updateSectionProductVisibility() { document.getElementById('sectionProductsField').hidden = sectionType.value !== 'Best Sellers'; }
+  function updateSectionProductVisibility() {
+    document.getElementById('sectionProductsField').hidden = sectionType.value !== 'Best Sellers';
+    const featured = document.getElementById('sectionFeaturedField');
+    if (featured) featured.hidden = sectionType.value !== 'Product Feature';
+  }
   function closeSectionModal() { sectionModal.classList.remove('open'); sectionForm.reset(); }
   function openSectionModal(section = null) {
     const products = Store.getProducts();
@@ -499,6 +503,17 @@
     document.getElementById('sectionBody').value = section?.body || '';
     document.getElementById('sectionEnabled').checked = section?.enabled !== false;
     document.getElementById('sectionProductOptions').innerHTML = products.map(product => `<label><input type="checkbox" name="products" value="${product.id}" ${(section?.products || []).includes(product.id) ? 'checked' : ''}><span><strong>${escapeHTML(product.name)}</strong><small>${escapeHTML(product.category)}</small></span></label>`).join('') || '<p class="admin-subtitle">Add products before selecting Best Sellers.</p>';
+    document.getElementById('sectionImage').value = section?.image || '';
+    const preview = document.getElementById('sectionImagePreview');
+    preview.src = section?.image || '';
+    preview.style.display = section?.image ? '' : 'none';
+    document.getElementById('sectionButtonLabel').value = section?.buttonLabel || '';
+    document.getElementById('sectionButtonHref').value = section?.buttonHref || '';
+    // Only complete systems make sense as the flagship breakdown.
+    const featureable = products.filter(product => product.productKind === 'system' || product.productKind === 'faucet');
+    document.getElementById('sectionFeaturedProduct').innerHTML =
+      '<option value="">Choose automatically</option>' + featureable.map(product =>
+        `<option value="${escapeHTML(product.id)}" ${section?.featuredProductId === product.id ? 'selected' : ''}>${escapeHTML(product.name)}</option>`).join('');
     sectionType.disabled = Boolean(section && section.type !== 'Custom Section');
     updateSectionProductVisibility();
     sectionModal.classList.add('open');
@@ -513,12 +528,59 @@
     const formData = new FormData(sectionForm);
     const id = formData.get('id');
     const existing = Store.getAdminData().pageSections.find(section => section.id === id);
-    const values = { type: sectionType.value, label: formData.get('label'), eyebrow: formData.get('eyebrow'), heading: formData.get('heading'), body: formData.get('body'), enabled: formData.get('enabled') === 'on', products: formData.getAll('products') };
+    const values = {
+      type: sectionType.value, label: formData.get('label'), eyebrow: formData.get('eyebrow'),
+      heading: formData.get('heading'), body: formData.get('body'),
+      enabled: formData.get('enabled') === 'on', products: formData.getAll('products'),
+      image: formData.get('image') || '', buttonLabel: formData.get('buttonLabel') || '',
+      buttonHref: formData.get('buttonHref') || '', featuredProductId: formData.get('featuredProductId') || ''
+    };
     if (existing) Store.updateAdminItem('pageSections', id, values);
     else Store.saveAdminCollection('pageSections', [...Store.getAdminData().pageSections, { id: `custom-${Date.now()}`, ...values }]);
     if (id === 'hero') Store.updateSiteSettings({ heroEyebrow: values.eyebrow, heroHeading: values.heading, heroBody: values.body });
     closeSectionModal(); renderContent(); toast('Landing page section saved');
   });
+  /* Section image: accept a path, or upload a file and keep it as a data URL
+     until Supabase Storage is wired up. */
+  const sectionImageInput = document.getElementById('sectionImage');
+  const sectionImagePreview = document.getElementById('sectionImagePreview');
+  sectionImageInput.addEventListener('input', () => {
+    sectionImagePreview.src = sectionImageInput.value;
+    sectionImagePreview.style.display = sectionImageInput.value ? '' : 'none';
+  });
+  document.getElementById('sectionImageUpload').addEventListener('click', () =>
+    document.getElementById('sectionImageFile').click());
+  document.getElementById('sectionImageFile').addEventListener('change', event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (file.size > 1.5 * 1024 * 1024) { toast('Please use an image under 1.5 MB, or paste a path instead'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      sectionImageInput.value = reader.result;
+      sectionImagePreview.src = reader.result;
+      sectionImagePreview.style.display = '';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  /* Publish: push the page layout and settings to Supabase so real visitors
+     see them. Without this, edits stay in this browser only. */
+  const publishBtn = document.getElementById('publishContentBtn');
+  if (publishBtn) publishBtn.addEventListener('click', async () => {
+    publishBtn.disabled = true;
+    const original = publishBtn.textContent;
+    publishBtn.textContent = 'Publishing...';
+    try {
+      const result = await Store.publishSiteContent();
+      toast(result.ok ? 'Website updated for all visitors' : result.error);
+    } catch (error) {
+      toast('Could not publish: ' + error.message);
+    } finally {
+      publishBtn.disabled = false;
+      publishBtn.textContent = original;
+    }
+  });
+
   document.getElementById('companySettingsForm').addEventListener('submit', event => {
     event.preventDefault(); Store.updateSiteSettings(Object.fromEntries(new FormData(event.currentTarget).entries())); toast('Company details saved');
   });
