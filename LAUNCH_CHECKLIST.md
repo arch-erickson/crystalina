@@ -123,7 +123,8 @@ workforce tools are on Supabase; **the storefront data layer is not yet.**
 - [ ] Custom 404 page
 - [ ] Redirects from the old `/page.html` URLs to `/page/`
 - [ ] Accessibility pass (contrast, keyboard nav, alt text, form labels)
-- [ ] Cross-browser and real-device testing (Safari, Firefox, Edge, iOS, Android)
+- [x] Responsive layer for iPad and phone across storefront, admin and staff
+- [ ] Real-device testing on actual iOS and Android hardware
 - [ ] Image optimization pass (the catalog is now image-heavy; check page weight and lazy loading)
 - [ ] Error monitoring (Sentry)
 - [ ] Real product reviews and ratings
@@ -176,12 +177,39 @@ Done
 - [x] create_order prices stage options and faucet upgrades server-side
 
 Still to do
-- [ ] Product page: stage-count selector and faucet-upgrade selector with live price
-- [ ] Cart lines keyed by configuration so one product can be added in two builds
+- [x] Product page: stage-count selector and faucet-upgrade selector with live price
+- [x] Cart lines keyed by configuration so one product can be added in two builds
 - [ ] Admin product editor: manage stage options and set the default faucet
 - [ ] Seed faucet products and set each system's default faucet
 - [ ] Editor coverage for repeatable items (trust bar, category tiles, testimonials,
       water-facts figures, process steps) as editable lists
-- [ ] Move uploaded images to Supabase Storage; data URLs will exhaust localStorage
+- [x] All admin uploads go to Supabase Storage; no data URLs remain
 - [ ] Footer should read company details from site settings (already stored, never used)
 - [ ] Free-shipping threshold is duplicated in three places; promote to site settings
+
+---
+
+## Immediate next actions (2026-08-31)
+
+**You need to do these two; I cannot from here.**
+1. **Apply the storage migration.** Supabase dashboard, SQL Editor, run
+   `supabase/migrations/20260831090000_site_media_storage.sql`. Until then admin
+   image uploads report that storage is not set up. Every other migration is
+   already applied and verified.
+2. **Deploy to Vercel.** `/api` cannot run on GitHub Pages, so the contact form,
+   newsletter and order creation stay inert until the cutover.
+
+**Catalog data to seed** (schema is live but empty):
+- Stage options per system, each with its own price, one marked default
+- Faucet products, then `available_as_upgrade` on the upgradeable ones and
+  `default_faucet_id` on each system
+- Stock levels for the 13 filters and bundles, all currently 0
+
+**Still open in the editor:** repeatable items inside sections (trust bar,
+category tiles, testimonials, water-facts figures, process steps) are not yet
+editable; the footer still ignores the company details already stored in
+settings; the $99 free-shipping threshold is duplicated in three places.
+
+**Known gap:** admin product edits still write only to localStorage and are
+overwritten on the next catalog hydration. A staff-gated upsert RPC is needed
+before the Products screen is trustworthy.
