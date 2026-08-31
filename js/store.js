@@ -113,22 +113,50 @@ const Store = (() => {
 
   const getCart = () => read(KEYS.cart, []);
   function setCart(cart) { write(KEYS.cart, cart); document.dispatchEvent(new CustomEvent('cart:changed')); }
-  function addToCart(id, qty = 1) {
+  /* A cart line is identified by the product plus its configuration, so the
+     same system in a 5-stage and a 7-stage build are separate lines. */
+  const lineKey = (id, config = {}) =>
+    [id, config.stageOptionId || '', config.faucetId || ''].join('|');
+
+  function addToCart(id, qty = 1, config = {}) {
     if (!getProduct(id)) return;
-    const cart = getCart(); const item = cart.find(entry => entry.id === id);
-    if (item) item.qty += qty; else cart.push({ id, qty });
+    const key = lineKey(id, config);
+    const cart = getCart();
+    const item = cart.find(entry => lineKey(entry.id, entry) === key);
+    if (item) item.qty += qty;
+    else cart.push({
+      id, qty,
+      stageOptionId: config.stageOptionId || null,
+      faucetId: config.faucetId || null
+    });
     setCart(cart);
   }
-  function updateQty(id, qty) {
-    const cart = getCart(); const item = cart.find(entry => entry.id === id);
+  function updateQty(id, qty, config = null) {
+    const cart = getCart();
+    // Without a configuration, fall back to the first line for this product so
+    // older callers keep working.
+    const key = config ? lineKey(id, config) : null;
+    const item = key
+      ? cart.find(entry => lineKey(entry.id, entry) === key)
+      : cart.find(entry => entry.id === id);
     if (!item) return;
-    if (qty <= 0) setCart(cart.filter(entry => entry.id !== id)); else { item.qty = qty; setCart(cart); }
+    if (qty <= 0) setCart(cart.filter(entry => entry !== item));
+    else { item.qty = qty; setCart(cart); }
   }
   const clearCart = () => setCart([]);
   const cartCount = () => getCart().reduce((count, item) => count + item.qty, 0);
+  /* Preview pricing only. The order API recomputes every figure from the
+     database before anything is charged. */
   function cartDetails() {
-    const items = getCart().map(item => ({ ...item, product: getProduct(item.id) })).filter(item => item.product);
-    return { items, subtotal: items.reduce((sum, item) => sum + item.product.price * item.qty, 0) };
+    const items = getCart().map(item => {
+      const product = getProduct(item.id);
+      if (!product) return null;
+      const option = (product.stageOptions || []).find(entry => entry.id === item.stageOptionId);
+      const faucet = item.faucetId ? getProduct(item.faucetId) : null;
+      const unitPrice = (option ? option.price : product.price) + (faucet ? faucet.price : 0);
+      return { ...item, product, option: option || null, faucet: faucet || null, unitPrice, lineId: lineKey(item.id, item) };
+    }).filter(Boolean);
+    return { items, subtotal: items.reduce((sum, item) => sum + item.unitPrice * item.qty, 0) };
   }
 
   const getUsers = () => read(KEYS.users, []);

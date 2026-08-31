@@ -36,6 +36,27 @@ window.CrystalinaData = (() => {
       description: row.description || extra.description || '',
       specs: Array.isArray(row.specs) && row.specs.length ? row.specs : (extra.specs || []),
       installationMinutes: row.installation_minutes ?? extra.installationMinutes ?? 30,
+      // Classification and merchandising now come from the database, so a
+      // product created there sorts and behaves correctly without a code change.
+      productKind: row.product_kind ?? extra.productKind ?? 'system',
+      sku: row.sku ?? extra.sku ?? '',
+      modelCode: row.model_code ?? extra.modelCode ?? '',
+      displayOrder: row.display_order ?? extra.displayOrder ?? 100,
+      priceIsPlaceholder: row.price_is_placeholder ?? extra.priceIsPlaceholder ?? false,
+      availableAsUpgrade: row.available_as_upgrade === true,
+      defaultFaucetId: row.default_faucet_id ?? null,
+      // Buyable configurations, cheapest build first.
+      stageOptions: (row.product_stage_options || [])
+        .slice()
+        .sort((a, b) => a.sort_order - b.sort_order || a.stage_count - b.stage_count)
+        .map(option => ({
+          id: option.id,
+          stageCount: option.stage_count,
+          price: centsToDollars(option.price_cents),
+          label: option.label || (option.stage_count + '-stage'),
+          description: option.description || '',
+          isDefault: option.is_default === true
+        })),
       // Prefer the richer editorial artwork shipped with the catalog.
       image: extra.image || row.image_path,
       rating: extra.rating ?? '0.0',
@@ -49,7 +70,7 @@ window.CrystalinaData = (() => {
   function loadProducts({ force = false } = {}) {
     if (force) productsPromise = null;
     if (!productsPromise) {
-      productsPromise = SB.restGet('products?select=*&published=eq.true&order=category,name')
+      productsPromise = SB.restGet('products?select=*,product_stage_options(*)&published=eq.true&order=display_order.asc,name.asc')
         .then(rows => {
           const local = localById();
           const mapped = rows.map(row => mapRow(row, local.get(row.id)));

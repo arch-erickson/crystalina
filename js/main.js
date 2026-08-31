@@ -281,23 +281,27 @@ function renderCartItems() {
         <img src="${escapeHTML(i.product.image)}" alt="${escapeHTML(i.product.name)}">
         <div class="ci-info">
           <a href="/product/?id=${encodeURIComponent(i.id)}" class="ci-name">${escapeHTML(i.product.name)}</a>
-          <div class="ci-price">${money(i.product.price)}</div>
+          ${i.option || i.faucet ? `<div class="ci-config">${[i.option ? escapeHTML(i.option.label) : "", i.faucet ? escapeHTML(i.faucet.name) : ""].filter(Boolean).join(" &middot; ")}</div>` : ""}
+          <div class="ci-price">${money(i.unitPrice)}</div>
           <div class="ci-qty">
-            <button data-act="dec" data-id="${i.id}">−</button>
+            <button data-act="dec" data-line="${escapeHTML(i.lineId)}" aria-label="Decrease quantity">−</button>
             <span>${i.qty}</span>
-            <button data-act="inc" data-id="${i.id}">+</button>
-            <button class="ci-remove" data-act="rm" data-id="${i.id}">Remove</button>
+            <button data-act="inc" data-line="${escapeHTML(i.lineId)}" aria-label="Increase quantity">+</button>
+            <button class="ci-remove" data-act="rm" data-line="${escapeHTML(i.lineId)}">Remove</button>
           </div>
         </div>
-        <div class="ci-line">${money(i.product.price * i.qty)}</div>
+        <div class="ci-line">${money(i.unitPrice * i.qty)}</div>
       </div>`).join('');
     wrap.querySelectorAll('button[data-act]').forEach(b => b.addEventListener('click', () => {
-      const { act, id } = b.dataset;
-      const item = Store.getCart().find(x => x.id === id);
+      // A line is product|stageOption|faucet, so the right build is mutated.
+      const { act, line } = b.dataset;
+      const [id, stageOptionId, faucetId] = String(line || '').split('|');
+      const config = { stageOptionId: stageOptionId || null, faucetId: faucetId || null };
+      const item = Store.cartDetails().items.find(x => x.lineId === line);
       if (!item) return;
-      if (act === 'inc') Store.updateQty(id, item.qty + 1);
-      if (act === 'dec') Store.updateQty(id, item.qty - 1);
-      if (act === 'rm') Store.updateQty(id, 0);
+      if (act === 'inc') Store.updateQty(id, item.qty + 1, config);
+      if (act === 'dec') Store.updateQty(id, item.qty - 1, config);
+      if (act === 'rm') Store.updateQty(id, 0, config);
     }));
   }
   const st = document.getElementById('cartSubtotal');

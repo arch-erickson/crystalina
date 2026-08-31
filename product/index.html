@@ -33,7 +33,8 @@
 </main>
 
 <script src="/js/product-catalog.js?v=20260825-product-editorial"></script>
-<script src="/js/store.js?v=20260825-product-editorial"></script>
+<script src="/js/supabase-client.js?v=20260825-product-editorial"></script>
+<script src="/js/data-remote.js?v=20260825-product-editorial"></script><script src="/js/store.js?v=20260825-product-editorial"></script>
 <script src="/js/main.js?v=20260825-product-editorial"></script>
 <script>
   initPage('/shop/');
@@ -75,6 +76,57 @@
         <p>This set is matched to the pictured Crystalina configuration.</p>
         <ul>${bundleComponents.map(item => `<li><span>${item.quantity} x</span><a href="/product/?id=${item.product.id}">${item.product.name}</a></li>`).join('')}</ul>
       </section>` : '';
+    /* Configuration: stage build and faucet. Prices shown here are a preview;
+       the order API recomputes every figure from the database before charging. */
+    const stageOptions = Array.isArray(p.stageOptions) ? p.stageOptions : [];
+    const faucetUpgrades = p.productKind === 'system'
+      ? Store.getProducts().filter(item => item.productKind === 'faucet' && item.availableAsUpgrade && item.stock !== 0)
+      : [];
+    const defaultFaucet = p.defaultFaucetId ? Store.getProduct(p.defaultFaucetId) : null;
+
+    const stageMarkup = stageOptions.length ? `
+      <div class="pd-config" role="group" aria-labelledby="stageLabel">
+        <h4 id="stageLabel">Choose your filtration build</h4>
+        <div class="config-options">
+          ${stageOptions.map(option => `
+            <label class="config-option">
+              <input type="radio" name="stageOption" value="${escapeHTML(option.id)}"
+                data-price="${option.price}" ${option.isDefault || stageOptions.length === 1 ? 'checked' : ''}>
+              <span class="config-body">
+                <strong>${escapeHTML(option.label)}</strong>
+                ${option.description ? `<small>${escapeHTML(option.description)}</small>` : ''}
+              </span>
+              <span class="config-price">${money(option.price)}</span>
+            </label>`).join('')}
+        </div>
+      </div>` : '';
+
+    const faucetMarkup = faucetUpgrades.length ? `
+      <div class="pd-config" role="group" aria-labelledby="faucetLabel">
+        <h4 id="faucetLabel">Faucet</h4>
+        <div class="config-options">
+          <label class="config-option">
+            <input type="radio" name="faucetOption" value="" data-add="0" checked>
+            <span class="config-body">
+              <strong>${defaultFaucet ? escapeHTML(defaultFaucet.name) : 'Included faucet'}</strong>
+              <small>Included with this system</small>
+            </span>
+            <span class="config-price">Included</span>
+          </label>
+          ${faucetUpgrades.map(faucet => `
+            <label class="config-option">
+              <input type="radio" name="faucetOption" value="${escapeHTML(faucet.id)}" data-add="${faucet.price}">
+              <span class="config-body">
+                <strong>${escapeHTML(faucet.name)}</strong>
+                ${faucet.short ? `<small>${escapeHTML(faucet.short)}</small>` : ''}
+              </span>
+              <span class="config-price">+${money(faucet.price)}</span>
+            </label>`).join('')}
+        </div>
+      </div>` : '';
+
+    const configuratorMarkup = stageMarkup + faucetMarkup;
+
     const stockCls = p.stock === 0 ? 'out' : p.stock <= 15 ? 'low' : 'in';
     const stockIc = p.stock === 0 ? 'close' : p.stock <= 15 ? 'alert' : 'check';
     const stockTxt = p.stock === 0 ? 'Out of stock' : p.stock <= 15 ? `Low stock, only ${p.stock} left` : 'In stock, ships in 1 to 2 business days';
@@ -86,9 +138,10 @@
         <h1 class="pd-name">${p.name}</h1>
         <div class="pd-rating">★ ${p.rating} <span>· ${p.reviews} reviews</span></div>
         <div class="pd-prices">
-          <span class="pd-price">${money(p.price)}</span>
+          <span class="pd-price" id="pdPrice">${money(p.price)}</span>
           ${p.comparePrice ? `<span class="pd-compare">${money(p.comparePrice)}</span>` : ''}
         </div>
+        ${configuratorMarkup}
         <div class="pd-stock ${stockCls}">${stockMsg}</div>
         <p class="pd-desc">${p.description}</p>
         <div class="pd-specs">
@@ -118,7 +171,31 @@
     document.getElementById('qInc').addEventListener('click', () => { qty = Math.min(qty + 1, Math.max(p.stock, 1)); qVal.textContent = qty; });
     document.getElementById('qDec').addEventListener('click', () => { qty = Math.max(1, qty - 1); qVal.textContent = qty; });
     const addBtn = document.getElementById('addBtn');
-    if (p.stock > 0) addBtn.addEventListener('click', () => { Store.addToCart(p.id, qty); toast('Added to cart'); openCart(); });
+    /* Keep the headline price in step with the chosen configuration. */
+    const priceEl = document.getElementById('pdPrice');
+    const selectedStage = () => layout.querySelector('input[name="stageOption"]:checked');
+    const selectedFaucet = () => layout.querySelector('input[name="faucetOption"]:checked');
+    function configuredPrice() {
+      const stage = selectedStage();
+      const faucet = selectedFaucet();
+      const base = stage ? Number(stage.dataset.price) : p.price;
+      return base + (faucet ? Number(faucet.dataset.add || 0) : 0);
+    }
+    function refreshPrice() { if (priceEl) priceEl.textContent = money(configuredPrice()); }
+    layout.querySelectorAll('input[name="stageOption"], input[name="faucetOption"]')
+      .forEach(input => input.addEventListener('change', refreshPrice));
+    refreshPrice();
+
+    if (p.stock > 0) addBtn.addEventListener('click', () => {
+      const stage = selectedStage();
+      const faucet = selectedFaucet();
+      Store.addToCart(p.id, qty, {
+        stageOptionId: stage ? stage.value : null,
+        faucetId: faucet && faucet.value ? faucet.value : null
+      });
+      toast('Added to cart');
+      openCart();
+    });
     document.querySelectorAll('.bundle-add:not([disabled])').forEach(button => button.addEventListener('click', () => {
       Store.addToCart(button.dataset.id);
       toast('Complete set added to cart');

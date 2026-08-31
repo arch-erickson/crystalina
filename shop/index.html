@@ -53,7 +53,8 @@
 </main>
 
 <script src="/js/product-catalog.js?v=20260825-product-editorial"></script>
-<script src="/js/store.js?v=20260825-product-editorial"></script>
+<script src="/js/supabase-client.js?v=20260825-product-editorial"></script>
+<script src="/js/data-remote.js?v=20260825-product-editorial"></script><script src="/js/store.js?v=20260825-product-editorial"></script>
 <script src="/js/main.js?v=20260825-product-editorial"></script>
 <script>
   initPage('/shop/');
@@ -91,6 +92,8 @@
 
   renderCats();
   renderGrid();
+  // Repaint when the live Supabase catalog arrives.
+  document.addEventListener('catalog:changed', () => { renderCats(); renderGrid(); });
 </script>
 </body>
 </html>
