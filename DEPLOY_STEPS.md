@@ -67,6 +67,16 @@ on conflict do nothing;
 
 # 2. Deploy to Vercel (20 minutes)
 
+> **Status verified 2026-08-31**
+> - Project **already linked** (, in .vercel/project.json) and
+>   **already deployed**: https://crystalina.vercel.app returns 200 on the current build.
+> - API functions **work**: POST /api/contact validates, GET returns 405.
+> - **Environment variables are NOT set.** POST /api/newsletter returns 500,
+>   meaning the function cannot reach Supabase. This is the only blocker.
+> - crystalina.org still serves from **GitHub Pages**, so DNS has not been cut over.
+>
+> Remaining work is 2.2 (env vars) then 2.4 (DNS). You can skip 2.1 and 2.3.
+
 GitHub Pages serves static files only, so the `/api` folder never runs there.
 The contact form, the newsletter and order creation stay inert until this is done.
 
