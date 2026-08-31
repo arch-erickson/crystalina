@@ -902,7 +902,7 @@
     if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   });
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const name = valueOf('pName');
     const price = Number(valueOf('pPrice'));
@@ -935,9 +935,22 @@
       warrantyMonths: numberOrNull('pWarrantyMonths'), returnWindowDays: numberOrNull('pReturnDays'),
       certifications: valueOf('pCertifications').split(',').map(item => item.trim()).filter(Boolean), manualUrl: valueOf('pManualUrl'), warrantyNotes: valueOf('pWarrantyNotes')
     });
+    // Persist to Supabase first so the change is real and visible to customers.
+    const saveBtn = form.querySelector('button[type="submit"]');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.dataset.label = saveBtn.textContent; saveBtn.textContent = 'Saving...'; }
+    const result = await window.CrystalinaData.saveProduct(Store.getProduct(id) || {});
+    if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = saveBtn.dataset.label || 'Save Product'; }
+
+    if (!result.ok) {
+      err.textContent = result.error + ' The change was not saved.';
+      err.classList.add('show');
+      return;
+    }
+    // Pull the authoritative record back so the table shows what the database holds.
+    await Store.hydrateFromSupabase({ force: true });
     closeModal();
     renderAll();
-    toast(wasEditing ? 'Product updated ✓' : 'Product added ✓');
+    toast(wasEditing ? 'Product updated and published' : 'Product added and published');
   });
 
   /* ---------- exposed handlers ---------- */
@@ -947,13 +960,15 @@
       document.querySelector('.side-link[data-view="products"]').click();
       openModal(Store.getProduct(id));
     },
-    removeProduct(id) {
+    async removeProduct(id) {
       const p = Store.getProduct(id);
-      if (p && confirm(`Delete "${p.name}"? This cannot be undone.`)) {
-        Store.deleteProduct(id);
-        renderAll();
-        toast('Product deleted');
-      }
+      if (!p || !confirm(`Delete "${p.name}"? This cannot be undone.`)) return;
+      const result = await window.CrystalinaData.removeProduct(id);
+      if (!result.ok) { toast(result.error); return; }
+      Store.deleteProduct(id);
+      await Store.hydrateFromSupabase({ force: true });
+      renderAll();
+      toast('Product deleted');
     },
     setStatus(id, status) {
       Store.updateOrderStatus(id, status);

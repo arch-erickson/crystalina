@@ -321,6 +321,15 @@ function toast(msg) {
 
 /* ---------- footer ---------- */
 function renderFooter() {
+  // Company details come from site settings so an edit in the admin console
+  // actually reaches the public footer.
+  const cfg = (Store.getSiteSettings && Store.getSiteSettings()) || {};
+  const companyName = cfg.companyName || 'Crystalina Water Co.';
+  const companyEmail = cfg.email || 'info@crystalina.org';
+  const companyPhone = cfg.phone || '(917) 809-4803';
+  const companyAddress = cfg.address || 'New York City, NY, USA';
+  const companyHours = cfg.hours || 'Monday to Saturday, 8am to 7pm ET';
+  const telHref = 'tel:+' + String(companyPhone).replace(/[^0-9]/g, '');
   const el = document.createElement('footer');
   el.className = 'site-footer';
   el.innerHTML = `
@@ -364,19 +373,19 @@ function renderFooter() {
       <h4>Support</h4>
       <a href="/contact/">Contact Us</a>
       <a href="/account/">My Account</a>
-      <a href="tel:+19178094803">(917) 809-4803</a>
-      <a href="mailto:info@crystalina.org">info@crystalina.org</a>
+      <a href="${telHref}">${escapeHTML(companyPhone)}</a>
+      <a href="mailto:${escapeHTML(companyEmail)}">${escapeHTML(companyEmail)}</a>
       <a href="https://wa.me/19178094803" target="_blank" rel="noopener">WhatsApp Us</a>
     </div>
     <div>
       <h4>Visit</h4>
-      <p class="footer-addr">Crystalina Water Co.<br>New York City, NY, USA</p>
-      <p class="footer-addr">Monday to Saturday, 8am to 7pm ET</p>
+      <p class="footer-addr">${escapeHTML(companyName)}<br>${escapeHTML(companyAddress)}</p>
+      <p class="footer-addr">${escapeHTML(companyHours)}</p>
     </div>
   </div>
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
-      <span>© ${new Date().getFullYear()} Crystalina Water Co. All rights reserved. Proudly serving the five boroughs.</span>
+      <span>© ${new Date().getFullYear()} ${escapeHTML(companyName)}. All rights reserved. Proudly serving the five boroughs.</span>
       <span class="footer-links"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="#">Shipping &amp; Returns</a> · <a href="/signin/?mode=staff">Staff sign in</a></span>
     </div>
   </div>`;

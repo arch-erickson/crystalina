@@ -214,5 +214,46 @@ window.CrystalinaData = (() => {
     return { ok: true, url: data.publicUrl, path };
   }
 
-  return { loadProducts, myOrders, createOrder, mapRow, loadSiteContent, saveSiteContent, uploadImage };
+  /* ---------------------------------------------------------------
+     Catalog writes. These call staff-gated database functions, so the
+     permission check lives on the server and the browser never holds a
+     privileged key. Everything the editor captures beyond the core
+     commerce columns travels in details.
+     --------------------------------------------------------------- */
+  const CORE_FIELDS = new Set([
+    'id', 'slug', 'name', 'category', 'price', 'comparePrice', 'stock', 'published',
+    'image', 'short', 'description', 'specs', 'badge', 'installationMinutes',
+    'sku', 'modelCode', 'productKind', 'displayOrder', 'availableAsUpgrade',
+    'defaultFaucetId', 'details', 'stageOptions', 'rating', 'reviews'
+  ]);
+
+  function splitDetails(product) {
+    const details = {};
+    Object.keys(product).forEach(key => {
+      if (!CORE_FIELDS.has(key)) details[key] = product[key];
+    });
+    return { ...product, details };
+  }
+
+  async function rpc(fn, args) {
+    const supabase = await SB.client();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return { ok: false, error: 'Sign in as staff to make catalog changes.' };
+    const { data, error } = await supabase.rpc(fn, args);
+    if (error) {
+      const denied = /not authorised|row-level security|42501/i.test(error.message);
+      return { ok: false, error: denied
+        ? 'Your account does not have permission to change the catalog.'
+        : error.message };
+    }
+    return { ok: true, data };
+  }
+
+  const saveProduct = product => rpc('upsert_product', { p_product: splitDetails(product) });
+  const removeProduct = id => rpc('delete_product', { p_id: id });
+  const saveStageOption = option => rpc('upsert_stage_option', { p_option: option });
+  const removeStageOption = id => rpc('delete_stage_option', { p_id: id });
+
+  return { loadProducts, myOrders, createOrder, mapRow, loadSiteContent, saveSiteContent, uploadImage,
+           saveProduct, removeProduct, saveStageOption, removeStageOption };
 })();
