@@ -68,7 +68,7 @@ on conflict do nothing;
 # 2. Deploy to Vercel (20 minutes)
 
 > **Status verified 2026-08-31**
-> - Project **already linked** (, in .vercel/project.json) and
+> - Project **already linked** (project name crystalina, see .vercel/project.json) and
 >   **already deployed**: https://crystalina.vercel.app returns 200 on the current build.
 > - API functions **work**: POST /api/contact validates, GET returns 405.
 > - **Environment variables are NOT set.** POST /api/newsletter returns 500,
