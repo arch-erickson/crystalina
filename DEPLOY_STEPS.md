@@ -7,8 +7,13 @@ each one depends on the previous.
 
 # 1. Apply the database migrations (10 minutes)
 
-Two migrations are written but not yet applied. Until they run, image uploads
-and admin product saves both fail with a clear message.
+> **Status verified 2026-08-31: step 1 is COMPLETE.**
+> Both migrations are applied. The `site-media` bucket exists, and the catalog
+> functions exist and correctly refuse anonymous callers. Move on to step 2.
+
+These two migrations add image storage and the staff-gated catalog write path.
+Both are already applied; the steps below are kept for reference and for
+rebuilding the project from scratch.
 
 1. Open the Supabase dashboard and select the Crystalina project
    (`ucrmebgsbkfizxthngbi`).
@@ -25,14 +30,18 @@ dropped before being recreated, and the functions use `create or replace`.
 
 ### Confirm it worked
 
-Run this in your terminal:
+This project returns HTTP **400** for a missing object, not 404, so the status
+code alone is misleading. Read the **body** instead. In PowerShell:
 
-```bash
-curl -s -o /dev/null -w "%{http_code}\n" https://ucrmebgsbkfizxthngbi.supabase.co/storage/v1/object/public/site-media/x.png
+```powershell
+curl.exe -s https://ucrmebgsbkfizxthngbi.supabase.co/storage/v1/object/public/site-media/x.png
 ```
 
-`404` is success: the bucket exists and that file simply is not in it.
-`400` means the bucket is still missing, so the first migration did not run.
+- `"code":"NoSuchKey"` means the **bucket exists** and only that file is absent. This is success.
+- `"code":"NoSuchBucket"` means the bucket was not created, so the migration did not run.
+
+Use `curl.exe`, not `curl`: in PowerShell `curl` is an alias for
+`Invoke-WebRequest`, which rejects the Unix `-s -o -w` flags.
 
 Then in the SQL Editor:
 

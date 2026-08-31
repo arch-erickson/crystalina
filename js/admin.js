@@ -369,52 +369,38 @@
     const t = section.typography || {};
     const products = Store.getProducts();
     const featureable = products.filter(p => p.productKind === 'system' || p.productKind === 'faucet');
+    // Text and images are edited directly in the preview above. Only settings
+    // with no on-page representation appear here.
     return `
       <div class="layer-editor" data-editor="${escapeHTML(section.id)}">
-        <div class="layer-editor-grid">
-          <div class="field"><label>Layer name (admin only)</label>
-            <input data-f="label" value="${escapeHTML(section.label || '')}"></div>
-          <div class="field"><label>Eyebrow</label>
-            <input data-f="eyebrow" value="${escapeHTML(section.eyebrow || '')}"></div>
-        </div>
-        <div class="field"><label>Heading</label>
-          <input data-f="heading" value="${escapeHTML(section.heading || '')}"></div>
-        <div class="field"><label>Supporting text</label>
-          <textarea data-f="body" rows="3">${escapeHTML(section.body || '')}</textarea></div>
+        <p class="layer-editor-hint">Click any heading, paragraph or image in the preview to edit it directly. The settings below have no visual equivalent on the page.</p>
 
-        <div class="layer-editor-grid">
-          <div class="field"><label>Button label</label>
-            <input data-f="buttonLabel" value="${escapeHTML(section.buttonLabel || '')}"></div>
-          <div class="field"><label>Button link</label>
-            <input data-f="buttonHref" value="${escapeHTML(section.buttonHref || '')}"></div>
-        </div>
-
-        <div class="field"><label>Section image</label>
-          <div class="section-image-row">
-            <img class="section-image-preview" data-role="img-preview"
-                 src="${escapeHTML(section.image || '')}" alt=""
-                 style="${section.image ? '' : 'display:none'}">
-            <div>
-              <input data-f="image" value="${escapeHTML(section.image || '')}" placeholder="/images/example.webp">
-              <button type="button" class="btn btn-sm btn-outline" data-role="img-upload">Upload image</button>
-              <input type="file" accept="image/*" hidden data-role="img-file">
-              <p class="field-hint">Paste a path, or upload. Uploads go to Supabase storage.</p>
-            </div>
+        <details class="type-panel">
+          <summary>Section settings</summary>
+          <div class="layer-editor-grid">
+            <div class="field"><label>Layer name (admin only)</label>
+              <input data-f="label" value="${escapeHTML(section.label || '')}"></div>
+            <div class="field"><label>Image path</label>
+              <input data-f="image" value="${escapeHTML(section.image || '')}" placeholder="/images/example.webp"></div>
           </div>
-        </div>
-
-        ${section.type === 'Product Feature' ? `
-        <div class="field"><label>Featured product</label>
-          <select data-f="featuredProductId">
-            <option value="">Choose automatically</option>
-            ${featureable.map(p => `<option value="${escapeHTML(p.id)}" ${section.featuredProductId === p.id ? 'selected' : ''}>${escapeHTML(p.name)}</option>`).join('')}
-          </select></div>` : ''}
-
-        ${section.type === 'Best Sellers' ? `
-        <div class="field"><label>Products shown here</label>
-          <div class="section-product-options" data-role="products">
-            ${products.map(p => `<label><input type="checkbox" value="${escapeHTML(p.id)}" ${(section.products || []).includes(p.id) ? 'checked' : ''}><span><strong>${escapeHTML(p.name)}</strong><small>${escapeHTML(p.category)}</small></span></label>`).join('')}
-          </div></div>` : ''}
+          <div class="layer-editor-grid">
+            <div class="field"><label>Button label</label>
+              <input data-f="buttonLabel" value="${escapeHTML(section.buttonLabel || '')}"></div>
+            <div class="field"><label>Button link</label>
+              <input data-f="buttonHref" value="${escapeHTML(section.buttonHref || '')}"></div>
+          </div>
+          ${section.type === 'Product Feature' ? `
+          <div class="field"><label>Featured product</label>
+            <select data-f="featuredProductId">
+              <option value="">Choose automatically</option>
+              ${featureable.map(p => `<option value="${escapeHTML(p.id)}" ${section.featuredProductId === p.id ? 'selected' : ''}>${escapeHTML(p.name)}</option>`).join('')}
+            </select></div>` : ''}
+          ${section.type === 'Best Sellers' ? `
+          <div class="field"><label>Products shown here</label>
+            <div class="section-product-options" data-role="products">
+              ${products.map(p => `<label><input type="checkbox" value="${escapeHTML(p.id)}" ${(section.products || []).includes(p.id) ? 'checked' : ''}><span><strong>${escapeHTML(p.name)}</strong><small>${escapeHTML(p.category)}</small></span></label>`).join('')}
+            </div></div>` : ''}
+        </details>
 
         <details class="type-panel">
           <summary>Text styling</summary>
@@ -432,12 +418,12 @@
             <div class="field"><label>Body colour</label>
               <input type="color" data-t="bodyColor" value="${escapeHTML(t.bodyColor || '#5B6B84')}"></div>
           </div>
-          <p class="field-hint">Leave a field empty to keep the site default. Sizes accept rem, px or %.</p>
+          <p class="field-hint">Leave a field empty to keep the site default.</p>
         </details>
 
         <div class="layer-editor-actions">
           <button type="button" class="btn btn-sm btn-ghost" data-role="cancel">Close</button>
-          <button type="button" class="btn btn-sm btn-primary" data-role="save">Save layer</button>
+          <button type="button" class="btn btn-sm btn-primary" data-role="save">Apply settings</button>
         </div>
       </div>`;
   }
@@ -449,6 +435,232 @@
      renders the actual page with the actual stylesheet, the miniature cannot
      drift from what visitors see.
      ------------------------------------------------------------------ */
+
+
+  /* Direct edits write straight to the layer record, so the only thing left
+     to surface is that there are unpublished changes. */
+  function markLayerDirty(sectionId) {
+    const layer = document.querySelector(`[data-layer="${CSS.escape(sectionId)}"]`);
+    if (layer) layer.classList.add('is-dirty');
+    const publish = document.getElementById('publishContentBtn');
+    if (publish) {
+      publish.classList.add('needs-publish');
+      publish.textContent = 'Publish changes';
+    }
+    // Keep the collapsed summary honest without rebuilding the open editor.
+    const record = Store.getAdminData().pageSections.find(s => s.id === sectionId);
+    const summary = layer?.querySelector('.layer-copy p');
+    if (record && summary) {
+      summary.textContent = record.heading || 'Untitled section';
+    }
+  }
+
+  /* ------------------------------------------------------------------
+     Direct manipulation inside the preview.
+
+     The miniature is the editor: click a heading to retype it, click an
+     image to replace, remove or change how it fills its frame. Each
+     editable node maps to one field on the layer record, so a change in
+     the preview is a change to the data the site renders from.
+     ------------------------------------------------------------------ */
+  const TEXT_TARGETS = [
+    { sel: '.hero-content .hero-eyebrow', field: 'eyebrow', label: 'Eyebrow' },
+    { sel: '.hero-content h1', field: 'heading', label: 'Headline' },
+    { sel: '.hero-content .lead', field: 'body', label: 'Supporting text' },
+    { sel: '.section-head .eyebrow', field: 'eyebrow', label: 'Eyebrow' },
+    { sel: '.section-head h2', field: 'heading', label: 'Heading' },
+    { sel: '.section-head p', field: 'body', label: 'Supporting text' },
+    { sel: '.cta-band h2', field: 'heading', label: 'Heading' },
+    { sel: '.cta-band p', field: 'body', label: 'Supporting text' },
+    { sel: '.split h2', field: 'heading', label: 'Heading' },
+    { sel: '.split > div > p', field: 'body', label: 'Supporting text' }
+  ];
+
+  const IMAGE_TARGETS = ['.split img', '.anatomy-figure img', '.hero'];
+
+  const EDIT_STYLES = `
+    [data-cw-edit] { outline: 2px dashed rgba(42,123,196,.55); outline-offset: 3px; cursor: text; transition: outline-color .15s, background .15s; }
+    [data-cw-edit]:hover { outline-color: #2A7BC4; background: rgba(42,123,196,.07); }
+    [data-cw-edit][contenteditable="true"] { outline: 2px solid #2A7BC4; background: rgba(42,123,196,.10); }
+    [data-cw-img] { outline: 2px dashed rgba(42,123,196,.55); outline-offset: 3px; cursor: pointer; }
+    [data-cw-img]:hover { outline-color: #2A7BC4; }
+    .cw-tag { position: absolute; z-index: 2147483647; background: #1F4C80; color: #fff; font: 600 11px/1.4 Inter, sans-serif; padding: 3px 8px; border-radius: 5px; pointer-events: none; white-space: nowrap; transform: translateY(-100%); }
+    .cw-imgbar { position: absolute; z-index: 2147483647; display: flex; gap: 6px; background: #1F4C80; padding: 6px; border-radius: 8px; box-shadow: 0 8px 22px rgba(0,0,0,.3); }
+    .cw-imgbar button { font: 600 11px/1 Inter, sans-serif; color: #1F4C80; background: #fff; border: 0; border-radius: 5px; padding: 7px 10px; cursor: pointer; }
+    .cw-imgbar button:hover { background: #E6F4FC; }
+  `;
+
+  /* Turn one preview document into a direct-manipulation surface. */
+  function enableInlineEditing(doc, sectionId, onDirty) {
+    if (doc.getElementById('cw-edit-styles')) return;
+    const style = doc.createElement('style');
+    style.id = 'cw-edit-styles';
+    style.textContent = EDIT_STYLES;
+    doc.head.appendChild(style);
+
+    const section = doc.querySelector(`[data-home-section="${CSS.escape(sectionId)}"]`);
+    if (!section) return;
+
+    const record = () => Store.getAdminData().pageSections.find(s => s.id === sectionId) || {};
+    const patch = changes => {
+      Store.updateAdminItem('pageSections', sectionId, changes);
+      if (sectionId === 'hero') {
+        const r = record();
+        Store.updateSiteSettings({
+          heroEyebrow: r.eyebrow, heroHeading: r.heading, heroBody: r.body, heroImage: r.image
+        });
+      }
+      onDirty();
+    };
+
+    /* Floating label naming the field under the cursor. */
+    const tag = doc.createElement('div');
+    tag.className = 'cw-tag';
+    tag.style.display = 'none';
+    doc.body.appendChild(tag);
+    const showTag = (el, text) => {
+      const r = el.getBoundingClientRect();
+      tag.textContent = text;
+      tag.style.display = '';
+      tag.style.left = (r.left + doc.defaultView.scrollX) + 'px';
+      tag.style.top = (r.top + doc.defaultView.scrollY - 6) + 'px';
+    };
+    const hideTag = () => { tag.style.display = 'none'; };
+
+    // ---------------- editable text ----------------
+    TEXT_TARGETS.forEach(target => {
+      section.querySelectorAll(target.sel).forEach(el => {
+        if (el.dataset.cwEdit) return;
+        el.dataset.cwEdit = target.field;
+        el.title = 'Click to edit';
+
+        el.addEventListener('mouseenter', () => showTag(el, target.label));
+        el.addEventListener('mouseleave', hideTag);
+
+        el.addEventListener('click', event => {
+          event.preventDefault();
+          event.stopPropagation();
+          if (el.getAttribute('contenteditable') === 'true') return;
+          el.setAttribute('contenteditable', 'true');
+          el.focus();
+          const range = doc.createRange();
+          range.selectNodeContents(el);
+          const sel = doc.defaultView.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        });
+
+        const commit = () => {
+          el.removeAttribute('contenteditable');
+          hideTag();
+          const value = el.textContent.trim();
+          if (value !== (record()[target.field] || '').trim()) {
+            patch({ [target.field]: value });
+          }
+        };
+        el.addEventListener('blur', commit);
+        el.addEventListener('keydown', event => {
+          if (event.key === 'Enter' && el.tagName !== 'P') { event.preventDefault(); el.blur(); }
+          if (event.key === 'Escape') { el.textContent = record()[target.field] || ''; el.blur(); }
+        });
+      });
+    });
+
+    // ---------------- editable images ----------------
+    const bar = doc.createElement('div');
+    bar.className = 'cw-imgbar';
+    bar.style.display = 'none';
+    doc.body.appendChild(bar);
+    let activeImage = null;
+
+    const placeBar = el => {
+      const r = el.getBoundingClientRect();
+      bar.style.display = 'flex';
+      bar.style.left = (r.left + doc.defaultView.scrollX + 10) + 'px';
+      bar.style.top = (r.top + doc.defaultView.scrollY + 10) + 'px';
+    };
+    const hideBar = () => { bar.style.display = 'none'; activeImage = null; };
+
+    const fileInput = doc.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.style.display = 'none';
+    doc.body.appendChild(fileInput);
+
+    fileInput.addEventListener('change', async () => {
+      const file = fileInput.files?.[0];
+      fileInput.value = '';
+      if (!file || !activeImage) return;
+      toast('Uploading image...');
+      const result = await window.CrystalinaData.uploadImage(file, { folder: 'sections' });
+      if (!result.ok) { toast(result.error); return; }
+      applyImage(activeImage, result.url);
+      patch({ image: result.url });
+      toast('Image replaced');
+    });
+
+    function applyImage(el, url) {
+      if (el.tagName === 'IMG') el.src = url;
+      else el.style.setProperty('--hero-image', `url("${url}")`);
+    }
+
+    function buildBar(el) {
+      const isHero = el.tagName !== 'IMG';
+      const fit = record().imageFit || 'cover';
+      bar.innerHTML = '';
+      const add = (label, handler) => {
+        const button = doc.createElement('button');
+        button.type = 'button';
+        button.textContent = label;
+        button.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); handler(); });
+        bar.appendChild(button);
+      };
+      add('Replace', () => fileInput.click());
+      if (!isHero) {
+        // Cover crops to fill the frame; contain shows the whole image uncropped.
+        add(fit === 'cover' ? 'Uncrop' : 'Crop to fill', () => {
+          const next = fit === 'cover' ? 'contain' : 'cover';
+          el.style.objectFit = next;
+          patch({ imageFit: next });
+          buildBar(el);
+          toast(next === 'contain' ? 'Showing the whole image' : 'Cropping to fill');
+        });
+        add('Remove', () => {
+          el.removeAttribute('src');
+          el.style.visibility = 'hidden';
+          patch({ image: '' });
+          hideBar();
+          toast('Image removed');
+        });
+      }
+      add('Done', hideBar);
+    }
+
+    IMAGE_TARGETS.forEach(sel => {
+      const nodes = sel === '.hero'
+        ? (section.matches('.hero') ? [section] : [])
+        : section.querySelectorAll(sel);
+      nodes.forEach(el => {
+        if (el.dataset.cwImg) return;
+        el.dataset.cwImg = '1';
+        el.title = 'Click to replace or crop';
+        el.addEventListener('mouseenter', () => showTag(el, el.tagName === 'IMG' ? 'Image' : 'Background image'));
+        el.addEventListener('mouseleave', hideTag);
+        el.addEventListener('click', event => {
+          event.preventDefault();
+          event.stopPropagation();
+          activeImage = el;
+          buildBar(el);
+          placeBar(el);
+        });
+      });
+    });
+
+    doc.addEventListener('click', event => {
+      if (!bar.contains(event.target) && !event.target.dataset?.cwImg) hideBar();
+    });
+  }
+
   const PREVIEW_WIDTH = 1280;
 
   function mountPreview(sectionId) {
@@ -497,6 +709,12 @@
       // Images and fonts settle after load; refit once they do.
       setTimeout(fit, 400);
       setTimeout(fit, 1200);
+
+      // The preview is the editor: make its text and images directly editable.
+      enableInlineEditing(doc, sectionId, () => {
+        markLayerDirty(sectionId);
+        setTimeout(fit, 60);
+      });
       window.addEventListener('resize', fit);
       stage.querySelector('.layer-preview-loading')?.remove();
     });
@@ -513,32 +731,13 @@
   }
 
   /* Wire the inline editor for one open layer. */
+  /* Wire the compact settings panel for one open layer. Text and images are
+     handled by direct manipulation inside the preview, not here. */
   function bindLayerEditor(sectionId) {
     const editor = document.querySelector(`[data-editor="${CSS.escape(sectionId)}"]`);
     if (!editor || editor.dataset.bound) return;
     editor.dataset.bound = '1';
     mountPreview(sectionId);
-
-    const imageInput = editor.querySelector('[data-f="image"]');
-    const imagePreview = editor.querySelector('[data-role="img-preview"]');
-    const fileInput = editor.querySelector('[data-role="img-file"]');
-
-    imageInput.addEventListener('input', () => {
-      imagePreview.src = imageInput.value;
-      imagePreview.style.display = imageInput.value ? '' : 'none';
-    });
-    editor.querySelector('[data-role="img-upload"]').addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', async event => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      toast('Uploading image...');
-      const result = await window.CrystalinaData.uploadImage(file, { folder: 'sections' });
-      if (!result.ok) { toast(result.error); return; }
-      imageInput.value = result.url;
-      imagePreview.src = result.url;
-      imagePreview.style.display = '';
-      toast('Image uploaded');
-    });
 
     editor.querySelector('[data-role="cancel"]').addEventListener('click', () => AdminUI.toggleLayer(sectionId));
     editor.querySelector('[data-role="save"]').addEventListener('click', () => {
@@ -551,21 +750,17 @@
       });
       values.typography = typography;
 
-      const productBoxes = editor.querySelectorAll('[data-role="products"] input:checked');
       if (editor.querySelector('[data-role="products"]')) {
-        values.products = [...productBoxes].map(box => box.value);
+        values.products = [...editor.querySelectorAll('[data-role="products"] input:checked')].map(box => box.value);
       }
 
       Store.updateAdminItem('pageSections', sectionId, values);
       if (sectionId === 'hero') {
-        Store.updateSiteSettings({
-          heroEyebrow: values.eyebrow, heroHeading: values.heading,
-          heroBody: values.body, heroImage: values.image
-        });
+        Store.updateSiteSettings({ heroImage: values.image });
       }
-      renderContent();
+      markLayerDirty(sectionId);
       refreshPreview(sectionId);
-      toast('Layer saved. Publish to make it live.');
+      toast('Settings applied. Publish to make them live.');
     });
   }
 
