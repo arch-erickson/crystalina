@@ -188,6 +188,22 @@ function applySiteSettings() {
   applyPageSections();
 }
 
+/* Text edited directly in the admin preview. Each entry is keyed by a
+   structural path within the section, so arbitrary text (a stat, a button
+   label, a list item) can be overridden without a field per element. */
+function applyTextOverrides(sectionEl, overrides) {
+  if (!sectionEl || !overrides) return;
+  Object.entries(overrides).forEach(([path, value]) => {
+    let node = sectionEl;
+    for (const step of path.split('>')) {
+      const index = Number(step.split(':')[1]);
+      node = node && node.children[index];
+      if (!node) return;
+    }
+    if (node && node !== sectionEl) node.textContent = value;
+  });
+}
+
 /* Per-section typography chosen in the content editor. Values are applied as
    inline custom properties so an empty field simply falls back to the design
    system rather than overriding it with a blank. */
@@ -217,6 +233,7 @@ function applyPageSections() {
     const config = sections.find(entry => entry.id === section.dataset.homeSection);
     if (config && config.enabled === false) section.hidden = true;
     if (config) applySectionTypography(section, config.typography);
+    if (config) applyTextOverrides(section, config.textOverrides);
   });
   sections.forEach(config => {
     let section = main.querySelector(`[data-home-section="${CSS.escape(config.id)}"]`);

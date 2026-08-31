@@ -664,6 +664,62 @@
       });
     });
 
+
+    /* ---- every remaining text node becomes editable ---- */
+    const primary = new Set([...section.querySelectorAll('[data-cw-edit]')]);
+    textLeaves(section).forEach(el => {
+      if (primary.has(el) || el.dataset.cwEdit || el.dataset.cwText) return;
+      const path = nodePath(section, el);
+      if (!path) return;
+      el.dataset.cwText = path;
+      el.title = 'Click to edit';
+
+      const isButton = el.classList.contains('btn') || el.closest('.btn');
+      const label = isButton ? 'Button label' : 'Text';
+      el.addEventListener('mouseenter', () => showTag(el, label));
+      el.addEventListener('mouseleave', hideTag);
+
+      el.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (el.getAttribute('contenteditable') === 'true') return;
+        el.setAttribute('contenteditable', 'true');
+        el.focus();
+        const range = doc.createRange();
+        range.selectNodeContents(el);
+        const sel = doc.defaultView.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      });
+
+      const original = el.textContent.trim();
+      const commit = () => {
+        el.removeAttribute('contenteditable');
+        hideTag();
+        const value = el.textContent.trim();
+        const overrides = { ...(record().textOverrides || {}) };
+        if (value === original && !overrides[path]) return;
+        if (value === original) delete overrides[path];
+        else overrides[path] = value;
+        patch({ textOverrides: overrides });
+      };
+      el.addEventListener('blur', commit);
+      el.addEventListener('keydown', event => {
+        if (event.key === 'Enter') { event.preventDefault(); el.blur(); }
+        if (event.key === 'Escape') {
+          const overrides = record().textOverrides || {};
+          el.textContent = overrides[path] || original;
+          el.blur();
+        }
+      });
+    });
+
+    /* Links inside the section keep working as editable labels, so a click
+       edits the label instead of navigating away from the preview. */
+    section.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', event => event.preventDefault());
+    });
+
     // ---------------- editable images ----------------
     const bar = doc.createElement('div');
     bar.className = 'cw-imgbar';
@@ -756,6 +812,35 @@
 
     doc.addEventListener('click', event => {
       if (!bar.contains(event.target) && !event.target.dataset?.cwImg) hideBar();
+    });
+  }
+
+
+  /* A stable address for any node inside a section, so an edit to arbitrary
+     text (a stat, a button label, a list item) can be stored and replayed on
+     the public site without inventing a field for every element. */
+  function nodePath(root, el) {
+    const parts = [];
+    let cur = el;
+    while (cur && cur !== root && cur.parentElement) {
+      const idx = [...cur.parentElement.children].indexOf(cur);
+      parts.unshift(cur.tagName.toLowerCase() + ':' + idx);
+      cur = cur.parentElement;
+    }
+    return parts.join('>');
+  }
+
+  /* Every leaf element that carries visible text. Anything mapped to a primary
+     field (heading, eyebrow, body) is handled separately so those keep their
+     own schema; the rest are stored as path-keyed overrides. */
+  function textLeaves(section) {
+    const SKIP = new Set(['SCRIPT', 'STYLE', 'SVG', 'PATH', 'IMG', 'INPUT', 'TEXTAREA', 'SELECT', 'BR']);
+    return [...section.querySelectorAll('*')].filter(el => {
+      if (SKIP.has(el.tagName)) return false;
+      if (el.closest('svg')) return false;
+      if (el.children.length > 0) return false;
+      const text = el.textContent.trim();
+      return text.length > 0 && text.length < 400;
     });
   }
 

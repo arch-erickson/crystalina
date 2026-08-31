@@ -2254,3 +2254,14 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
   .edit-savebar { flex-direction: column; align-items: stretch; }
   .edit-savebar-actions .btn { flex: 1; }
 }
+
+/* Hero calls to action stack full width on small phones so both remain easy
+   to tap, and long edited labels cannot overflow their button. */
+.btn { max-width: 100%; }
+.hero-cta .btn { text-align: center; }
+@media (max-width: 430px) {
+  .hero-cta { flex-direction: column; align-items: stretch; }
+  .hero-cta .btn { width: 100%; }
+  .cta-band > div:last-child { width: 100%; }
+  .cta-band > div:last-child .btn { flex: 1 1 100%; }
+}
