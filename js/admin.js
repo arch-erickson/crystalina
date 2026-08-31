@@ -200,12 +200,16 @@
 
   let staffPhotoId = null;
   const staffPhotoInput = document.getElementById('staffPhotoInput');
-  staffPhotoInput.addEventListener('change', () => {
+  staffPhotoInput.addEventListener('change', async () => {
     const file = staffPhotoInput.files[0]; if (!file || !staffPhotoId) return;
-    if (file.size > 2.5 * 1024 * 1024) { toast('Photo too large, please keep under 2.5 MB'); return; }
-    const reader = new FileReader();
-    reader.onload = () => { Store.updateAdminItem('staff', staffPhotoId, { photo: reader.result }); const member = Store.getAdminData().staff.find(item => item.id === staffPhotoId); staffPhotoId = null; staffPhotoInput.value = ''; renderStaff(); openStaffProfile(member); toast('Staff photo saved'); };
-    reader.readAsDataURL(file);
+    toast('Uploading photo...');
+    const result = await window.CrystalinaData.uploadImage(file, { folder: 'staff' });
+    const targetId = staffPhotoId;
+    staffPhotoId = null; staffPhotoInput.value = '';
+    if (!result.ok) { toast(result.error); return; }
+    Store.updateAdminItem('staff', targetId, { photo: result.url });
+    const member = Store.getAdminData().staff.find(item => item.id === targetId);
+    renderStaff(); openStaffProfile(member); toast('Staff photo saved');
   });
 
   /* ---------- operations ---------- */
@@ -474,13 +478,16 @@
   });
   const heroImageInput = document.getElementById('heroImageInput');
   document.getElementById('heroImageButton').addEventListener('click', () => heroImageInput.click());
-  heroImageInput.addEventListener('change', () => {
+  heroImageInput.addEventListener('change', async () => {
     const file = heroImageInput.files[0];
     if (!file) return;
-    if (file.size > 2.5 * 1024 * 1024) { toast('Image too large, please keep under 2.5 MB'); return; }
-    const reader = new FileReader();
-    reader.onload = () => { Store.updateSiteSettings({ heroImage: reader.result }); renderContent(); toast('Landing page image saved'); };
-    reader.readAsDataURL(file);
+    toast('Uploading image...');
+    const result = await window.CrystalinaData.uploadImage(file, { folder: 'hero' });
+    heroImageInput.value = '';
+    if (!result.ok) { toast(result.error); return; }
+    Store.updateSiteSettings({ heroImage: result.url });
+    renderContent();
+    toast('Landing page image saved. Publish to make it live.');
   });
 
   const sectionModal = document.getElementById('sectionModal');
@@ -550,17 +557,26 @@
   });
   document.getElementById('sectionImageUpload').addEventListener('click', () =>
     document.getElementById('sectionImageFile').click());
-  document.getElementById('sectionImageFile').addEventListener('change', event => {
+  document.getElementById('sectionImageFile').addEventListener('change', async event => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (file.size > 1.5 * 1024 * 1024) { toast('Please use an image under 1.5 MB, or paste a path instead'); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      sectionImageInput.value = reader.result;
-      sectionImagePreview.src = reader.result;
-      sectionImagePreview.style.display = '';
-    };
-    reader.readAsDataURL(file);
+    // Show the local file immediately, then replace the preview with the
+    // hosted URL once the upload finishes.
+    const localPreview = URL.createObjectURL(file);
+    sectionImagePreview.src = localPreview;
+    sectionImagePreview.style.display = '';
+    toast('Uploading image...');
+    const result = await window.CrystalinaData.uploadImage(file, { folder: 'sections' });
+    URL.revokeObjectURL(localPreview);
+    if (!result.ok) {
+      sectionImagePreview.src = sectionImageInput.value || '';
+      sectionImagePreview.style.display = sectionImageInput.value ? '' : 'none';
+      toast(result.error);
+      return;
+    }
+    sectionImageInput.value = result.url;
+    sectionImagePreview.src = result.url;
+    toast('Image uploaded');
   });
 
   /* Publish: push the page layout and settings to Supabase so real visitors
@@ -812,14 +828,14 @@
     const availableSlots = Math.max(0, 8 - productImages.length);
     const accepted = [...files].filter(file => file.type.startsWith('image/')).slice(0, availableSlots);
     if (!accepted.length) { if (!availableSlots) toast('This product already has eight photos'); return; }
-    const oversized = accepted.find(file => file.size > 2.5 * 1024 * 1024);
-    if (oversized) { toast(`${oversized.name} is over 2.5 MB`); return; }
-    const additions = await Promise.all(accepted.map(file => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    })));
+    toast(accepted.length > 1 ? `Uploading ${accepted.length} photos...` : 'Uploading photo...');
+    const results = await Promise.all(
+      accepted.map(file => window.CrystalinaData.uploadImage(file, { folder: 'products' }))
+    );
+    const failed = results.filter(result => !result.ok);
+    if (failed.length) toast(failed[0].error);
+    const additions = results.filter(result => result.ok).map(result => result.url);
+    if (!additions.length) return;
     productImages.push(...additions);
     renderMediaGallery();
   }

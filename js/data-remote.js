@@ -175,5 +175,44 @@ window.CrystalinaData = (() => {
     return { ok: true };
   }
 
-  return { loadProducts, myOrders, createOrder, mapRow, loadSiteContent, saveSiteContent };
+  /* ---------------------------------------------------------------
+     Media uploads. Files go to the public site-media bucket and we keep
+     only the resulting URL, so images reach real visitors and never sit
+     in localStorage as multi-megabyte data URLs.
+     --------------------------------------------------------------- */
+  const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+  const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/avif', 'image/svg+xml'];
+
+  async function uploadImage(file, { folder = 'content' } = {}) {
+    if (!file) return { ok: false, error: 'No file selected.' };
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      return { ok: false, error: 'Use a PNG, JPG, WebP, AVIF or SVG image.' };
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return { ok: false, error: 'That image is over 5 MB. Please compress it first.' };
+    }
+
+    const supabase = await SB.client();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return { ok: false, error: 'Sign in as staff to upload images.' };
+
+    // Keep a readable, collision-free name.
+    const safeName = file.name.toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-|-$/g, '');
+    const path = `${folder}/${Date.now()}-${safeName}`;
+
+    const { error } = await supabase.storage.from('site-media')
+      .upload(path, file, { cacheControl: '31536000', upsert: false, contentType: file.type });
+    if (error) {
+      if (/bucket not found|NoSuchBucket/i.test(error.message)) {
+        return { ok: false, error: 'Image storage is not set up yet. Apply the site-media storage migration in Supabase, then try again.' };
+      }
+      return { ok: false, error: /row-level security|not authorized/i.test(error.message)
+        ? 'Your account does not have permission to upload images.'
+        : error.message };
+    }
+    const { data } = supabase.storage.from('site-media').getPublicUrl(path);
+    return { ok: true, url: data.publicUrl, path };
+  }
+
+  return { loadProducts, myOrders, createOrder, mapRow, loadSiteContent, saveSiteContent, uploadImage };
 })();
