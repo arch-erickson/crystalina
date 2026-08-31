@@ -149,7 +149,19 @@ function renderHeader(active = '') {
   updateCartBadge();
 }
 
+function applyAnnouncementStyle(settings) {
+  const bar = document.querySelector('.announce-bar');
+  if (!bar || !settings) return;
+  const style = settings.announcementStyle || {};
+  if (style.font) bar.style.fontFamily = style.font;
+  if (style.size) bar.style.fontSize = style.size;
+  if (style.color) bar.style.color = style.color;
+  if (style.background) bar.style.background = style.background;
+}
+
 function applySiteSettings() {
+  const _annSettings = Store.getSiteSettings ? Store.getSiteSettings() : null;
+  applyAnnouncementStyle(_annSettings);
   if (!Store.getSiteSettings) return;
   const settings = Store.getSiteSettings();
   document.documentElement.style.setProperty('--navy-900', settings.navy);
@@ -176,6 +188,23 @@ function applySiteSettings() {
   applyPageSections();
 }
 
+/* Per-section typography chosen in the content editor. Values are applied as
+   inline custom properties so an empty field simply falls back to the design
+   system rather than overriding it with a blank. */
+function applySectionTypography(el, typography) {
+  if (!el || !typography) return;
+  const map = {
+    headingFont: '--sec-heading-font', headingSize: '--sec-heading-size',
+    headingColor: '--sec-heading-color', bodyFont: '--sec-body-font',
+    bodySize: '--sec-body-size', bodyColor: '--sec-body-color'
+  };
+  let touched = false;
+  Object.entries(map).forEach(([key, prop]) => {
+    if (typography[key]) { el.style.setProperty(prop, typography[key]); touched = true; }
+  });
+  if (touched) el.classList.add('has-custom-type');
+}
+
 function applyPageSections() {
   const main = document.querySelector('main');
   const sections = Store.getAdminData?.().pageSections || [];
@@ -187,6 +216,7 @@ function applyPageSections() {
     // blank out the rest of the homepage.
     const config = sections.find(entry => entry.id === section.dataset.homeSection);
     if (config && config.enabled === false) section.hidden = true;
+    if (config) applySectionTypography(section, config.typography);
   });
   sections.forEach(config => {
     let section = main.querySelector(`[data-home-section="${CSS.escape(config.id)}"]`);

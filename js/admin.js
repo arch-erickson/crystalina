@@ -351,21 +351,274 @@
   }
 
   let contentFilter = 'all';
+  /* ------------------------------------------------------------------
+     The landing page as a stack of expandable layers. Each layer shows a
+     live miniature of the real section, rendered from the actual site in an
+     iframe, so what the editor shows is what a visitor gets. Opening a layer
+     reveals its content and typography controls inline.
+     ------------------------------------------------------------------ */
+  const TYPE_FONTS = ['Inter', 'Poppins', 'Georgia', 'Helvetica Neue', 'system-ui'];
+  const openLayers = new Set();
+
+  function fontOptions(selected) {
+    return TYPE_FONTS.map(font =>
+      `<option value="${font}" ${selected === font ? 'selected' : ''}>${font}</option>`).join('');
+  }
+
+  function layerEditor(section) {
+    const t = section.typography || {};
+    const products = Store.getProducts();
+    const featureable = products.filter(p => p.productKind === 'system' || p.productKind === 'faucet');
+    return `
+      <div class="layer-editor" data-editor="${escapeHTML(section.id)}">
+        <div class="layer-editor-grid">
+          <div class="field"><label>Layer name (admin only)</label>
+            <input data-f="label" value="${escapeHTML(section.label || '')}"></div>
+          <div class="field"><label>Eyebrow</label>
+            <input data-f="eyebrow" value="${escapeHTML(section.eyebrow || '')}"></div>
+        </div>
+        <div class="field"><label>Heading</label>
+          <input data-f="heading" value="${escapeHTML(section.heading || '')}"></div>
+        <div class="field"><label>Supporting text</label>
+          <textarea data-f="body" rows="3">${escapeHTML(section.body || '')}</textarea></div>
+
+        <div class="layer-editor-grid">
+          <div class="field"><label>Button label</label>
+            <input data-f="buttonLabel" value="${escapeHTML(section.buttonLabel || '')}"></div>
+          <div class="field"><label>Button link</label>
+            <input data-f="buttonHref" value="${escapeHTML(section.buttonHref || '')}"></div>
+        </div>
+
+        <div class="field"><label>Section image</label>
+          <div class="section-image-row">
+            <img class="section-image-preview" data-role="img-preview"
+                 src="${escapeHTML(section.image || '')}" alt=""
+                 style="${section.image ? '' : 'display:none'}">
+            <div>
+              <input data-f="image" value="${escapeHTML(section.image || '')}" placeholder="/images/example.webp">
+              <button type="button" class="btn btn-sm btn-outline" data-role="img-upload">Upload image</button>
+              <input type="file" accept="image/*" hidden data-role="img-file">
+              <p class="field-hint">Paste a path, or upload. Uploads go to Supabase storage.</p>
+            </div>
+          </div>
+        </div>
+
+        ${section.type === 'Product Feature' ? `
+        <div class="field"><label>Featured product</label>
+          <select data-f="featuredProductId">
+            <option value="">Choose automatically</option>
+            ${featureable.map(p => `<option value="${escapeHTML(p.id)}" ${section.featuredProductId === p.id ? 'selected' : ''}>${escapeHTML(p.name)}</option>`).join('')}
+          </select></div>` : ''}
+
+        ${section.type === 'Best Sellers' ? `
+        <div class="field"><label>Products shown here</label>
+          <div class="section-product-options" data-role="products">
+            ${products.map(p => `<label><input type="checkbox" value="${escapeHTML(p.id)}" ${(section.products || []).includes(p.id) ? 'checked' : ''}><span><strong>${escapeHTML(p.name)}</strong><small>${escapeHTML(p.category)}</small></span></label>`).join('')}
+          </div></div>` : ''}
+
+        <details class="type-panel">
+          <summary>Text styling</summary>
+          <div class="type-grid">
+            <div class="field"><label>Heading font</label>
+              <select data-t="headingFont"><option value="">Default</option>${fontOptions(t.headingFont)}</select></div>
+            <div class="field"><label>Heading size</label>
+              <input data-t="headingSize" value="${escapeHTML(t.headingSize || '')}" placeholder="2.3rem"></div>
+            <div class="field"><label>Heading colour</label>
+              <input type="color" data-t="headingColor" value="${escapeHTML(t.headingColor || '#1F4C80')}"></div>
+            <div class="field"><label>Body font</label>
+              <select data-t="bodyFont"><option value="">Default</option>${fontOptions(t.bodyFont)}</select></div>
+            <div class="field"><label>Body size</label>
+              <input data-t="bodySize" value="${escapeHTML(t.bodySize || '')}" placeholder="1rem"></div>
+            <div class="field"><label>Body colour</label>
+              <input type="color" data-t="bodyColor" value="${escapeHTML(t.bodyColor || '#5B6B84')}"></div>
+          </div>
+          <p class="field-hint">Leave a field empty to keep the site default. Sizes accept rem, px or %.</p>
+        </details>
+
+        <div class="layer-editor-actions">
+          <button type="button" class="btn btn-sm btn-ghost" data-role="cancel">Close</button>
+          <button type="button" class="btn btn-sm btn-primary" data-role="save">Save layer</button>
+        </div>
+      </div>`;
+  }
+
+
+  /* ------------------------------------------------------------------
+     Live section preview. Loads the real homepage in an iframe, hides
+     everything except the chosen section, then scales it to fit. Because it
+     renders the actual page with the actual stylesheet, the miniature cannot
+     drift from what visitors see.
+     ------------------------------------------------------------------ */
+  const PREVIEW_WIDTH = 1280;
+
+  function mountPreview(sectionId) {
+    const stage = document.querySelector(`[data-preview="${CSS.escape(sectionId)}"]`);
+    if (!stage || stage.dataset.mounted) return;
+    stage.dataset.mounted = '1';
+
+    const frame = document.createElement('iframe');
+    frame.className = 'layer-preview-frame';
+    frame.setAttribute('title', 'Section preview');
+    frame.setAttribute('loading', 'lazy');
+    frame.width = PREVIEW_WIDTH;
+    frame.src = '/?preview=1';
+
+    frame.addEventListener('load', () => {
+      const doc = frame.contentDocument;
+      if (!doc) return;
+      const target = doc.querySelector(`[data-home-section="${CSS.escape(sectionId)}"]`);
+      if (!target) {
+        stage.innerHTML = '<p class="layer-preview-loading">This layer has no matching section on the page yet.</p>';
+        return;
+      }
+      /* Strip chrome and every sibling section so only this one remains.
+         The page re-appends sections in applyPageSections() after load, so we
+         run this again once its scripts have settled. */
+      const strip = () => {
+        doc.querySelectorAll('.site-header, .announce-bar, .site-footer, .wa-float, .cart-drawer, .cart-overlay')
+          .forEach(node => node.remove());
+        doc.querySelectorAll('[data-home-section]').forEach(node => {
+          if (node.dataset.homeSection !== sectionId) node.remove();
+        });
+      };
+      strip();
+      doc.documentElement.style.overflow = 'hidden';
+      doc.body.style.margin = '0';
+
+      const fit = () => {
+        strip();
+        const height = Math.max(target.getBoundingClientRect().height, 120);
+        frame.style.height = height + 'px';
+        const scale = stage.clientWidth / PREVIEW_WIDTH;
+        frame.style.transform = `scale(${scale})`;
+        stage.style.height = (height * scale) + 'px';
+      };
+      fit();
+      // Images and fonts settle after load; refit once they do.
+      setTimeout(fit, 400);
+      setTimeout(fit, 1200);
+      window.addEventListener('resize', fit);
+      stage.querySelector('.layer-preview-loading')?.remove();
+    });
+
+    stage.appendChild(frame);
+  }
+
+  function refreshPreview(sectionId) {
+    const stage = document.querySelector(`[data-preview="${CSS.escape(sectionId)}"]`);
+    if (!stage) return;
+    stage.dataset.mounted = '';
+    stage.innerHTML = '<p class="layer-preview-loading">Updating preview...</p>';
+    mountPreview(sectionId);
+  }
+
+  /* Wire the inline editor for one open layer. */
+  function bindLayerEditor(sectionId) {
+    const editor = document.querySelector(`[data-editor="${CSS.escape(sectionId)}"]`);
+    if (!editor || editor.dataset.bound) return;
+    editor.dataset.bound = '1';
+    mountPreview(sectionId);
+
+    const imageInput = editor.querySelector('[data-f="image"]');
+    const imagePreview = editor.querySelector('[data-role="img-preview"]');
+    const fileInput = editor.querySelector('[data-role="img-file"]');
+
+    imageInput.addEventListener('input', () => {
+      imagePreview.src = imageInput.value;
+      imagePreview.style.display = imageInput.value ? '' : 'none';
+    });
+    editor.querySelector('[data-role="img-upload"]').addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async event => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      toast('Uploading image...');
+      const result = await window.CrystalinaData.uploadImage(file, { folder: 'sections' });
+      if (!result.ok) { toast(result.error); return; }
+      imageInput.value = result.url;
+      imagePreview.src = result.url;
+      imagePreview.style.display = '';
+      toast('Image uploaded');
+    });
+
+    editor.querySelector('[data-role="cancel"]').addEventListener('click', () => AdminUI.toggleLayer(sectionId));
+    editor.querySelector('[data-role="save"]').addEventListener('click', () => {
+      const values = {};
+      editor.querySelectorAll('[data-f]').forEach(field => { values[field.dataset.f] = field.value; });
+
+      const typography = {};
+      editor.querySelectorAll('[data-t]').forEach(field => {
+        if (field.value) typography[field.dataset.t] = field.value;
+      });
+      values.typography = typography;
+
+      const productBoxes = editor.querySelectorAll('[data-role="products"] input:checked');
+      if (editor.querySelector('[data-role="products"]')) {
+        values.products = [...productBoxes].map(box => box.value);
+      }
+
+      Store.updateAdminItem('pageSections', sectionId, values);
+      if (sectionId === 'hero') {
+        Store.updateSiteSettings({
+          heroEyebrow: values.eyebrow, heroHeading: values.heading,
+          heroBody: values.body, heroImage: values.image
+        });
+      }
+      renderContent();
+      refreshPreview(sectionId);
+      toast('Layer saved. Publish to make it live.');
+    });
+  }
+
   function renderContent() {
     const data = Store.getAdminData();
     const settings = data.siteSettings;
-    document.getElementById('announcementInput').value = settings.announcement;
-    document.getElementById('heroImagePreview').style.setProperty('--hero-preview', `url("${settings.heroImage.replace(/"/g, '\\"')}")`);
+    document.getElementById('announcementInput').value = settings.announcement || '';
+    const annStyle = settings.announcementStyle || {};
+    const setIf = (id, value) => { const el = document.getElementById(id); if (el && value) el.value = value; };
+    setIf('annFont', annStyle.font); setIf('annSize', annStyle.size);
+    setIf('annColor', annStyle.color); setIf('annBg', annStyle.background);
     const sections = data.pageSections || [];
-    document.getElementById('pageSectionList').innerHTML = sections.map((section, index) => `<article class="content-layer ${section.enabled === false ? 'is-hidden' : ''}">
-      <div class="layer-order"><span>${String(index + 1).padStart(2, '0')}</span><small>${index === 0 ? 'TOP' : index === sections.length - 1 ? 'BOTTOM' : 'LAYER'}</small></div>
-      <div class="layer-copy"><div><strong>${escapeHTML(section.label || section.heading)}</strong><span>${escapeHTML(section.type)}</span></div><p>${escapeHTML(section.heading || 'Untitled section')}${section.type === 'Best Sellers' ? ` · ${(section.products || []).length} selected products` : ''}</p></div>
-      <label class="layer-toggle"><input type="checkbox" ${section.enabled !== false ? 'checked' : ''} onchange="AdminUI.toggleSection('${section.id}',this.checked)"><span>${section.enabled !== false ? 'Visible' : 'Hidden'}</span></label>
-      <div class="layer-actions"><button class="btn btn-sm btn-ghost" ${index === 0 ? 'disabled' : ''} onclick="AdminUI.moveSection('${section.id}',-1)" aria-label="Move section up">↑</button><button class="btn btn-sm btn-ghost" ${index === sections.length - 1 ? 'disabled' : ''} onclick="AdminUI.moveSection('${section.id}',1)" aria-label="Move section down">↓</button><button class="btn btn-sm btn-outline" onclick="AdminUI.editSection('${section.id}')">Edit</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.duplicateSection('${section.id}')">Duplicate</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteSection('${section.id}')">Delete</button></div>
-    </article>`).join('') || '<p class="admin-subtitle">No landing-page sections. Add a section to start rebuilding the page.</p>';
+
+    document.getElementById('pageSectionList').innerHTML = sections.map((section, index) => {
+      const isOpen = openLayers.has(section.id);
+      const position = index === 0 ? 'TOP' : index === sections.length - 1 ? 'BOTTOM' : 'LAYER';
+      return `<article class="content-layer ${section.enabled === false ? 'is-hidden' : ''} ${isOpen ? 'is-open' : ''}" data-layer="${escapeHTML(section.id)}">
+        <div class="layer-head">
+          <div class="layer-order"><span>${String(index + 1).padStart(2, '0')}</span><small>${position}</small></div>
+          <div class="layer-copy">
+            <div><strong>${escapeHTML(section.label || section.heading)}</strong><span>${escapeHTML(section.type)}</span></div>
+            <p>${escapeHTML(section.heading || 'Untitled section')}${section.type === 'Best Sellers' ? ` &middot; ${(section.products || []).length} selected products` : ''}</p>
+          </div>
+          <label class="layer-toggle"><input type="checkbox" ${section.enabled !== false ? 'checked' : ''} onchange="AdminUI.toggleSection('${section.id}',this.checked)"><span>${section.enabled !== false ? 'Visible' : 'Hidden'}</span></label>
+          <div class="layer-actions">
+            <button class="btn btn-sm btn-ghost" ${index === 0 ? 'disabled' : ''} onclick="AdminUI.moveSection('${section.id}',-1)" aria-label="Move up">&uarr;</button>
+            <button class="btn btn-sm btn-ghost" ${index === sections.length - 1 ? 'disabled' : ''} onclick="AdminUI.moveSection('${section.id}',1)" aria-label="Move down">&darr;</button>
+            <button class="btn btn-sm btn-outline layer-disclose" aria-expanded="${isOpen}" onclick="AdminUI.toggleLayer('${section.id}')">
+              <span>${isOpen ? 'Close' : 'Open'}</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="disclose-chevron"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <button class="btn btn-sm btn-ghost" onclick="AdminUI.duplicateSection('${section.id}')">Duplicate</button>
+            <button class="btn btn-sm btn-danger" onclick="AdminUI.deleteSection('${section.id}')">Delete</button>
+          </div>
+        </div>
+        ${isOpen ? `<div class="layer-body">
+          <div class="layer-preview">
+            <div class="layer-preview-label">Live preview</div>
+            <div class="layer-preview-stage" data-preview="${escapeHTML(section.id)}">
+              <p class="layer-preview-loading">Loading preview...</p>
+            </div>
+          </div>
+          ${layerEditor(section)}
+        </div>` : ''}
+      </article>`;
+    }).join('') || '<p class="admin-subtitle">No landing-page sections. Add a section to start rebuilding the page.</p>';
+
+    sections.forEach(section => { if (openLayers.has(section.id)) bindLayerEditor(section.id); });
+
     const content = contentFilter === 'all' ? data.content : data.content.filter(item => item.type === contentFilter);
     document.querySelector('#contentTable tbody').innerHTML = content.map(item => `<tr><td><strong>${escapeHTML(item.title)}</strong><br><small>${escapeHTML(item.type)}</small></td><td>${escapeHTML(item.placement)}</td><td>${formatDate(item.updated)}</td><td><select class="admin-select" onchange="AdminUI.setContentStatus('${item.id}',this.value)">${['Draft', 'Needs approval', 'Published', 'Archived'].map(status => `<option ${status === item.status ? 'selected' : ''}>${status}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('content','${item.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('content','${item.id}','${encodeURIComponent(item.title)}')">Delete</button></div></td></tr>`).join('') || '<tr><td colspan="5">No website items match this filter.</td></tr>';
   }
+
 
   function renderFinance() {
     const adminData = Store.getAdminData();
@@ -471,23 +724,18 @@
     leadFilters = { search: document.getElementById('leadSearch').value.trim().toLowerCase(), stage: document.getElementById('leadStageFilter').value, source: document.getElementById('leadSourceFilter').value }; renderLeads();
   }));
 
+  /* Announcement bar: text plus its own typography. The hero image now lives
+     in the Hero layer editor, where the rest of the hero copy is. */
   document.getElementById('heroMediaForm').addEventListener('submit', event => {
     event.preventDefault();
-    Store.updateSiteSettings(Object.fromEntries(new FormData(event.currentTarget).entries()));
-    toast('Announcement saved');
-  });
-  const heroImageInput = document.getElementById('heroImageInput');
-  document.getElementById('heroImageButton').addEventListener('click', () => heroImageInput.click());
-  heroImageInput.addEventListener('change', async () => {
-    const file = heroImageInput.files[0];
-    if (!file) return;
-    toast('Uploading image...');
-    const result = await window.CrystalinaData.uploadImage(file, { folder: 'hero' });
-    heroImageInput.value = '';
-    if (!result.ok) { toast(result.error); return; }
-    Store.updateSiteSettings({ heroImage: result.url });
-    renderContent();
-    toast('Landing page image saved. Publish to make it live.');
+    const form = new FormData(event.currentTarget);
+    const announcementStyle = {};
+    if (form.get('annFont')) announcementStyle.font = form.get('annFont');
+    if (form.get('annSize')) announcementStyle.size = form.get('annSize');
+    if (form.get('annColor')) announcementStyle.color = form.get('annColor');
+    if (form.get('annBg')) announcementStyle.background = form.get('annBg');
+    Store.updateSiteSettings({ announcement: form.get('announcement'), announcementStyle });
+    toast('Announcement saved. Publish to make it live.');
   });
 
   const sectionModal = document.getElementById('sectionModal');
@@ -955,6 +1203,10 @@
 
   /* ---------- exposed handlers ---------- */
   window.AdminUI = {
+    toggleLayer(id) {
+      if (openLayers.has(id)) openLayers.delete(id); else openLayers.add(id);
+      renderContent();
+    },
     editProduct(id) {
       // jump to products view and open the modal
       document.querySelector('.side-link[data-view="products"]').click();
