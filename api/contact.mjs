@@ -1,10 +1,10 @@
 /* POST /api/contact
    Stores the enquiry in Supabase and emails the team. Protected by Turnstile
    (when configured) and a per-IP rate limit. */
-import { json, methodGuard, readJson, clientIp, rateLimit, isEmail, cleanText } from './_lib/http.js';
-import { verifyTurnstile } from './_lib/turnstile.js';
-import { admin } from './_lib/supabase.js';
-import { sendEmail, esc } from './_lib/email.js';
+import { json, methodGuard, readJson, clientIp, rateLimit, isEmail, cleanText } from './_lib/http.mjs';
+import { verifyTurnstile } from './_lib/turnstile.mjs';
+import { admin } from './_lib/supabase.mjs';
+import { sendEmail, esc } from './_lib/email.mjs';
 import { createHash } from 'node:crypto';
 
 const TOPICS = [

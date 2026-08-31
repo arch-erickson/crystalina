@@ -1,7 +1,7 @@
 /* POST /api/newsletter — subscribe an address to the Crystalina Club. */
-import { json, methodGuard, readJson, clientIp, rateLimit, isEmail, cleanText } from './_lib/http.js';
-import { verifyTurnstile } from './_lib/turnstile.js';
-import { admin } from './_lib/supabase.js';
+import { json, methodGuard, readJson, clientIp, rateLimit, isEmail, cleanText } from './_lib/http.mjs';
+import { verifyTurnstile } from './_lib/turnstile.mjs';
+import { admin } from './_lib/supabase.mjs';
 
 export default async function handler(req, res) {
   if (!methodGuard(req, res)) return;

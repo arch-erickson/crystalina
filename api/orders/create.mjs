@@ -2,10 +2,10 @@
    Server-authoritative order creation. The browser sends product ids and
    quantities only; the database recomputes every price and total, enforces
    stock, and decrements inventory in one transaction. */
-import { json, methodGuard, readJson, clientIp, rateLimit, cleanText } from '../_lib/http.js';
-import { verifyTurnstile } from '../_lib/turnstile.js';
-import { userFromToken, rpcAsUser } from '../_lib/supabase.js';
-import { sendEmail, esc } from '../_lib/email.js';
+import { json, methodGuard, readJson, clientIp, rateLimit, cleanText } from '../_lib/http.mjs';
+import { verifyTurnstile } from '../_lib/turnstile.mjs';
+import { userFromToken, rpcAsUser } from '../_lib/supabase.mjs';
+import { sendEmail, esc } from '../_lib/email.mjs';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
