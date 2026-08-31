@@ -357,11 +357,11 @@
     <section id="view-content" class="admin-view" style="display:none">
       <div class="admin-head">
         <div><h1>Content &amp; Website</h1><p class="admin-subtitle">Manage the landing page as an ordered stack, from the hero through customer reviews and calls to action.</p></div>
-        <div class="table-actions"><button class="btn btn-outline" data-open-record="content">+ Add Website Item</button><button class="btn btn-outline" id="addSectionBtn">+ Add Page Section</button><button class="btn btn-primary" id="publishContentBtn">Publish to website</button></div>
+        <div class="table-actions" id="contentToolbar"><button class="btn btn-outline" data-open-record="content">+ Add Website Item</button><button class="btn btn-outline" id="addSectionBtn">+ Add Page Section</button><button class="btn btn-primary" id="editPageBtn" onclick="AdminUI.startEditing()">Edit page</button><button class="btn btn-ghost" id="cancelEditBtn" hidden onclick="AdminUI.cancelEditing()">Cancel</button><button class="btn btn-primary" id="savePageBtn" hidden onclick="AdminUI.saveEditing(this)">Save &amp; publish</button></div>
       </div>
       <div class="admin-panel">
         <div class="panel-title-row"><div><h3>Landing Page Layers</h3><p class="admin-subtitle">The first layer appears at the top of the page. Reorder, hide, edit, duplicate, or delete any section.</p></div><span class="admin-badge">Live in this browser</span></div>
-        <div class="content-layer-list" id="pageSectionList"></div>
+        <div class="content-layer-list" id="pageSectionList"></div><div class="edit-savebar" id="editSaveBar" hidden><span class="edit-savebar-note"><strong>Edit mode.</strong> Click any text or image in a preview to change it. Nothing is live until you save.</span><div class="edit-savebar-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.cancelEditing()">Cancel</button><button class="btn btn-sm btn-primary" onclick="AdminUI.saveEditing(this)">Save &amp; publish</button></div></div>
       </div>
       <div class="admin-two-col content-layout">
         <div class="admin-panel">

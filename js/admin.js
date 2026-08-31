@@ -437,6 +437,104 @@
      ------------------------------------------------------------------ */
 
 
+
+  /* ------------------------------------------------------------------
+     Edit mode and the working draft.
+
+     The page is read-only until someone turns editing on. From that point
+     every change, whether typed into the preview or set in a panel, is held
+     in an in-memory draft. Nothing touches storage or the database until
+     Save, which writes the whole page as one document. Cancel throws the
+     draft away.
+     ------------------------------------------------------------------ */
+  let editMode = false;
+  let draft = null;
+
+  const clone = value => JSON.parse(JSON.stringify(value));
+
+  /* Sections the editor should render: the draft while editing, else the
+     published copy. */
+  function workingSections() {
+    if (editMode && draft) return draft.pageSections;
+    return Store.getAdminData().pageSections || [];
+  }
+  function workingSettings() {
+    if (editMode && draft) return draft.siteSettings;
+    return Store.getSiteSettings();
+  }
+  function workingSection(id) {
+    return workingSections().find(section => section.id === id) || {};
+  }
+
+  /* One write path for every editing surface. */
+  function patchSection(id, changes) {
+    if (editMode && draft) {
+      const section = draft.pageSections.find(entry => entry.id === id);
+      if (section) Object.assign(section, changes);
+    } else {
+      Store.updateAdminItem('pageSections', id, changes);
+    }
+    markLayerDirty(id);
+  }
+  function patchSettings(changes) {
+    if (editMode && draft) Object.assign(draft.siteSettings, changes);
+    else Store.updateSiteSettings(changes);
+  }
+  function replaceSections(sections) {
+    if (editMode && draft) draft.pageSections = sections;
+    else Store.saveAdminCollection('pageSections', sections);
+  }
+
+  function hasDraftChanges() {
+    if (!editMode || !draft) return false;
+    const live = { pageSections: Store.getAdminData().pageSections, siteSettings: Store.getSiteSettings() };
+    return JSON.stringify(draft) !== JSON.stringify(live);
+  }
+
+  function enterEditMode() {
+    draft = clone({
+      pageSections: Store.getAdminData().pageSections || [],
+      siteSettings: Store.getSiteSettings()
+    });
+    editMode = true;
+    renderContent();
+    toast('Edit mode on. Click any text or image in a preview to change it.');
+  }
+
+  function cancelEditMode() {
+    if (hasDraftChanges() && !confirm('Discard all unsaved changes to the page?')) return;
+    editMode = false;
+    draft = null;
+    openLayers.clear();
+    renderContent();
+    toast('Changes discarded');
+  }
+
+  /* Commit the whole page in one go: local cache first, then a single
+     publish of both documents to Supabase. */
+  async function saveAllChanges(button) {
+    if (!draft) return;
+    const original = button ? button.textContent : '';
+    if (button) { button.disabled = true; button.textContent = 'Saving...'; }
+    try {
+      Store.saveAdminCollection('pageSections', draft.pageSections);
+      Store.updateSiteSettings(draft.siteSettings);
+      const result = await Store.publishSiteContent();
+      if (!result.ok) {
+        toast(result.error + ' Your changes are still here; try again.');
+        return;
+      }
+      editMode = false;
+      draft = null;
+      renderContent();
+      toast('Page saved and published');
+    } catch (error) {
+      toast('Could not save: ' + error.message);
+    } finally {
+      if (button) { button.disabled = false; button.textContent = original; }
+    }
+  }
+
   /* Direct edits write straight to the layer record, so the only thing left
      to surface is that there are unpublished changes. */
   function markLayerDirty(sectionId) {
@@ -501,12 +599,12 @@
     const section = doc.querySelector(`[data-home-section="${CSS.escape(sectionId)}"]`);
     if (!section) return;
 
-    const record = () => Store.getAdminData().pageSections.find(s => s.id === sectionId) || {};
+    const record = () => workingSection(sectionId);
     const patch = changes => {
-      Store.updateAdminItem('pageSections', sectionId, changes);
+      patchSection(sectionId, changes);
       if (sectionId === 'hero') {
         const r = record();
-        Store.updateSiteSettings({
+        patchSettings({
           heroEyebrow: r.eyebrow, heroHeading: r.heading, heroBody: r.body, heroImage: r.image
         });
       }
@@ -710,11 +808,14 @@
       setTimeout(fit, 400);
       setTimeout(fit, 1200);
 
-      // The preview is the editor: make its text and images directly editable.
-      enableInlineEditing(doc, sectionId, () => {
-        markLayerDirty(sectionId);
-        setTimeout(fit, 60);
-      });
+      // The preview becomes editable only in edit mode, so a manager can read
+      // the page safely without changing it by accident.
+      if (editMode) {
+        enableInlineEditing(doc, sectionId, () => {
+          markLayerDirty(sectionId);
+          setTimeout(fit, 60);
+        });
+      }
       window.addEventListener('resize', fit);
       stage.querySelector('.layer-preview-loading')?.remove();
     });
@@ -754,25 +855,23 @@
         values.products = [...editor.querySelectorAll('[data-role="products"] input:checked')].map(box => box.value);
       }
 
-      Store.updateAdminItem('pageSections', sectionId, values);
-      if (sectionId === 'hero') {
-        Store.updateSiteSettings({ heroImage: values.image });
-      }
-      markLayerDirty(sectionId);
+      patchSection(sectionId, values);
+      if (sectionId === 'hero') patchSettings({ heroImage: values.image });
       refreshPreview(sectionId);
-      toast('Settings applied. Publish to make them live.');
+      toast(editMode ? 'Settings applied to your draft' : 'Settings saved');
     });
   }
 
   function renderContent() {
     const data = Store.getAdminData();
     const settings = data.siteSettings;
-    document.getElementById('announcementInput').value = settings.announcement || '';
-    const annStyle = settings.announcementStyle || {};
+    const liveSettings = workingSettings();
+    document.getElementById('announcementInput').value = liveSettings.announcement || '';
+    const annStyle = liveSettings.announcementStyle || {};
     const setIf = (id, value) => { const el = document.getElementById(id); if (el && value) el.value = value; };
     setIf('annFont', annStyle.font); setIf('annSize', annStyle.size);
     setIf('annColor', annStyle.color); setIf('annBg', annStyle.background);
-    const sections = data.pageSections || [];
+    const sections = workingSections();
 
     document.getElementById('pageSectionList').innerHTML = sections.map((section, index) => {
       const isOpen = openLayers.has(section.id);
@@ -809,6 +908,16 @@
     }).join('') || '<p class="admin-subtitle">No landing-page sections. Add a section to start rebuilding the page.</p>';
 
     sections.forEach(section => { if (openLayers.has(section.id)) bindLayerEditor(section.id); });
+
+    // Reflect edit mode in the toolbar, the save bar and the layer list.
+    const show = (id, visible) => { const el = document.getElementById(id); if (el) el.hidden = !visible; };
+    show('editPageBtn', !editMode);
+    show('cancelEditBtn', editMode);
+    show('savePageBtn', editMode);
+    show('editSaveBar', editMode);
+    document.getElementById('pageSectionList')?.classList.toggle('is-editing', editMode);
+    const badge = document.querySelector('#view-content .panel-badge');
+    if (badge) badge.textContent = editMode ? 'Editing draft' : 'Published';
 
     const content = contentFilter === 'all' ? data.content : data.content.filter(item => item.type === contentFilter);
     document.querySelector('#contentTable tbody').innerHTML = content.map(item => `<tr><td><strong>${escapeHTML(item.title)}</strong><br><small>${escapeHTML(item.type)}</small></td><td>${escapeHTML(item.placement)}</td><td>${formatDate(item.updated)}</td><td><select class="admin-select" onchange="AdminUI.setContentStatus('${item.id}',this.value)">${['Draft', 'Needs approval', 'Published', 'Archived'].map(status => `<option ${status === item.status ? 'selected' : ''}>${status}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('content','${item.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('content','${item.id}','${encodeURIComponent(item.title)}')">Delete</button></div></td></tr>`).join('') || '<tr><td colspan="5">No website items match this filter.</td></tr>';
@@ -929,8 +1038,8 @@
     if (form.get('annSize')) announcementStyle.size = form.get('annSize');
     if (form.get('annColor')) announcementStyle.color = form.get('annColor');
     if (form.get('annBg')) announcementStyle.background = form.get('annBg');
-    Store.updateSiteSettings({ announcement: form.get('announcement'), announcementStyle });
-    toast('Announcement saved. Publish to make it live.');
+    patchSettings({ announcement: form.get('announcement'), announcementStyle });
+    toast(editMode ? 'Announcement updated in your draft' : 'Announcement saved');
   });
 
   const sectionModal = document.getElementById('sectionModal');
@@ -1398,6 +1507,9 @@
 
   /* ---------- exposed handlers ---------- */
   window.AdminUI = {
+    startEditing() { enterEditMode(); },
+    cancelEditing() { cancelEditMode(); },
+    saveEditing(button) { saveAllChanges(button); },
     toggleLayer(id) {
       if (openLayers.has(id)) openLayers.delete(id); else openLayers.add(id);
       renderContent();
@@ -1455,26 +1567,27 @@
       Store.updateAdminItem('content', id, { status, updated: new Date().toISOString().slice(0, 10) }); renderContent(); toast('Content status updated');
     },
     editSection(id) { openSectionModal(Store.getAdminData().pageSections.find(section => section.id === id)); },
-    toggleSection(id, enabled) { Store.updateAdminItem('pageSections', id, { enabled }); renderContent(); toast(`Section ${enabled ? 'shown' : 'hidden'} on landing page`); },
+    toggleSection(id, enabled) { patchSection(id, { enabled }); renderContent(); toast(`Section ${enabled ? 'shown' : 'hidden'}`); },
     moveSection(id, direction) {
-      const sections = [...Store.getAdminData().pageSections];
+      const sections = [...workingSections()];
       const index = sections.findIndex(section => section.id === id);
       const nextIndex = index + direction;
       if (index < 0 || nextIndex < 0 || nextIndex >= sections.length) return;
       [sections[index], sections[nextIndex]] = [sections[nextIndex], sections[index]];
-      Store.saveAdminCollection('pageSections', sections); renderContent(); toast('Landing page order updated');
+      replaceSections(sections); renderContent(); toast('Order updated');
     },
     duplicateSection(id) {
-      const sections = [...Store.getAdminData().pageSections];
+      const sections = [...workingSections()];
       const index = sections.findIndex(section => section.id === id);
       if (index < 0) return;
       const duplicate = { ...sections[index], id: `custom-${Date.now()}`, type: 'Custom Section', label: `${sections[index].label} copy` };
-      sections.splice(index + 1, 0, duplicate); Store.saveAdminCollection('pageSections', sections); renderContent(); toast('Section duplicated');
+      sections.splice(index + 1, 0, duplicate); replaceSections(sections); renderContent(); toast('Section duplicated');
     },
     deleteSection(id) {
-      const section = Store.getAdminData().pageSections.find(item => item.id === id);
-      if (!section || !confirm(`Delete the ${section.label} landing-page section?`)) return;
-      Store.deleteAdminItem('pageSections', id); renderContent(); toast('Landing page section deleted');
+      const section = workingSection(id);
+      if (!section.id || !confirm(`Delete the ${section.label} landing-page section?`)) return;
+      replaceSections(workingSections().filter(item => item.id !== id));
+      openLayers.delete(id); renderContent(); toast('Section deleted');
     },
     setRolePermissions(id, permissions) {
       Store.updateAdminItem('roles', id, { permissions }); renderSettings(); toast('Role permissions updated');

@@ -2236,3 +2236,21 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
   0%, 100% { box-shadow: 0 0 0 0 rgba(232,161,61,.55); }
   50% { box-shadow: 0 0 0 7px rgba(232,161,61,0); }
 }
+
+/* ---------- edit mode ---------- */
+/* Read-only until edit mode is on, so a manager can browse without changing anything. */
+.content-layer-list:not(.is-editing) .layer-preview-stage { cursor: default; }
+.content-layer-list:not(.is-editing) .layer-preview-label::after { content: ' — turn on Edit page to make changes'; }
+.content-layer-list.is-editing .layer-preview-label::after { content: ' — click any text or image to edit'; }
+
+.edit-savebar { position: sticky; bottom: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 14px; padding: 14px 18px; background: var(--navy-800); color: #fff; border-radius: var(--radius-sm); box-shadow: 0 -6px 24px rgba(21,55,93,.22); }
+.edit-savebar-note { font-size: .86rem; color: #dbe9fb; }
+.edit-savebar-note strong { color: #fff; }
+.edit-savebar-actions { display: flex; gap: 10px; }
+.edit-savebar .btn-ghost { color: #cfe3fb; }
+.edit-savebar .btn-ghost:hover { color: #fff; }
+
+@media (max-width: 620px) {
+  .edit-savebar { flex-direction: column; align-items: stretch; }
+  .edit-savebar-actions .btn { flex: 1; }
+}
