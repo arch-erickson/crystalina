@@ -1,5 +1,7 @@
 # Crystalina — Brief for Codex
 
+**Last verified: 2026-08-31.** Re-check anything older than a week; two assistants commit to `main`.
+
 You are **Codex**, joining the Crystalina project to **collaborate with Claude Code**. Claude has
 built the site so far; you're coming in to **generate the imagery and help push the project toward
 launch**. Treat this as a shared codebase: match the existing conventions, keep changes clean, and

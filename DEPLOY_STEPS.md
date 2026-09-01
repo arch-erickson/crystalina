@@ -1,5 +1,7 @@
 # Crystalina: go-live steps
 
+**Last verified: 2026-08-31.** Re-check anything older than a week; two assistants commit to `main`.
+
 Three tasks, in order. Roughly 45 minutes total. Do them in this order because
 each one depends on the previous.
 
