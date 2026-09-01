@@ -2,22 +2,31 @@
 
 **Last verified: 2026-08-31.** Re-check anything older than a week; two assistants commit to `main`.
 
-You are **Codex**, joining the Crystalina project to **collaborate with Claude Code**. Claude has
-built the site so far; you're coming in to **generate the imagery and help push the project toward
-launch**. Treat this as a shared codebase: match the existing conventions, keep changes clean, and
+You are **Codex**, working on Crystalina alongside Claude Code. **You own security, the
+database and server logistics**; Claude Code owns the storefront, the admin content editor
+and the design system.
+
+**Your current work list is `CODEX_TASKS.md`.** It is dated and prioritised. Read it first.
+The original image-generation task described below is **complete** and is kept for context. Treat this as a shared codebase: match the existing conventions, keep changes clean, and
 write clear commit messages so Claude can pick up seamlessly.
 
 ## The project
 - **Crystalina** — a premium home water-filtration e-commerce site for **New York City** ("Pure Water. Pure Life.").
-- **Live:** https://crystalina.org · **Repo:** `arch-erickson/crystalina` (branch `main`) · **Host:** GitHub Pages (push to `main` auto-deploys).
-- **Stack:** static HTML/CSS/JS, no build step. Clean URLs (`/shop/`, not `/shop.html`). Serves the five boroughs.
+- **Live:** https://crystalina.org, currently served by **GitHub Pages**. A Vercel project
+  (`crystalina`) is linked and deployed at https://crystalina.vercel.app and runs the `/api`
+  functions; the DNS cutover is still pending. See `CODEX_TASKS.md`.
+- **Stack:** static HTML/CSS/JS with Vercel serverless functions in `/api` (`.mjs`, ESM). No build
+  step. Clean URLs. Products, orders and site content live in **Supabase**; the browser uses the
+  publishable key only and every privileged write goes through `/api` or a role-gated function.
 
 ## Step 1 — Get oriented (read these first, in order)
 1. `README.md` — what the site is and how it runs.
 2. `LAUNCH_CHECKLIST.md` — current status and the full roadmap to launch. **Work from this.**
 3. `IMAGE_PROMPTS.md` — every image to generate, with exact target paths, sizes, and prompts.
 4. `css/styles.css` — the complete design system (palette, unified buttons, components).
-5. `js/main.js`, `js/store.js`, `js/admin.js` — shared UI + icon system, the localStorage data layer, the admin dashboard.
+5. `js/main.js` (shared UI, icons, escaping), `js/store.js` (local cache, hydrated from Supabase),
+   `js/data-remote.js` (Supabase reads, writes and uploads), `js/admin.js` (admin console).
+6. `supabase/migrations/` — the schema. `docs/SUPABASE_VERCEL_SETUP.md` and `DEPLOY_STEPS.md`.
 6. `index.html` and the per-folder pages: `shop/`, `product/`, `quiz/`, `nyc-water/`, `about/`, `contact/`, `checkout/`, `signin/`, `account/`, `admin/`.
 
 Going through the **LAUNCH_CHECKLIST.md** end to end should give you a solid understanding of what's
@@ -31,7 +40,11 @@ done, what's pending, and where you can help.
 - **Paths** are root-absolute (`/css/…`, `/js/…`, `/images/…`); URLs are clean folders.
 - **Buttons** use the unified center-out fill hover — don't reintroduce ad-hoc button styles.
 
-## Step 2 — Your main task: generate the images
+## Completed: image generation (kept for reference)
+
+All images below were generated and are in the repo. Nothing to do here.
+
+### Original brief
 1. Generate **every image in `IMAGE_PROMPTS.md`**, export **WebP** at the specified sizes, and save each to the **exact path** listed:
    - `/images/hero-bg.webp` (full-bleed hero, **a family on the right**, calm negative space on the left)
    - `/images/exploded-filter.webp` (transparent exploded RO-10)
@@ -49,7 +62,7 @@ done, what's pending, and where you can help.
 - **Don't improvise the big-ticket checklist items** (backend, payments, real auth) — those are team decisions; flag them rather than building them ad hoc.
 - Co-author your commits (e.g. `Co-Authored-By: Codex <noreply@openai.com>`).
 
-## Step 3 — Then
-Work down `LAUNCH_CHECKLIST.md` for anything else you can safely advance (image optimization,
-replacing remaining stock placeholders with the new assets, alt-text polish). When in doubt, leave a
-note in the commit or open a discussion so Claude can coordinate.
+## Where to go next
+Work `CODEX_TASKS.md` in priority order. `LAUNCH_CHECKLIST.md` holds the wider roadmap and
+records what is already done. When in doubt, say so in the commit message so Claude can
+coordinate rather than duplicating the work.
