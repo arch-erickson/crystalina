@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>Crystalina blueprint diagrams</title>
+<style>
+  :root {
+    --navy: #15375D; --blue: #2A7BC4; --mute: #5A646D;
+    --rule: #D8DEE5; --wash: #F5F8FB; --paper: #fff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--wash); color: var(--navy);
+    font: 16px/1.55 Inter, "Segoe UI", system-ui, sans-serif;
+  }
+  header { background: var(--paper); border-bottom: 1px solid var(--rule); padding: 32px 24px; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-family: Poppins, Inter, sans-serif; font-size: 28px; margin: 0 0 6px; }
+  .meta { color: var(--mute); font-size: 13.5px; margin: 0; }
+  nav ol { columns: 2; gap: 32px; margin: 20px 0 0; padding-left: 20px; font-size: 14px; }
+  nav a { color: var(--blue); text-decoration: none; }
+  nav a:hover, figcaption a:hover { text-decoration: underline; }
+  main { padding: 28px 24px 64px; }
+  figure {
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 14px;
+    margin: 0 0 26px; padding: 22px; max-width: 1180px; margin-inline: auto;
+  }
+  figcaption h2 { font-family: Poppins, Inter, sans-serif; font-size: 19px; margin: 0 0 6px; }
+  figcaption p { color: var(--mute); font-size: 14px; margin: 0 0 8px; max-width: 76ch; }
+  figcaption a { color: var(--blue); font-size: 13px; text-decoration: none; }
+  .plate { margin-top: 16px; overflow-x: auto; border-top: 1px solid var(--rule); padding-top: 16px; }
+  .plate img { display: block; min-width: 760px; width: 100%; height: auto; }
+  footer { padding: 0 24px 56px; color: var(--mute); font-size: 13px; }
+  @media (max-width: 700px) { nav ol { columns: 1; } }
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Crystalina blueprint diagrams</h1>
+      <p class="meta">
+        Generated 2026-10-09 from <code>docs/diagrams/model.mjs</code> by <code>npm run diagrams</code>.
+        State last verified against the live project 2026-10-09.
+        Do not edit these files by hand: edit the model and regenerate.
+      </p>
+      <nav aria-label="Diagrams"><ol>
+        <li><a href="#d1">Architecture today</a></li>
+        <li><a href="#d2">Architecture after the move to Cloudflare</a></li>
+        <li><a href="#d3">Channels and accounts already held</a></li>
+        <li><a href="#d4">Site map, with a status on every page</a></li>
+        <li><a href="#d5">The content model</a></li>
+        <li><a href="#d6">Placing an order, as it works today</a></li>
+        <li><a href="#d7">Taking the money (Stripe, phase 3)</a></li>
+        <li><a href="#d8">Signing in, and what a role is allowed to do</a></li>
+        <li><a href="#d9">Staff changing what a visitor sees</a></li>
+        <li><a href="#d10">A stranger sending something in</a></li>
+        <li><a href="#d11">Deployment, environments and secrets</a></li>
+        <li><a href="#d12">Performance budget</a></li>
+        <li><a href="#d13">Build plan</a></li>
+        <li><a href="#d14">Risks</a></li>
+        <li><a href="#d15">One definition, read everywhere</a></li>
+        <li><a href="#d16">Icon and component library</a></li>
+      </ol></nav>
+    </div>
+  </header>
+  <main class="wrap">
+    <figure id="d1">
+      <figcaption>
+        <h2>Architecture today</h2>
+        <p>Two hosts serve the same repository. crystalina.org is static GitHub Pages, so the /api folder never runs there; the Vercel project runs the functions but has no environment variables set, so every server path returns 500. Verified 2026-08-31.</p>
+        <a href="architecture-now.svg">Open architecture-now.svg</a>
+      </figcaption>
+      <div class="plate"><img src="architecture-now.svg" alt="Architecture today" loading="lazy" /></div>
+    </figure>
+    <figure id="d2">
+      <figcaption>
+        <h2>Architecture after the move to Cloudflare</h2>
+        <p>One platform serves the site and the server boundary, and one DNS zone sits in front of both. Supabase is kept: the schema, the row level security and the server-authoritative order function already exist and work, and moving them to D1 would be a rewrite with nothing to show for it (AD3). Turnstile is already the captcha, so it comes home to the same account.</p>
+        <a href="architecture-target.svg">Open architecture-target.svg</a>
+      </figcaption>
+      <div class="plate"><img src="architecture-target.svg" alt="Architecture after the move to Cloudflare" loading="lazy" /></div>
+    </figure>
+    <figure id="d3">
+      <figcaption>
+        <h2>Channels and accounts already held</h2>
+        <p>The domain, Search Console, the Meta Business account and the WhatsApp number exist. The status on each card is whether the site actually uses it.</p>
+        <a href="channels.svg">Open channels.svg</a>
+      </figcaption>
+      <div class="plate"><img src="channels.svg" alt="Channels and accounts already held" loading="lazy" /></div>
+    </figure>
+    <figure id="d4">
+      <figcaption>
+        <h2>Site map, with a status on every page</h2>
+        <p>The one picture that answers "how far along are we". Plus signs are backend work that is built; minus signs are what remains.</p>
+        <a href="sitemap.svg">Open sitemap.svg</a>
+      </figcaption>
+      <div class="plate"><img src="sitemap.svg" alt="Site map, with a status on every page" loading="lazy" /></div>
+    </figure>
+    <figure id="d5">
+      <figcaption>
+        <h2>The content model</h2>
+        <p>What exists in Supabase, which tables are still empty, and where the privilege boundary sits.</p>
+        <a href="data-model.svg">Open data-model.svg</a>
+      </figcaption>
+      <div class="plate"><img src="data-model.svg" alt="The content model" loading="lazy" /></div>
+    </figure>
+    <figure id="d6">
+      <figcaption>
+        <h2>Placing an order, as it works today</h2>
+        <p>Server-authoritative and atomic, and deliberately unreachable: nothing takes money yet, so the submit button in /checkout/ is disabled.</p>
+        <a href="flow-order.svg">Open flow-order.svg</a>
+      </figcaption>
+      <div class="plate"><img src="flow-order.svg" alt="Placing an order, as it works today" loading="lazy" /></div>
+    </figure>
+    <figure id="d7">
+      <figcaption>
+        <h2>Taking the money (Stripe, phase 3)</h2>
+        <p>Nothing of this exists yet. Drawn because it is the one flow that must be right the first time: a payment that is taken twice, or an order marked paid that was not, is not a bug you can apologise your way out of.</p>
+        <a href="flow-payment.svg">Open flow-payment.svg</a>
+      </figcaption>
+      <div class="plate"><img src="flow-payment.svg" alt="Taking the money (Stripe, phase 3)" loading="lazy" /></div>
+    </figure>
+    <figure id="d8">
+      <figcaption>
+        <h2>Signing in, and what a role is allowed to do</h2>
+        <p>The data is protected by row level security, which is the part that matters. What is wrong is the gate in front of the dashboards: it is markup, and markup is a suggestion.</p>
+        <a href="flow-identity.svg">Open flow-identity.svg</a>
+      </figcaption>
+      <div class="plate"><img src="flow-identity.svg" alt="Signing in, and what a role is allowed to do" loading="lazy" /></div>
+    </figure>
+    <figure id="d9">
+      <figcaption>
+        <h2>Staff changing what a visitor sees</h2>
+        <p>Editing is local until someone presses Publish to website. That is deliberate: a manager can work through changes without a half-finished page going live.</p>
+        <a href="flow-publish.svg">Open flow-publish.svg</a>
+      </figcaption>
+      <div class="plate"><img src="flow-publish.svg" alt="Staff changing what a visitor sees" loading="lazy" /></div>
+    </figure>
+    <figure id="d10">
+      <figcaption>
+        <h2>A stranger sending something in</h2>
+        <p>Contact and newsletter share one shape. Both are open to the internet with no session, so they are the cheapest thing to abuse and the first thing to harden.</p>
+        <a href="flow-inbound.svg">Open flow-inbound.svg</a>
+      </figcaption>
+      <div class="plate"><img src="flow-inbound.svg" alt="A stranger sending something in" loading="lazy" /></div>
+    </figure>
+    <figure id="d11">
+      <figcaption>
+        <h2>Deployment, environments and secrets</h2>
+        <p>One deploy path, two environments, and the three places a value is allowed to live. The middle column is the one that ends a project if it leaks.</p>
+        <a href="deployment.svg">Open deployment.svg</a>
+      </figcaption>
+      <div class="plate"><img src="deployment.svg" alt="Deployment, environments and secrets" loading="lazy" /></div>
+    </figure>
+    <figure id="d12">
+      <figcaption>
+        <h2>Performance budget</h2>
+        <p>The targets are set. The bars stay empty until the harness has rendered a served copy, because a guessed number in a budget gets believed.</p>
+        <a href="performance-budget.svg">Open performance-budget.svg</a>
+      </figcaption>
+      <div class="plate"><img src="performance-budget.svg" alt="Performance budget" loading="lazy" /></div>
+    </figure>
+    <figure id="d13">
+      <figcaption>
+        <h2>Build plan</h2>
+        <p>What each phase needs before it can start, and who owns it. Arrows are dependencies, not a schedule.</p>
+        <a href="build-plan.svg">Open build-plan.svg</a>
+      </figcaption>
+      <div class="plate"><img src="build-plan.svg" alt="Build plan" loading="lazy" /></div>
+    </figure>
+    <figure id="d14">
+      <figcaption>
+        <h2>Risks</h2>
+        <p>Top right is what to fix first. R1 and R3 are both one short task each and both are top row.</p>
+        <a href="risks.svg">Open risks.svg</a>
+      </figcaption>
+      <div class="plate"><img src="risks.svg" alt="Risks" loading="lazy" /></div>
+    </figure>
+    <figure id="d15">
+      <figcaption>
+        <h2>One definition, read everywhere</h2>
+        <p>Where each shared fact lives, who reads it, and the three that still have no home.</p>
+        <a href="one-definition.svg">Open one-definition.svg</a>
+      </figcaption>
+      <div class="plate"><img src="one-definition.svg" alt="One definition, read everywhere" loading="lazy" /></div>
+    </figure>
+    <figure id="d16">
+      <figcaption>
+        <h2>Icon and component library</h2>
+        <p>The vocabulary the other fourteen drawings are assembled from: every symbol, and every component in each state it is used in.</p>
+        <a href="component-library.svg">Open component-library.svg</a>
+      </figcaption>
+      <div class="plate"><img src="component-library.svg" alt="Icon and component library" loading="lazy" /></div>
+    </figure>
+  </main>
+  <footer class="wrap">
+    Status words are the five in WebWork playbook 13, used here and in any progress report with no friendlier synonyms:
+    Implemented, Partial, Missing, Refactor, Post-MVP.
+  </footer>
+</body>
+</html>

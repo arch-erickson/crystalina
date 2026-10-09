@@ -1,0 +1,26 @@
+# Cloudflare Pages response headers.
+# The same set vercel.json carried, so the move changes the host and not the
+# security posture. There is deliberately no Content-Security-Policy yet: the
+# pages still use inline handlers, so a policy today would either break them
+# or be weak enough to be theatre. It belongs with the XSS sweep in phase 6.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+# Nothing from the server boundary is ever cacheable.
+/api/*
+  Cache-Control: no-store
+
+# Fingerprinted assets could be cached hard; these are not fingerprinted yet,
+# so a returning visitor can hold a stale stylesheet after a deploy. Cache
+# busting is phase 1 work, and this stays short until it exists.
+/css/*
+  Cache-Control: public, max-age=300, must-revalidate
+/js/*
+  Cache-Control: public, max-age=300, must-revalidate
+/images/*
+  Cache-Control: public, max-age=86400

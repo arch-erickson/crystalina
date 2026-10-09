@@ -1,6 +1,10 @@
 # Crystalina — Brief for Codex
 
-**Last verified: 2026-08-31.** Re-check anything older than a week; two assistants commit to `main`.
+**Last verified: 2026-10-09** (hosting and tests) and **2026-08-31** (database). Re-check anything older than a week; two assistants commit to `main`.
+
+> **Read `docs/blueprint.html` first.** It replaced the scattered status notes: what exists, what is
+> decided and why, every risk, and every open question with an owner. This brief is now the short
+> version of it.
 
 You are **Codex**, working on Crystalina alongside Claude Code. **You own security, the
 database and server logistics**; Claude Code owns the storefront, the admin content editor
@@ -14,9 +18,12 @@ write clear commit messages so Claude can pick up seamlessly.
 - **Crystalina** — a premium home water-filtration e-commerce site for **New York City** ("Pure Water. Pure Life.").
 - **Live:** https://crystalina.org, currently served by **GitHub Pages**. A Vercel project
   (`crystalina`) is linked and deployed at https://crystalina.vercel.app and runs the `/api`
-  functions; the DNS cutover is still pending. See `CODEX_TASKS.md`.
-- **Stack:** static HTML/CSS/JS with Vercel serverless functions in `/api` (`.mjs`, ESM). No build
-  step. Clean URLs. Products, orders and site content live in **Supabase**; the browser uses the
+  functions, but its environment variables are unset so every function returns 500.
+  **Both are being retired: the project is moving to Cloudflare Pages.** See section 3 of
+  `docs/blueprint.html`, and `CODEX_TASKS.md`.
+- **Stack:** static HTML/CSS/JS with the server boundary in `/api` (`.mjs`, ESM), run on Cloudflare
+  Pages Functions through `functions/_shim.js`. No bundler; `npm run build:site` assembles `dist/`
+  from an explicit publish allow-list (AD7). Clean URLs. Products, orders and site content live in **Supabase**; the browser uses the
   publishable key only and every privileged write goes through `/api` or a role-gated function.
 
 ## Step 1 — Get oriented (read these first, in order)
@@ -34,7 +41,7 @@ done, what's pending, and where you can help.
 
 ## Brand + code conventions (keep these consistent)
 - **Palette:** navy `#15375D` / `#1F4C80`, blue `#2A7BC4`, light blue `#53A4DA`, cyan `#3DC7F4`, silver `#CFD2D3`, white. No greens, purples, or warm casts.
-- **Fonts:** Inter (body), Poppins (headings).
+- **Fonts:** Montserrat (body), Playfair Display (headings), standing in for Canela until it is licensed. See AD8.
 - **No em/en dashes** in copy — use commas/periods; numeric ranges read "1961 to 1990".
 - **Icons** are professional stroke line-icons (see `ICONS` in `js/main.js`). No emoji anywhere.
 - **Paths** are root-absolute (`/css/…`, `/js/…`, `/images/…`); URLs are clean folders.

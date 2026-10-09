@@ -27,8 +27,8 @@
   --shadow-lg: 0 26px 64px rgba(21, 55, 93, .18);
   --shadow-card: 0 4px 14px rgba(21, 55, 93, .06), 0 18px 40px rgba(21, 55, 93, .09);
   --ring: 0 0 0 3px rgba(42, 123, 196, .35);
-  --font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-head: 'Poppins', 'Inter', system-ui, sans-serif;
+  --font-body: 'Montserrat', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-head: 'Playfair Display', 'Canela', Georgia, serif;
   --wipe: 1900ms;
   --wipe-ease: cubic-bezier(.45, 0, .2, 1);
 }

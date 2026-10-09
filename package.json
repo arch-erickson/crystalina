@@ -2,11 +2,20 @@
   "name": "crystalina",
   "private": true,
   "version": "1.0.0",
-  "description": "Crystalina water filtration storefront. Static pages plus Vercel serverless functions.",
+  "description": "Crystalina water filtration storefront. Static pages plus Cloudflare Pages Functions.",
   "engines": {
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test tests/*.test.cjs"
+    "test": "node --test \"tests/*.test.cjs\" \"tests/*.test.mjs\"",
+    "serve": "node scripts/serve.mjs",
+    "build:site": "node scripts/build-site.mjs",
+    "diagrams": "node scripts/diagrams.mjs",
+    "diagrams:check": "node scripts/diagrams.mjs --check",
+    "blueprint": "node scripts/blueprint.mjs",
+    "blueprint:check": "node scripts/blueprint.mjs --check",
+    "docs": "npm run diagrams && npm run blueprint",
+    "verify": "node scripts/verify.mjs",
+    "check": "npm test && npm run build:site && npm run diagrams:check && npm run blueprint:check"
   }
 }

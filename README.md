@@ -1,15 +1,29 @@
 # Crystalina — Water Filtration for New York City
 
-First-draft website for Crystalina ("Pure Water. Pure Life."), a water filter company serving NYC.
-Pure HTML/CSS/JS — no build step, no server required.
+Website for Crystalina ("Pure Water. Pure Life."), a water filter company serving NYC.
+Pure HTML, CSS and JavaScript with no bundler, Cloudflare Pages Functions for the server
+boundary, and Supabase for data and identity.
+
+**Start with [docs/blueprint.html](docs/blueprint.html).** It is the record of what exists, what is
+decided and why, and what is still open, with every diagram generated from one data file. Agents
+should read [CLAUDE.md](CLAUDE.md) and [COORDINATION.md](COORDINATION.md) as well.
 
 ## Run it
 
-Open `index.html` in any browser, or serve the folder for cleaner URL handling:
+The pages use root-absolute paths, so opening a file directly gives unstyled markup. Serve it:
 
 ```
-npx serve .
+npm run serve            # the repository, on http://localhost:4321
+npm run serve -- --dist  # what actually ships, after npm run build:site
 ```
+
+| Command | What it does |
+|---|---|
+| `npm test` | 29 tests, about a second |
+| `npm run build:site` | Assemble `dist/` from the publish allow-list |
+| `npm run docs` | Rebuild every diagram and the blueprint |
+| `npm run check` | Tests, build, and both drift checks |
+| `npm run verify -- /shop/` | Render a page and measure it (needs puppeteer) |
 
 ## Pages
 

@@ -1,0 +1,31 @@
+# Cloudflare Pages, for crystalina.org.
+#
+# Serving and the server boundary in one project (AD1). The static site is
+# dist/, assembled by `npm run build:site` from an explicit allow-list, and
+# the three routes under functions/ run as Pages Functions (AD2).
+#
+# Secrets are NOT here and never will be. They are set by the owner in the
+# Pages dashboard, per environment. The names are listed in section 9 of
+# docs/blueprint.html and in .env.example.
+
+name = "crystalina"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-09-01"
+
+# nodejs_compat gives the functions Buffer and node:crypto. api/contact.mjs
+# hashes with node:crypto, and functions/_shim.js builds the request body
+# with Buffer. Without this flag both fail at runtime, not at deploy.
+compatibility_flags = ["nodejs_compat"]
+
+# Two environments, from the first deploy. Preview gets its own values, so a
+# test order on a branch cannot mail a real customer or move real stock (U4).
+[env.preview]
+# Set in the dashboard, per environment:
+#   SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, PUBLIC_SITE_URL,
+#   TURNSTILE_SITE_KEY, EMAIL_FROM, CONTACT_INBOX
+# and as secrets (never as plain variables):
+#   SUPABASE_SERVICE_ROLE_KEY, TURNSTILE_SECRET_KEY, RESEND_API_KEY,
+#   STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+
+[env.production]
+# Same names, production values.

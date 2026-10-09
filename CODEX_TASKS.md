@@ -1,5 +1,17 @@
 # Codex task list: security, database and server
 
+> **Superseded in part, 2026-10-09.** The build plan in section 12 of
+> `docs/blueprint.html` replaced this list's ordering, and the project is
+> moving to **Cloudflare Pages**, not Vercel. Tasks 1 and 3 below are about
+> Vercel and no longer apply as written; their replacements are phases P1,
+> P2 and P5. Everything else here (tasks 2, 4 to 12) still stands and is
+> still yours. This file is kept rather than deleted because the dated
+> record of what was checked and when is the useful part.
+>
+> **New since this list was issued:** R11, verified 2026-10-09. The live
+> Vercel host serves `supabase/migrations/*.sql`, `tests/*` and this file
+> to anyone who asks. `npm run build:site` fixes it for Cloudflare.
+
 **Issued:** Monday 2026-08-31 · **State verified:** 2026-08-31 · **Review by:** 2026-09-07
 
 Each task carries a target window and a `Status:` line with the date it was last
@@ -155,3 +167,5 @@ checked and when is more useful than a short list.
 | Date | Task | Change | By |
 |---|---|---|---|
 | 2026-08-31 | — | List issued; state verified against the live project | Claude Code |
+| 2026-10-09 | 1, 3 | Superseded: the project is moving to Cloudflare Pages, not Vercel. Replaced by phases P1, P2 and P5 in the blueprint | Claude Code |
+| 2026-10-09 | — | Hosting facts re-verified against the live hosts: unchanged. R11 found and recorded | Claude Code |
