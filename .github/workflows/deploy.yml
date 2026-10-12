@@ -1,0 +1,103 @@
+# One deploy path, and it is this one (AD1).
+#
+# Cloudflare Pages can also deploy from its own Git connection. Do not turn
+# that on: with both, every push deploys twice, the two race, and the one
+# that wins is whichever finished last. In the Pages dashboard the project
+# stays as "Direct Upload"; this workflow does the uploading.
+#
+# A pull request gets a preview. A push to main runs the same checks and
+# then waits for a person to approve the production deploy, because the
+# migrations have to be applied before the code that needs them.
+#
+# The project has no dependencies, so there is nothing to install: the tests
+# are node:test and the build is a file copy.
+
+name: Deploy
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  check:
+    name: Tests, build and drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Tests
+        run: npm test
+
+      # Fails if a committed drawing or the blueprint no longer matches its
+      # source, so a stale diagram cannot reach a reader.
+      - name: Diagrams match the model
+        run: npm run diagrams:check
+      - name: Blueprint matches its source
+        run: npm run blueprint:check
+
+      # Refuses to finish if anything on the forbidden list reached dist/.
+      - name: Assemble the publishable site
+        run: npm run build:site
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          retention-days: 7
+
+  preview:
+    name: Preview
+    needs: check
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm run build:site
+      - name: Deploy to the preview environment
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy dist
+            --project-name=crystalina
+            --branch=${{ github.head_ref }}
+
+  production:
+    name: Production
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # Protect this environment in the repository settings with a required
+    # reviewer. That is the manual approval, and it is also where the
+    # "migrations first" rule gets enforced by a human.
+    environment:
+      name: production
+      url: https://crystalina.org
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm run build:site
+      - name: Deploy to production
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=crystalina --branch=main
