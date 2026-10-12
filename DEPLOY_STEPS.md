@@ -54,16 +54,67 @@ where proname in ('upsert_product','delete_product','upsert_stage_option','delet
 
 You should get four rows.
 
-### Give yourself the admin role
+### Granting a staff role
 
-The catalog functions check your role, so your account needs one. Still in the
-SQL Editor, with your own email:
+The catalog functions and every staff dashboard check `private.has_role(...)`,
+so an account does nothing until it has a row in `public.user_roles`. The
+roles are `admin`, `manager`, `technician`, `sales` and `customer`.
+
+**The person has to sign up first.** `user_roles.user_id` is a foreign key to
+`public.profiles`, and a profile row is only created by the `handle_new_user`
+trigger when the account is created. Granting a role to an address that has
+never signed up does nothing at all, silently.
+
+Never put a real email address in a file in this repository: it is public.
+These run in the Supabase SQL Editor and nowhere else.
+
+**1. Check the account exists and has a profile.**
+
+```sql
+select u.id, u.email, u.email_confirmed_at, p.id is not null as has_profile
+from auth.users u
+left join public.profiles p on p.id = u.id
+where lower(u.email) = lower('person@example.com');
+```
+
+No row means they have not signed up. One row with `has_profile` false means
+the trigger did not fire; fix that before granting anything.
+
+**2. Grant the role.** Selecting through `profiles` rather than straight from
+`auth.users`, so the foreign key cannot fail:
 
 ```sql
 insert into public.user_roles (user_id, role)
-select id, 'admin' from auth.users where email = 'you@example.com'
-on conflict do nothing;
+select p.id, 'admin'
+from public.profiles p
+join auth.users u on u.id = p.id
+where lower(u.email) = lower('person@example.com')
+on conflict (user_id, role) do nothing;
 ```
+
+**3. Verify.** This is the step people skip, and `on conflict do nothing`
+means a failed grant looks exactly like a successful one:
+
+```sql
+select u.email, r.role, r.created_at
+from public.user_roles r
+join auth.users u on u.id = r.user_id
+order by r.created_at desc;
+```
+
+The address should be listed with the role you granted. If it is not, go back
+to step 1.
+
+**To remove a role**, which is worth knowing before you need it:
+
+```sql
+delete from public.user_roles
+where role = 'admin'
+  and user_id = (select id from auth.users where lower(email) = lower('person@example.com'));
+```
+
+An admin can read customer records and publish to the live site, so treat the
+list in step 3 as something to review rather than something to grow.
 
 ---
 
