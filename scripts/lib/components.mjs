@@ -20,6 +20,7 @@ import {
 } from './svg.mjs';
 import { STATUS_DASH } from './tokens.mjs';
 import { use as useIcon, hasIcon } from './icons.mjs';
+import { Board } from './board.mjs';
 
 /* Text with a paper halo, so a label stays readable where it crosses a line. */
 export const halo = (x, y, str, o = {}) => {
@@ -46,26 +47,14 @@ export const SectionRule = (x, y, w, label, o = {}) =>
  * is; everything inside belongs to it.
  * ---------------------------------------------------------------- */
 export function ZonePanel(w, z) {
-  const fam = familyOf(z.family);
-  const tabH = 28;
-  const tabPadX = 14;
-  const tabW = measure(z.label, 13, 600) + tabPadX * 2;
-  const sub = z.note ? wrap(z.note, w - 32, 10.5) : [];
-  const headroom = tabH / 2 + 12 + sub.length * 14;
-
+  const board = new Board(0);
+  const g = board.group({ ...z, id: z.id || 'z', x: 0, y: 0, w, h: 0 });
   return {
-    headroom,
-    tabH,
+    headroom: z.note ? 86 : 58,
+    tabH: 30,
     draw(x, y, h) {
-      let s = box(x, y, w, h, { fill: fam.wash, stroke: fam.line, sw: 1.4, rx: 14 });
-      s += box(x + 16, y - tabH / 2, tabW, tabH, { fill: fam.solid, stroke: fam.solid, rx: 8 });
-      s += text(x + 16 + tabPadX, y - tabH / 2 + 18.5, z.label, {
-        size: 13, weight: 600, fill: INK.paper,
-      });
-      sub.forEach((l, i) => {
-        s += text(x + 18, y + tabH / 2 + 10 + i * 14, l, { size: 10.5, fill: fam.ink });
-      });
-      return s;
+      g.x = x; g.y = y; g.h = h;
+      return board.renderGroup(g);
     },
   };
 }
@@ -76,52 +65,14 @@ export function ZonePanel(w, z) {
  * and a status chip sitting on the top-right corner.
  * ---------------------------------------------------------------- */
 export function Card(w, d, o = {}) {
-  const pad = 13;
-  const ts = o.titleSize || 12.8;
-  const fam = familyOf(d.family || o.family || 'slate');
-  const ico = d.icon && hasIcon(d.icon) ? d.icon : null;
-  const indent = ico ? 34 : 0;
-  const inner = w - pad * 2 - indent;
-
-  const titleLines = wrap(d.label, inner, ts, 600);
-  const detail = d.detail ? wrap(d.detail, inner, 10.4) : [];
-  const note = d.note ? wrap(d.note, w - pad * 2, 9.8) : [];
-
-  const tB = pad + ts + 1;
-  const dB = tB + 14;
-  const dEnd = detail.length ? dB + (detail.length - 1) * 13.2 : tB;
-  const titleEnd = tB + (titleLines.length - 1) * (ts + 2.5);
-  const bodyEnd = Math.max(titleEnd, dEnd);
-  const nB = bodyEnd + 15;
-  const nEnd = note.length ? nB + (note.length - 1) * 12.4 : bodyEnd;
-  const h = Math.max(nEnd + pad + 2, 54);
-
+  const board = new Board(0);
+  const c = board.card({ ...d, w, x: 0, y: 0 });
+  const h = c.h;
   return {
     h,
     draw(x, y, height = h) {
-      const dash = STATUS_DASH[d.status] || null;
-      let s = box(x, y, w, height, {
-        fill: INK.card, stroke: d.status === 'Missing' ? fam.line : INK.ruleStrong,
-        sw: 1.1, rx: 9, dash,
-      });
-      if (ico) s += useIcon(ico, x + pad, y + pad - 1, 21, fam.solid);
-      titleLines.forEach((l, i) => {
-        s += text(x + pad + indent, y + tB + i * (ts + 2.5), l,
-          { size: ts, weight: 600, fill: INK.title });
-      });
-      detail.forEach((l, i) => {
-        s += text(x + pad + indent, y + dB + (titleLines.length - 1) * (ts + 2.5) + i * 13.2, l,
-          { size: 10.4, fill: fam.ink });
-      });
-      note.forEach((l, i) => {
-        s += text(x + pad, y + nB + (titleLines.length - 1) * (ts + 2.5) + i * 12.4, l,
-          { size: 9.8, fill: INK.mute, italic: true });
-      });
-      if (d.status) {
-        const made = chip(0, 0, d.status);
-        s += chip(x + w - made.width - 10, y - 9, d.status).svg;
-      }
-      return s;
+      c.x = x; c.y = y; c.h = height;
+      return board.renderCard(c);
     },
   };
 }
@@ -148,10 +99,11 @@ export function PageCard(w, p) {
     h,
     draw(x, y, height = h) {
       const serverFam = statusFamily(p.server);
-      let s = box(x, y, w, height, {
-        fill: INK.card, stroke: INK.ruleStrong, sw: 1.1, rx: 10,
+      let s = box(x + 5, y + 5, w, height, {
+        fill: INK.paper, stroke: INK.title, sw: 1.2, rx: 10,
       });
-      s += box(x, y, 5, height, { fill: fam.solid, stroke: 'none', rx: 2.5 });
+      s += box(x, y, w, height, { fill: INK.card, stroke: INK.title, sw: 1.5, rx: 10 });
+      s += box(x, y, 5, height, { fill: fam.arrow, stroke: 'none', rx: 2.5 });
       let yy = y + pad + 14;
       if (p.icon && hasIcon(p.icon)) s += useIcon(p.icon, x + pad + 4, y + pad - 2, 20, fam.solid);
       s += text(x + pad + (p.icon ? 30 : 4), yy, p.label,
@@ -200,8 +152,12 @@ export function TableCard(w, t, o = {}) {
   return {
     h,
     draw(x, y) {
-      let s = box(x, y, w, h, {
-        fill: INK.card, stroke: INK.ruleStrong, sw: 1.1, rx: 9,
+      const ghost = !STATUS_DASH[t.status];
+      let s = ghost
+        ? box(x + 5, y + 5, w, h, { fill: INK.paper, stroke: INK.title, sw: 1.2, rx: 9 })
+        : '';
+      s += box(x, y, w, h, {
+        fill: INK.card, stroke: STATUS_DASH[t.status] ? INK.mute : INK.title, sw: 1.5, rx: 9,
         dash: STATUS_DASH[t.status] || null,
       });
       s += box(x + 1, y + 1, w - 2, 29, { fill: fam.wash, stroke: 'none', rx: 8 });
@@ -231,14 +187,16 @@ export function Lane(w, l, o = {}) {
   return {
     h,
     draw(x, y) {
-      let s = box(x, y, w, h, { fill: fam.solid, stroke: fam.solid, rx: 10 });
+      let s = box(x + 4, y + 4, w, h, { fill: INK.paper, stroke: INK.title, sw: 1.1, rx: 9 });
+      s += box(x, y, w, h, { fill: INK.paper, stroke: INK.title, sw: 1.5, rx: 9 });
+      s += box(x, y, 5, h, { fill: fam.arrow, stroke: 'none', rx: 2 });
+      /* Left aligned behind the rail, the same as a participant head in a
+         sequence diagram, so the two never read as different things. */
       const ico = l.icon && hasIcon(l.icon);
-      const labelW = measure(l.label, 12.5, 600);
-      if (ico) s += useIcon(l.icon, x + w / 2 - labelW / 2 - 25, y + 9, 18, '#FFFFFF', { opacity: 0.92 });
-      s += text(x + w / 2 + (ico ? 10 : 0), y + 23, l.label,
-        { size: 12.5, weight: 600, fill: INK.paper, anchor: 'middle' });
-      s += text(x + w / 2, y + 42, l.detail,
-        { size: 9.8, fill: '#FFFFFF', anchor: 'middle', opacity: 0.74 });
+      if (ico) s += useIcon(l.icon, x + 12, y + (h - 28) / 2, 28, fam.arrow);
+      const tx = x + (ico ? 46 : 16);
+      s += text(tx, y + (h / 2) - 3, l.label, { size: 12.5, weight: 600, fill: INK.title });
+      s += text(tx, y + (h / 2) + 12, l.detail, { size: 10.3, fill: fam.ink });
       return s;
     },
   };

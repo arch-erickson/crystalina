@@ -4,10 +4,16 @@ A premium home water filtration shop for New York City. Pure HTML, CSS and
 JavaScript with no bundler, Cloudflare Pages Functions for the server
 boundary, and Supabase for data and identity.
 
-**Read `docs/blueprint.html` before changing anything structural.** It is the
-record of what exists, what is decided and why, and what is still unknown.
-It is generated; its source is `docs/blueprint-content.mjs` and
-`docs/diagrams/model.mjs`.
+**Read the blueprint before changing anything structural.** It is the record
+of what exists, what is decided and why, and what is still unknown.
+
+- **https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo** is the published
+  Artifact, and the copy to send anyone.
+- `docs/blueprint.html` is the same page as a file in the repository.
+
+Both are generated from `docs/blueprint-content.mjs` and
+`docs/diagrams/model.mjs`. Never edit either output: `npm run docs`
+overwrites them.
 
 ## The rule that matters most
 

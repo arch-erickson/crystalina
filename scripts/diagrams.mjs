@@ -24,6 +24,7 @@ import {
   ZonePanel, Connector, SectionRule, halo, toneOf, COMPONENTS,
 } from './lib/components.mjs';
 import { beginDoc, spriteUsed, usedNames, iconNames, use as useIcon } from './lib/icons.mjs';
+import { Board, sequence, roundPath } from './lib/board.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = join(HERE, '..', 'docs', 'diagrams');
@@ -56,96 +57,92 @@ function emit(name, { w, h, title, desc, body, caption }) {
  * ================================================================ */
 function architecture(key, phase) {
   beginDoc();
-  const CARD = 232;
-  const GAP = 78;
-  const SUBGAP = 64;
+  const CARD = 252;
+  const PAD = 20;
+  const COLW = CARD + PAD * 2;
+  const GAPX = 104;
+  const GAPY = 56;
+
   const cols = [...new Set(phase.zones.map((z) => z.col))].sort((a, b) => a - b);
-  const subs = {};
-  for (const c of cols) subs[c] = Math.max(...phase.zones.filter((z) => z.col === c).map((z) => z.cols || 1));
-
   const colX = {};
-  let x = 32;
-  for (const c of cols) {
-    colX[c] = x;
-    x += subs[c] * CARD + (subs[c] - 1) * SUBGAP + GAP;
-  }
-  const w = x - GAP + 32;
+  let x = 34;
+  for (const c of cols) { colX[c] = x; x += COLW + GAPX; }
+  const w = x - GAPX + 34;
+
   const fr = frame({ title: phase.title, note: phase.note, asOf, w });
-
-  const top = fr.bottom + 46;
+  const board = new Board(w);
   const colY = {};
-  for (const c of cols) colY[c] = top;
+  for (const c of cols) colY[c] = fr.bottom + 58;
 
-  const rects = {};
-  let bandsSvg = '';
-  let cardsSvg = '';
-
-  const familyOfNode = {};
-
+  const colOf = {};
   for (const zone of phase.zones) {
-    const nSub = zone.cols || 1;
-    const bandW = subs[zone.col] * CARD + (subs[zone.col] - 1) * SUBGAP;
-    const bandX = colX[zone.col];
-    const bandY = colY[zone.col];
+    const g = board.group({
+      id: 'g-' + zone.id, x: colX[zone.col], y: colY[zone.col], w: COLW,
+      family: zone.family, label: zone.label,
+    });
+    board.stack(g.id, zone.nodes.map((n) => ({
+      id: n.id, label: n.label, detail: n.detail, note: n.note,
+      status: n.status, family: n.family || zone.family, icon: n.icon,
+    })), { top: 58, gap: 18, pad: PAD });
+    for (const n of zone.nodes) colOf[n.id] = zone.col;
+    colY[zone.col] = g.y + g.h + GAPY;
+  }
 
-    const per = Math.ceil(zone.nodes.length / nSub);
-    const made = zone.nodes.map((n) => ({ n, card: Card(CARD, n) }));
-    const panel = ZonePanel(bandW + 32, zone);
-    const colHeights = [];
-    for (let s = 0; s < nSub; s += 1) {
-      const slice = made.slice(s * per, (s + 1) * per);
-      colHeights.push(slice.reduce((sum, m) => sum + m.card.h + 14, 0));
-    }
-    const bandH = Math.max(...colHeights) + panel.headroom + 14;
+  /* Two routing problems, both of which a straight midpoint gets wrong.
 
-    bandsSvg += panel.draw(bandX - 16, bandY, bandH);
+     Across a gap: several arrows would share one vertical leg, so each gets
+     its own lane, in the order the edges are listed.
 
-    for (let s = 0; s < nSub; s += 1) {
-      let yy = bandY + panel.headroom;
-      const sx = bandX + s * (CARD + SUBGAP);
-      for (const m of made.slice(s * per, (s + 1) * per)) {
-        cardsSvg += m.card.draw(sx, yy);
-        rects[m.n.id] = { x: sx, y: yy, w: CARD, h: m.card.h, cx: sx + CARD / 2, cy: yy + m.card.h / 2 };
-        familyOfNode[m.n.id] = m.n.family || zone.family;
-        yy += m.card.h + 14;
+     Down a column: an arrow between two cards with a third card between
+     them would run underneath it and look like two arrows. Those are sent
+     out of the left face and down a lane beside the group instead. Cards
+     that are next to each other in the stack still go straight down, into
+     the gap between them, where there is nothing to hide behind. */
+  const lanes = {};
+  const sideLanes = {};
+  for (const e of phase.edges) {
+    const a = board.nodes[e.from];
+    const b = board.nodes[e.to];
+    if (!a || !b) continue;
+    const edge = {
+      from: e.from, to: e.to, label: e.label,
+      family: e.family || b.family,
+      dashed: Boolean(e.dash) || e.tone === 'mute',
+    };
+    const ca = colOf[e.from];
+    const cb = colOf[e.to];
+
+    if (cb > ca) {
+      const k = lanes[ca] = (lanes[ca] || 0);
+      lanes[ca] += 1;
+      edge.midX = Math.round(colX[ca] + COLW + 26 + k * 20);
+    } else if (ca === cb) {
+      const between = board.cards.some((c) =>
+        c !== a && c !== b && Math.abs(c.x - a.x) < 2
+        && c.y > Math.min(a.y, b.y) && c.y < Math.max(a.y + a.h, b.y + b.h));
+      if (between) {
+        const k = sideLanes[ca] = (sideLanes[ca] || 0);
+        sideLanes[ca] += 1;
+        const lane = Math.round(colX[ca] - 16 - k * 18);
+        edge.fs = 'left';
+        edge.ts = 'left';
+        edge.via = [[lane, a.y + a.h / 2], [lane, b.y + b.h / 2]];
+        edge.anchor = 'end';
+        edge.lx = lane - 8;
+        edge.ly = Math.round((a.y + a.h / 2 + b.y + b.h / 2) / 2);
       }
     }
-    colY[zone.col] = bandY + bandH + 46;
+    board.edge(edge);
   }
 
-  /* An arrow is the colour of what it points at, so following a path
-     through the drawing means following one colour. */
-  let edgesSvg = '';
-  const outbound = {};
-  for (const e of phase.edges) {
-    const a = rects[e.from];
-    const b = rects[e.to];
-    if (!a || !b) continue;
-    const k = outbound[e.from] = (outbound[e.from] || 0);
-    outbound[e.from] += 1;
-    edgesSvg += Connector(a, b, {
-      label: e.label,
-      family: e.family || familyOfNode[e.to],
-      dash: e.dash || (e.tone === 'mute' ? '5 4' : null),
-      sw: e.tone === 'mute' ? 1.3 : 1.7,
-      /* Fan the labels of several arrows leaving the same card. */
-      at: 0.3 + k * 0.18,
-    });
-  }
-
-  const h = Math.max(...Object.values(colY)) + 44;
-  const body = fr.svg
-    + bandsSvg + edgesSvg + cardsSvg
-    + statusLegend(32, h - 22);
+  const { svg, maxY } = board.body();
+  const h = maxY + 58;
+  const body = fr.svg + svg + statusLegend(34, h - 22);
 
   emit(`architecture-${key}.svg`, {
     w, h, title: phase.title, desc: phase.note, body, caption: phase.note,
   });
 }
-
-/* ================================================================ *
- * 3. Channels and accounts the owner already holds.
- * ================================================================ */
 function channels() {
   beginDoc();
   const CARD = 300;
@@ -338,76 +335,49 @@ function dataModel() {
  * ================================================================ */
 function flow(f) {
   beginDoc();
-  const w = 1380;
-  const left = 56;
-  const laneW = (w - left * 2) / f.lanes.length;
-  const laneX = (i) => left + laneW * i + laneW / 2;
-  const idx = {};
-  f.lanes.forEach((l, i) => { idx[l.id] = i; });
 
-  const fr = frame({ title: f.title, note: f.note, asOf, w });
-  const headTop = fr.bottom + 46;
-  const headH = 52;
-  const firstStep = headTop + headH + 44;
-
-  /* Measure every step so the lifelines are exactly long enough. */
-  const rows = [];
-  let y = firstStep;
-  for (const s of f.steps) {
-    const span = s.self ? laneW * 1.9 : Math.max(laneW * Math.abs(idx[s.to] - idx[s.from]) - 24, 120);
-    const lines = wrap(`${s.n}. ${s.label}`, span, 10.5);
-    const h = Math.max(s.self ? 40 : 34, lines.length * 14 + 20);
-    rows.push({ s, lines, y, h, span });
-    y += h;
-  }
-  const lifeEnd = y + 12;
-
-  let svg = '';
-  f.lanes.forEach((l, i) => {
-    const x = left + laneW * i + 10;
-    const lw = laneW - 20;
-    svg += Lane(lw, l, { h: headH }).draw(x, headTop);
-    svg += line(laneX(i), headTop + headH, laneX(i), lifeEnd, { stroke: T.silver, sw: 1.4, dash: '3 4' });
+  /* The sequence itself: lifelines, numbered steps, self-calls. */
+  const seq = sequence({
+    participants: f.lanes.map((l) => ({
+      id: l.id, label: l.label, detail: l.detail, icon: l.icon, family: l.family,
+    })),
+    steps: f.steps.map((s) => ({
+      from: s.from, to: s.to, text: s.label,
+      family: s.tone === 'amber' ? 'rose' : undefined,
+      dashed: Boolean(s.back),
+    })),
+    colW: 196,
+    top: 0,
   });
 
-  for (const row of rows) {
-    const { s, lines } = row;
-    const yy = row.y + row.h / 2;
-    const a = laneX(idx[s.from]);
-    const b = laneX(idx[s.to]);
-    const tone = toneOf(s.tone || (s.back ? 'mute' : 'blue'));
-
-    if (s.self) {
-      const bx = a + 14;
-      const bw = row.span;
-      const bh = lines.length * 14 + 14;
-      const byy = yy - bh / 2;
-      svg += path(`M ${r(a)} ${r(byy + 6)} L ${r(a - 10)} ${r(byy + 6)} L ${r(a - 10)} ${r(byy + bh - 6)} L ${r(a)} ${r(byy + bh - 6)}`,
-        { stroke: tone.stroke, sw: 1.3, marker: tone.marker });
-      svg += box(bx, byy, bw, bh, { fill: s.tone === 'amber' ? T.amberWash : T.wash, stroke: tone.stroke, rx: 7, dash: s.tone === 'amber' ? null : '3 3' });
-      lines.forEach((l, i) => { svg += text(bx + 10, byy + 16 + i * 14, l, { size: 10.5, fill: s.tone === 'amber' ? '#6B3F08' : T.navy }); });
-    } else {
-      svg += line(a, yy, b + (b > a ? -3 : 3), yy, {
-        stroke: tone.stroke, sw: s.back ? 1.2 : 1.6, marker: tone.marker, dash: s.back ? '5 4' : null,
-      });
-      const mid = (a + b) / 2;
-      lines.forEach((l, i) => {
-        svg += halo(mid, yy - 10 - (lines.length - 1 - i) * 13, l, { fill: tone.ink, size: 10.5, weight: s.back ? 400 : 500 });
-      });
-    }
-  }
+  const w = Math.max(seq.w, 860);
+  const fr = frame({ title: f.title, note: f.note, asOf, w });
+  const seqTop = fr.bottom + 54;
 
   /* The failure path, as a panel rather than a footnote. */
-  const fx = 56;
-  const fw = w - 112;
-  const fy = lifeEnd + 34;
-  const panel = FailurePanel(fw, f.failures);
-  const fail = panel.draw(fx, fy);
-  const fh = panel.h;
+  const board = new Board(w);
+  const fx = 34;
+  const fw = w - 68;
+  const fy = seqTop + seq.h + 34;
+  const lines2 = f.failures.map((t) => wrap(t, fw - 70, 11.5));
+  const fh = 46 + lines2.reduce((n, l) => n + l.length, 0) * 15.5 + lines2.length * 6;
+  const rose = familyOf('rose');
+  let fail = box(fx, fy, fw, fh, { fill: rose.wash, stroke: rose.line, rx: 10 });
+  fail += box(fx, fy, 4.5, fh, { fill: rose.solid, stroke: 'none', rx: 2 });
+  fail += useIcon('alert', fx + 18, fy + 14, 17, rose.solid);
+  fail += bandLabel(fx + 43, fy + 27, 'The failure path, and what is wrong with it today',
+    { size: 10, fill: rose.chipInk });
+  let fyy = fy + 50;
+  for (const group of lines2) {
+    for (const l of group) { fail += text(fx + 18, fyy, l, { size: 11.5, fill: rose.ink }); fyy += 15.5; }
+    fyy += 6;
+  }
 
-  const h = fy + fh + 44;
-  const statusChip = chip(w - 32 - measure(f.status, 9.5, 600) - 14, fr.bottom + 14, f.status, { status: f.status });
-  const body = fr.svg + statusChip.svg + svg + fail;
+  const h = fy + fh + 40;
+  const statusChip = Board.chip(f.status, w - 34, fr.bottom + 16);
+  const body = fr.svg + statusChip
+    + `<g transform="translate(0 ${seqTop})">${seq.svg}</g>`
+    + fail;
 
   emit(`flow-${f.id}.svg`, {
     w, h, title: f.title, desc: f.note, body, caption: f.note,

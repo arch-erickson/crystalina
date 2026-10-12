@@ -25,7 +25,7 @@ export const meta = {
   project: 'Crystalina',
   tagline: 'Pure Water. Pure Life.',
   domain: 'crystalina.org',
-  asOf: '2026-10-09',
+  asOf: '2026-10-11',
   /* Two dates, because they were checked by different means and one is
      older. Never collapse them into a single reassuring number. */
   stateVerified: '2026-10-09',

@@ -175,11 +175,17 @@ export const bandLabel = (x, y, label, o = {}) =>
   });
 
 /* One arrow marker per family, so an arrowhead is the colour of the thing
-   it is pointing at. */
+   it is pointing at.
+
+   An open chevron rather than a filled triangle: it reads as lighter at the
+   end of a 2.2px line, and markerUnits="userSpaceOnUse" keeps its weight
+   fixed instead of scaling with the stroke. */
 export const arrowDefs = () => {
   const markers = Object.entries(FAMILY).map(([name, f]) =>
-    `<marker id="m-${name}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">`
-    + `<path d="M 0 0.6 L 9.4 5 L 0 9.4 z" fill="${f.solid}" /></marker>`).join('');
+    `<marker id="m-${name}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="11"`
+    + ' markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse">'
+    + `<path d="M1.5 1.5L8.5 5L1.5 8.5" fill="none" stroke="${f.arrow || f.solid}"`
+    + ' stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>').join('');
   return `  <defs>${markers}</defs>`;
 };
 

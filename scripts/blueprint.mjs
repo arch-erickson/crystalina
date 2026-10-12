@@ -23,6 +23,7 @@ import * as M from '../docs/diagrams/model.mjs';
 import { doc as meta, sections } from '../docs/blueprint-content.mjs';
 import { buildAll } from './diagrams.mjs';
 import { arrowDefs, esc } from './lib/svg.mjs';
+import { TYPE } from './lib/tokens.mjs';
 import { sprite } from './lib/icons.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -157,16 +158,10 @@ const sectionsHTML = sections.map((s, i) => `<section class="s" id="${s.id}">
 ${s.blocks.map(blockHTML).join('\n')}
 </section>`).join('\n\n');
 
-const html = `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<meta name="robots" content="noindex" />
-<title>${esc(meta.title)}</title>
+const head = `<title>${esc(meta.title)}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" />
+<link rel="stylesheet" href="${esc(TYPE.googleHref)}" />
 <style>
 :root{
   color-scheme:light;
@@ -259,9 +254,9 @@ footer.doc{border-top:1px solid var(--line);margin-top:2.6rem;padding-top:1.4rem
 @media (max-width:620px){.dec dl{grid-template-columns:minmax(0,1fr)}.dec dt{padding-top:.5rem}}
 @media print{nav.toc{display:none}.shell{grid-template-columns:1fr}.diagram{break-inside:avoid}}
 </style>
-</head>
-<body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>${sprite(allIcons)}</defs>${arrowDefs()}</svg>
+`;
+
+const bodyInner = `<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>${sprite(allIcons)}</defs>${arrowDefs()}</svg>
 <div class="shell">
   <nav class="toc" aria-label="Contents">
     <p class="brand">${esc(M.meta.project)}</p>
@@ -294,8 +289,28 @@ ${sectionsHTML}
     </footer>
   </main>
 </div>
+`;
+
+/* Two surfaces, one markup. The Artifact is the primary one, so it gets the
+   bare fragment the platform wraps in its own skeleton; the repository copy
+   is a whole document that opens from the file system. Neither is written
+   by hand, and both come from the same two strings above. */
+const html = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="robots" content="noindex" />
+${head}
+</head>
+<body>
+${bodyInner}
 </body>
 </html>
+`;
+
+const artifact = `${head}
+${bodyInner}
 `;
 
 /* ------------------------------------------------------------------ *
@@ -379,7 +394,11 @@ const md = [
 
 /* ------------------------------------------------------------------ */
 
-const outputs = [['blueprint.html', html], ['blueprint.md', md]];
+const outputs = [
+  ['blueprint.html', html],
+  ['blueprint.artifact.html', artifact],
+  ['blueprint.md', md],
+];
 const stale = [];
 for (const [name, body] of outputs) {
   const file = join(DOCS, name);

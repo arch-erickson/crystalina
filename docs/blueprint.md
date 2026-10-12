@@ -10,7 +10,7 @@
 | Prepared | 2026-10-09 |
 | State verified | 2026-10-09 (hosting), 2026-08-31 (database) |
 | Target | Cloudflare Pages, Pages Functions and Turnstile, with Supabase kept for data and identity |
-| Revised | 2026-10-09 — first blueprint. Written from the WebWork order of work and the state of the repository, with the hosting facts re-checked against the live hosts on the day. |
+| Revised | 2026-10-11 — the drawings were rebuilt on an orthogonal router, so every arrow now leaves a named side of a card and turns at right angles rather than curving across the page. Content unchanged since 2026-10-09, when the blueprint was first written and the hosting facts were checked against the live hosts. |
 
 What Crystalina is, what actually runs today, and the move to Cloudflare that turns two half-deployed hosts into one. Every drawing in this document is generated from one data file, and every status word on every card is one of five.
 
@@ -570,8 +570,8 @@ _**Icon and component library.** The vocabulary the other fourteen drawings are 
 
 ## 18. How this document is kept true
 
-- The source is docs/blueprint-content.mjs and docs/diagrams/model.mjs. This page and docs/blueprint.md are generated. Editing either generated file is work that the next regeneration silently destroys.
-- npm run blueprint rebuilds both. npm run diagrams rebuilds every drawing. npm run diagrams:check fails if a committed drawing no longer matches the model, so a stale picture cannot survive a pull request.
+- The source is docs/blueprint-content.mjs and docs/diagrams/model.mjs. Three surfaces are generated from them and none is written by hand: the Artifact at https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo, which is the one to send anybody; docs/blueprint.html, the same page as a file that opens from the repository; and docs/blueprint.md, for reading in a pull request. Editing any of the three is work that the next regeneration silently destroys.
+- npm run blueprint rebuilds all three. npm run diagrams rebuilds every drawing. npm run check runs the tests, the publish allow-list and both drift checks, so a stale picture or a page that has drifted from its source cannot survive a pull request.
 - Amend this in the same commit as the change it describes. A decision that changes in code and not here is a decision that will be made again, differently.
 - Mark an answered question answered, with the date and the answer. Do not delete it.
 - When a section is superseded, say so at the top of the section and point at what replaced it. Never renumber.
@@ -579,4 +579,4 @@ _**Icon and component library.** The vocabulary the other fourteen drawings are 
 
 > **Publish from one place**
 >
-> If this page is ever published somewhere outside the repository, publish it from one machine, say in the document where its sources are, and read the live version before republishing. A generated document published from two places stops matching its own sources quietly, and the next person to rebuild wipes out work nobody remembers doing.
+> The Artifact is published from this repository and nowhere else. Anyone republishing it pulls first and republishes to the same URL (https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo) rather than creating a second one. A generated document published from two places stops matching its own sources quietly, and the next person to rebuild wipes out work nobody remembers doing.

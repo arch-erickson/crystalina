@@ -42,8 +42,9 @@ Shared, so announce in the log before touching: `css/styles.css`,
 2. **Never revert the other agent's work.** If yours was overwritten,
    re-apply it and note it. Do not undo theirs.
 3. **Generated files are generated.** `docs/blueprint.html`,
-   `docs/blueprint.md`, `docs/diagrams/*.svg`, `docs/diagrams/index.html`
-   and `dist/` are output. Edit the source and run `npm run docs`.
+   `docs/blueprint.artifact.html`, `docs/blueprint.md`,
+   `docs/diagrams/*.svg`, `docs/diagrams/index.html` and `dist/` are output.
+   Edit the source and run `npm run docs`.
 4. **Stage only your own files.** A wide `git add` sweeps up work in
    progress that is not yours.
 5. **Pull with rebase, then push.** A commit that is not pushed is as
@@ -66,10 +67,13 @@ do about it.
 
 **What changed.**
 
-- `docs/blueprint.html` and `docs/blueprint.md`, generated from
-  `docs/blueprint-content.mjs` and `docs/diagrams/model.mjs`. Eighteen
-  sections, sixteen drawings, every decision numbered and every unknown
-  owned.
+- The blueprint, published as an Artifact at
+  https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo and generated into
+  `docs/blueprint.html`, `docs/blueprint.artifact.html` and
+  `docs/blueprint.md` from `docs/blueprint-content.mjs` and
+  `docs/diagrams/model.mjs`. Eighteen sections, sixteen drawings, every
+  decision numbered and every unknown owned. **The Artifact is the primary
+  surface:** republish to that URL, never to a new one.
 - A diagram system: `scripts/lib/{tokens,svg,icons,components}.mjs` and
   `scripts/diagrams.mjs`. Forty one icon symbols, six components, one
   colour-family palette where the colour carries meaning.

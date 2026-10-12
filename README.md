@@ -4,9 +4,11 @@ Website for Crystalina ("Pure Water. Pure Life."), a water filter company servin
 Pure HTML, CSS and JavaScript with no bundler, Cloudflare Pages Functions for the server
 boundary, and Supabase for data and identity.
 
-**Start with [docs/blueprint.html](docs/blueprint.html).** It is the record of what exists, what is
-decided and why, and what is still open, with every diagram generated from one data file. Agents
-should read [CLAUDE.md](CLAUDE.md) and [COORDINATION.md](COORDINATION.md) as well.
+**Start with the blueprint: [https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo](https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo).**
+It is the record of what exists, what is decided and why, and what is still open, with sixteen
+diagrams generated from one data file. The same page is in the repository at
+[docs/blueprint.html](docs/blueprint.html), and as markdown at [docs/blueprint.md](docs/blueprint.md).
+Agents should read [CLAUDE.md](CLAUDE.md) and [COORDINATION.md](COORDINATION.md) as well.
 
 ## Run it
 

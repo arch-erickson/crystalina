@@ -23,37 +23,37 @@
 
 export const FAMILY = {
   blue: {
-    solid: '#1D6FE0', ink: '#2F6CAE', wash: '#EFF6FF', line: '#AFCDF6',
+    solid: '#1D6FE0', arrow: '#3B82F6', ink: '#2F6CAE', wash: '#EFF6FF', line: '#AFCDF6',
     chipWash: '#E0EDFD', chipInk: '#1B5FBF',
   },
   amber: {
-    solid: '#C2680C', ink: '#9A6214', wash: '#FFFBEB', line: '#F2D08C',
+    solid: '#C2680C', arrow: '#E29A12', ink: '#9A6214', wash: '#FFFBEB', line: '#F2D08C',
     chipWash: '#FDF0D5', chipInk: '#8A5207',
   },
   violet: {
-    solid: '#7C3AED', ink: '#6D4CB0', wash: '#FAF5FF', line: '#D2BAF7',
+    solid: '#7C3AED', arrow: '#8B5CF6', ink: '#6D4CB0', wash: '#FAF5FF', line: '#D2BAF7',
     chipWash: '#F1E7FE', chipInk: '#6025CC',
   },
   teal: {
-    solid: '#0D9488', ink: '#157F76', wash: '#ECFDFA', line: '#99E0D8',
+    solid: '#0D9488', arrow: '#14B8A6', ink: '#157F76', wash: '#ECFDFA', line: '#99E0D8',
     chipWash: '#D8F5F0', chipInk: '#0B7A70',
   },
   green: {
-    solid: '#0E9F6E', ink: '#19795A', wash: '#F0FDF5', line: '#A2DEC1',
+    solid: '#0E9F6E', arrow: '#22C55E', ink: '#19795A', wash: '#F0FDF5', line: '#A2DEC1',
     chipWash: '#DCF5E8', chipInk: '#0A7A54',
   },
   rose: {
-    solid: '#DC2F4B', ink: '#B23347', wash: '#FEF2F3', line: '#F4B3BC',
+    solid: '#DC2F4B', arrow: '#E0455F', ink: '#B23347', wash: '#FEF2F3', line: '#F4B3BC',
     chipWash: '#FCE4E7', chipInk: '#B21E38',
   },
   slate: {
-    solid: '#64748B', ink: '#5A6675', wash: '#F8FAFC', line: '#D5DCE4',
+    solid: '#64748B', arrow: '#94A3B8', ink: '#5A6675', wash: '#F8FAFC', line: '#D5DCE4',
     chipWash: '#EEF1F5', chipInk: '#505C6B',
   },
   /* Crystalina's own navy, for the brand and for lifelines. Not a meaning,
      a voice. */
   navy: {
-    solid: '#15375D', ink: '#36485C', wash: '#F3F7FB', line: '#BFD2E4',
+    solid: '#15375D', arrow: '#475569', ink: '#36485C', wash: '#F3F7FB', line: '#BFD2E4',
     chipWash: '#E4EDF6', chipInk: '#15375D',
   },
 };
