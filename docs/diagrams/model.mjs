@@ -25,7 +25,7 @@ export const meta = {
   project: 'Crystalina',
   tagline: 'Pure Water. Pure Life.',
   domain: 'crystalina.org',
-  asOf: '2026-10-11',
+  asOf: '2026-11-02',
   /* Two dates, because they were checked by different means and one is
      older. Never collapse them into a single reassuring number. */
   stateVerified: '2026-10-09',
@@ -608,13 +608,13 @@ export const flows = [
  * ------------------------------------------------------------------ */
 
 export const deployment = {
-  note: 'One deploy path, not two. Cloudflare Pages can deploy from its own Git connection or from a workflow; picking both means every push deploys twice. The workflow is chosen because the tests and the render harness have to pass first.',
+  note: 'One deploy path, not two. Cloudflare Pages deploys from its own Git connection: it clones the repository, runs the build and publishes dist. GitHub Actions deploys nothing and holds no credential; it runs the tests and the drift checks, and branch protection makes them required. The gate on production is therefore the merge, performed by a person who has applied the migrations first (AD9).',
   stages: [
     { id: 'dev', family: 'slate', icon: 'branch', label: 'Working tree', detail: 'npm test, npm run build:site, node scripts/verify.mjs', status: 'Partial', note: 'Harness added, no browser installed yet' },
-    { id: 'pr', family: 'blue', icon: 'check', label: 'Pull request', detail: 'GitHub Actions: tests, harness, diagram drift', status: 'Missing' },
-    { id: 'preview', family: 'violet', icon: 'eye', label: 'Pages preview', detail: 'Per-branch URL behind Cloudflare Access, noindex', status: 'Missing' },
-    { id: 'approve', family: 'amber', icon: 'person', label: 'Manual approval', detail: 'A person presses it. Migrations first', status: 'Missing' },
-    { id: 'prod', family: 'green', icon: 'rocket', label: 'Production', detail: 'crystalina.org through the Cloudflare zone', status: 'Missing' },
+    { id: 'pr', family: 'blue', icon: 'check', label: 'Pull request', detail: 'Actions: tests, both drift checks, the build', status: 'Implemented', note: 'Make them required on main, or this is decoration' },
+    { id: 'preview', family: 'violet', icon: 'eye', label: 'Pages preview', detail: 'Cloudflare builds every branch, behind Access', status: 'Missing' },
+    { id: 'merge', family: 'amber', icon: 'person', label: 'Merge to main', detail: 'The gate. A person merges, migrations first', status: 'Missing', note: 'Needs branch protection on main' },
+    { id: 'prod', family: 'green', icon: 'rocket', label: 'Production', detail: 'Cloudflare builds main, crystalina.org', status: 'Missing' },
     { id: 'rollback', family: 'slate', icon: 'undo', label: 'Rollback', detail: 'Promote the previous Pages deployment', status: 'Missing', note: 'Practise once before launch' },
   ],
   environments: [

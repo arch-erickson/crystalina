@@ -10,7 +10,7 @@
 | Prepared | 2026-10-09 |
 | State verified | 2026-10-09 (hosting), 2026-08-31 (database) |
 | Target | Cloudflare Pages, Pages Functions and Turnstile, with Supabase kept for data and identity |
-| Revised | 2026-10-11 — the drawings were rebuilt on an orthogonal router, so every arrow now leaves a named side of a card and turns at right angles rather than curving across the page. Content unchanged since 2026-10-09, when the blueprint was first written and the hosting facts were checked against the live hosts. |
+| Revised | 2026-11-02 — the deploy path changed: Cloudflare Pages deploys from its own Git connection and GitHub Actions only gates it, which removes the API token entirely (AD9). Diagrams rebuilt on an orthogonal router 2026-10-11. Content otherwise unchanged since 2026-10-09, when the hosting facts were last checked against the live hosts. |
 
 What Crystalina is, what actually runs today, and the move to Cloudflare that turns two half-deployed hosts into one. Every drawing in this document is generated from one data file, and every status word on every card is one of five.
 
@@ -292,7 +292,7 @@ _**Deployment, environments and secrets.** One deploy path, two environments, an
 
 > **One deploy path, not two**
 >
-> Cloudflare Pages can deploy from its own Git connection or from a workflow in the repository. Pick one. With both connected, every push deploys twice, the two deployments race, and the one that wins is whichever finished last. The workflow is the choice here, because the tests and the render harness have to pass before anything is published.
+> Cloudflare Pages can deploy from its own Git connection or from a workflow in the repository. Pick one. With both connected, every push deploys twice, the two race, and the one that wins is whichever finished last. The Git connection is the choice here, and GitHub Actions only gates it. See AD9.
 
 ### Rollback
 
@@ -486,6 +486,17 @@ _Decided 2026-10-09._
 - **What it costs.** Montserrat is a wider face than Inter, so anything that was close to wrapping now wraps. Checked at 1280: the navigation still fits on one line. Canela is licensed, so Playfair Display stands in for it.
 - **Right for now.** Both faces are on Google Fonts, so there is no licence to buy and no file to self-host yet.
 - **Replace when.** Canela is licensed. Then change the one token in each place, and self-host rather than loading from a third party.
+
+#### AD9 · Cloudflare deploys from its own Git connection, and GitHub Actions only gates it
+
+_Decided 2026-11-02._
+
+- **What it does.** Cloudflare Pages clones the repository, runs npm run build:site and publishes dist. Every branch gets a preview and main goes to production. GitHub Actions deploys nothing: it runs the tests and both drift checks, and branch protection on main makes them required.
+- **Why we need it.** The first plan had the workflow do the deploying, which meant an API token in repository secrets and a hand-built approval step. Two weeks of elapsed time later none of it was set up, and the setup was the reason.
+- **Why it belongs here.** It removes the credential entirely. A workflow that holds no token cannot leak one, and the repository is public, so that is worth more here than it would be elsewhere. The gate moves from a deploy approval to the merge, which is where a person already has to think.
+- **What it costs.** Production deploys on every push to main with no second confirmation. That is only safe because nothing reaches main without a reviewed, green pull request, so branch protection is load bearing rather than optional.
+- **Right for now.** One person, one repository, and a build that is a file copy. The simpler path is the one that actually gets finished.
+- **Replace when.** Production needs to lag main deliberately, or a deploy needs to wait on something a merge cannot express, such as a migration run by a job rather than by hand. Then the workflow comes back, and AD1 stands as written.
 
 ---
 

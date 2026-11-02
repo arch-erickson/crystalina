@@ -1,0 +1,56 @@
+# The gate. This workflow does not deploy anything.
+#
+# Cloudflare Pages deploys, from its own Git connection: it clones the
+# repository, runs `npm run build:site`, and publishes `dist/`. Every branch
+# gets a preview and `main` goes to production (AD9).
+#
+# So the only job here is to decide whether a change is allowed to reach
+# `main` at all. Make these checks required in the branch protection rule
+# for `main`, or this file is decoration.
+#
+# Nothing here needs a secret, which is the point: a workflow with no
+# credentials cannot leak one.
+#
+# The project has no dependencies, so there is nothing to install. The tests
+# are node:test and the build is a file copy.
+
+name: Checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Tests, build and drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Tests
+        run: npm test
+
+      # Fails if a committed drawing or the blueprint no longer matches its
+      # source, so a stale picture cannot reach a reader.
+      - name: Diagrams match the model
+        run: npm run diagrams:check
+      - name: Blueprint matches its source
+        run: npm run blueprint:check
+
+      # The same command Cloudflare runs. Failing here rather than in the
+      # Pages build means the pull request goes red, not the deployment.
+      # It also refuses to finish if anything on the forbidden list reached
+      # dist/, which is what keeps the repository out of the published site.
+      - name: Assemble the publishable site
+        run: npm run build:site

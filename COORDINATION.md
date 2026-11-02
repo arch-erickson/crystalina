@@ -63,6 +63,23 @@ Shared, so announce in the log before touching: `css/styles.css`,
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-02 · Claude Code · The deploy path changed, and the token is gone
+
+Cloudflare Pages now deploys from its own Git connection. `.github/workflows/deploy.yml`
+is deleted and replaced by `.github/workflows/checks.yml`, which deploys
+nothing and holds no credential: it runs the tests and both drift checks,
+and branch protection on `main` makes them required. Recorded as AD9.
+
+**What this changes for you.** There is no `CLOUDFLARE_API_TOKEN` any more,
+and nothing in CI needs a secret. The gate on production is the merge, so a
+migration has to be applied before the pull request that needs it is merged,
+not after.
+
+**Still owner work, in Cloudflare:** connect the Pages project to the repo
+with build command `npm run build:site` and output directory `dist`, turn
+on branch protection for `main` requiring the Checks job, and put Access in
+front of `*.crystalina.pages.dev`.
+
 ### 2026-10-09 · Claude Code · The WebWork method, and the groundwork for Cloudflare
 
 **What changed.**
