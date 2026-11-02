@@ -78,7 +78,7 @@ export const architecture = {
         label: 'Data and identity',
         nodes: [
           { id: 'pg', family: 'teal', icon: 'database', label: 'Supabase Postgres', detail: '23 tables, RLS on, 12 migrations applied', status: 'Implemented' },
-          { id: 'auth', family: 'violet', icon: 'key', label: 'Supabase Auth', detail: 'Email sign-in, JWT, user_roles', status: 'Partial', note: 'No reset, no verification' },
+          { id: 'auth', family: 'violet', icon: 'key', label: 'Supabase Auth', detail: 'Email code, JWT, user_roles', status: 'Partial', note: 'Passwordless. Google not yet enabled' },
           { id: 'storage', family: 'teal', icon: 'image', label: 'Supabase Storage', detail: 'site-media bucket, public reads', status: 'Implemented' },
         ],
       },
@@ -138,7 +138,7 @@ export const architecture = {
         label: 'Data and identity (kept)',
         nodes: [
           { id: 'pg', family: 'teal', icon: 'database', label: 'Supabase Postgres', detail: 'RLS, create_order, catalog RPCs', status: 'Implemented' },
-          { id: 'auth', family: 'violet', icon: 'key', label: 'Supabase Auth', detail: 'Email sign-in, JWT, user_roles', status: 'Partial', note: 'Reset and verification to add' },
+          { id: 'auth', family: 'violet', icon: 'key', label: 'Supabase Auth', detail: 'Google or email code, JWT, user_roles', status: 'Partial', note: 'Google provider to enable in Supabase' },
           { id: 'storage', family: 'teal', icon: 'image', label: 'Supabase Storage', detail: 'site-media bucket', status: 'Implemented' },
         ],
       },
@@ -321,7 +321,7 @@ export const pages = [
     id: 'signin', icon: 'key', label: 'Sign in', route: '/signin/', area: 'client', col: 2, row: 1,
     design: 'Implemented', server: 'Partial',
     built: ['CrystalinaAuth on Supabase Auth, real sessions'],
-    remaining: ['No password reset, no email verification', 'Store.signUp and Store.signIn stubs still exist and must be retired'],
+    remaining: ['Continue with Google is built; the provider is not enabled in Supabase yet', 'Store.signUp and Store.signIn stubs still exist and must be retired'],
   },
   {
     id: 'account', icon: 'person', label: 'Account', route: '/account/', area: 'client', col: 3, row: 1,
@@ -526,12 +526,12 @@ export const flows = [
     note: 'The data is protected by row level security, which is the part that matters. What is wrong is the gate in front of the dashboards: it is markup, and markup is a suggestion.',
     lanes: [
       { family: 'blue', icon: 'browser', id: 'b', label: 'Browser', detail: '/signin/' },
-      { id: 'auth', family: 'violet', icon: 'key', label: 'Supabase Auth', detail: 'email and password' },
+      { id: 'auth', family: 'violet', icon: 'key', label: 'Supabase Auth', detail: 'Google, or a code by email' },
       { family: 'violet', icon: 'page', id: 'page', label: 'Dashboard page', detail: '/admin/, /manager/, ...' },
       { family: 'teal', icon: 'database', id: 'db', label: 'Postgres', detail: 'RLS and has_role()' },
     ],
     steps: [
-      { from: 'b', to: 'auth', label: 'email and password', n: 1 },
+      { from: 'b', to: 'auth', label: 'Google, or an eight-digit code by email', n: 1 },
       { from: 'auth', to: 'b', label: 'session and JWT', n: 2, back: true },
       { from: 'b', to: 'page', label: 'open a staff page', n: 3 },
       { from: 'page', to: 'page', label: 'today: the page itself decides what to show. This is the hole', n: 4, self: true, tone: 'amber' },

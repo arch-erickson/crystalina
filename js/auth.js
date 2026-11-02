@@ -49,6 +49,29 @@ window.CrystalinaAuth = (async () => {
   }
 
   return {
+    /* Google sign-in. Supabase handles the OAuth round trip; the browser
+       only starts it. The return lands back on /signin/, where
+       detectSessionInUrl picks the session out of the URL and the page
+       routes on whatever currentUser() then reports.
+
+       `next` survives the redirect as a query parameter, because the staff
+       or customer choice the visitor made is otherwise lost at Google. */
+    async signInWithGoogle({ next } = {}) {
+      const back = new URL('/signin/', location.origin);
+      if (next) back.searchParams.set('next', next);
+      const { error } = await client.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: back.href,
+          /* Always offer the account chooser. Without it a visitor with
+             several Google accounts is silently signed in as whichever one
+             the browser saw last, which is the single most common support
+             complaint about this button. */
+          queryParams: { prompt: 'select_account' },
+        },
+      });
+      if (error) throw error;
+    },
     async sendCode(email, { allowSignup = false } = {}) {
       const { error } = await client.auth.signInWithOtp({
         email,

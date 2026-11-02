@@ -133,10 +133,12 @@ One platform for the pages, the server code, the captcha, the preview gate and t
 #### What the owner does, and what the agent does
 
 1. The owner creates the Cloudflare account and turns on two-step sign-in.
-2. The owner creates a scoped API token with Pages edit permission, and stores it with the account id as repository secrets. The agent never sees a password.
-3. The owner adds every secret in section 10 to the Pages project, per environment. The agent names them; it does not hold them.
-4. The owner moves the crystalina.org nameservers to Cloudflare when, and only when, a preview has passed.
-5. The agent does everything else, and lists in a handoff exactly which names were set and which were not.
+2. The owner connects the Pages project to the repository, with build command npm run build:site and output directory dist. No API token is created: nothing in CI holds a credential (AD9).
+3. The owner adds every value in section 9 to the Pages project, per environment. The agent names them; it does not hold them.
+4. The owner enables the Google provider in Supabase and pastes in the OAuth client it created in Google Cloud. The sign-in button is already built and does nothing until that is done.
+5. The owner turns on branch protection for main, requiring the Checks job. Without it nothing gates production.
+6. The owner moves the crystalina.org nameservers to Cloudflare when, and only when, a preview has passed.
+7. The agent does everything else, and lists in a handoff exactly which names were set and which were not.
 
 ![Architecture after the move to Cloudflare](diagrams/architecture-target.svg)
 
@@ -320,7 +322,7 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | NYC water | /nyc-water/ | Implemented | Missing | Figures are illustrative and unverified against NYC DEP reports (U2) |
 | About | /about/ | Implemented | Missing | Nothing. No server work needed |
 | Contact | /contact/ | Implemented | Partial | Returns 500 in production: no environment variables are set No Turnstile widget |
-| Sign in | /signin/ | Implemented | Partial | No password reset, no email verification Store.signUp and Store.signIn stubs still exist and must be retired |
+| Sign in | /signin/ | Implemented | Partial | Continue with Google is built; the provider is not enabled in Supabase yet Store.signUp and Store.signIn stubs still exist and must be retired |
 | Account | /account/ | Implemented | Refactor | Still reads local session state instead of CrystalinaAuth |
 | Admin console | /admin/ | Implemented | Partial | Access decided in the browser, not by a policy (U1) Record fields reach innerHTML unescaped: stored XSS route No screen for stage options or faucet assignment |
 | Manager | /manager/ | Implemented | Partial | Same browser-side gate and same unescaped interpolation |

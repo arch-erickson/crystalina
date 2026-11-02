@@ -141,8 +141,10 @@ export const sections = [
       t: 'ol',
       items: [
         'The owner creates the Cloudflare account and turns on two-step sign-in.',
-        'The owner creates a scoped API token with Pages edit permission, and stores it with the account id as repository secrets. The agent never sees a password.',
-        'The owner adds every secret in section 10 to the Pages project, per environment. The agent names them; it does not hold them.',
+        'The owner connects the Pages project to the repository, with build command npm run build:site and output directory dist. No API token is created: nothing in CI holds a credential (AD9).',
+        'The owner adds every value in section 9 to the Pages project, per environment. The agent names them; it does not hold them.',
+        'The owner enables the Google provider in Supabase and pastes in the OAuth client it created in Google Cloud. The sign-in button is already built and does nothing until that is done.',
+        'The owner turns on branch protection for main, requiring the Checks job. Without it nothing gates production.',
         'The owner moves the crystalina.org nameservers to Cloudflare when, and only when, a preview has passed.',
         'The agent does everything else, and lists in a handoff exactly which names were set and which were not.',
       ],
