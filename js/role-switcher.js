@@ -12,7 +12,12 @@
   const routes = { admin: '/admin/', manager: '/manager/', technician: '/technician/', sales: '/sales/' };
   const labels = { admin: 'Admin', manager: 'Manager', technician: 'Technician', sales: 'Sales' };
   const available = user.roles.filter(role => routes[role]);
-  if (available.length < 2) return;
+  /* One staff role is enough now: the customer view is always an option,
+     so there is always somewhere else to go. */
+  if (!available.length) return;
+  routes.customer = '/account/';
+  labels.customer = 'Customer view';
+  available.push('customer');
   const active = Object.entries(routes).find(([, path]) => location.pathname.startsWith(path))?.[0];
   const nav = document.createElement('nav');
   nav.className = 'role-switcher';

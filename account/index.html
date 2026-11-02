@@ -47,9 +47,23 @@
 <script>
   const user = Store.currentUser();
   if (!user) location.href = '/signin/';
-  else if (user.role === 'admin') location.href = '/admin/';
 
   initPage('');
+
+  /* Staff are customers too. Signing in through the customer form used to
+     bounce an admin straight to the dashboard, which left no way to see
+     your own orders or check what a shopper sees. The choice is now
+     explicit: this link goes one way, the switcher on the dashboard comes
+     back. */
+  const STAFF_ROUTES = { admin: '/admin/', manager: '/manager/', technician: '/technician/', sales: '/sales/' };
+  const staffRole = ['admin', 'manager', 'sales', 'technician'].find(role => (user.roles || []).includes(role));
+  if (staffRole) {
+    const link = document.createElement('a');
+    link.className = 'btn btn-outline';
+    link.href = STAFF_ROUTES[staffRole];
+    link.textContent = 'Switch to staff view';
+    document.querySelector('#acctTitle').insertAdjacentElement('afterend', link);
+  }
 
   document.getElementById('acctSub').textContent = 'Welcome back, ' + user.name.split(' ')[0] + '!';
   document.getElementById('acctName').textContent = user.name;
