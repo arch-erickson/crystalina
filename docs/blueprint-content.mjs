@@ -492,6 +492,20 @@ export const sections = [
     },
     {
       t: 'decision',
+      id: 'AD10',
+      date: '2026-11-02',
+      title: 'A Worker with static assets, because Cloudflare retired the Pages flow',
+      fields: {
+        'What it does': 'worker.js routes /api/* to the three handlers and hands everything else to the ASSETS binding, which serves dist. wrangler.toml declares main and [assets] rather than pages_build_output_dir.',
+        'Why we need it': 'Creating a project now goes through the Workers flow. It requires a deploy command, fills in wrangler deploy, and issues a build token with Workers permissions. Five builds failed: first on the wrong command, then on the Pages API refusing a Workers-scoped token. The platform had moved; the configuration had not.',
+        'Why it belongs here': 'The handlers in api/ did not change, and neither did functions/_shim.js. A Pages Function is handed { request, env } and so is this, so one adapter serves both. The files under functions/ still work if the Pages flow ever returns.',
+        'What it costs': 'Routing is now a table in worker.js rather than the filesystem, so a new endpoint means a line there as well as a file. Six tests pin that table down.',
+        'Right for now': 'Three routes. A table of three is easier to read than file-based routing anyway.',
+        'Replace when': 'The route list outgrows one screen, or Cloudflare offers file-based routing for Workers.',
+      },
+    },
+    {
+      t: 'decision',
       id: 'AD9',
       date: '2026-11-02',
       title: 'Cloudflare deploys from its own Git connection, and GitHub Actions only gates it',

@@ -123,8 +123,8 @@ export const architecture = {
         label: 'Cloudflare (one account)',
         nodes: [
           { id: 'cfdns', family: 'amber', icon: 'globe', label: 'Cloudflare DNS', detail: 'crystalina.org zone, proxied', status: 'Missing', note: 'Nameserver change, phase 5' },
-          { id: 'cfpages', family: 'amber', icon: 'cloud', label: 'Pages', detail: 'Static site, production and preview', status: 'Missing', note: 'Phase 1' },
-          { id: 'cffn', family: 'amber', icon: 'bolt', label: 'Pages Functions', detail: 'functions/api/*, Workers runtime', status: 'Missing', note: 'Port of /api, phase 2' },
+          { id: 'cfpages', family: 'amber', icon: 'cloud', label: 'Static assets', detail: 'dist, served by the ASSETS binding', status: 'Partial', note: 'Builds green, deploy not landed' },
+          { id: 'cffn', family: 'amber', icon: 'bolt', label: 'Worker routes', detail: 'worker.js routes /api/*', status: 'Partial', note: 'Written and tested, not yet deployed' },
           { id: 'cfts', family: 'rose', icon: 'shield', label: 'Turnstile', detail: 'Widget plus server verification', status: 'Partial', note: 'Server side already done' },
           { id: 'cfaccess', family: 'violet', icon: 'lock', label: 'Access', detail: 'Preview and staging gate', status: 'Missing', note: 'Phase 1' },
           { id: 'cfwaf', family: 'rose', icon: 'filter', label: 'WAF rate limiting', detail: 'Durable limit on /api/*', status: 'Missing', note: 'Replaces the in-process limiter' },
@@ -608,7 +608,7 @@ export const flows = [
  * ------------------------------------------------------------------ */
 
 export const deployment = {
-  note: 'One deploy path, not two. Cloudflare Pages deploys from its own Git connection: it clones the repository, runs the build and publishes dist. GitHub Actions deploys nothing and holds no credential; it runs the tests and the drift checks, and branch protection makes them required. The gate on production is therefore the merge, performed by a person who has applied the migrations first (AD9).',
+  note: 'One deploy path, not two. Cloudflare builds from its own Git connection: it clones the repository, runs the build and deploys a Worker that serves dist and routes /api/* (AD10). GitHub Actions deploys nothing and holds no credential; it runs the tests and the drift checks, and branch protection makes them required. The gate on production is therefore the merge, performed by a person who has applied the migrations first (AD9).',
   stages: [
     { id: 'dev', family: 'slate', icon: 'branch', label: 'Working tree', detail: 'npm test, npm run build:site, node scripts/verify.mjs', status: 'Partial', note: 'Harness added, no browser installed yet' },
     { id: 'pr', family: 'blue', icon: 'check', label: 'Pull request', detail: 'Actions: tests, both drift checks, the build', status: 'Implemented', note: 'Make them required on main, or this is decoration' },
