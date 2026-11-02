@@ -17,15 +17,17 @@ compatibility_date = "2026-09-01"
 # with Buffer. Without this flag both fail at runtime, not at deploy.
 compatibility_flags = ["nodejs_compat"]
 
-# Two environments, from the first deploy. Preview gets its own values, so a
-# test order on a branch cannot mail a real customer or move real stock (U4).
-[env.preview]
-# Set in the dashboard, per environment:
-#   SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, PUBLIC_SITE_URL,
-#   TURNSTILE_SITE_KEY, EMAIL_FROM, CONTACT_INBOX
-# and as secrets (never as plain variables):
-#   SUPABASE_SERVICE_ROLE_KEY, TURNSTILE_SECRET_KEY, RESEND_API_KEY,
-#   STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
-
-[env.production]
-# Same names, production values.
+# No [env.*] blocks here on purpose. They held nothing but comments, and
+# their presence made wrangler warn that multiple environments were defined
+# with no target chosen, then auto-fill a deploy command of `wrangler deploy`
+# that is wrong for Pages. The Pages project needs no deploy command at all:
+# it uploads pages_build_output_dir itself.
+#
+# Variables are set per environment in the Pages dashboard, under Settings,
+# Variables and secrets. Preview gets its own values so a test on a branch
+# cannot mail a real customer or move real stock (U4).
+#
+# Plain values:  SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, PUBLIC_SITE_URL,
+#                TURNSTILE_SITE_KEY, EMAIL_FROM, CONTACT_INBOX
+# Secrets:       SUPABASE_SERVICE_ROLE_KEY, TURNSTILE_SECRET_KEY,
+#                RESEND_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
