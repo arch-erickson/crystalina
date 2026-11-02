@@ -357,12 +357,19 @@
      iframe, so what the editor shows is what a visitor gets. Opening a layer
      reveals its content and typography controls inline.
      ------------------------------------------------------------------ */
-  const TYPE_FONTS = ['Inter', 'Poppins', 'Georgia', 'Helvetica Neue', 'system-ui'];
+  // The two faces of the design system, and nothing else. A font the site
+  // does not load cannot be offered here: the visitor would be given
+  // whatever their machine happened to have. See the type rule in
+  // css/styles.css.
+  const TYPE_FONTS = [
+    { value: 'var(--font-head)', label: 'Playfair Display, for titles' },
+    { value: 'var(--font-body)', label: 'Montserrat, for text' },
+  ];
   const openLayers = new Set();
 
   function fontOptions(selected) {
     return TYPE_FONTS.map(font =>
-      `<option value="${font}" ${selected === font ? 'selected' : ''}>${font}</option>`).join('');
+      `<option value="${escapeHTML(font.value)}" ${selected === font.value ? 'selected' : ''}>${escapeHTML(font.label)}</option>`).join('');
   }
 
   function layerEditor(section) {

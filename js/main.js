@@ -214,9 +214,17 @@ function applySectionTypography(el, typography) {
     headingColor: '--sec-heading-color', bodyFont: '--sec-body-font',
     bodySize: '--sec-body-size', bodyColor: '--sec-body-color'
   };
+  // Only the two design system faces may be set. A section saved before the
+  // type rule existed can still name a font the site does not load, which
+  // would render in whatever the visitor's machine happened to have.
+  const FACES = ['var(--font-head)', 'var(--font-body)'];
   let touched = false;
   Object.entries(map).forEach(([key, prop]) => {
-    if (typography[key]) { el.style.setProperty(prop, typography[key]); touched = true; }
+    const value = typography[key];
+    if (!value) return;
+    if (key.endsWith('Font') && !FACES.includes(value)) return;
+    el.style.setProperty(prop, value);
+    touched = true;
   });
   if (touched) el.classList.add('has-custom-type');
 }

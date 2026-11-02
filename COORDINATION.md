@@ -63,6 +63,35 @@ Shared, so announce in the log before touching: `css/styles.css`,
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-02 · Claude Code · One type rule, and every page head rewritten
+
+Playfair Display is the display face by decision rather than as a stand-in,
+and Canela is out of the stack. Four weights exist as tokens in
+`css/styles.css`, and all 135 numeric `font-weight` declarations across the
+stylesheet, the quiz page and the editor now use them. Weight 800 was set in
+32 places and was never loaded, so the browser was drawing a synthetic bold;
+that is gone. Recorded as AD8, amended, and AD10, new.
+
+**What this changes for you.** I touched the `<head>` of all fourteen pages.
+The font link is now one identical string everywhere, and the stylesheet is
+`/css/styles.css?v=20261102-type-rule` on every page, where eleven of them
+previously had no version at all. If you are editing page heads for auth or
+for Cloudflare, take this change first and keep the two strings identical
+across every page: they are a single definition that happens to be stored in
+fourteen files, which is the next thing section 13 should fix.
+
+The content editor no longer offers Inter, Poppins, Georgia, Helvetica Neue
+or system-ui. It offers the two faces of the design system, and `js/main.js`
+now ignores any other face stored against a section, so old rows in
+`site_content` cannot put an unloaded font on the page.
+
+`npm run check` passes: 29 tests, the build, and both drift checks.
+
+**Still open, and not mine to take.** `checkout/index.html` computes
+shipping in the browser as `subtotal >= 99 ? 0 : 9.99`, and the free
+shipping threshold is written in nine places across the site. The claims
+table above still assigns `api/`, `functions/` and `supabase/` to Codex,
+which no longer reflects who is working here.
 ### 2026-11-02 · Claude Code · The deploy path changed, and the token is gone
 
 Cloudflare Pages now deploys from its own Git connection. `.github/workflows/deploy.yml`

@@ -73,8 +73,12 @@ designer.
   cyan `#3DC7F4`, silver `#CFD2D3`, white. No greens, purples or warm casts
   anywhere a customer can see. The wider palette in
   `scripts/lib/tokens.mjs` is for internal diagrams only.
-- Type: **Montserrat** for text, **Playfair Display** for headings, standing
-  in for Canela until it is licensed (AD8).
+- Type: **Montserrat** for text, **Playfair Display** for titles (AD8). Four
+  weights exist, and they are tokens: `--w-regular` 400, `--w-medium` 500,
+  `--w-semibold` 600, `--w-bold` 700. **Never write a numeric font-weight.**
+  Montserrat sets everything that is read, including all dashboard text.
+  Playfair sets titles, the button label, prices and the large storefront
+  numerals. The rule is written out at the top of `css/styles.css` (AD10).
 - Paths are root-absolute (`/css/...`), URLs are clean folders.
 - Buttons use the unified centre-out fill hover. Do not reintroduce ad hoc
   button styles.

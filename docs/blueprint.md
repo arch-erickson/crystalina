@@ -478,16 +478,27 @@ _Decided 2026-10-09._
 - **Right for now.** Fifteen directories and nineteen files. Small enough to read in one screen.
 - **Replace when.** A real build step appears for another reason, and can own the same list.
 
-#### AD8 · Montserrat for text, and a Canela-like serif for titles
+#### AD8 · Montserrat for text, and Playfair Display for titles
 
 _Decided 2026-10-09._
 
 - **What it does.** Replaces Inter and Poppins across the site and the blueprint. Two tokens in css/styles.css and one in scripts/lib/tokens.mjs.
 - **Why we need it.** The brand reads as a premium product and was set in two geometric sans faces, which read as a technology product.
 - **Why it belongs here.** Changing it costs two tokens and a font link while the site is pre-launch. After launch it is a visual regression test across every page.
-- **What it costs.** Montserrat is a wider face than Inter, so anything that was close to wrapping now wraps. Checked at 1280: the navigation still fits on one line. Canela is licensed, so Playfair Display stands in for it.
+- **What it costs.** Montserrat is a wider face than Inter, so anything that was close to wrapping now wraps. Checked at 1280: the navigation still fits on one line.
 - **Right for now.** Both faces are on Google Fonts, so there is no licence to buy and no file to self-host yet.
-- **Replace when.** Canela is licensed. Then change the one token in each place, and self-host rather than loading from a third party.
+- **Replace when.** A licensed display face is bought and self-hosted. Canela was the intended face and was never licensed. On 2026-11-02 thirteen candidates were set in the headings of this site and compared, and Playfair Display was chosen on its merits: the two faces closest to Canela in shape, Marcellus and Gilda Display, carry a single weight each, which would have put synthetic bold back on the page.
+
+#### AD10 · Four weights, and one rule for which face a thing is set in
+
+_Decided 2026-11-02._
+
+- **What it does.** Names the four weights as tokens in css/styles.css and replaces all 135 numeric font-weight declarations with them. Montserrat sets everything that is read. Playfair Display sets titles, the button label, prices and the large storefront numerals, and nothing else. The content editor offers those two faces only, and main.js refuses any other face stored against a section.
+- **Why we need it.** Weight 800 was set in 32 places and neither family was ever loaded at 800, so the browser drew a synthetic bold in its place. The editor offered Inter, Poppins, Georgia, Helvetica Neue and system-ui, none of which the site loads. Prices were set in the display face in two components and in the body face in three.
+- **Why it belongs here.** A type rule that lives only in the head of whoever reviews the change is decided again, differently, the next time a component is added.
+- **What it costs.** Thirty two places are one step lighter than they were, which is the difference between a drawn bold and a real one. The page head asks for the same seven files as before, and every one of them is now a weight the stylesheet uses.
+- **Right for now.** Four weights carry every component on the site, and the whole rule is one comment block at the top of the stylesheet.
+- **Replace when.** A component genuinely needs a fifth weight. Add it to the token block and to the loader in every page head in the same commit, never as a literal.
 
 #### AD9 · Cloudflare deploys from its own Git connection, and GitHub Actions only gates it
 
