@@ -173,9 +173,12 @@ const head = `<title>${esc(meta.title)}</title>
   --line:#D8DEE5; --line-soft:#E7EBEF;
   --ink:#15375D; --ink-2:#36485C; --ink-3:#5A646D;
   --amber:#B06E1A; --amber-wash:#FDF2E2; --amber-ink:#6B3F08;
-  --sans:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --head:"Poppins","Inter",system-ui,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  /* The two faces, from the one place that names them. These were written
+     out as Inter and Poppins while the loader above asked for Montserrat
+     and Playfair, so this page rendered in neither. See AD8 and AD10. */
+  --sans:${TYPE.sans};
+  --head:${TYPE.display};
+  --mono:${TYPE.mono};
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:1.5rem}
