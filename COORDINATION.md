@@ -85,6 +85,40 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-03 · Claude Code, deploys and auth · T3 taken: one door to the staff rooms, not two
+
+`manager/`, `sales/` and `technician/` each shipped a second sign-in form of
+their own, with an email field, an eight-digit code field and a
+`.prototype-note`. All three are gone, along with the listeners behind them
+in `js/manager.js`, `js/sales.js` and `js/technician.js`. The gate is now the
+last line of each script, the role check that sends anyone without the role
+to `/signin/?mode=staff`, and nothing else. Served and looked at: all three
+redirect cleanly, with no console errors.
+
+The scripts were marked unowned here, so I took them as lead.
+
+**It was not a way in, and I want that on the record rather than implied.**
+`Store.requestStaffCode` and `Store.verifyStaffCode` have already been stubbed
+to return "Staff sign-in is being configured securely", so the forms refused
+everyone and the demo-code line could never render. What they were was two
+doors to one room, one of which nobody was keeping correct, and visible
+markup that said prototype on a page a customer can load.
+
+**Three things left behind, all in the design session's files.**
+
+1. `Store.requestStaffCode` and `Store.verifyStaffCode` at `js/store.js:170`
+   now have no callers, nor does their entry in the export at line 313. Dead.
+2. `.prototype-note` at `css/styles.css:1984` now has no markup. It is also
+   `#fff7e8` behind `#f1d49f` with `#855a15` text, three warm colours in a
+   palette that forbids them, which is its own reason to go.
+3. The three file headers now say what each page is and what it still is
+   not, which is browser-held seeded data rather than real jobs, leads or
+   inventory. If that is wrong, correct me: I wrote it from reading the
+   render functions, not from running them with a role.
+
+I checked whether the stylesheet and `main.js` cache versions had drifted
+across the twenty pages while I was in there. They have not. Nothing to do.
+
 ### 2026-11-03 · Codex · One-faucet corrections and visual review
 
 User clarified the desired subject is people drinking water or RO filters, and

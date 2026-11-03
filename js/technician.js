@@ -1,12 +1,15 @@
-/* Crystalina technician portal, browser-backed prototype. */
+/* Crystalina technician portal.
+ *
+ * Signing in happens at /signin/?mode=staff and nowhere else. This page
+ * used to carry a second form of its own; the role check at the foot
+ * redirected before anyone could reach it, and the verification step
+ * behind it was never built. The gate is the last line of this file.
+ *
+ * What it shows is still browser-held data, seeded in js/store.js, not
+ * real assigned jobs. That is the next thing to fix here.
+ */
 (() => {
-  const REQUIRED_ROLE = 'Technician';
-  const auth = document.getElementById('portalAuth');
   const shell = document.getElementById('portalShell');
-  const emailForm = document.getElementById('staffEmailForm');
-  const codeForm = document.getElementById('staffCodeForm');
-  const error = document.getElementById('portalError');
-  let pendingEmail = '';
   let pendingPhoto = null;
 
   const defaultChecklist = job => [
@@ -17,12 +20,11 @@
     { label: 'Record finished-job photo', done: Boolean(job.afterPhoto) }
   ];
 
-  function showError(message) { error.textContent = message; error.classList.toggle('show', Boolean(message)); }
   function sessionIsValid(session) {
     return Boolean(session?.roles?.includes('technician'));
   }
   function showPortal(session) {
-    auth.hidden = true; shell.hidden = false;
+    shell.hidden = false;
     document.getElementById('portalStaffName').textContent = session.name;
     document.getElementById('portalStaffId').textContent = session.id;
     renderJobs(session);
@@ -30,22 +32,6 @@
     window.dispatchEvent(new CustomEvent('technician-session-ready'));
   }
 
-  emailForm.addEventListener('submit', event => {
-    event.preventDefault(); pendingEmail = document.getElementById('staffEmail').value.trim();
-    const result = Store.requestStaffCode(pendingEmail, REQUIRED_ROLE);
-    if (!result.ok) { showError(result.error); return; }
-    showError(''); emailForm.hidden = true; codeForm.hidden = false;
-    const note = document.getElementById('prototypeCode');
-    note.hidden = false; note.innerHTML = `<strong>Prototype verification</strong><span>Email delivery will be connected with the backend. For this browser demo, use code <b>${result.demoCode}</b>.</span>`;
-    document.getElementById('staffCode').focus();
-  });
-  codeForm.addEventListener('submit', event => {
-    event.preventDefault();
-    const result = Store.verifyStaffCode(pendingEmail, document.getElementById('staffCode').value.trim(), REQUIRED_ROLE);
-    if (!result.ok) { showError(result.error); return; }
-    showPortal(result.staff);
-  });
-  document.getElementById('changeStaffEmail').addEventListener('click', () => { codeForm.hidden = true; emailForm.hidden = false; document.getElementById('prototypeCode').hidden = true; showError(''); });
   document.getElementById('staffSignOut').addEventListener('click', async () => { try { const authClient = await window.CrystalinaAuth; await authClient.signOut(); } finally { Store.signOut(); Store.staffSignOut(); location.href = '/signin/?mode=staff'; } });
 
   function renderJobs(session = Store.currentStaff()) {
