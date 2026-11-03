@@ -47,17 +47,17 @@ export default async function handler(req, res) {
   for (const item of items) {
     const productId = String(item?.productId || '');
     const quantity = Number(item?.quantity);
-    if (!UUID_RE.test(productId)) return json(res, 400, { error: 'Unrecognised product in cart.' });
+    if (!UUID_RE.test(productId)) return json(res, 400, { error: 'Unrecognized product in cart.' });
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
       return json(res, 400, { error: 'Invalid quantity.' });
     }
     const line = { productId, quantity };
     if (item?.stageOptionId) {
-      if (!UUID_RE.test(String(item.stageOptionId))) return json(res, 400, { error: 'Unrecognised configuration.' });
+      if (!UUID_RE.test(String(item.stageOptionId))) return json(res, 400, { error: 'Unrecognized configuration.' });
       line.stageOptionId = String(item.stageOptionId);
     }
     if (item?.faucetId) {
-      if (!UUID_RE.test(String(item.faucetId))) return json(res, 400, { error: 'Unrecognised faucet.' });
+      if (!UUID_RE.test(String(item.faucetId))) return json(res, 400, { error: 'Unrecognized faucet.' });
       line.faucetId = String(item.faucetId);
     }
     cleanItems.push(line);
