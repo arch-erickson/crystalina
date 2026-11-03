@@ -148,6 +148,70 @@ const tableHTML = (t) => `<div class="tbl"><table>
 <tbody>${t.rows.map((row) => `<tr>${row.map((c) => `<td>${cell(c)}</td>`).join('')}</tr>`).join('\n')}</tbody>
 </table></div>${t.caption ? `<p class="cap">${esc(t.caption)}</p>` : ''}`;
 
+
+/* ------------------------------------------------------------------ *
+ * Screens. docs/screens/index.json is written by scripts/screens.mjs and
+ * lists every page and home section at three viewports. The images stay
+ * as files beside the page; the Artifact publishes them as its files.
+ * ------------------------------------------------------------------ */
+const SCREENS_FILE = join(DOCS, 'screens', 'index.json');
+const SCREENS = existsSync(SCREENS_FILE) ? JSON.parse(readFileSync(SCREENS_FILE, 'utf8')) : null;
+
+function screensHTML() {
+  if (!SCREENS) return '<p class="cap">No captures yet. Serve the site and run <code>npm run screens</code>.</p>';
+  const vps = SCREENS.viewports;
+  const frame = (item, kind) => vps.map((vp) => {
+    const shot = item.shots[vp.name];
+    if (!shot) return '';
+    const shown = kind === 'page' ? Math.min(shot.height, Math.round(vp.height * 1.6)) : shot.height;
+    return `<a class="screen-frame" data-vp="${vp.name}" href="screens/${shot.file}" target="_blank" rel="noopener" style="aspect-ratio:${shot.width}/${shown}"><img src="screens/${shot.file}" alt="${esc(item.title || item.heading || item.slug)} at ${vp.name}, ${vp.width} pixels wide" loading="lazy" width="${shot.width}" height="${shot.height}"></a>`;
+  }).join('');
+  const pageCard = (p) => `<figure class="screen-card">
+  <figcaption><span class="screen-name">${esc(p.title)}</span><code>${esc(p.path)}</code>${p.h1 ? `<span class="screen-h1">${esc(p.h1)}</span>` : ''}</figcaption>
+  ${frame(p, 'page')}
+</figure>`;
+  const sectionCard = (sct) => `<figure class="screen-card">
+  <figcaption><span class="screen-name">${esc(sct.heading || sct.slug)}</span><code>data-home-section="${esc(sct.slug)}"</code></figcaption>
+  ${frame(sct, 'section')}
+</figure>`;
+  const group = (title, cards) => `<h3>${esc(title)}</h3><div class="screen-grid">${cards.join('')}</div>`;
+  return `<div class="screens" data-vp="desktop" id="screens">
+<div class="screens-toggle" role="tablist" aria-label="Viewport">
+  ${vps.map((vp, i) => `<button type="button" role="tab" aria-selected="${i === 0}" data-set-vp="${vp.name}">${esc(vp.name[0].toUpperCase() + vp.name.slice(1))} <small>${vp.width}</small></button>`).join('')}
+  <span class="screens-note">Captured ${esc(SCREENS.captured)}. Each frame scrolls; click one to open the full capture.</span>
+</div>
+${group('What a customer sees', SCREENS.pages.filter((p) => p.group === 'customer').map(pageCard))}
+${group('What the staff see', SCREENS.pages.filter((p) => p.group === 'staff').map(pageCard))}
+${group('The home page, section by section', SCREENS.sections.map(sectionCard))}
+</div>
+<script>
+(function () {
+  var root = document.getElementById('screens');
+  if (!root) return;
+  root.querySelectorAll('[data-set-vp]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      root.setAttribute('data-vp', b.getAttribute('data-set-vp'));
+      root.querySelectorAll('[data-set-vp]').forEach(function (o) { o.setAttribute('aria-selected', String(o === b)); });
+    });
+  });
+})();
+</script>`;
+}
+
+function screensMD() {
+  if (!SCREENS) return 'No captures yet. Serve the site and run npm run screens.';
+  const line = (item, label) => `- **${label}**: ${SCREENS.viewports.map((vp) => item.shots[vp.name] ? `[${vp.name}](screens/${item.shots[vp.name].file})` : '').filter(Boolean).join(', ')}`;
+  return [
+    `Captured ${SCREENS.captured} at ${SCREENS.viewports.map((v) => v.width).join(', ')} pixels wide.`,
+    '', '### What a customer sees',
+    ...SCREENS.pages.filter((p) => p.group === 'customer').map((p) => line(p, `${p.title} ${p.path}`)),
+    '', '### What the staff see',
+    ...SCREENS.pages.filter((p) => p.group === 'staff').map((p) => line(p, `${p.title} ${p.path}`)),
+    '', '### The home page, section by section',
+    ...SCREENS.sections.map((s) => line(s, s.heading || s.slug)),
+  ].join('\n');
+}
+
 function diagramHTML(name) {
   const d = byName.get(name);
   if (!d) return `<p class="cap">Missing drawing: ${esc(name)}</p>`;
@@ -240,6 +304,7 @@ function blockHTML(b) {
     case 'ol': return `<ol>${b.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ol>`;
     case 'table': return tableHTML(b);
     case 'diagram': return diagramHTML(b.name);
+    case 'screens': return screensHTML();
     case 'callout': return `<div class="callout ${b.kind || 'note'}">
 <span class="k">${esc(b.title || '')}</span>
 ${b.text ? `<p>${esc(b.text)}</p>` : ''}
@@ -275,13 +340,12 @@ const head = `<title>${esc(meta.title)}</title>
   --line:#D8DEE5; --line-soft:#E7EBEF;
   --ink:#15375D; --ink-2:#36485C; --ink-3:#5A646D;
   --amber:#B06E1A; --amber-wash:#FDF2E2; --amber-ink:#6B3F08;
-  /* AD8: Montserrat for everything that is read, Playfair Display standing
-     in for Canela on titles. These were still Inter and Poppins here long
-     after the site had moved, which is exactly the kind of second copy
-     this document is about. */
-  --sans:"Montserrat","Segoe UI",system-ui,-apple-system,sans-serif;
-  --head:"Playfair Display","Canela",Georgia,serif;
-  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  /* The two faces, from the one place that names them. These were written
+     out as Inter and Poppins while the loader above asked for Montserrat
+     and Playfair, so this page rendered in neither. See AD8 and AD12. */
+  --sans:${TYPE.sans};
+  --head:${TYPE.display};
+  --mono:${TYPE.mono};
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:1.5rem}
@@ -352,6 +416,22 @@ td{color:var(--ink-2)}
 .diagram{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;margin:1rem 0 .4rem}
 .diagram svg{display:block;width:100%;height:auto}
 footer.doc{border-top:1px solid var(--line);margin-top:2.6rem;padding-top:1.4rem;font-size:.8rem;color:var(--ink-3);max-width:80ch}
+.screens-toggle{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;margin:.6rem 0 1.2rem}
+.screens-toggle button{font:inherit;font-size:.78rem;font-weight:600;color:var(--ink-2);background:var(--tile);border:1px solid var(--line);border-radius:3px;padding:.38rem .8rem;cursor:pointer}
+.screens-toggle button small{font-family:var(--mono);font-weight:400;color:var(--ink-3);margin-left:.25rem}
+.screens-toggle button[aria-selected="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.screens-toggle button[aria-selected="true"] small{color:#CFD2D3}
+.screens-note{font-size:.76rem;color:var(--ink-3);margin-left:auto}
+.screen-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem 1rem;margin:0 0 1.6rem;max-width:1320px}
+.screens[data-vp="mobile"] .screen-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.screen-card{margin:0;background:var(--surface);border:1px solid var(--line-soft);border-radius:5px;padding:.7rem .7rem .55rem}
+.screen-card figcaption{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .6rem;margin-bottom:.55rem;font-size:.8rem}
+.screen-name{font-weight:600;color:var(--ink)}
+.screen-card figcaption code{font-size:.7rem}
+.screen-h1{flex-basis:100%;color:var(--ink-3);font-size:.74rem;line-height:1.35}
+.screen-frame{display:none;overflow-y:auto;overflow-x:hidden;background:var(--tile);border:1px solid var(--line);border-radius:3px;scrollbar-width:thin}
+.screen-frame img{display:block;width:100%;height:auto}
+.screens[data-vp="desktop"] .screen-frame[data-vp="desktop"],.screens[data-vp="tablet"] .screen-frame[data-vp="tablet"],.screens[data-vp="mobile"] .screen-frame[data-vp="mobile"]{display:block}
 @media (max-width:1080px){
   .shell{grid-template-columns:minmax(0,1fr)}
   nav.toc{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line-soft);padding:1.2rem}
@@ -480,6 +560,7 @@ function blockMD(b) {
       if (!d) return `_Missing drawing: ${b.name}_`;
       return `![${d.title}](diagrams/${d.name})\n\n_**${d.title}.** ${d.caption}_`;
     }
+    case 'screens': return screensMD();
     case 'callout': return [
       `> **${b.title || 'Note'}**`, '>',
       ...(b.text ? [`> ${b.text}`] : []),

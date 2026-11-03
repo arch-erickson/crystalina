@@ -24,6 +24,7 @@ markup, look for the component. If it half exists, extend it.
 | Concern | File |
 | --- | --- |
 | Design tokens and every component | `css/styles.css` |
+| The library, rendered live, for looking | `docs/components.html` at /docs/components.html when served |
 | Shared UI, icons, `escapeHTML` | `js/main.js` |
 | Local cache, hydrated from Supabase | `js/store.js` |
 | Supabase reads, writes and uploads | `js/data-remote.js` |
@@ -64,7 +65,11 @@ weight.
 ## Voice
 
 Client facing and professional, addressed to the reader and never to the
-designer.
+designer. The subject is health: what a household drinks every day, and the
+quiet confidence of having taken care of it. New York water is why we know
+what we are doing, not the headline. Affordability is said as value, never
+as cheapness; speed as ease; the product as care. Subtle and eloquent,
+never breathless. "Water Facts", not "NYC Water Facts".
 
 - **No em dashes or en dashes.** Use commas and full stops. Ranges read
   "1961 to 1990".
@@ -76,8 +81,18 @@ designer.
   cyan `#3DC7F4`, silver `#CFD2D3`, white. No greens, purples or warm casts
   anywhere a customer can see. The wider palette in
   `scripts/lib/tokens.mjs` is for internal diagrams only.
-- Type: **Montserrat** for text, **Playfair Display** for headings, standing
-  in for Canela until it is licensed (AD8).
+- **Two colours are sanctioned exceptions, and there are no others.** The
+  four-colour Google G inside the sign-in button, and WhatsApp green
+  `#25D366` on the `.wa-float` button. Both are another company mark, where
+  recolouring it to the palette would misrepresent the brand and, for
+  Google, break their terms. Neither licenses a third green: a new
+  third-party mark is a decision, not a precedent.
+- Type: **Montserrat** for text, **Playfair Display** for titles (AD8). Four
+  weights exist, and they are tokens: `--w-regular` 400, `--w-medium` 500,
+  `--w-semibold` 600, `--w-bold` 700. **Never write a numeric font-weight.**
+  Montserrat sets everything that is read, including all dashboard text.
+  Playfair sets titles, the button label, prices and the large storefront
+  numerals. The rule is written out at the top of `css/styles.css` (AD12).
 - Paths are root-absolute (`/css/...`), URLs are clean folders.
 - Buttons use the unified centre-out fill hover. Do not reintroduce ad hoc
   button styles.
@@ -116,9 +131,13 @@ migrations, the tests and the internal task list to anyone who asked.
 - **Dashboard access control.** Row level security protects the data; the
   gate in front of the dashboards is browser-side and unproven (U1).
 
-## Two assistants
+## Who works here
 
-Claude Code and Codex both commit to `main`. Read `COORDINATION.md` before
-you start, `git pull` before you start and before each push, and keep commits
-small and clearly described. Amend the blueprint in the same commit as the
-change it describes.
+Claude Code does the building, across more than one session at a time, and
+the sessions cannot message each other. Codex no longer writes code here:
+it generates images, to the briefs in `IMAGE_PROMPTS.md`.
+
+Read `COORDINATION.md` before you start, take the claims table seriously
+because another session may be in the same file, `git pull` before you start
+and before each push, and keep commits small and clearly described. Amend
+the blueprint in the same commit as the change it describes.

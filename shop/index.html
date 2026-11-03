@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shop Water Filters | Crystalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css?v=20260825-product-editorial-3">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v=20261102-type-rule">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=4">
@@ -17,10 +17,11 @@
 <body>
 
 <main>
-  <section class="page-hero">
+  <section class="page-hero page-hero--quiet">
     <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Shop</span></nav>
       <h1>Shop Filtration Systems</h1>
-      <p>Every system is specced for New York City water. Free delivery in the five boroughs on orders over $99.</p>
+      <p>Three tiers of filtration, each tuned for New York water. Free delivery in the five boroughs on orders over $99.</p>
     </div>
   </section>
 
@@ -64,7 +65,9 @@
   let query = '';
   let sort = 'featured';
 
-  const cats = ['All', ...new Set(Store.getProducts().map(p => p.category))];
+  // Every category the site names, from the one list, whether or not it has
+  // stock today; an empty one shows the empty state rather than vanishing.
+  const cats = ['All', ...CATEGORIES.map(c => c.name)];
   const catFilter = document.getElementById('catFilter');
 
   function renderCats() {

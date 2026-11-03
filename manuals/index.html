@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manuals and Guides | Crystalina</title>
+<meta name="description" content="The manual for every Crystalina system, to read here or keep. Search by product, model or category.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v=20261102-type-rule">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=4">
+<link rel="icon" href="/favicon.ico?v=4" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4">
+<link rel="manifest" href="/site.webmanifest">
+</head>
+<body>
+
+<main>
+  <section class="page-hero page-hero--quiet">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Manuals</span></nav>
+      <h1>Manuals and guides</h1>
+      <p>The manual for every system we sell, to read here or to keep. Find yours by name, model or category.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="shop-toolbar doc-toolbar">
+        <label class="sr-only" for="manualSearch">Search manuals</label>
+        <input type="search" id="manualSearch" placeholder="Search by product, model or category" autocomplete="off">
+        <div class="cat-filter cat-filter--row" id="manualCats" role="group" aria-label="Filter by category"></div>
+      </div>
+      <p class="doc-count" id="manualCount" aria-live="polite"></p>
+      <div class="doc-grid" id="manualGrid"></div>
+    </div>
+  </section>
+</main>
+
+<dialog class="doc-viewer" id="manualViewer" aria-labelledby="manualViewerTitle">
+  <div class="doc-viewer-head">
+    <div>
+      <span class="eyebrow">Manual</span>
+      <h2 id="manualViewerTitle"></h2>
+    </div>
+    <div class="doc-viewer-actions">
+      <a class="btn btn-outline btn-sm" id="manualViewerDownload" href="#" download>Download</a>
+      <button class="btn btn-ghost btn-sm" id="manualViewerClose" type="button">Close</button>
+    </div>
+  </div>
+  <iframe class="doc-viewer-frame" id="manualViewerFrame" title="Manual" src="about:blank"></iframe>
+</dialog>
+
+<script src="/js/product-catalog.js"></script>
+<script src="/js/supabase-client.js"></script>
+<script src="/js/data-remote.js"></script>
+<script src="/js/store.js"></script>
+<script src="/js/main.js"></script>
+<script>
+  initPage('/manuals/');
+
+  /* Every product has a manual at a known address, /manuals/files/<slug>.pdf,
+     unless the catalogue names another. The page checks each address once
+     and says honestly which are here: a manual that is not here yet can be
+     asked for, and nothing on the page promises a date. */
+  const params = new URLSearchParams(location.search);
+  let query = (params.get('q') || '').toLowerCase();
+  let activeCat = params.get('cat') || 'All';
+  const available = new Map();
+
+  const manualUrl = p => p.manualUrl || ('/manuals/files/' + encodeURIComponent(p.slug || p.id) + '.pdf');
+  const products = () => sortForDisplay(Store.getProducts());
+
+  async function probe(p) {
+    const url = manualUrl(p);
+    if (available.has(url)) return available.get(url);
+    let ok = false;
+    try { const res = await fetch(url, { method: 'HEAD' }); ok = res.ok && /pdf/i.test(res.headers.get('content-type') || ''); } catch { ok = false; }
+    available.set(url, ok);
+    return ok;
+  }
+
+  function matches(p) {
+    const hay = [p.name, p.modelCode, p.sku, p.category, p.short].filter(Boolean).join(' ').toLowerCase();
+    return (activeCat === 'All' || p.category === activeCat) && (!query || hay.includes(query));
+  }
+
+  function renderCats() {
+    const cats = ['All', ...CATEGORIES.map(c => c.name)];
+    const el = document.getElementById('manualCats');
+    el.innerHTML = cats.map(c => `<button type="button" class="${c === activeCat ? 'active' : ''}" data-cat="${escapeHTML(c)}">${escapeHTML(c)}</button>`).join('');
+    el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { activeCat = b.dataset.cat; renderCats(); renderGrid(); }));
+  }
+
+  function card(p) {
+    const url = manualUrl(p);
+    const ok = available.get(url);
+    const actions = ok === undefined
+      ? `<span class="doc-state">Checking</span>`
+      : ok
+        ? `<button type="button" class="btn btn-primary btn-sm doc-view" data-id="${escapeHTML(p.id)}">View</button>
+           <a class="btn btn-outline btn-sm" href="${url}" download>Download</a>`
+        : `<a class="btn btn-outline btn-sm" href="mailto:info@crystalina.org?subject=${encodeURIComponent('Manual for ' + p.name)}">Request this manual</a>`;
+    return `
+    <article class="doc-card" data-id="${escapeHTML(p.id)}">
+      <a class="pc-img" href="/product/?id=${encodeURIComponent(p.id)}" aria-label="${escapeHTML(p.name)}">
+        <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}" loading="lazy">
+      </a>
+      <div class="doc-body">
+        <span class="pc-cat">${escapeHTML(p.category)}</span>
+        <h3 class="doc-name">${escapeHTML(p.name)}</h3>
+        <p class="doc-meta">${escapeHTML(p.modelCode || p.sku || '')}</p>
+        <div class="doc-actions">${actions}</div>
+      </div>
+    </article>`;
+  }
+
+  function renderGrid() {
+    const list = products().filter(matches);
+    const grid = document.getElementById('manualGrid');
+    document.getElementById('manualCount').textContent = list.length
+      ? `${list.length} ${list.length === 1 ? 'manual' : 'manuals'}${activeCat === 'All' ? '' : ' in ' + activeCat}${query ? ' matching "' + query + '"' : ''}`
+      : '';
+    grid.innerHTML = list.length
+      ? list.map(card).join('')
+      : `<div class="shop-empty"><h3>Nothing matches</h3><p>Try the model number on the front of the system, or <a class="link" href="/contact/">ask us</a> and we will send the right manual.</p></div>`;
+    grid.querySelectorAll('.doc-view').forEach(b => b.addEventListener('click', () => openViewer(Store.getProduct(b.dataset.id))));
+    if (window.initReveal) initReveal(grid);
+  }
+
+  const viewer = document.getElementById('manualViewer');
+  function openViewer(p) {
+    if (!p) return;
+    const url = manualUrl(p);
+    document.getElementById('manualViewerTitle').textContent = p.name;
+    document.getElementById('manualViewerDownload').href = url;
+    document.getElementById('manualViewerFrame').src = url + '#view=FitH';
+    viewer.showModal();
+    document.body.classList.add('viewer-open');
+  }
+  function closeViewer() {
+    viewer.close();
+    document.getElementById('manualViewerFrame').src = 'about:blank';
+    document.body.classList.remove('viewer-open');
+  }
+  document.getElementById('manualViewerClose').addEventListener('click', closeViewer);
+  viewer.addEventListener('close', () => document.body.classList.remove('viewer-open'));
+  viewer.addEventListener('click', e => { if (e.target === viewer) closeViewer(); });
+
+  const search = document.getElementById('manualSearch');
+  search.value = query;
+  search.addEventListener('input', () => { query = search.value.trim().toLowerCase(); renderGrid(); });
+
+  renderCats();
+  renderGrid();
+  Promise.all(products().map(probe)).then(renderGrid);
+</script>
+</body>
+</html>

@@ -111,6 +111,11 @@ Two agents. Codex owns security, the database and server logistics. Claude
 Code owns the storefront, the admin content editor, the design system and
 the blueprint. Both commit to `main`. See `COORDINATION.md`.
 
+**Superseded 2026-11-02.** Codex no longer writes code here and generates
+images only. Claude Code does the building, in more than one session. The
+paragraph above is left as written because this file records what was true
+on 2026-10-09; `COORDINATION.md` is the current answer.
+
 ### Budget and timing
 
 Nobody has said. The Cloudflare path is costed at nothing to five dollars a

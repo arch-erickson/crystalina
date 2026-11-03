@@ -246,6 +246,7 @@ export const sections = [
   blocks: [
     { t: 'p', text: 'Anything that appears twice is built once, and a variation is a parameter rather than a second copy. This is the rule the whole project runs on, and it is the rule that quietly breaks first.' },
     { t: 'diagram', name: 'one-definition.svg' },
+    { t: 'p', text: 'The library can be looked at as well as read. docs/components.html is a page in the repository that loads the real stylesheet and the real script and renders every token, button, heading, band, card, wash and icon the storefront is built from, with the real header above it. Serve the site and open /docs/components.html. It is outside the publish allow-list, so it never reaches a customer, and because it uses the live components rather than copies of them, it cannot drift from the site.' },
     {
       t: 'callout', kind: 'warn', title: 'The one that is worse than it looked',
       text: 'The free shipping threshold was recorded as living in three places. Checked on 2026-11-02 it is on ten lines across six files: six of them arithmetic, including both versions of create_order, and four of them sentences of customer-facing copy. The database is already authoritative, because create_order computes the shipping line. The other nine are copies of a number the database already knows.',
@@ -331,12 +332,26 @@ export const sections = [
         'npm run docs rebuilds every drawing and all three surfaces. npm run check runs the tests, the publish allow-list and both drift checks, so a stale picture or a page that has drifted from its source cannot survive a pull request.',
         'Amend this in the same commit as the change it describes. A decision that changes in code and not here is a decision that will be made again, differently.',
         'Mark an answered question answered, with the date and the answer. Do not delete it. Never renumber a decision or an unknown.',
-        'Two assistants commit to main. Read COORDINATION.md before editing, and pull before you start and before each push.',
+        'More than one session commits to main. Read COORDINATION.md before editing, and pull before you start and before each push.',
       ],
     },
     {
       t: 'callout', kind: 'learn', title: 'Publish from one place',
       text: 'The Artifact is published from this repository and nowhere else. Anyone republishing it pulls first and republishes to the same URL rather than creating a second one. A generated document published from two places stops matching its own sources quietly, and the next person to rebuild wipes out work nobody remembers doing.',
+    },
+  ],
+},
+
+/* ================================================================= */
+{
+  id: 'screens',
+  title: 'What every screen looks like today',
+  blocks: [
+    { t: 'p', text: 'The site map says what each page is for. This section shows what each one actually looks like, captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them.' },
+    { t: 'screens' },
+    {
+      t: 'callout', kind: 'learn', title: 'Refreshing the captures',
+      text: 'Serve the site, then run npm run screens. The script captures every page, seventeen at the time of writing, and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.',
     },
   ],
 },

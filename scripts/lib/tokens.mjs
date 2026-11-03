@@ -90,13 +90,15 @@ export const STATUS_DASH = {
   'Post-MVP': '2 3',
 };
 
-/* Type. Montserrat for everything that is read, and a Canela-like display
-   serif for titles. Canela is licensed; Playfair Display is the closest
-   freely available face with the weights this needs. Swap the one token
-   below to move to the real thing. */
+/* Type. Montserrat for everything that is read, Playfair Display for
+   titles, mirroring the two faces the site uses. See AD8 and AD12.
+
+   The weights below are the ones the drawings use and are deliberately
+   not the same set as the site: these pages set display text at 500,
+   and no storefront component does. */
 export const TYPE = {
   sans: "'Montserrat','Segoe UI',system-ui,sans-serif",
-  display: "'Playfair Display','Canela',Georgia,serif",
+  display: "'Playfair Display',Georgia,serif",
   mono: "'JetBrains Mono',ui-monospace,Consolas,monospace",
   googleHref: 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
 };

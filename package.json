@@ -16,6 +16,7 @@
     "blueprint:check": "node scripts/blueprint.mjs --check",
     "docs": "npm run diagrams && npm run blueprint",
     "verify": "node scripts/verify.mjs",
+    "screens": "node scripts/screens.mjs",
     "check": "npm test && npm run build:site && npm run diagrams:check && npm run blueprint:check"
   }
 }

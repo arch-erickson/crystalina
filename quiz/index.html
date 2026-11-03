@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Find Your Filter | Crystalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css?v=20261102-type-rule">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96.png?v=4">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=4">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=4">
@@ -136,7 +136,7 @@
       const { q, opts } = QUESTIONS[step];
       card.innerHTML = `
         <div class="quiz-progress"><div style="width:${step / QUESTIONS.length * 100}%"></div></div>
-        <p style="font-size:.8rem;color:var(--muted);font-weight:600;">QUESTION ${step + 1} OF ${QUESTIONS.length}</p>
+        <p style="font-size:.8rem;color:var(--muted);font-weight:var(--w-semibold);">QUESTION ${step + 1} OF ${QUESTIONS.length}</p>
         <h2 class="quiz-q">${q}</h2>
         <div class="quiz-opts">${opts.map((o, i) => `<button data-i="${i}"><span class="quiz-opt-ic">${svgIcon(o.ic)}</span><span>${o.t}</span></button>`).join('')}</div>
         ${step > 0 ? '<p style="margin-top:20px"><span class="link" id="quizBack">← Back</span></p>' : ''}`;
@@ -153,14 +153,14 @@
       if (!p) { card.innerHTML = '<h2 class="quiz-q">Our catalog is loading</h2><p style="color:var(--muted)">Please refresh in a moment, or <a class="link" href="/shop/">browse all systems</a>.</p>'; return; }
       card.innerHTML = `
         <div class="quiz-progress"><div style="width:100%"></div></div>
-        <p style="font-size:.8rem;color:var(--success);font-weight:700;display:flex;align-items:center;gap:6px;"><span class="ic" style="width:1.1em;height:1.1em">${svgIcon('check')}</span> YOUR MATCH</p>
+        <p style="font-size:.8rem;color:var(--success);font-weight:var(--w-bold);display:flex;align-items:center;gap:6px;"><span class="ic" style="width:1.1em;height:1.1em">${svgIcon('check')}</span> YOUR MATCH</p>
         <h2 class="quiz-q">We recommend the ${escapeHTML(p.name)}</h2>
         <div style="display:grid;grid-template-columns:140px 1fr;gap:20px;align-items:center;margin-bottom:22px;">
           <img src="${escapeHTML(p.image)}" style="border-radius:12px;aspect-ratio:1;object-fit:cover;" alt="${escapeHTML(p.name)}">
           <div>
             <p style="color:var(--muted);font-size:.92rem;">${escapeHTML(p.short)}</p>
-            <p style="font-size:1.3rem;font-weight:800;color:var(--navy-800);margin-top:8px;">${money(p.price)}
-              ${p.comparePrice ? `<span style="font-size:.9rem;color:var(--muted);text-decoration:line-through;font-weight:500;"> ${money(p.comparePrice)}</span>` : ''}</p>
+            <p class="quiz-price" style="font-size:1.3rem;font-weight:var(--w-bold);color:var(--navy-800);margin-top:8px;">${money(p.price)}
+              ${p.comparePrice ? `<span style="font-size:.9rem;color:var(--muted);text-decoration:line-through;font-weight:var(--w-medium);"> ${money(p.comparePrice)}</span>` : ''}</p>
           </div>
         </div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;">

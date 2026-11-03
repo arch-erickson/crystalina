@@ -40,6 +40,7 @@ A readable version of this document, with every drawing inline, is at
 18. [The drawing system](#18-the-drawing-system)
 19. [Everything, one card at a time](#19-everything-one-card-at-a-time)
 20. [How this document is kept true](#20-how-this-document-is-kept-true)
+21. [What every screen looks like today](#21-what-every-screen-looks-like-today)
 
 ---
 
@@ -152,7 +153,7 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 
 | Page | Route | Design | Server | What remains |
 | --- | --- | --- | --- | --- |
-| Home | / | Implemented | Partial | Trust bar, category tiles, testimonials and water facts are still in the HTML |
+| Home | / | Implemented | Partial | Trust list, testimonials, water facts and process steps are still in the HTML; the category tiles read CATEGORIES in main.js |
 | Shop | /shop/ | Implemented | Implemented | Thirteen of seventeen rows carry stock 0, so most cards read out of stock |
 | Product | /product/?id= | Implemented | Partial | product_stage_options is empty, so no 5, 6 or 7 stage choice renders No faucet rows exist, so the upgrade control has nothing to offer |
 | Checkout | /checkout/ | Implemented | Partial | No payment: the submit button carries a static disabled attribute No Turnstile widget, though the server expects a token |
@@ -160,6 +161,10 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | NYC water | /nyc-water/ | Implemented | Missing | Figures are illustrative and unverified against NYC DEP reports (U2) |
 | About | /about/ | Implemented | Missing | Nothing. No server work needed |
 | Contact | /contact/ | Implemented | Implemented | No Turnstile widget, and the page reads a token from one that does not exist The notification lands in a suspended inbox (U8) |
+| Privacy policy | /privacy/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
+| Terms of service | /terms/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
+| Shipping and returns | /shipping-returns/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
+| Manuals and guides | /manuals/ | Implemented | Missing | No manual file exists yet: each product resolves to /manuals/files/<slug>.pdf and the page checks the address when it loads Nothing on the server. No server work needed |
 | Sign in | /signin/ | Implemented | Implemented | Store.signUp and Store.signIn stubs are still exported from js/store.js and must be retired |
 | Account | /account/ | Implemented | Refactor | Gates on Store.currentUser() from localStorage and does not load js/auth.js at all |
 | Admin console | /admin/ | Implemented | Partial | About thirty record-text interpolations reach innerHTML unescaped (F3) Gated on localStorage, not on the session (F4, U1) No screen for stage options or faucet assignment |
@@ -305,6 +310,8 @@ Anything that appears twice is built once, and a variation is a parameter rather
 
 _**One definition, read everywhere.** Where each shared fact lives and who reads it. The three marked Refactor or Partial are the ones with a second copy; click one for where the copies are._
 
+The library can be looked at as well as read. docs/components.html is a page in the repository that loads the real stylesheet and the real script and renders every token, button, heading, band, card, wash and icon the storefront is built from, with the real header above it. Serve the site and open /docs/components.html. It is outside the publish allow-list, so it never reaches a customer, and because it uses the live components rather than copies of them, it cannot drift from the site.
+
 > **The one that is worse than it looked**
 >
 > The free shipping threshold was recorded as living in three places. Checked on 2026-11-02 it is on ten lines across six files: six of them arithmetic, including both versions of create_order, and four of them sentences of customer-facing copy. The database is already authoritative, because create_order computes the shipping line. The other nine are copies of a number the database already knows.
@@ -441,11 +448,11 @@ Partial. What a manager can edit is the part that was finished; what is still in
 
 - **Reached from.** Admin console (publish to website)
 - **Links to.** Shop (browse); NYC water (learn); Find your filter (not sure)
-- **See also.** Published page sections; U7 · Who maintains this after launch, and how technical are they?; Staff changing what a visitor sees
+- **See also.** Published page sections; U7 · Who maintains this after launch, and how technical are they?; Staff changing what a visitor sees; Privacy policy; Terms of service; Shipping and returns; AD11 · The voice turns to health, and New York water becomes the reason rather than the headline; AD12 · Four weights, and one rule for which face a thing is set in
 - **Design.** Implemented
 - **Server.** Partial
 - **Backend built.** Hydrates hero, sections and best sellers from site_content Products read with the publishable key
-- **Remaining.** Trust bar, category tiles, testimonials and water facts are still in the HTML
+- **Remaining.** Trust list, testimonials, water facts and process steps are still in the HTML; the category tiles read CATEGORIES in main.js
 
 #### Shop · Implemented
 
@@ -457,7 +464,7 @@ Implemented on the server side, and reading as mostly sold out because of the da
 
 - **Reached from.** Home (browse); NYC water (shop); Admin console (price, stock, copy)
 - **Links to.** Product (open)
-- **See also.** The catalogue is schema-complete and data-empty; products; P7 · Seed the catalogue; Customer browser
+- **See also.** The catalogue is schema-complete and data-empty; products; P7 · Seed the catalogue; Customer browser; Manuals and guides; AD11 · The voice turns to health, and New York water becomes the reason rather than the headline
 - **Design.** Implemented
 - **Server.** Implemented
 - **Backend built.** Catalog, filter, search and sort read from Supabase
@@ -473,7 +480,7 @@ Partial. Both configuration controls are built, priced server-side in create_ord
 
 - **Reached from.** Shop (open); Find your filter (recommended)
 - **Links to.** Checkout (add to cart); Sign in (sign in to buy)
-- **See also.** The catalogue is schema-complete and data-empty; product_stage_options; P7 · Seed the catalogue
+- **See also.** The catalogue is schema-complete and data-empty; product_stage_options; P7 · Seed the catalogue; Manuals and guides
 - **Design.** Implemented
 - **Server.** Partial
 - **Backend built.** Product, specs, compatibility and bundle relationships Related products
@@ -552,6 +559,62 @@ Implemented as of 2026-11-02: the route answers on the Worker, the method guard 
 - **Server.** Implemented
 - **Backend built.** POST /api/contact validates, rate limits and writes contact_messages Answers 200 on the Worker, checked 2026-11-02
 - **Remaining.** No Turnstile widget, and the page reads a token from one that does not exist The notification lands in a suspended inbox (U8)
+
+#### Privacy policy · Missing
+
+_Page · /privacy/._
+
+The privacy policy, in plain language: what the shop collects, which services see it, and how to have it removed.
+
+Drafted and styled, not published. The wording is under review and is partly a legal question, so the page exists in the repository and nowhere else until the owner says otherwise.
+
+- **See also.** Home
+- **Design.** Implemented
+- **Server.** Missing
+- **Backend built.** What is collected, who handles it, how to have it removed Set in the long-form text component shared by every legal page
+- **Remaining.** Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed
+
+#### Terms of service · Missing
+
+_Page · /terms/._
+
+The terms of service: orders, pricing, warranty, returns and disputes.
+
+Drafted and styled, not published. The wording is under review and is partly a legal question, so the page exists in the repository and nowhere else until the owner says otherwise.
+
+- **See also.** Home
+- **Design.** Implemented
+- **Server.** Missing
+- **Backend built.** Orders, pricing, warranty, returns and disputes in plain language Set in the long-form text component shared by every legal page
+- **Remaining.** Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed
+
+#### Shipping and returns · Missing
+
+_Page · /shipping-returns/._
+
+Shipping and returns: where we deliver, how fast, the free shipping threshold and the return window.
+
+Drafted and styled, not published. The wording is under review and is partly a legal question, so the page exists in the repository and nowhere else until the owner says otherwise.
+
+- **See also.** Home
+- **Design.** Implemented
+- **Server.** Missing
+- **Backend built.** Delivery areas, timing, the free shipping threshold and the return window Set in the long-form text component shared by every legal page
+- **Remaining.** Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed
+
+#### Manuals and guides · Missing
+
+_Page · /manuals/._
+
+The manual for every system, found by product, model or category, read in the page or kept as a file.
+
+Implemented as a page; empty as a library. The files are the owner's to add, one per product slug, and the page needs no change when they arrive.
+
+- **See also.** Product; Shop
+- **Design.** Implemented
+- **Server.** Missing
+- **Backend built.** Every product listed with its picture, model code and category, searchable by any of them A manual is read in a dialog or downloaded; one that is not on the server yet can be requested by email
+- **Remaining.** No manual file exists yet: each product resolves to /manuals/files/<slug>.pdf and the page checks the address when it loads Nothing on the server. No server work needed
 
 #### Sign in · Implemented
 
@@ -1839,7 +1902,7 @@ Partial as of 2026-11-02. The project exists, builds and deploys; the Worker ans
 - **Waiting on the answer to.** U4 · Is there a second Supabase project for preview, or does preview share production data?
 - **Unblocks.** P2 · Run /api on Cloudflare; P4 · Finish the auth migration
 - **See also.** Access; Set every secret on the Worker; Production; AD1 · Cloudflare, rather than staying on Vercel or on GitHub Pages
-- **Owner.** Owner, then Codex
+- **Owner.** Owner, then Claude Code
 
 #### P2 · Run /api on Cloudflare · Implemented
 
@@ -1852,7 +1915,7 @@ Implemented as of 2026-11-02 and verified against the live Worker. It is the fir
 - **Needs first.** P1 · Cloudflare project and secrets
 - **Unblocks.** P3 · Stripe checkout and webhook; P5 · DNS cutover; P6 · Security hardening
 - **See also.** AD10 · A Worker with static assets, because Cloudflare retired the Pages flow; Cloudflare Worker; Worker routes
-- **Owner.** Codex
+- **Owner.** Claude Code
 
 #### P3 · Stripe checkout and webhook · Missing
 
@@ -1867,7 +1930,7 @@ Missing, and it is now the largest thing between here and an open shop. Nothing 
 - **Closes.** Nothing takes payment; Payment taken twice on a webhook redelivery; Payment taken twice
 - **Unblocks.** P5 · DNS cutover; P8 · Order lifecycle
 - **See also.** Taking the money (Stripe, phase 3); AD4 · The money is recomputed in the database, and the webhook is the source of truth; Stripe; Worker routes; Stripe; Checkout; Cron Triggers for carts and reconciliation
-- **Owner.** Codex
+- **Owner.** Claude Code
 
 #### P4 · Finish the auth migration · Partial
 
@@ -1881,7 +1944,7 @@ Partial. Sign-in itself is finished, Google included. What remains is everything
 - **Waiting on the answer to.** U1 · Does opening /admin/ as an ordinary customer expose anything at all?
 - **Closes.** The gate in front of every private page is localStorage; Every private page gated in the browser only; A customer opening a staff page
 - **See also.** Account; Staff browser; Signing in, and what a role is allowed to do
-- **Owner.** Codex
+- **Owner.** Claude Code
 
 #### P5 · DNS cutover · Missing
 
@@ -1911,7 +1974,7 @@ Partial. The scope shrank on 2026-11-02 when the other dashboards were checked a
 - **Closes.** One dashboard interpolates record text unescaped; Unescaped record text in js/admin.js; Rate limit does not survive the instance; Staff text reaching another staff member as script; Form spam and abuse
 - **Unblocks.** P10 · Launch
 - **See also.** Turnstile; Turnstile; WAF rate limiting; A third-party script changing the page; A Content-Security-Policy
-- **Owner.** Codex
+- **Owner.** Claude Code
 
 #### P7 · Seed the catalogue · Missing
 
@@ -1937,7 +2000,7 @@ Missing, and genuinely blocked: there is no paid order to move through a lifecyc
 - **Needs first.** P3 · Stripe checkout and webhook
 - **Waiting on the answer to.** U3 · Which Resend sending domain, and is it verified?
 - **See also.** orders; Subscriptions and replacement reminders
-- **Owner.** Codex
+- **Owner.** Claude Code
 
 #### P9 · Backups and monitoring · Missing
 
@@ -1951,7 +2014,7 @@ Missing. A backup nobody has restored is a hope, not a backup.
 - **Closes.** No backup has ever been restored
 - **Unblocks.** P10 · Launch
 - **See also.** Error monitoring; Rollback
-- **Owner.** Codex
+- **Owner.** Claude Code
 
 #### P10 · Launch · Missing
 
@@ -2414,7 +2477,7 @@ Replaces Inter and Poppins across the site, the drawings and this document. Two 
 
 Both faces are on Google Fonts, so there is no licence to buy and no file to self-host yet.
 
-- **See also.** Status vocabulary, drawings and dependencies
+- **See also.** Status vocabulary, drawings and dependencies; AD12 · Four weights, and one rule for which face a thing is set in
 - **Why we need it.** The brand reads as a premium product and was set in two geometric sans faces, which read as a technology product.
 - **Why it belongs here.** Changing it costs two tokens and a font link while the site is pre-launch. After launch it is a visual regression test across every page.
 - **What it costs.** Montserrat is a wider face than Inter, so anything that was close to wrapping now wraps. Canela is licensed, so Playfair Display stands in for it.
@@ -2448,18 +2511,46 @@ Verified on 2026-11-02 against the live Worker: three routes answer, method guar
 - **What it costs.** Routing is now a table in worker.js rather than the filesystem, so a new endpoint means a line there as well as a file. Six tests pin that table down.
 - **Replace when.** The route list outgrows one screen, or Cloudflare offers file-based routing for Workers.
 
+#### AD11 · The voice turns to health, and New York water becomes the reason rather than the headline · Implemented
+
+_Decision · Decided 2026-11-02._
+
+Rewrites the home page, the shop head, the editor defaults in store.js and the navigation. The subject is what a household drinks every day and the quiet confidence of having taken care of it. Affordability is said as value, speed as ease, the product as care. NYC Water Facts becomes Water Facts.
+
+One voice in one commit, recorded in CLAUDE.md under Voice.
+
+- **See also.** Home; Shop
+- **Why we need it.** The previous copy led with the plumbing of the city and a problem. The owner wants to speak to people who care about their health and their family first, and to reach every household and budget, with New York water as the proof that we know what we are doing.
+- **Why it belongs here.** Copy that lives in index.html, in store.js and in site_content at once has to change in all three in one commit, or the editor quietly restores the old voice the next time it publishes.
+- **What it costs.** Rows already published in site_content still carry the old copy until they are republished from the editor. The hero hides its first sentence on phones, which the editor must respect: the rule is in applyPageSections.
+- **Replace when.** The owner changes the positioning again. Then the same three places move together.
+
+#### AD12 · Four weights, and one rule for which face a thing is set in · Implemented
+
+_Decision · Decided 2026-11-02._
+
+Names the four weights as tokens in css/styles.css and replaces all 135 numeric font-weight declarations with them. Montserrat sets everything that is read. Playfair Display sets titles, the button label, prices and the large storefront numerals, and nothing else. The content editor offers those two faces only, and main.js refuses any other face stored against a section.
+
+Four weights carry every component on the site, and the whole rule is one comment block at the top of the stylesheet. Playfair Display was chosen over Canela on 2026-11-02 after thirteen candidates were compared; Canela is out of the stack.
+
+- **See also.** AD8 · Montserrat for text, and a Canela-like serif for titles; Home
+- **Why we need it.** Weight 800 was set in 32 places and neither family was ever loaded at 800, so the browser drew a synthetic bold in its place. The editor offered Inter, Poppins, Georgia, Helvetica Neue and system-ui, none of which the site loads. Prices were set in the display face in two components and in the body face in three.
+- **Why it belongs here.** A type rule that lives only in the head of whoever reviews the change is decided again, differently, the next time a component is added.
+- **What it costs.** Thirty two places are one step lighter than they were, which is the difference between a drawn bold and a real one. The page head asks for the same seven files as before, and every one of them is now a weight the stylesheet uses.
+- **Replace when.** A component genuinely needs a fifth weight. Add it to the token block and to the loader in every page head in the same commit, never as a literal.
+
 ### Unknowns
 
 #### U1 · Does opening /admin/ as an ordinary customer expose anything at all? · Missing
 
-_Unknown · Owner: Codex._
+_Unknown · Owner: Claude Code._
 
 Row level security should mean the page renders and every query returns nothing. Should is not a result. Until someone signs in as a customer and looks, the gate is an assumption.
 
 - **Blocks.** P4 · Finish the auth migration; P6 · Security hardening; The gate in front of every private page is localStorage
 - **See also.** Every private page gated in the browser only; A customer opening a staff page; Staff browser; Signing in, and what a role is allowed to do
 - **How to resolve it.** Create a customer account on a preview, open each of the five private pages, and read the network tab as well as the screen.
-- **Owner.** Codex
+- **Owner.** Claude Code
 
 #### U2 · Are the NYC water figures on /nyc-water/ defensible? · Missing
 
@@ -2486,13 +2577,13 @@ EMAIL_FROM is noreply@crystalina.org. Mail from an unverified domain is either r
 
 #### U4 · Is there a second Supabase project for preview, or does preview share production data? · Missing
 
-_Unknown · Owner: Owner, with Codex._
+_Unknown · Owner: Owner, with Claude Code._
 
 Two environments with one database is one environment. A test order placed on a preview would decrement real stock and send a real email.
 
 - **Blocks.** Preview; P1 · Cloudflare project and secrets
 - **How to resolve it.** Decide. If the answer is one project, then preview must be read-only and say so, loudly, in the handoff.
-- **Owner.** Owner, with Codex
+- **Owner.** Owner, with Claude Code
 
 #### U5 · What retention does the workforce data need, and under what rule? · Missing
 
@@ -2547,8 +2638,53 @@ The Workspace subscription is suspended behind a Squarespace reseller lock, so i
 - npm run docs rebuilds every drawing and all three surfaces. npm run check runs the tests, the publish allow-list and both drift checks, so a stale picture or a page that has drifted from its source cannot survive a pull request.
 - Amend this in the same commit as the change it describes. A decision that changes in code and not here is a decision that will be made again, differently.
 - Mark an answered question answered, with the date and the answer. Do not delete it. Never renumber a decision or an unknown.
-- Two assistants commit to main. Read COORDINATION.md before editing, and pull before you start and before each push.
+- More than one session commits to main. Read COORDINATION.md before editing, and pull before you start and before each push.
 
 > **Publish from one place**
 >
 > The Artifact is published from this repository and nowhere else. Anyone republishing it pulls first and republishes to the same URL rather than creating a second one. A generated document published from two places stops matching its own sources quietly, and the next person to rebuild wipes out work nobody remembers doing.
+
+---
+
+## 21. What every screen looks like today
+
+The site map says what each page is for. This section shows what each one actually looks like, captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them.
+
+Captured 2026-11-03 at 1366, 834, 390 pixels wide.
+
+### What a customer sees
+- **Home /**: [desktop](screens/page-home-desktop.webp), [tablet](screens/page-home-tablet.webp), [mobile](screens/page-home-mobile.webp)
+- **Shop /shop/**: [desktop](screens/page-shop-desktop.webp), [tablet](screens/page-shop-tablet.webp), [mobile](screens/page-shop-mobile.webp)
+- **Product /product/**: [desktop](screens/page-product-desktop.webp), [tablet](screens/page-product-tablet.webp), [mobile](screens/page-product-mobile.webp)
+- **Checkout /checkout/**: [desktop](screens/page-checkout-desktop.webp), [tablet](screens/page-checkout-tablet.webp), [mobile](screens/page-checkout-mobile.webp)
+- **NYC water /nyc-water/**: [desktop](screens/page-nyc-water-desktop.webp), [tablet](screens/page-nyc-water-tablet.webp), [mobile](screens/page-nyc-water-mobile.webp)
+- **Find your filter /quiz/**: [desktop](screens/page-quiz-desktop.webp), [tablet](screens/page-quiz-tablet.webp), [mobile](screens/page-quiz-mobile.webp)
+- **Sign in /signin/**: [desktop](screens/page-signin-desktop.webp), [tablet](screens/page-signin-tablet.webp), [mobile](screens/page-signin-mobile.webp)
+- **Account /account/**: [desktop](screens/page-account-desktop.webp), [tablet](screens/page-account-tablet.webp), [mobile](screens/page-account-mobile.webp)
+- **About /about/**: [desktop](screens/page-about-desktop.webp), [tablet](screens/page-about-tablet.webp), [mobile](screens/page-about-mobile.webp)
+- **Contact /contact/**: [desktop](screens/page-contact-desktop.webp), [tablet](screens/page-contact-tablet.webp), [mobile](screens/page-contact-mobile.webp)
+- **Privacy policy /privacy/**: [desktop](screens/page-privacy-desktop.webp), [tablet](screens/page-privacy-tablet.webp), [mobile](screens/page-privacy-mobile.webp)
+- **Terms of service /terms/**: [desktop](screens/page-terms-desktop.webp), [tablet](screens/page-terms-tablet.webp), [mobile](screens/page-terms-mobile.webp)
+- **Shipping and returns /shipping-returns/**: [desktop](screens/page-shipping-desktop.webp), [tablet](screens/page-shipping-tablet.webp), [mobile](screens/page-shipping-mobile.webp)
+
+### What the staff see
+- **Admin console /admin/**: [desktop](screens/page-admin-desktop.webp), [tablet](screens/page-admin-tablet.webp), [mobile](screens/page-admin-mobile.webp)
+- **Manager /manager/**: [desktop](screens/page-manager-desktop.webp), [tablet](screens/page-manager-tablet.webp), [mobile](screens/page-manager-mobile.webp)
+- **Sales /sales/**: [desktop](screens/page-sales-desktop.webp), [tablet](screens/page-sales-tablet.webp), [mobile](screens/page-sales-mobile.webp)
+- **Technician /technician/**: [desktop](screens/page-technician-desktop.webp), [tablet](screens/page-technician-tablet.webp), [mobile](screens/page-technician-mobile.webp)
+
+### The home page, section by section
+- **Most of what your family drinks is water. Make it the purest thing in the house.**: [desktop](screens/section-hero-desktop.webp), [tablet](screens/section-hero-tablet.webp), [mobile](screens/section-hero-mobile.webp)
+- **trust**: [desktop](screens/section-trust-desktop.webp), [tablet](screens/section-trust-tablet.webp), [mobile](screens/section-trust-mobile.webp)
+- **A system for every home, and every household.**: [desktop](screens/section-categories-desktop.webp), [tablet](screens/section-categories-tablet.webp), [mobile](screens/section-categories-mobile.webp)
+- **Component by Component**: [desktop](screens/section-anatomy-desktop.webp), [tablet](screens/section-anatomy-tablet.webp), [mobile](screens/section-anatomy-mobile.webp)
+- **What New York households choose**: [desktop](screens/section-best-sellers-desktop.webp), [tablet](screens/section-best-sellers-tablet.webp), [mobile](screens/section-best-sellers-mobile.webp)
+- **Good water is treated at the source. The last mile is yours.**: [desktop](screens/section-water-facts-desktop.webp), [tablet](screens/section-water-facts-tablet.webp), [mobile](screens/section-water-facts-mobile.webp)
+- **Better water in four unhurried steps**: [desktop](screens/section-process-desktop.webp), [tablet](screens/section-process-tablet.webp), [mobile](screens/section-process-mobile.webp)
+- **Made for New York, by people who drink it too.**: [desktop](screens/section-why-crystalina-desktop.webp), [tablet](screens/section-why-crystalina-tablet.webp), [mobile](screens/section-why-crystalina-mobile.webp)
+- **What our neighbors say**: [desktop](screens/section-testimonials-desktop.webp), [tablet](screens/section-testimonials-tablet.webp), [mobile](screens/section-testimonials-mobile.webp)
+- **Not sure where to begin?**: [desktop](screens/section-cta-desktop.webp), [tablet](screens/section-cta-tablet.webp), [mobile](screens/section-cta-mobile.webp)
+
+> **Refreshing the captures**
+>
+> Serve the site, then run npm run screens. The script captures every page, seventeen at the time of writing, and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.

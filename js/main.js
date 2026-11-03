@@ -77,9 +77,35 @@ const SOCIALS = [
   { name: 'WhatsApp', url: 'https://wa.me/19178094803', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.2-.8l.5-.7c.1-.2 0-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.9.9-1.1 2.2-.3 3.7a12 12 0 0 0 4.6 4.5c1.7.9 2.7 1 3.6.7.6-.2 1.4-.8 1.6-1.5.2-.7.2-1.2.1-1.3-.1-.2-.3-.2-.6-.3z"/></svg>' }
 ];
 
+/* The six shop categories, written once. The home page tiles, the Shop menu
+   and the footer all read this list; the shop page filters by the name. */
+const CATEGORIES = [
+  { name: 'Reverse Osmosis',     desc: 'Under-sink purity',    image: '/images/cat-reverse-osmosis.webp', alt: 'Reverse osmosis drinking water' },
+  { name: 'Whole House',         desc: 'Every tap protected',  image: '/images/cat-whole-house.webp',     alt: 'Whole house water filtration' },
+  { name: 'Countertop',          desc: 'Renter friendly',      image: '/images/cat-countertop.webp',      alt: 'Countertop water dispenser' },
+  { name: 'Shower & Bath',       desc: 'Softer skin and hair', image: '/images/cat-shower.webp',          alt: 'Shower filtration' },
+  { name: 'Replacement Filters', desc: 'Keep it pure',         image: '/images/cat-replacement.webp',     alt: 'Replacement filters' },
+  { name: 'Accessories',         desc: 'Meters, UV and more',  image: '/images/cat-accessories.webp',     alt: 'Water accessories' },
+].map(c => ({ ...c, href: '/shop/?cat=' + encodeURIComponent(c.name) }));
+
+/* Top navigation. An item with a menu opens a full width panel; its columns
+   are lists of links and an optional feature tile, and every link is to a
+   page or a filter that exists. */
 const NAV_LINKS = [
-  { label: 'Shop', href: '/shop/' },
-  { label: 'NYC Water Facts', href: '/nyc-water/' },
+  { label: 'Shop', href: '/shop/', menu: {
+    columns: [
+      { title: 'Systems', links: CATEGORIES.slice(0, 4).map(c => ({ label: c.name, href: c.href, desc: c.desc })) },
+      { title: 'Keep it running', links: CATEGORIES.slice(4).map(c => ({ label: c.name, href: c.href, desc: c.desc })) },
+      { title: 'Help choosing', links: [
+        { label: 'Find your filter', href: '/quiz/', desc: 'Five questions, one answer' },
+        { label: 'Water facts', href: '/nyc-water/', desc: 'What is in the tap, and why it matters' },
+        { label: 'Manuals and guides', href: '/manuals/', desc: 'Every manual, to read or keep' },
+        { label: 'Talk to us', href: '/contact/', desc: 'Call, WhatsApp or visit' },
+      ] },
+    ],
+    feature: { href: '/shop/', image: '/images/products/h5-600-uv-editorial.webp', alt: 'The Crystalina flagship reverse osmosis system', title: 'The flagship', text: 'Ten stages, alkaline, UV, built for New York water.' },
+  } },
+  { label: 'Water Facts', href: '/nyc-water/' },
   { label: 'Find Your Filter', href: '/quiz/' },
   { label: 'About Us', href: '/about/' },
   { label: 'Contact', href: '/contact/' }
@@ -94,49 +120,129 @@ const LOGO_MARK = `<img src="/logo-mark.png" class="logo-mark" alt="Crystalina" 
 const LOGO_LOCKUP = `<img src="/logo-mark.png" class="brand-mark" alt=""><img src="/logo-text.png" class="brand-wordmark" alt="Crystalina. Pure Water. Pure Life.">`;
 
 /* ---------- header ---------- */
+function navItem(link, active) {
+  const cls = 'nav-link' + (active === link.href ? ' active' : '');
+  if (!link.menu) return `<li><a href="${link.href}" class="${cls}">${escapeHTML(link.label)}</a></li>`;
+  const col = c => `<div class="mega-col"><h4>${escapeHTML(c.title)}</h4><ul>${c.links.map(k =>
+    `<li><a href="${k.href}">${escapeHTML(k.label)}${k.desc ? `<small>${escapeHTML(k.desc)}</small>` : ''}</a></li>`).join('')}</ul></div>`;
+  const feat = link.menu.feature ? `<a class="mega-feature" href="${link.menu.feature.href}">
+      <div class="mega-feature-media"><img src="${link.menu.feature.image}" alt="${escapeHTML(link.menu.feature.alt)}" loading="lazy"></div>
+      <strong>${escapeHTML(link.menu.feature.title)}</strong><small>${escapeHTML(link.menu.feature.text)}</small></a>` : '';
+  return `<li class="has-menu"><a href="${link.href}" class="${cls}" aria-haspopup="true" aria-expanded="false">${escapeHTML(link.label)}</a>
+    <div class="mega"><div class="container mega-inner">${link.menu.columns.map(col).join('')}${feat}</div></div></li>`;
+}
+
 function renderHeader(active = '') {
   const user = Store.currentUser();
   const notifications = user && user.role === 'customer' && Store.getNotificationsForUser ? Store.getNotificationsForUser(user) : [];
   const unreadNotifications = notifications.filter(item => !item.read).length;
+  // The home page carries the header over its full viewport hero; every other
+  // page has it as a sticky white bar in the flow.
+  const overlay = active === '/';
   const el = document.createElement('div');
+  el.className = 'site-top' + (overlay ? ' site-top--overlay' : '');
   el.innerHTML = `
   <div class="announce-bar">
     <span>${icon('droplet')} Free shipping on orders over $99, delivered anywhere in the five boroughs</span>
-    <a href="tel:+19178094803" class="announce-phone">${icon('phone')} (917) 809-4803</a>
   </div>
-  <header class="site-header">
+  <header class="site-header${overlay ? ' is-transparent' : ''}">
     <div class="container header-inner">
-      <a class="brand" href="/" aria-label="Crystalina. Pure Water. Pure Life.">
-        ${LOGO_LOCKUP}
-      </a>
-      <nav class="main-nav" id="mainNav">
-        ${NAV_LINKS.map(l => `<a href="${l.href}" class="${active === l.href ? 'active' : ''}">${l.label}</a>`).join('')}
-      </nav>
-      <div class="header-actions">
-        ${user && user.role === 'customer' ? `<div class="notification-wrap">
-          <button class="icon-btn notification-btn" id="notificationBtn" title="Notifications" aria-label="Notifications">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
-            <span class="icon-label">Alerts</span>${unreadNotifications ? `<span class="notification-count" id="notificationCount">${unreadNotifications}</span>` : ''}
-          </button>
-          <div class="notification-menu" id="notificationMenu"><div class="notification-menu-head"><strong>Notifications</strong><span>${unreadNotifications} new</span></div>${notifications.length ? notifications.map(item => `<article class="notification-item ${item.read ? '' : 'unread'}"><strong>${escapeHTML(item.title)}</strong><p>${escapeHTML(item.message)}</p><small>${new Date(item.sent).toLocaleDateString('en-US', { dateStyle: 'medium' })}</small></article>`).join('') : '<p class="notification-empty">You have no notifications.</p>'}</div>
-        </div>` : ''}
-        <a href="${user ? (user.role === 'admin' ? '/admin/' : '/account/') : '/signin/'}" class="icon-btn" title="${user ? user.name : 'Sign in'}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
-          <span class="icon-label">${user ? user.name.split(' ')[0] : 'Sign In'}</span>
+      <div class="header-row">
+        <div class="header-side header-side--left">
+          <a href="tel:+19178094803" class="header-link">${icon('phone')} (917) 809-4803</a>
+        </div>
+        <a class="brand" href="/" aria-label="Crystalina. Pure Water. Pure Life.">
+          ${LOGO_LOCKUP}
         </a>
-        <button class="icon-btn cart-btn" id="cartOpenBtn" title="Cart">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2.5 3.5h3l2.6 12h10.4l2.5-8.5H6.2"/></svg>
-          <span class="icon-label">Cart</span>
-          <span class="cart-count" id="cartCount">0</span>
-        </button>
-        <button class="hamburger" id="hamburgerBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+        <div class="header-side header-actions">
+          ${user && user.role === 'customer' ? `<div class="notification-wrap">
+            <button class="icon-btn notification-btn" id="notificationBtn" title="Notifications" aria-label="Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+              <span class="icon-label">Alerts</span>${unreadNotifications ? `<span class="notification-count" id="notificationCount">${unreadNotifications}</span>` : ''}
+            </button>
+            <div class="notification-menu" id="notificationMenu"><div class="notification-menu-head"><strong>Notifications</strong><span>${unreadNotifications} new</span></div>${notifications.length ? notifications.map(item => `<article class="notification-item ${item.read ? '' : 'unread'}"><strong>${escapeHTML(item.title)}</strong><p>${escapeHTML(item.message)}</p><small>${new Date(item.sent).toLocaleDateString('en-US', { dateStyle: 'medium' })}</small></article>`).join('') : '<p class="notification-empty">You have no notifications.</p>'}</div>
+          </div>` : ''}
+          <a href="${user ? (user.role === 'admin' ? '/admin/' : '/account/') : '/signin/'}" class="icon-btn" title="${user ? user.name : 'Sign in'}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+            <span class="icon-label">${user ? user.name.split(' ')[0] : 'Sign In'}</span>
+          </a>
+          <button class="icon-btn cart-btn" id="cartOpenBtn" title="Cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2.5 3.5h3l2.6 12h10.4l2.5-8.5H6.2"/></svg>
+            <span class="icon-label">Cart</span>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+          <button class="hamburger" id="hamburgerBtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+        </div>
       </div>
+      <nav class="main-nav" id="mainNav" aria-label="Main">
+        <button class="nav-close" id="navCloseBtn" aria-label="Close menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <ul>${NAV_LINKS.map(link => navItem(link, active)).join('')}</ul>
+      </nav>
     </div>
-  </header>`;
+  </header>
+  <div class="nav-overlay" id="navOverlay"></div>`;
   document.body.prepend(el);
 
-  document.getElementById('hamburgerBtn').addEventListener('click', () =>
-    document.getElementById('mainNav').classList.toggle('open'));
+  const header = el.querySelector('.site-header');
+  const nav = document.getElementById('mainNav');
+
+  // Height as a custom property, for anything that has to clear the bar.
+  const setHeight = () => document.documentElement.style.setProperty('--header-h', el.offsetHeight + 'px');
+  setHeight();
+  if (window.ResizeObserver) new ResizeObserver(setHeight).observe(el);
+
+  // Transparent over the hero, white once scrolled.
+  if (overlay) {
+    const onScroll = () => header.classList.toggle('is-transparent', window.scrollY < 24 && !nav.classList.contains('open'));
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    nav.addEventListener('transitionend', onScroll);
+  }
+
+  const hamburger = document.getElementById('hamburgerBtn');
+  const setDrawer = open => {
+    nav.classList.toggle('open', open);
+    document.body.classList.toggle('nav-open', open);
+    hamburger.setAttribute('aria-expanded', String(open));
+    if (overlay) header.classList.toggle('is-transparent', !open && window.scrollY < 24);
+  };
+  hamburger.addEventListener('click', () => setDrawer(!nav.classList.contains('open')));
+  document.getElementById('navCloseBtn').addEventListener('click', () => setDrawer(false));
+  document.getElementById('navOverlay').addEventListener('click', () => setDrawer(false));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && nav.classList.contains('open')) { setDrawer(false); hamburger.focus(); } });
+
+  // While a menu is open the bar is white even over the hero, and the link
+  // says so to assistive technology.
+  el.querySelectorAll('.has-menu').forEach(li => {
+    const link = li.querySelector('.nav-link');
+    const show = () => { header.classList.add('menu-open'); link.setAttribute('aria-expanded', 'true'); };
+    const hide = () => { if (!li.classList.contains('is-open')) { header.classList.remove('menu-open'); link.setAttribute('aria-expanded', 'false'); } };
+    li.addEventListener('mouseenter', show);
+    li.addEventListener('mouseleave', hide);
+    li.addEventListener('focusin', show);
+    li.addEventListener('focusout', event => { if (!li.contains(event.relatedTarget)) hide(); });
+  });
+
+  // Menus: hover and focus open them on their own through CSS. Where there is
+  // no hover, or inside the drawer, the first tap opens and the second follows.
+  const closeMenus = () => { el.querySelectorAll('.has-menu.is-open').forEach(li => {
+    li.classList.remove('is-open');
+    li.querySelector('.nav-link').setAttribute('aria-expanded', 'false');
+  }); header.classList.remove('menu-open'); };
+  el.querySelectorAll('.has-menu > .nav-link').forEach(link => {
+    link.addEventListener('click', event => {
+      const li = link.parentElement;
+      const tapToOpen = window.matchMedia('(max-width: 860px)').matches || window.matchMedia('(hover: none)').matches;
+      if (!tapToOpen || li.classList.contains('is-open')) return;
+      event.preventDefault();
+      closeMenus();
+      li.classList.add('is-open');
+      link.setAttribute('aria-expanded', 'true');
+    });
+  });
+  document.addEventListener('click', event => { if (!event.target.closest('.has-menu')) closeMenus(); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') { closeMenus(); document.activeElement?.blur(); } });
+
   document.getElementById('cartOpenBtn').addEventListener('click', openCart);
   const notificationBtn = document.getElementById('notificationBtn');
   if (notificationBtn) notificationBtn.addEventListener('click', event => {
@@ -147,6 +253,17 @@ function renderHeader(active = '') {
   });
   document.addEventListener('click', event => { if (!event.target.closest('.notification-wrap')) document.getElementById('notificationMenu')?.classList.remove('open'); });
   updateCartBadge();
+}
+
+/* Home page category tiles, from the same list as the menu. */
+function renderCategoryTiles() {
+  const grid = document.getElementById('categoryGrid');
+  if (!grid) return;
+  grid.innerHTML = CATEGORIES.map((c, i) => `
+    <a href="${c.href}" class="cat-tile">
+      <div class="ct-media"><img src="${c.image}" alt="${escapeHTML(c.alt)}" loading="lazy" onerror="this.onerror=null;this.src=Store.placeholder('${escapeHTML(c.name).replace(/'/g, '')}',${i})"></div>
+      <div class="ct-label">${escapeHTML(c.name)} <small>${escapeHTML(c.desc)}</small></div>
+    </a>`).join('');
 }
 
 function applyAnnouncementStyle(settings) {
@@ -214,17 +331,46 @@ function applySectionTypography(el, typography) {
     headingColor: '--sec-heading-color', bodyFont: '--sec-body-font',
     bodySize: '--sec-body-size', bodyColor: '--sec-body-color'
   };
+  // Only the two design system faces may be set. A section saved before the
+  // type rule existed can still name a font the site does not load, which
+  // would render in whatever the visitor's machine happened to have.
+  const FACES = ['var(--font-head)', 'var(--font-body)'];
   let touched = false;
   Object.entries(map).forEach(([key, prop]) => {
-    if (typography[key]) { el.style.setProperty(prop, typography[key]); touched = true; }
+    const value = typography[key];
+    if (!value) return;
+    if (key.endsWith('Font') && !FACES.includes(value)) return;
+    el.style.setProperty(prop, value);
+    touched = true;
   });
   if (touched) el.classList.add('has-custom-type');
+}
+
+/* Hero copy from the editor, written so a phone can leave out everything
+   before the last sentence: those sentences are wrapped in .phone-hide. The
+   accent, when given, is set in an em wherever it appears. */
+function setHeroText(el, text, accent) {
+  const appendWithAccent = (parent, str) => {
+    if (!accent || !str.includes(accent)) { parent.append(document.createTextNode(str)); return; }
+    str.split(accent).forEach((part, i) => {
+      if (i) { const em = document.createElement('em'); em.textContent = accent; parent.append(em); }
+      if (part) parent.append(document.createTextNode(part));
+    });
+  };
+  el.replaceChildren();
+  const sentences = String(text || '').match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [];
+  const head = sentences.slice(0, -1).join('');
+  const tail = sentences[sentences.length - 1] || '';
+  if (head) { const span = document.createElement('span'); span.className = 'phone-hide'; appendWithAccent(span, head); el.append(span); }
+  appendWithAccent(el, tail);
 }
 
 function applyPageSections() {
   const main = document.querySelector('main');
   const sections = Store.getAdminData?.().pageSections || [];
-  if (!main || !sections.length) return;
+  // Only the home page has a section stack. Without this guard every other
+  // page grew the whole stack as empty headings beneath its own content.
+  if (!main || !sections.length || !main.querySelector('[data-home-section]')) return;
   const configuredIds = new Set(sections.map(section => section.id));
   main.querySelectorAll('[data-home-section]').forEach(section => {
     // Hide only what the editor explicitly disabled. A section that is simply
@@ -250,14 +396,8 @@ function applyPageSections() {
       const heading = section.querySelector('#homeHeroHeading');
       const body = section.querySelector('#homeHeroBody');
       if (eyebrow) eyebrow.textContent = config.eyebrow || '';
-      if (heading) {
-        heading.replaceChildren();
-        (config.heading || '').split(/(50 Feet)/).forEach(part => {
-          if (part === '50 Feet') { const accent = document.createElement('em'); accent.textContent = part; heading.append(accent); }
-          else heading.append(document.createTextNode(part));
-        });
-      }
-      if (body) body.textContent = config.body || '';
+      if (heading) setHeroText(heading, config.heading, heading.querySelector('em')?.textContent || '');
+      if (body) setHeroText(body, config.body);
     } else {
       const eyebrow = section.querySelector('.section-head .eyebrow') || section.querySelector('.split .eyebrow');
       const heading = section.querySelector('.section-head h2') || section.querySelector('.split h2') || section.querySelector('.cta-band h2');
@@ -275,7 +415,7 @@ function renderCartDrawer() {
   const el = document.createElement('div');
   el.innerHTML = `
   <div class="cart-overlay" id="cartOverlay"></div>
-  <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+  <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping cart">
     <div class="cart-head">
       <h3>Your Cart</h3>
       <button class="cart-close" id="cartCloseBtn" aria-label="Close cart">&times;</button>
@@ -403,21 +543,18 @@ function renderFooter() {
     </div>
     <div>
       <h4>Shop</h4>
-      <a href="/shop/?cat=Reverse%20Osmosis">Reverse Osmosis</a>
-      <a href="/shop/?cat=Whole%20House">Whole House</a>
-      <a href="/shop/?cat=Countertop">Countertop</a>
-      <a href="/shop/?cat=Shower%20%26%20Bath">Shower &amp; Bath</a>
-      <a href="/shop/?cat=Replacement%20Filters">Replacement Filters</a>
+      ${CATEGORIES.map(c => `<a href="${c.href}">${escapeHTML(c.name)}</a>`).join('')}
     </div>
     <div>
       <h4>Learn</h4>
-      <a href="/nyc-water/">NYC Water Facts</a>
+      <a href="/nyc-water/">Water Facts</a>
       <a href="/quiz/">Find Your Filter</a>
       <a href="/about/">Our Story</a>
       <a href="/contact/">FAQ</a>
     </div>
     <div>
       <h4>Support</h4>
+      <a href="/manuals/">Manuals and Guides</a>
       <a href="/contact/">Contact Us</a>
       <a href="/account/">My Account</a>
       <a href="${telHref}">${escapeHTML(companyPhone)}</a>
@@ -432,7 +569,7 @@ function renderFooter() {
   </div>
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
-      <span>© ${new Date().getFullYear()} ${escapeHTML(companyName)}. All rights reserved. Proudly serving the five boroughs.</span>
+      <span>© ${new Date().getFullYear()} ${escapeHTML(companyName.replace(/\.$/, ''))}. All rights reserved. Proudly serving the five boroughs.</span>
       <span class="footer-links"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="#">Shipping &amp; Returns</a> · <a href="/signin/?mode=staff">Staff sign in</a></span>
     </div>
   </div>`;
@@ -486,7 +623,7 @@ function productCard(p) {
     <div class="pc-body">
       <span class="pc-cat">${escapeHTML(p.category)}</span>
       <a href="/product/?id=${encodeURIComponent(p.id)}" class="pc-name">${escapeHTML(p.name)}</a>
-      <div class="pc-rating">★ ${p.rating} <span>(${p.reviews})</span></div>
+      ${p.reviews ? `<div class="pc-rating">★ ${p.rating} <span>(${p.reviews})</span></div>` : ''}
       <div class="pc-prices">
         <span class="pc-price">${money(p.price)}</span>
         ${p.comparePrice ? `<span class="pc-compare">${money(p.comparePrice)}</span>` : ''}
@@ -549,6 +686,11 @@ function initPage(activeNav = '') {
   applySiteSettings();
   renderCartDrawer();
   renderFooter();
+  renderCategoryTiles();
+  // One class says whether the page has scrolled; phone-only rules read it.
+  const markScrolled = () => document.body.classList.toggle('is-scrolled', window.scrollY > 120);
+  markScrolled();
+  window.addEventListener('scroll', markScrolled, { passive: true });
   autoReveal();
   requestAnimationFrame(() => initReveal());
   bindNewsletter();

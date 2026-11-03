@@ -1,16 +1,24 @@
 # Coordination
 
-Two agents work in this repository at the same time and cannot message each
-other. This file is the channel, and git is the sync point.
+More than one agent works in this repository at the same time and they
+cannot message each other. This file is the channel, and git is the sync
+point.
 
 **Who decides.** Claude Code is the lead. Where the agents disagree, the lead
 decides and records it in the log. Where another agent's work is incomplete
 or wrong, the lead corrects it and logs the fix; ownership of paths does not
 change because of a correction.
 
-**Division of labour.** Codex owns security, the database and server
-logistics. Claude Code owns the storefront, the admin content editor, the
-design system and the blueprint.
+**Division of labour.** Claude Code does all of the building, in more than
+one session: one holds the storefront, the design system, the content
+editor and the blueprint, and one holds deploys, the server boundary and
+auth. Codex no longer writes code here. It generates images, to the briefs
+in `IMAGE_PROMPTS.md`, and owns nothing else.
+
+**Changed 2026-11-02.** Codex previously owned security, the database and
+server logistics. Those paths did not move to the design session with it:
+read the table below for where each one went, and treat anything marked
+unowned as work that needs a person before it needs a commit.
 
 **Read the claims table before editing, and commit often.** An uncommitted
 change is invisible to everyone else, so work sitting in a working tree for
@@ -25,15 +33,16 @@ not own, add a line to the log and wait rather than taking it.
 
 | Path | Owner | Since | State |
 | --- | --- | --- | --- |
-| `docs/`, `scripts/`, `CLAUDE.md`, `COORDINATION.md` | Claude Code | 2026-10-09 | Active |
-| `css/`, `js/main.js`, `js/store.js`, `js/admin.js` | Claude Code | 2026-10-09 | Active |
-| `IMAGE_PROMPTS.md`, `image-refs/`, `images/` | Claude Code, image direction | 2026-11-02 | Active |
-| `api/`, `functions/`, `supabase/` | Codex | 2026-08-31 | Active |
-| `wrangler.toml`, `_headers`, `_routes.json` | Codex | 2026-10-09 | Handed over, see the log |
-| `js/manager.js`, `js/sales.js`, `js/technician.js`, schedule modules | Codex | 2026-08-31 | Active, XSS sweep pending |
+| `docs/`, `scripts/` except `build-site.mjs`, `CLAUDE.md` | Claude Code, design | 2026-10-09 | Active |
+| `css/`, `js/main.js`, `js/store.js`, `js/admin.js` | Claude Code, design | 2026-10-09 | Active |
+| `IMAGE_PROMPTS.md`, `image-refs/`, `images/` | Claude Code, image direction; Codex generates the files | 2026-11-02 | Active |
+| `api/`, `functions/`, `worker.js`, `supabase/`, `wrangler.toml`, `_headers`, `_routes.json`, `.github/`, `scripts/build-site.mjs` | Claude Code, deploys and auth | 2026-11-02 | Active |
+| `js/manager.js`, `js/sales.js`, `js/technician.js`, schedule modules | **Nobody** | 2026-11-02 | **Unowned.** Was Codex. The XSS sweep is still pending and is finding 3 in the blueprint |
 
 Shared, so announce in the log before touching: `css/styles.css`,
-`js/main.js`, `index.html`, `package.json`, `docs/diagrams/model.mjs`.
+`js/main.js`, `index.html`, `package.json`, `docs/diagrams/model.mjs`,
+`COORDINATION.md`, and the `<head>` of any page, which both sessions have
+reason to edit and which has to stay identical across all fourteen.
 
 ---
 
@@ -64,6 +73,125 @@ Shared, so announce in the log before touching: `css/styles.css`,
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-02 · Claude Code · The voice turns to health, and the review is answered
+
+The home page, the shop head, the navigation and the editor defaults in
+js/store.js now speak to people who care about what their household drinks:
+health first, every home and budget, quick and easy, with New York water as
+the reason we know what we are doing. Recorded as AD11 and in CLAUDE.md
+under Voice. NYC Water Facts is Water Facts everywhere it is named; the
+/nyc-water/ address is unchanged.
+
+**What this changes for you.** Rows already published in site_content carry
+the old copy and win over the HTML until the owner republishes from the
+editor. The hero hides its first sentence on phones; applyPageSections does
+this for editor copy too, so do not write hero text any other way.
+
+A design review by a subagent found, and this pass fixed: the phone drawer
+could not be closed by touch (it now has a close control, an overlay, a
+scroll lock and Escape); a designer note was printed to customers under the
+home chart; the Shop menu opened a white panel under a transparent bar; the
+header text over the hero fell to 3.3:1; every card printed a 0.0 rating;
+amber and red survived on the product and water pages; the footer left a
+white strip under the full bleed photograph; three different quiet surfaces
+are one; the shop filter lists all six categories; steps have one form
+everywhere; disabled buttons are legible; focus is a ring.
+
+Not taken from the review, and open: the product page is still the previous
+design apart from its image panel; prefers-reduced-motion is not honoured,
+which the stylesheet records as deliberate for the button wipe; the three
+legal links in the footer stay # until the wording is approved.
+### 2026-11-02 · Claude Code · The legal pages have their component
+
+`.legal` and `.legal-date` are built once in `css/styles.css`, under
+"long-form text", and privacy, terms and shipping-returns all read them: a
+68ch measure, generous space above each heading, lists that breathe, a
+date line set as metadata. Looked at at 1366 and 390: no overflow, no ghost
+sections, Playfair headings and Montserrat body as everywhere.
+
+**What I changed in those three files, and nothing else.** The font link
+and the stylesheet version in each head are now the one string every other
+page carries, and the eyebrow in the page hero uses the existing
+`.eyebrow--on-dark` modifier in place of an inline colour. The wording is
+untouched and reads clearly to me. The footer hrefs and the allow-list are
+as you left them.
+### 2026-11-02 · Claude Code · The storefront redesign, first pass, and a bug every page had
+
+The header is one component with two states: centred lockup, uppercase
+navigation beneath, a full width hover menu on Shop, white and sticky on
+inner pages, transparent over the full viewport hero on the home page. The
+home page is rebuilt as editorial bands on white and the light silver, the
+shop is a filter rail and a three up grid in the manner of a fashion
+listing, and the product card is one card everywhere. Every data-home-section
+id and editor hook is preserved, so the content editor still works.
+
+**A bug every inner page had.** applyPageSections appended the whole home
+section stack, as empty headings, to any page whose main lacked it. Checkout,
+shop, sign in, every one of them carried nine ghost sections above the
+footer on the live site. It now runs only where a data-home-section exists.
+
+**What this changes for you.** The six categories are CATEGORIES in
+js/main.js and the tiles, the menu and the footer read it; do not write a
+category name anywhere else. The header is renderHeader() and nothing in a
+page head duplicates it. docs/components.html is the living library; if you
+need a component, look there first. docs/screens is regenerated by npm run
+screens, so do not hand edit it.
+
+### 2026-11-02 · Claude Code · Codex writes no more code, and the table says so
+
+The owner has moved Codex to image generation only. The claims table and the
+division of labour above are rewritten to match, and `CLAUDE.md` with them.
+
+**What this changes for you.** `api/`, `functions/`, `supabase/`,
+`wrangler.toml`, `_headers`, `_routes.json`, `.github/` and
+`scripts/build-site.mjs` are now listed against the Claude Code session that
+holds deploys and auth, which is where that work was already happening. The
+design session does not take them and has not touched them.
+
+**One group has no owner at all.** `js/manager.js`, `js/sales.js`,
+`js/technician.js` and the schedule modules were Codex, and the XSS sweep on
+them was pending when Codex stopped. That sweep is finding 3 in the
+blueprint, a live stored-XSS route where staff text reaches another staff
+member through innerHTML unescaped. It is marked unowned rather than
+quietly reassigned, because pretending it has an owner is how it stays open.
+
+Build plan owners in `docs/diagrams/model.mjs` and the owners on U1 and U4
+moved from Codex to Claude Code, so the blueprint stops naming someone who
+is not coming back.
+
+**One palette decision.** WhatsApp green `#25D366` on the floating button is
+now a sanctioned exception beside the four-colour Google G, recorded in
+`CLAUDE.md`. Those two are the whole list. A third-party mark is not a
+precedent for a third green.
+### 2026-11-02 · Claude Code · One type rule, and every page head rewritten
+
+Playfair Display is the display face by decision rather than as a stand-in,
+and Canela is out of the stack. Four weights exist as tokens in
+`css/styles.css`, and all 135 numeric `font-weight` declarations across the
+stylesheet, the quiz page and the editor now use them. Weight 800 was set in
+32 places and was never loaded, so the browser was drawing a synthetic bold;
+that is gone. Recorded as AD8, amended, and AD12, new.
+
+**What this changes for you.** I touched the `<head>` of all fourteen pages.
+The font link is now one identical string everywhere, and the stylesheet is
+`/css/styles.css?v=20261102-type-rule` on every page, where eleven of them
+previously had no version at all. If you are editing page heads for auth or
+for Cloudflare, take this change first and keep the two strings identical
+across every page: they are a single definition that happens to be stored in
+fourteen files, which is the next thing section 13 should fix.
+
+The content editor no longer offers Inter, Poppins, Georgia, Helvetica Neue
+or system-ui. It offers the two faces of the design system, and `js/main.js`
+now ignores any other face stored against a section, so old rows in
+`site_content` cannot put an unloaded font on the page.
+
+`npm run check` passes: 29 tests, the build, and both drift checks.
+
+**Still open, and not mine to take.** `checkout/index.html` computes
+shipping in the browser as `subtotal >= 99 ? 0 : 9.99`, and the free
+shipping threshold is written in nine places across the site. The claims
+table above still assigns `api/`, `functions/` and `supabase/` to Codex,
+which no longer reflects who is working here.
 ### 2026-11-02 · Codex · User correction: clean editorial homes and branded products
 
 The user rejected the excessive dirt/wear in the first imagery pass and explicitly authorized rewriting Claude's prompt files. New direction: attractive, clean middle-income apartments; only subtle aesthetic material imperfections; filter is the visual focal point. The two supplied Crystalina marks may be engraved, labelled, printed, textured or integrated into the actual product. This supersedes the previous blanket logo/text ban and grime-led room direction. Codex owns this revision to IMAGE_PROMPTS.md, image-refs/ and the 11 generated site assets; no original product photos are to be edited. Source logos are copied unchanged into image-refs/brand/. The user's prior native-resolution exception remains active. Regeneration in progress.
