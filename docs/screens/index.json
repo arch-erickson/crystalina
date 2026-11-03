@@ -33,12 +33,12 @@
         "tablet": {
           "file": "page-home-tablet.webp",
           "width": 834,
-          "height": 11134
+          "height": 11487
         },
         "mobile": {
           "file": "page-home-mobile.webp",
           "width": 390,
-          "height": 15229
+          "height": 15064
         }
       },
       "h1": "Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem."
@@ -57,12 +57,12 @@
         "tablet": {
           "file": "page-shop-tablet.webp",
           "width": 834,
-          "height": 6878
+          "height": 6911
         },
         "mobile": {
           "file": "page-shop-mobile.webp",
           "width": 390,
-          "height": 12308
+          "height": 12050
         }
       },
       "h1": "Shop Filtration Systems"
@@ -81,12 +81,12 @@
         "tablet": {
           "file": "page-product-tablet.webp",
           "width": 834,
-          "height": 1676
+          "height": 1644
         },
         "mobile": {
           "file": "page-product-mobile.webp",
           "width": 390,
-          "height": 2230
+          "height": 2272
         }
       },
       "h1": "Product not found"
@@ -105,12 +105,12 @@
         "tablet": {
           "file": "page-checkout-tablet.webp",
           "width": 834,
-          "height": 1618
+          "height": 1602
         },
         "mobile": {
           "file": "page-checkout-mobile.webp",
           "width": 390,
-          "height": 2268
+          "height": 2276
         }
       },
       "h1": "Checkout"
@@ -129,12 +129,12 @@
         "tablet": {
           "file": "page-nyc-water-tablet.webp",
           "width": 834,
-          "height": 5896
+          "height": 5827
         },
         "mobile": {
           "file": "page-nyc-water-mobile.webp",
           "width": 390,
-          "height": 7383
+          "height": 7534
         }
       },
       "h1": "What's Really in NYC Tap Water?"
@@ -153,12 +153,12 @@
         "tablet": {
           "file": "page-quiz-tablet.webp",
           "width": 834,
-          "height": 1889
+          "height": 1873
         },
         "mobile": {
           "file": "page-quiz-mobile.webp",
           "width": 390,
-          "height": 2454
+          "height": 2489
         }
       },
       "h1": "Find Your Perfect Filter"
@@ -225,12 +225,12 @@
         "tablet": {
           "file": "page-about-tablet.webp",
           "width": 834,
-          "height": 3713
+          "height": 3677
         },
         "mobile": {
           "file": "page-about-mobile.webp",
           "width": 390,
-          "height": 4486
+          "height": 4566
         }
       },
       "h1": "Pure Water. Pure Life. Pure New York."
@@ -249,12 +249,12 @@
         "tablet": {
           "file": "page-contact-tablet.webp",
           "width": 834,
-          "height": 2632
+          "height": 2616
         },
         "mobile": {
           "file": "page-contact-mobile.webp",
           "width": 390,
-          "height": 3448
+          "height": 3456
         }
       },
       "h1": "Talk to a Real New Yorker"
@@ -273,12 +273,12 @@
         "tablet": {
           "file": "page-privacy-tablet.webp",
           "width": 834,
-          "height": 3132
+          "height": 3116
         },
         "mobile": {
           "file": "page-privacy-mobile.webp",
           "width": 390,
-          "height": 4428
+          "height": 4547
         }
       },
       "h1": "Privacy Policy"
@@ -297,12 +297,12 @@
         "tablet": {
           "file": "page-terms-tablet.webp",
           "width": 834,
-          "height": 3098
+          "height": 3082
         },
         "mobile": {
           "file": "page-terms-mobile.webp",
           "width": 390,
-          "height": 4337
+          "height": 4485
         }
       },
       "h1": "Terms of Service"
@@ -321,12 +321,12 @@
         "tablet": {
           "file": "page-shipping-tablet.webp",
           "width": 834,
-          "height": 3052
+          "height": 3036
         },
         "mobile": {
           "file": "page-shipping-mobile.webp",
           "width": 390,
-          "height": 4236
+          "height": 4328
         }
       },
       "h1": "Shipping and Returns"
@@ -467,7 +467,7 @@
         "mobile": {
           "file": "section-trust-mobile.webp",
           "width": 390,
-          "height": 397
+          "height": 447
         }
       }
     },
@@ -483,12 +483,12 @@
         "tablet": {
           "file": "section-categories-tablet.webp",
           "width": 834,
-          "height": 1376
+          "height": 1372
         },
         "mobile": {
           "file": "section-categories-mobile.webp",
           "width": 390,
-          "height": 2455
+          "height": 2308
         }
       }
     },
@@ -504,12 +504,12 @@
         "tablet": {
           "file": "section-anatomy-tablet.webp",
           "width": 834,
-          "height": 1049
+          "height": 1487
         },
         "mobile": {
           "file": "section-anatomy-mobile.webp",
           "width": 390,
-          "height": 1583
+          "height": 1539
         }
       }
     },
@@ -525,12 +525,12 @@
         "tablet": {
           "file": "section-best-sellers-tablet.webp",
           "width": 834,
-          "height": 1492
+          "height": 1486
         },
         "mobile": {
           "file": "section-best-sellers-mobile.webp",
           "width": 390,
-          "height": 2648
+          "height": 2582
         }
       }
     },
@@ -546,12 +546,12 @@
         "tablet": {
           "file": "section-water-facts-tablet.webp",
           "width": 834,
-          "height": 1218
+          "height": 1202
         },
         "mobile": {
           "file": "section-water-facts-mobile.webp",
           "width": 390,
-          "height": 1700
+          "height": 1831
         }
       }
     },
@@ -567,12 +567,12 @@
         "tablet": {
           "file": "section-process-tablet.webp",
           "width": 834,
-          "height": 705
+          "height": 689
         },
         "mobile": {
           "file": "section-process-mobile.webp",
           "width": 390,
-          "height": 1141
+          "height": 1135
         }
       }
     },
@@ -588,12 +588,12 @@
         "tablet": {
           "file": "section-why-crystalina-tablet.webp",
           "width": 834,
-          "height": 1511
+          "height": 1482
         },
         "mobile": {
           "file": "section-why-crystalina-mobile.webp",
           "width": 390,
-          "height": 1223
+          "height": 1216
         }
       }
     },
@@ -609,12 +609,12 @@
         "tablet": {
           "file": "section-testimonials-tablet.webp",
           "width": 834,
-          "height": 1042
+          "height": 1026
         },
         "mobile": {
           "file": "section-testimonials-mobile.webp",
           "width": 390,
-          "height": 1238
+          "height": 1202
         }
       }
     },
@@ -635,7 +635,7 @@
         "mobile": {
           "file": "section-cta-mobile.webp",
           "width": 390,
-          "height": 480
+          "height": 440
         }
       }
     }
