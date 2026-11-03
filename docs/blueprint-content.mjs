@@ -665,7 +665,7 @@ export const sections = [
     { t: 'screens' },
     {
       t: 'callout', kind: 'learn', title: 'Refreshing the captures',
-      text: 'Serve the site, then run npm run screens. The script captures the fourteen pages and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.',
+      text: 'Serve the site, then run npm run screens. The script captures every page, seventeen at the time of writing, and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.',
     },
   ],
 },

@@ -273,7 +273,7 @@ export const pages = [
     id: 'home', icon: 'page', label: 'Home', route: '/', area: 'client', col: 0, row: 0,
     design: 'Implemented', server: 'Partial',
     built: ['Hydrates hero, sections and best sellers from site_content', 'Products read with the publishable key'],
-    remaining: ['Trust bar, category tiles, testimonials and water facts are still in the HTML'],
+    remaining: ['Trust list, testimonials, water facts and process steps are still in the HTML; the category tiles now read CATEGORIES in main.js'],
   },
   {
     id: 'shop', icon: 'cart', label: 'Shop', route: '/shop/', area: 'client', col: 1, row: 0,
@@ -316,6 +316,24 @@ export const pages = [
     design: 'Implemented', server: 'Partial',
     built: ['POST /api/contact validates, rate limits and writes contact_messages', 'Resend email to CONTACT_INBOX when the key is set'],
     remaining: ['Returns 500 in production: no environment variables are set', 'No Turnstile widget'],
+  },
+  {
+    id: 'privacy', icon: 'page', label: 'Privacy policy', route: '/privacy/', area: 'client', col: 2, row: 2,
+    design: 'Implemented', server: 'Missing',
+    built: ['What is collected, who handles it, how to have it removed', 'Set in the long-form text component shared by every legal page'],
+    remaining: ['Not in the publish allow-list and linked from the footer as # until the owner has approved the wording', 'Nothing on the server. No server work needed'],
+  },
+  {
+    id: 'terms', icon: 'page', label: 'Terms of service', route: '/terms/', area: 'client', col: 3, row: 2,
+    design: 'Implemented', server: 'Missing',
+    built: ['Orders, pricing, warranty, returns and disputes in plain language', 'Set in the long-form text component shared by every legal page'],
+    remaining: ['Not in the publish allow-list and linked from the footer as # until the owner has approved the wording', 'Nothing on the server. No server work needed'],
+  },
+  {
+    id: 'shipping', icon: 'page', label: 'Shipping and returns', route: '/shipping-returns/', area: 'client', col: 0, row: 3,
+    design: 'Implemented', server: 'Missing',
+    built: ['Delivery areas, timing, the free shipping threshold and the return window', 'Set in the long-form text component shared by every legal page'],
+    remaining: ['Not in the publish allow-list and linked from the footer as # until the owner has approved the wording', 'Nothing on the server. No server work needed'],
   },
   {
     id: 'signin', icon: 'key', label: 'Sign in', route: '/signin/', area: 'client', col: 2, row: 1,

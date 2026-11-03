@@ -36,7 +36,9 @@ const VIEWPORTS = [
   { name: 'mobile',  width: 390,  height: 844 },
 ];
 
-/* The same fourteen pages as the site map in section 10, in the same two groups. */
+/* Every page, in the two groups the site map in section 10 uses. The three
+   legal pages are drafts outside the publish allow-list, captured so the
+   record is complete. */
 const PAGES = [
   { slug: 'home',       path: '/',            title: 'Home',             group: 'customer' },
   { slug: 'shop',       path: '/shop/',       title: 'Shop',             group: 'customer' },
@@ -48,6 +50,9 @@ const PAGES = [
   { slug: 'account',    path: '/account/',    title: 'Account',          group: 'customer' },
   { slug: 'about',      path: '/about/',      title: 'About',            group: 'customer' },
   { slug: 'contact',    path: '/contact/',    title: 'Contact',          group: 'customer' },
+  { slug: 'privacy',    path: '/privacy/',    title: 'Privacy policy',   group: 'customer' },
+  { slug: 'terms',      path: '/terms/',      title: 'Terms of service', group: 'customer' },
+  { slug: 'shipping',   path: '/shipping-returns/', title: 'Shipping and returns', group: 'customer' },
   { slug: 'admin',      path: '/admin/',      title: 'Admin console',    group: 'staff' },
   { slug: 'manager',    path: '/manager/',    title: 'Manager',          group: 'staff' },
   { slug: 'sales',      path: '/sales/',      title: 'Sales',            group: 'staff' },

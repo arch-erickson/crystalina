@@ -315,7 +315,7 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 
 | Page | Route | Design | Server | What remains |
 | --- | --- | --- | --- | --- |
-| Home | / | Implemented | Partial | Trust bar, category tiles, testimonials and water facts are still in the HTML |
+| Home | / | Implemented | Partial | Trust list, testimonials, water facts and process steps are still in the HTML; the category tiles now read CATEGORIES in main.js |
 | Shop | /shop/ | Implemented | Implemented | Stock is 0 on all 13 items, so every card reads out of stock |
 | Product | /product/?id= | Implemented | Partial | product_stage_options is empty, so no 5, 6 or 7 stage choice renders No faucet products exist, so the upgrade control has nothing to offer |
 | Checkout | /checkout/ | Implemented | Partial | No payment: the submit button is disabled on purpose No Turnstile widget, though the server expects a token |
@@ -323,6 +323,9 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | NYC water | /nyc-water/ | Implemented | Missing | Figures are illustrative and unverified against NYC DEP reports (U2) |
 | About | /about/ | Implemented | Missing | Nothing. No server work needed |
 | Contact | /contact/ | Implemented | Partial | Returns 500 in production: no environment variables are set No Turnstile widget |
+| Privacy policy | /privacy/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
+| Terms of service | /terms/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
+| Shipping and returns | /shipping-returns/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
 | Sign in | /signin/ | Implemented | Partial | Continue with Google is built; the provider is not enabled in Supabase yet Store.signUp and Store.signIn stubs still exist and must be retired |
 | Account | /account/ | Implemented | Refactor | Still reads local session state instead of CrystalinaAuth |
 | Admin console | /admin/ | Implemented | Partial | Access decided in the browser, not by a policy (U1) Record fields reach innerHTML unescaped: stored XSS route No screen for stage options or faucet assignment |
@@ -659,4 +662,4 @@ Captured 2026-11-03 at 1366, 834, 390 pixels wide.
 
 > **Refreshing the captures**
 >
-> Serve the site, then run npm run screens. The script captures the fourteen pages and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.
+> Serve the site, then run npm run screens. The script captures every page, seventeen at the time of writing, and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.
