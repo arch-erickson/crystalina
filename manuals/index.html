@@ -64,10 +64,12 @@
   initPage('/manuals/');
 
   /* A manual named on the product row, manualUrl, lives in the site-media
-     bucket and is trusted. Only the guessed address, /manuals/files/<slug>.pdf,
-     is checked, once, so the page makes fewer requests as the library fills.
-     A manual that is not here yet can be asked for, and nothing on the page
-     promises a date. */
+     bucket and is trusted. Every other manual is a file in /manuals/files/
+     named <slug>.pdf and listed in /manuals/files/index.json, which the page
+     reads once: one request, and no 404 for a manual that is not here yet.
+     Adding a manual means dropping the PDF in that folder and adding its
+     name to the list. A manual that is not here can be asked for, and
+     nothing on the page promises a date. */
   const params = new URLSearchParams(location.search);
   let query = (params.get('q') || '').toLowerCase();
   let activeCat = params.get('cat') || 'All';
@@ -76,14 +78,14 @@
   const manualUrl = p => p.manualUrl || ('/manuals/files/' + encodeURIComponent(p.slug || p.id) + '.pdf');
   const products = () => sortForDisplay(Store.getProducts());
 
-  async function probe(p) {
-    const url = manualUrl(p);
-    if (p.manualUrl) { available.set(url, true); return true; }
-    if (available.has(url)) return available.get(url);
-    let ok = false;
-    try { const res = await fetch(url, { method: 'HEAD' }); ok = res.ok && /pdf/i.test(res.headers.get('content-type') || ''); } catch { ok = false; }
-    available.set(url, ok);
-    return ok;
+  async function loadManifest() {
+    let files = [];
+    try { const res = await fetch('/manuals/files/index.json'); if (res.ok) files = await res.json(); } catch { files = []; }
+    const listed = new Set(Array.isArray(files) ? files.map(String) : []);
+    products().forEach(p => {
+      const url = manualUrl(p);
+      available.set(url, Boolean(p.manualUrl) || listed.has(decodeURIComponent(url.split('/').pop())));
+    });
   }
 
   function matches(p) {
@@ -159,7 +161,8 @@
 
   renderCats();
   renderGrid();
-  Promise.all(products().map(probe)).then(renderGrid);
+  loadManifest().then(renderGrid);
+  document.addEventListener('catalog:changed', () => loadManifest().then(renderGrid));
 </script>
 </body>
 </html>

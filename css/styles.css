@@ -83,7 +83,8 @@ h1, h2, h3, h4 { line-height: 1.18; color: var(--navy-800); font-weight: var(--w
    Dashboard figures are deliberately not in this list. */
 .pc-price, .pd-price, .summary-total, .hero-stat strong, .quiz-price { font-family: var(--font-head); }
 
-.eyebrow { display: inline-block; font-size: .78rem; font-weight: var(--w-bold); letter-spacing: .16em; text-transform: uppercase; color: var(--blue-500); margin-bottom: 10px; }
+/* The eyebrow is navy, not blue: blue on white measures 4.4 to 1 and on the silver band less, under the 4.5 the small text needs. On navy it is cyan (eyebrow--on-dark). */
+.eyebrow { display: inline-block; font-size: .78rem; font-weight: var(--w-bold); letter-spacing: .16em; text-transform: uppercase; color: var(--navy-700); margin-bottom: 10px; }
 
 /* ---------- buttons ----------
    Hover: a solid --btn-fill wipes the WHOLE button from the vertical

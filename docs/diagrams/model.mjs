@@ -1219,13 +1219,13 @@ export const ownerSteps = {
  * ------------------------------------------------------------------ */
 
 export const budget = {
-  note: 'Target is the first screen on a mid-range phone over 4G. Nothing here has been measured yet: scripts/verify.mjs reports transferred weight per page, and these bars fill in once it has been run against a served copy.',
+  note: 'Target is the first screen on a mid-range phone over 4G. Measured 2026-11-03 with scripts/verify.mjs against the local server at 390px wide, whole page, uncompressed: the Worker compresses text, so CSS and JS weigh about a third of this in the field, and images, which do not compress, are the figure that matters. Desktop in brackets. Every page is over budget, and every page is over for one reason: photographs at two to four times the pixels they are shown at. Thumbnails of 1086 by 1448 are drawn at 262 wide; the logo mark of 1000px is drawn at 44. The fix is image variants and srcset, which is image work, and is logged in COORDINATION.md for the image session. Measured against a served copy.',
   unit: 'KB transferred, first screen',
   rows: [
-    { page: '/', budget: 420, measured: null, heavy: 'hero-bg.webp is allowed to be the single heaviest asset' },
-    { page: '/shop/', budget: 380, measured: null, heavy: 'Seventeen product thumbnails, lazy below the fold' },
-    { page: '/product/', budget: 400, measured: null, heavy: 'One large product photo' },
-    { page: '/checkout/', budget: 220, measured: null, heavy: 'No imagery. Should be the lightest page' },
+    { page: '/', budget: 420, measured: 1684, heavy: 'hero-bg.webp 402 KB, nyc-skyline 296, the H5-600 editorial 241, lifestyle 201 (desktop 2195)' },
+    { page: '/shop/', budget: 380, measured: 1505, heavy: 'Seventeen thumbnails of 1086 by 1448 drawn at 262 wide (desktop 1749)' },
+    { page: '/product/', budget: 400, measured: 690, heavy: 'One product photo and four related thumbnails (desktop 768)' },
+    { page: '/checkout/', budget: 220, measured: 337, heavy: 'The page floor: 178 KB of CSS and 104 KB of JS uncompressed, plus the logo files (desktop 591)' },
     { page: '/admin/', budget: 600, measured: null, heavy: 'Staff only, on a desktop. Deliberately allowed to be heavy' },
   ],
 };

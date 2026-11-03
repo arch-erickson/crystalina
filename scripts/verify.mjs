@@ -1,7 +1,10 @@
 #!/usr/bin/env node
 /* The verification harness.
  *
- *   node scripts/verify.mjs / [--base http://localhost:4321] [--out .verify]
+ *   node scripts/verify.mjs / [--base http://localhost:4321] [--out .verify] [--verbose]
+ *
+ * --verbose lists every low-contrast text node, every oversized image and
+ * the heaviest requests, so a count can be acted on rather than read.
  *
  * Renders the page in a real browser and reports what is measurable rather
  * than what was intended: console errors, horizontal overflow, text contrast,
@@ -160,6 +163,10 @@ for (const [w, h, label] of SIZES) {
   report.lowContrast.slice(0, 3).forEach((c) => console.log('      ' + c.ratio + ':1 needs ' + c.need + '  "' + c.text + '"'));
   console.log('  long lines          ' + report.longLines.length + (report.longLines[0] ? ' (' + report.longLines[0].chars + ' characters)' : ''));
   console.log('  images              ' + report.images.length + ', ' + unsized + ' unsized, ' + noAlt + ' without alt, ' + heavy.length + ' oversized');
+  if (process.argv.includes('--verbose')) {
+    report.lowContrast.forEach((t) => console.log('    contrast ' + t.ratio + ' of ' + t.need + '  "' + t.text + '"'));
+    heavy.forEach((i) => console.log('    oversized ' + i.natural + ' shown at ' + i.shown + '  ' + i.src));
+  }
   heavy.slice(0, 3).forEach((i) => console.log('      ' + i.src + ': ' + i.natural + ' shown at ' + i.shown));
   if (label === 'desktop' && report.h1s !== 1) console.log('  headings            ' + report.h1s + ' h1 elements, expected 1');
 
