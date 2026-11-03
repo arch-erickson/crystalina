@@ -347,7 +347,7 @@ body.nav-open { overflow: hidden; }
 .src { color: var(--blue-500); font-size: .7em; vertical-align: super; text-decoration: none; margin-left: 2px; font-weight: var(--w-semibold); }
 .nyc-band .src { color: var(--cyan-300); }
 .section--sources { padding: 34px 0 48px; border-top: 1px solid var(--silver-200); }
-.sources-head { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 14px; }
+.sources-head { font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 14px; }
 .sources { margin: 0; padding-left: 1.3em; display: grid; gap: 7px; font-size: .78rem; color: var(--muted); max-width: 78ch; line-height: 1.55; }
 .sources a { color: var(--navy-800); text-decoration: underline; text-underline-offset: 3px; }
 .sources a:hover { color: var(--blue-500); }
@@ -447,7 +447,7 @@ body.cart-open { overflow: hidden; }
 .footer-grid h4 { color: #fff; font-size: .92rem; margin-bottom: 14px; letter-spacing: .06em; }
 .footer-grid a { display: block; font-size: .86rem; padding: 4px 0; color: #b8cbe6; }
 .footer-grid a:hover { color: var(--cyan-300); }
-.footer-tag { letter-spacing: .2em; text-transform: uppercase; font-size: .68rem; color: var(--cyan-300); font-weight: var(--w-bold); margin: 10px 0 8px; }
+.footer-tag { letter-spacing: .2em; text-transform: uppercase; font-size: .72rem; color: var(--cyan-300); font-weight: var(--w-bold); margin: 10px 0 8px; }
 .footer-desc { font-size: .84rem; }
 .footer-addr { font-size: .84rem; margin-bottom: 12px; }
 .socials { display: flex; gap: 10px; margin-top: 18px; }
@@ -553,11 +553,11 @@ body.viewer-open { overflow: hidden; }
 .receipt-meta { color: var(--muted); font-size: .86rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .receipt-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .receipt-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
-.receipt-table th { text-align: left; font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); padding: 14px 0 10px; border-bottom: 1px solid var(--silver-200); }
+.receipt-table th { text-align: left; font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); padding: 14px 0 10px; border-bottom: 1px solid var(--silver-200); }
 .receipt-table td { padding: 14px 0; border-bottom: 1px solid var(--silver-200); vertical-align: top; }
 .receipt-table th:not(:first-child), .receipt-table td:not(:first-child) { text-align: right; white-space: nowrap; padding-left: 18px; }
 .receipt-grid { display: grid; grid-template-columns: 1fr minmax(240px, 300px); gap: 32px 48px; padding: 26px 0; }
-.receipt-grid h3 { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 10px; }
+.receipt-grid h3 { font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 10px; }
 .receipt-address { line-height: 1.6; }
 .receipt-note { color: var(--muted); font-size: .86rem; margin-top: 10px; }
 .receipt-totals { display: grid; grid-template-columns: 1fr auto; gap: 8px 18px; margin: 0; font-size: .92rem; align-content: start; }
@@ -566,7 +566,7 @@ body.viewer-open { overflow: hidden; }
 .receipt-totals .receipt-total { padding-top: 10px; border-top: 1px solid var(--silver-200); color: var(--navy-800); font-weight: var(--w-bold); font-family: var(--font-head); font-size: 1.15rem; }
 .receipt-foot { color: var(--muted); font-size: .86rem; border-top: 1px solid var(--silver-200); padding-top: 18px; }
 .receipt-history { padding: 4px 0 26px; }
-.receipt-history h3 { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 14px; }
+.receipt-history h3 { font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 14px; }
 
 /* ---------- timeline ----------
    Events in order down a hairline rail: a dot per event, the time in small
@@ -640,7 +640,7 @@ body.viewer-open { overflow: hidden; }
 .pd-bundle-panel { display: grid; grid-template-columns: minmax(110px, 150px) minmax(0, 1fr); gap: 20px; margin: 30px 0 0; padding: 22px 0; border-top: 1px solid var(--silver-200); border-bottom: 1px solid var(--silver-200); }
 .pd-bundle-image { width: 100%; aspect-ratio: 1; object-fit: contain; align-self: start; }
 .pd-bundle-content { min-width: 0; }
-.pd-bundle-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: .68rem; font-weight: var(--w-semibold); letter-spacing: .13em; text-transform: uppercase; }
+.pd-bundle-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: .72rem; font-weight: var(--w-semibold); letter-spacing: .13em; text-transform: uppercase; }
 .pd-bundle-content h3 { margin-bottom: 6px; font-size: 1.05rem; }
 .pd-bundle-content > p { color: var(--muted); font-size: .88rem; line-height: 1.5; }
 .pd-bundle-content .pd-fit-note { margin-top: 8px; color: var(--ink); font-size: .8rem; }
@@ -721,7 +721,7 @@ body.viewer-open { overflow: hidden; }
 .checkout-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr); gap: 64px; align-items: start; }
 .form-section { padding: 28px 0; border-top: 1px solid var(--silver-200); }
 .form-sections > .form-section:first-child, .form-sections > .form-error + .form-section { border-top: 0; padding-top: 0; }
-.form-section h3, .co-summary h3 { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 18px; }
+.form-section h3, .co-summary h3 { font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 18px; }
 .form-note { color: var(--muted); font-size: .9rem; line-height: 1.6; margin-bottom: 18px; max-width: 54ch; }
 .form-actions { display: grid; gap: 10px; max-width: 420px; }
 .co-summary { position: sticky; top: calc(var(--header-h, 120px) + 24px); padding: 26px 28px 24px; background: var(--silver-50); }
@@ -749,7 +749,7 @@ body.viewer-open { overflow: hidden; }
 .acct-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; border-top: 1px solid var(--silver-200); padding-top: 18px; }
 .acct-links .text-link { background: none; border-top: 0; border-left: 0; border-right: 0; cursor: pointer; }
 .text-link--quiet { color: var(--muted); }
-.acct-orders h3 { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 4px; }
+.acct-orders h3 { font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 4px; }
 .acct-empty { color: var(--muted); font-size: .92rem; padding: 18px 0; border-top: 1px solid var(--silver-200); }
 .order-card { padding: 18px 0; border-top: 1px solid var(--silver-200); }
 .order-card:last-child { border-bottom: 1px solid var(--silver-200); }
@@ -2212,7 +2212,7 @@ body.viewer-open { overflow: hidden; }
    shows progress, the options are hairline rows with a line icon, and the
    answer is the product said plainly with its photograph and price. */
 .quiz-card { max-width: 640px; margin: 0 auto; }
-.quiz-step { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); margin-bottom: 10px; }
+.quiz-step { font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); margin-bottom: 10px; }
 .quiz-q { font-size: clamp(1.4rem, 2.4vw, 1.9rem); margin-bottom: 26px; }
 .quiz-opts { display: grid; gap: 0; border-top: 1px solid var(--silver-200); }
 .quiz-back { margin-top: 24px; }
@@ -2236,7 +2236,7 @@ body.viewer-open { overflow: hidden; }
 .contact-grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; align-items: start; }
 .contact-ways { margin: 0; border-top: 1px solid var(--silver-200); }
 .contact-ways > div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--silver-200); }
-.contact-ways dt { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); padding-top: 4px; }
+.contact-ways dt { font-size: .72rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); padding-top: 4px; }
 .contact-ways dd { margin: 0; color: var(--navy-800); font-size: .95rem; }
 .contact-ways dd a { color: var(--navy-800); text-decoration: underline; text-underline-offset: 3px; }
 .contact-ways dd a:hover { color: var(--blue-500); }
@@ -2612,7 +2612,7 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
    The choices on a product page are hairline rows under a small heading.
    The chosen row is navy with its price; nothing is boxed. */
 .pd-config { margin: 0 0 22px; }
-.pd-config h4 { font-size: .68rem; text-transform: uppercase; letter-spacing: .13em; margin-bottom: 4px; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); }
+.pd-config h4 { font-size: .72rem; text-transform: uppercase; letter-spacing: .13em; margin-bottom: 4px; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); }
 .config-options { display: grid; gap: 0; border-top: 1px solid var(--silver-200); }
 .config-option { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--silver-200); cursor: pointer; transition: color .2s; }
 .config-option:hover .config-body strong { color: var(--blue-500); }
