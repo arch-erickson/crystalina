@@ -25,6 +25,8 @@ import { buildAll } from './diagrams.mjs';
 import { arrowDefs, esc } from './lib/svg.mjs';
 import { TYPE } from './lib/tokens.mjs';
 import { sprite } from './lib/icons.mjs';
+import { buildGraph } from './lib/graph.mjs';
+import { css as viewerCSS, js as viewerJS } from './lib/viewer.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const DOCS = join(HERE, '..', 'docs');
@@ -33,6 +35,56 @@ const CHECK = process.argv.includes('--check');
 const { written } = buildAll({ write: false });
 const byName = new Map(written.map((d) => [d.name, d]));
 const allIcons = [...new Set(written.flatMap((d) => d.icons))].sort();
+
+/* ------------------------------------------------------------------ *
+ * The registry, and two checks that stop it drifting from the drawings.
+ * ------------------------------------------------------------------ */
+
+const G = buildGraph(M);
+
+const unresolved = G.unresolved();
+if (unresolved.length) {
+  console.error('These cross-references name a node that does not exist:');
+  unresolved.forEach((u) => console.error('  ' + u));
+  process.exit(1);
+}
+
+/* Every key a drawing writes into data-node has to have a panel, or a
+   reader clicks a card and nothing happens. */
+const drawnKeys = new Set();
+for (const d of written) {
+  for (const m of d.body.matchAll(/data-node="([^"]+)"/g)) drawnKeys.add(m[1]);
+}
+const orphans = [...drawnKeys].filter((k) => !G.get(k));
+if (orphans.length) {
+  console.error('These cards are drawn with no panel behind them:');
+  orphans.forEach((o) => console.error('  ' + o));
+  process.exit(1);
+}
+
+/* And the other way: a drawing name in the registry that nothing emits
+   would send a reader to a link that is not there. */
+const badShown = [...G.nodes.values()]
+  .flatMap((n) => n.shown)
+  .filter((name, i, all) => all.indexOf(name) === i && !byName.has(name));
+if (badShown.length) {
+  console.error('The registry points at drawings that are not generated: ' + badShown.join(', '));
+  process.exit(1);
+}
+
+const domId = (key) => 'n-' + String(key).replace(/[^a-z0-9]+/gi, '-');
+const figId = (name) => 'fig-' + name.replace(/\.svg$/, '');
+
+/* "Supabase Postgres" is a card in two drawings and "Stripe" is a card in
+   two more. In a list of links that is two identical rows, so anything
+   whose name is not unique carries where it is from. */
+const labelCount = new Map();
+for (const n of G.nodes.values()) {
+  labelCount.set(n.label, (labelCount.get(n.label) || 0) + 1);
+}
+const nodeLabel = (n) => (labelCount.get(n.label) > 1
+  ? `${esc(n.label)} <span class="np-via">${esc(n.kind)}</span>`
+  : esc(n.label));
 
 /* ------------------------------------------------------------------ *
  * Tables the model generates, so they cannot disagree with a diagram.
@@ -50,14 +102,6 @@ const secretsTable = () => ({
   rows: M.deployment.secrets.map((s) => [s.name, s.secret ? 'Yes' : 'No', s.where]),
 });
 
-const phasesTable = () => ({
-  head: ['Phase', 'What gets built', 'Needs first', 'Owner', 'State'],
-  rows: M.phases.map((p) => [
-    `${p.id} · ${p.label}`, p.detail, p.needs.length ? p.needs.join(', ') : 'Nothing',
-    p.owner, p.status,
-  ]),
-});
-
 const verifiedTable = () => ({
   head: ['What was checked', 'When', 'How'],
   rows: Object.entries(M.meta.verified).map(([k, v]) => [
@@ -65,19 +109,16 @@ const verifiedTable = () => ({
   ]),
 });
 
-const definitionsTable = () => ({
-  head: ['Defined once', 'Lives in', 'Read by', 'State'],
-  rows: M.definitions.map((d) => [
-    d.thing, d.home, d.readers.join(', '), d.status + (d.note ? `. ${d.note}` : ''),
-  ]),
+const personalTable = () => ({
+  head: ['What is held', 'Where', 'For how long'],
+  rows: M.personalData.map((d) => [d.what, d.where, d.how]),
 });
 
 const generated = {
   matrix: featureMatrix,
   secrets: secretsTable,
-  phases: phasesTable,
   verified: verifiedTable,
-  definitions: definitionsTable,
+  personal: personalTable,
 };
 
 /* ------------------------------------------------------------------ *
@@ -175,10 +216,83 @@ function diagramHTML(name) {
   const d = byName.get(name);
   if (!d) return `<p class="cap">Missing drawing: ${esc(name)}</p>`;
   const minW = Math.min(d.w, 960);
-  return `<figure class="diagram">
+  return `<figure class="diagram" id="${figId(d.name)}">
 <svg class="fx" viewBox="0 0 ${d.w} ${d.h}" style="min-width:${minW}px" role="img" aria-label="${esc(d.desc || d.title)}">${d.body}</svg>
 </figure>
 <p class="cap"><strong>${esc(d.title)}.</strong> ${esc(d.caption)} <a href="diagrams/${d.name}">Open on its own</a></p>`;
+}
+
+/* ------------------------------------------------------------------ *
+ * The detail panels. One article per node, written into the page so
+ * that a reader with scripting off gets an index rather than nothing,
+ * and the viewer has something to lift into the drawer.
+ *
+ * Each one answers four questions and stops: what is this, how far
+ * along is it, what is it waiting on, what is waiting on it.
+ * ------------------------------------------------------------------ */
+
+const depList = (edges, heading) => {
+  /* Edges arrive carrying their own relationship word. Group by it, so a
+     node that both feeds and is fed reads as two short lists rather than
+     one long one. */
+  const groups = new Map();
+  for (const e of edges) {
+    const [rel, detail] = e.rel.split(/:\s*/);
+    if (!groups.has(rel)) groups.set(rel, []);
+    groups.get(rel).push({ key: e.key, detail });
+  }
+  if (!groups.size) return '';
+  return [...groups].map(([rel, items]) => `<h4>${esc(rel === 'Then' || rel === 'After' ? heading(rel) : rel)}</h4>
+<ul class="np-dep">${items.map(({ key, detail }) => {
+    const n = G.get(key);
+    if (!n) return '';
+    return `<li><a href="#${domId(key)}" data-go="${esc(key)}">${nodeLabel(n)}</a>`
+      + `${detail ? ` <span class="np-via">${esc(detail)}</span>` : ''}`
+      + `${n.status ? statusPill(n.status) : ''}</li>`;
+  }).join('')}</ul>`).join('');
+};
+
+function panelHTML(n) {
+  const where = n.shown
+    .filter((name) => byName.get(name))
+    .map((name) => `<a href="#${figId(name)}">${esc(byName.get(name).title)}</a>`);
+  return `<article class="np" id="${domId(n.key)}" data-np="${esc(n.key)}">
+<h3>${esc(n.label)}${n.status ? statusPill(n.status) : ''}</h3>
+<p class="np-kind">${esc(n.kind)}${n.sub ? ` · ${esc(n.sub)}` : ''}</p>
+${n.what ? `<h4>What it is</h4><p>${esc(n.what)}</p>` : ''}
+${n.why ? `<h4>Why it is where it is</h4><p>${esc(n.why)}</p>` : ''}
+${depList(n.in, (r) => (r === 'After' ? 'Comes after' : 'Then'))}
+${depList(n.out, (r) => (r === 'Then' ? 'Then' : 'Comes after'))}
+${n.see.length ? `<h4>See also</h4><ul class="np-dep">${n.see.map((k) => {
+    const o = G.get(k);
+    return o ? `<li><a href="#${domId(k)}" data-go="${esc(k)}">${nodeLabel(o)}</a>${o.status ? statusPill(o.status) : ''}</li>` : '';
+  }).join('')}</ul>` : ''}
+${n.extra.filter(([, v]) => v && v.length).length ? `<dl>${n.extra.filter(([, v]) => v && v.length)
+    .map(([k, v]) => `<dt>${esc(k)}</dt><dd>${Array.isArray(v)
+      ? `<ul>${v.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`
+      : cell(v)}</dd>`).join('')}</dl>` : ''}
+${where.length ? `<p class="np-where">Drawn in ${where.join(', ')}</p>` : ''}
+</article>`;
+}
+
+/* The index is grouped, because 120 panels in one list is a list nobody
+   reads. The order is the order a reader meets them in the document. */
+const INDEX_GROUPS = [
+  ['Findings', 'finding'], ['Pages', 'page'], ['Architecture today', 'now'],
+  ['Request path', 'rq'], ['After the cutover', 'target'], ['Channels', 'asset'],
+  ['Tables', 'table'], ['Flows', 'flow'], ['Threats', 'threat'],
+  ['Deploy stages', 'stage'], ['Owner tasks', 'own'], ['Phases', 'phase'],
+  ['Risks', 'risk'], ['One definition', 'def'], ['Postponed', 'trigger'],
+  ['Decisions', 'ad'], ['Unknowns', 'unknown'],
+];
+
+function indexHTML() {
+  return INDEX_GROUPS.map(([label, ns]) => {
+    const list = G.order.map((k) => G.get(k)).filter((n) => n.ns === ns);
+    if (!list.length) return '';
+    return `<h3>${esc(label)}</h3>
+<div class="np-index">${list.map(panelHTML).join('\n')}</div>`;
+  }).join('\n');
 }
 
 function blockHTML(b) {
@@ -196,19 +310,7 @@ function blockHTML(b) {
 ${b.text ? `<p>${esc(b.text)}</p>` : ''}
 ${b.items ? `<ul>${b.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>` : ''}
 </div>`;
-    case 'decision': return `<div class="dec" id="${b.id}">
-<h3><span class="n">${esc(b.id)}</span> ${esc(b.title)} <span class="when">${esc(b.date)}</span></h3>
-<dl>${Object.entries(b.fields).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
-</div>`;
-    case 'unknown': return `<div class="dec unk" id="${b.id}">
-<h3><span class="n">${esc(b.id)}</span> ${esc(b.question)}</h3>
-<dl>
-<dt>Why it matters</dt><dd>${esc(b.why)}</dd>
-<dt>How to resolve</dt><dd>${esc(b.how)}</dd>
-<dt>Owner</dt><dd>${esc(b.owner)}</dd>
-<dt>Blocks</dt><dd>${esc(b.blocks)}</dd>
-</dl>
-</div>`;
+    case 'index': return indexHTML();
     default:
       if (generated[b.t]) return tableHTML(generated[b.t]());
       return '';
@@ -240,7 +342,7 @@ const head = `<title>${esc(meta.title)}</title>
   --amber:#B06E1A; --amber-wash:#FDF2E2; --amber-ink:#6B3F08;
   /* The two faces, from the one place that names them. These were written
      out as Inter and Poppins while the loader above asked for Montserrat
-     and Playfair, so this page rendered in neither. See AD8 and AD10. */
+     and Playfair, so this page rendered in neither. See AD8 and AD12. */
   --sans:${TYPE.sans};
   --head:${TYPE.display};
   --mono:${TYPE.mono};
@@ -336,7 +438,10 @@ footer.doc{border-top:1px solid var(--line);margin-top:2.6rem;padding-top:1.4rem
   nav.toc ol{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
 }
 @media (max-width:620px){.dec dl{grid-template-columns:minmax(0,1fr)}.dec dt{padding-top:.5rem}}
-@media print{nav.toc{display:none}.shell{grid-template-columns:1fr}.diagram{break-inside:avoid}}
+@media print{nav.toc{display:none}.shell{grid-template-columns:1fr}.diagram{break-inside:avoid}
+  .np-drawer,.dg-full,.dg-bar{display:none!important}}
+.np-via{font-size:.72rem;color:var(--ink-3)}
+${viewerCSS}
 </style>
 `;
 
@@ -373,6 +478,7 @@ ${sectionsHTML}
     </footer>
   </main>
 </div>
+<script>${viewerJS}</script>
 `;
 
 /* Two surfaces, one markup. The Artifact is the primary one, so it gets the
@@ -406,6 +512,41 @@ const mdTable = (t) => {
   return [row(t.head), row(t.head.map(() => '---')), ...t.rows.map(row)].join('\n');
 };
 
+/* The same panels in markdown, so the document is whole in a pull request
+   and not only in a browser. */
+const depMD = (edges) => {
+  const groups = new Map();
+  for (const e of edges) {
+    const [rel, detail] = e.rel.split(/:\s*/);
+    if (!groups.has(rel)) groups.set(rel, []);
+    groups.get(rel).push({ key: e.key, detail });
+  }
+  return [...groups].map(([rel, items]) => `- **${rel}.** ` + items.map(({ key, detail }) => {
+    const n = G.get(key);
+    return n ? `${n.label}${detail ? ` (${detail})` : ''}` : key;
+  }).join('; '));
+};
+
+function indexMD() {
+  return INDEX_GROUPS.map(([label, ns]) => {
+    const list = G.order.map((k) => G.get(k)).filter((n) => n.ns === ns);
+    if (!list.length) return '';
+    return [`### ${label}`, '', ...list.flatMap((n) => [
+      `#### ${n.label}${n.status ? ` · ${n.status}` : ''}`,
+      '',
+      `_${n.kind}${n.sub ? ` · ${n.sub}` : ''}._`,
+      '',
+      ...(n.what ? [n.what, ''] : []),
+      ...(n.why ? [n.why, ''] : []),
+      ...depMD(n.in), ...depMD(n.out),
+      ...(n.see.length ? [`- **See also.** ${n.see.map((k) => (G.get(k) ? G.get(k).label : k)).join('; ')}`] : []),
+      ...n.extra.filter(([, v]) => v && v.length)
+        .map(([k, v]) => `- **${k}.** ${Array.isArray(v) ? v.join(' ') : v}`),
+      '',
+    ])].join('\n');
+  }).filter(Boolean).join('\n');
+}
+
 function blockMD(b) {
   switch (b.t) {
     case 'p': return b.text;
@@ -425,18 +566,7 @@ function blockMD(b) {
       ...(b.text ? [`> ${b.text}`] : []),
       ...(b.items ? b.items.map((i) => `> - ${i}`) : []),
     ].join('\n');
-    case 'decision': return [
-      `#### ${b.id} · ${b.title}`, '',
-      `_Decided ${b.date}._`, '',
-      ...Object.entries(b.fields).map(([k, v]) => `- **${k}.** ${v}`),
-    ].join('\n');
-    case 'unknown': return [
-      `#### ${b.id} · ${b.question}`, '',
-      `- **Why it matters.** ${b.why}`,
-      `- **How to resolve.** ${b.how}`,
-      `- **Owner.** ${b.owner}`,
-      `- **Blocks.** ${b.blocks}`,
-    ].join('\n');
+    case 'index': return indexMD();
     default:
       if (generated[b.t]) return mdTable(generated[b.t]());
       return '';
@@ -484,12 +614,15 @@ const outputs = [
   ['blueprint.artifact.html', artifact],
   ['blueprint.md', md],
 ];
+/* See the note in scripts/diagrams.mjs: the comparison is about content,
+   and a checkout on Windows changes every line ending. */
+const lf = (s) => String(s).split('\r\n').join('\n');
 const stale = [];
 for (const [name, body] of outputs) {
   const file = join(DOCS, name);
   if (CHECK) {
     const old = existsSync(file) ? readFileSync(file, 'utf8') : '';
-    if (old !== body) stale.push(name);
+    if (lf(old) !== lf(body)) stale.push(name);
   } else {
     writeFileSync(file, body);
     console.log(`wrote   docs/${name}`);

@@ -1,210 +1,151 @@
 /* The blueprint, as content rather than as a page.
  *
- * This file and docs/diagrams/model.mjs are the source. docs/blueprint.html
- * and docs/blueprint.md are both generated from them by
+ * This file and docs/diagrams/model.mjs are the source. docs/blueprint.html,
+ * docs/blueprint.artifact.html and docs/blueprint.md are generated from them
+ * by
  *
  *     npm run blueprint
  *
- * Do not edit either generated file. If a decision changes, change it here
- * in the same commit as the code it describes, and regenerate.
+ * Do not edit any generated file. If a decision changes, change it here or
+ * in the model, in the same commit as the code it describes.
  *
- * Section numbers never change. A reference to "section 9" in a handoff has
- * to still mean section 9 in a month, so sections are added at the end or
- * given a letter (9b), never renumbered.
+ * **What belongs here, and what does not.** This file holds the connecting
+ * sentences: the ones that say why a drawing is on the page and what to
+ * look at in it. Everything else, every "what this is", every "why it has
+ * that status", every dependency, belongs on the node in
+ * docs/diagrams/model.mjs, where it is one click away from the card that
+ * names it and cannot drift from the drawing. If a paragraph here is really
+ * detail about one thing, it is in the wrong file.
+ *
+ * Section ids were rewritten on 2026-11-02 from s1..s18 to the names below,
+ * because the order changed. Decision ids (AD1 to AD10) and unknown ids
+ * (U1 to U8) are never renumbered, and are what anything else should cite.
  *
  * Block types the renderer understands:
- *   p, h3, h4, ul, ol, table, callout, diagram, facts, decision, unknown,
- *   matrix, phases, secrets, definitions
+ *   p, h3, h4, ul, ol, table, callout, diagram, index,
+ *   matrix, secrets, verified, personal
  */
 
 export const doc = {
   title: 'Crystalina blueprint',
   subtitle: 'Water filtration for New York City. Pure Water. Pure Life.',
-  lede: 'What Crystalina is, what actually runs today, and the move to Cloudflare that turns two half-deployed hosts into one. Every drawing in this document is generated from one data file, and every status word on every card is one of five.',
+  lede: 'What Crystalina is, what actually runs today, and what stands between it and an open shop. Every drawing is generated from one data file, every card in every drawing can be clicked for what it is and what it is waiting on, and every status word is one of five.',
   shape: 'Shop',
   status: 'Building',
   prepared: '2026-10-09',
-  revised: '2026-11-02 — the deploy path changed: Cloudflare Pages deploys from its own Git connection and GitHub Actions only gates it, which removes the API token entirely (AD9). Diagrams rebuilt on an orthogonal router 2026-10-11. Content otherwise unchanged since 2026-10-09, when the hosting facts were last checked against the live hosts.',
+  revised: '2026-11-02. The server boundary works for the first time: the Worker is live and all three API routes answer, checked against the live host. The Vercel project is deleted and the domain still points at GitHub Pages. Google sign-in is enabled and there is no password anywhere in the project. Four claims that had been carried forward unchecked were wrong and are corrected below. Every card in every drawing is now clickable.',
 };
 
 export const sections = [
 
 /* ================================================================= */
 {
-  id: 's1',
-  title: 'Executive summary',
+  id: 'stands',
+  title: 'Where this stands',
   blocks: [
-    { t: 'p', text: 'Crystalina is a premium home water filtration shop for New York City: thirteen products, a catalogue with real compatibility and bundle relationships, a customer account, and four staff workspaces for admin, managers, sales and field technicians. The design is built. The database is built and protected. What is missing is the middle: one host that actually runs the server code, and a way to take money.' },
-    { t: 'h3', text: 'The five findings that matter' },
+    { t: 'p', text: 'Crystalina is a premium home water filtration shop for New York City: seventeen products with real compatibility and bundle relationships, a customer account, and five private pages for admin, managers, sales and field technicians. The design is built. The database is built and protected. As of today the server boundary runs as well. What is missing is a way to take money, a shelf that is not sold out, and a domain pointed at the half that works.' },
+    { t: 'diagram', name: 'findings.svg' },
     {
-      t: 'table',
-      head: ['', 'Finding', 'Severity'],
-      rows: [
-        ['1', 'Two hosts serve one project and neither serves it completely. crystalina.org is GitHub Pages, which cannot run the /api folder at all; the Vercel copy runs it but has no environment variables, so every server call returns 500. Re-checked 2026-10-09: still true, six weeks after it was first written down.', 'Critical'],
-        ['2', 'Nothing takes payment. There are zero Stripe references in the codebase, and the checkout button is disabled on purpose so that nobody can place an unpaid order. The shop cannot open until this exists.', 'Critical'],
-        ['3', 'The dashboards are gated in the browser. Row level security protects the data, which is the part that matters, but staff text reaches another staff member through innerHTML unescaped. That is a live stored-XSS route.', 'High'],
-        ['4', 'The catalogue is schema-complete and data-empty. Stock is 0 on all thirteen items, product_stage_options has no rows, and no faucet products exist, so the shop reads as sold out and the five, six and seven stage choice never renders.', 'High'],
-        ['5', 'The accounts that would bring people in already exist and are not connected. The domain, Google Search Console, the Meta Business account and the WhatsApp number are all held; there is no product feed, no analytics and no attribution on any of them.', 'Medium'],
-      ],
+      t: 'callout', kind: 'note', title: 'How to read this document',
+      text: 'Every card in every drawing opens a panel: what the thing is, why it carries the status it carries, what it is waiting on, and what is waiting on it. Both lists are derived from one data file rather than written out, so they cannot drift. Click through a chain and the trail at the top of the panel remembers where you started. Nothing here is fetched: with scripting off, the same detail is an index at the foot of the page.',
     },
     { t: 'h3', text: 'The path, in four lines' },
     {
       t: 'ol',
       items: [
-        'Move to Cloudflare. One account serves the pages, runs the server code, holds the captcha, gates the preview and rate limits the API. That retires both current hosts and removes the whole class of problem in finding 1.',
-        'Build the payment path once, carefully, with the money recomputed on the server and the webhook keyed so a retry cannot charge twice.',
-        'Close the security findings while the site is still small: escape the dashboards, put the Turnstile widgets on the forms, move the rate limit to the edge.',
-        'Then seed the catalogue, point the DNS, and open.',
+        'Build the payment path once, carefully, with the money recomputed on the server and the webhook keyed so a retry cannot charge twice. This is now the largest remaining piece of work.',
+        'Seed the catalogue. It is half a day, it is blocked on nothing, and it is the difference between a shop and a page of sold-out items.',
+        'Close the three findings that are each under a day: escape one file, put the captcha widget on three forms, move the rate limit to the edge.',
+        'Then move the nameservers, which is what makes everything already built visible to a visitor.',
       ],
     },
+    { t: 'h3', text: 'What was checked, when, and how' },
+    { t: 'verified' },
     {
-      t: 'callout', kind: 'note', title: 'What this document is',
-      text: 'Not a proposal and not a snapshot that stopped being true in week two. Every decision below carries a number, a date, what it costs and when it should be replaced. Every unknown carries an owner and what it blocks. When a decision changes, this file changes in the same commit as the code.',
+      t: 'callout', kind: 'warn', title: 'Four things this document used to say that were not true',
+      items: [
+        'That all four staff dashboards interpolated record text unescaped. One does, about thirty times: js/admin.js. The other five files escape theirs.',
+        'That the free shipping threshold was written in three places. It is written on ten lines across six files, six of them arithmetic.',
+        'That stock was 0 on all thirteen products. There are seventeen published rows; four systems carry stock 1 and the other thirteen carry 0.',
+        'That the environment variables were unset and every server call returned 500. The Worker answers, and the method guards and validators on all three routes were exercised against the live host today.',
+      ],
     },
   ],
 },
 
 /* ================================================================= */
 {
-  id: 's2',
+  id: 'today',
   title: 'What runs today',
   blocks: [
-    { t: 'p', text: 'An honest inventory, including the parts that look finished and are not. Anything that could not be verified is marked unknown rather than assumed.' },
-    { t: 'verified' },
-    { t: 'h3', text: 'The two hosts' },
-    {
-      t: 'table',
-      head: ['Host', 'What it serves', 'State'],
-      rows: [
-        ['GitHub Pages', 'crystalina.org and every static page on it', 'Live, and structurally unable to run the /api folder. A static host has no server.'],
-        ['Vercel', 'crystalina.vercel.app, including the three /api functions', 'Deployed and answering 200 on pages. Every function returns 500 because no environment variables are set.'],
-        ['Squarespace DNS', 'The crystalina.org zone, four GitHub Pages A records', 'Unchanged. No cutover has happened.'],
-        ['Supabase', '23 tables, row level security, Auth, the site-media storage bucket', 'Live and working. Twelve migrations applied, last checked 2026-08-31.'],
-      ],
-    },
+    { t: 'p', text: 'One working host nobody visits, and one stale host everybody visits. That is the whole of the remaining hosting problem, and it is one nameserver change rather than the two half-deployments it was a month ago.' },
+    { t: 'diagram', name: 'architecture-now.svg' },
     {
       t: 'callout', kind: 'warn', title: 'The shape of the problem',
-      text: 'The repository is correct. Both deployments are correct in isolation. What is wrong is that the domain points at the half that cannot run code, and the half that can run code has never been given its keys. No amount of further building fixes that; one deployment decision does.',
-    },
-    { t: 'h3', text: 'What is genuinely finished' },
-    {
-      t: 'ul',
-      items: [
-        'The design system in css/styles.css: palette, type, the unified button, the components. Every page is assembled from it.',
-        'The storefront: home, shop, product, quiz, NYC water, about, contact. All hydrate from Supabase where they should.',
-        'The database: 23 tables with row level security, a server-authoritative create_order that reprices every line and decrements stock in one transaction, and four staff-gated catalogue functions that correctly refuse anonymous callers.',
-        'The server boundary itself: three functions with method guards, body size caps, input cleaning, Turnstile verification and an order path that never trusts a browser-supplied price.',
-        'Twenty tests, all passing, run on 2026-10-09.',
-      ],
-    },
-    { t: 'h3', text: 'What looks finished and is not' },
-    {
-      t: 'ul',
-      items: [
-        'The shop. Every product renders, and stock is 0 on all thirteen, so a visitor sees a catalogue of sold-out items.',
-        'The product page. The five, six and seven stage choice and the faucet upgrade are both built and both have no data behind them, so neither control appears.',
-        'Checkout. The whole order path works except the part that takes money, and the button is disabled so that the gap cannot be reached by accident.',
-        'The contact and newsletter forms. They validate, they are rate limited, they verify a captcha, and in production they return 500.',
-        'Sign-in. Real Supabase Auth on /signin/ only. The other five pages that need a session still read local state, and the old Store.signUp and Store.signIn stubs are still exported.',
-      ],
+      text: 'The repository is correct. Both deployments are correct in isolation. What is wrong is that the domain points at the half that cannot run code. No amount of further building fixes that; one nameserver change does, and it is held up by a question about mail rather than by anything technical.',
     },
   ],
 },
 
 /* ================================================================= */
 {
-  id: 's3',
-  title: 'The move to Cloudflare',
+  id: 'request',
+  title: 'How one request travels',
   blocks: [
-    { t: 'p', text: 'One platform for the pages, the server code, the captcha, the preview gate and the rate limit, with the database left exactly where it is. This is the smallest change that removes the largest problem.' },
-    { t: 'h3', text: 'What moves, and what deliberately does not' },
-    {
-      t: 'table',
-      head: ['Job', 'Today', 'After', 'Why'],
-      rows: [
-        ['Serving the pages', 'GitHub Pages', 'Cloudflare Pages', 'Static files served from the edge, and the same project can run server code. One host instead of two.'],
-        ['Server code', 'Vercel functions', 'Pages Functions', 'Three routes, already dependency free and already written against the standard fetch and crypto APIs. The port is small.'],
-        ['DNS', 'Squarespace', 'Cloudflare DNS', 'The zone has to be on Cloudflare for Access, WAF rules and Web Analytics to apply. The registrar can stay where it is.'],
-        ['Captcha', 'Cloudflare Turnstile', 'Cloudflare Turnstile', 'Already the choice. It simply comes home to the same account and dashboard.'],
-        ['Rate limiting', 'An in-process counter', 'WAF rate limiting on /api/*', 'A counter inside a serverless instance does not survive the instance. The edge is the only place this can be true.'],
-        ['Preview protection', 'None', 'Cloudflare Access', 'A staging site that a search engine can index is a known hazard. Access closes it, free, including on the pages.dev address.'],
-        ['Database, auth, storage', 'Supabase', 'Supabase, unchanged', 'See AD3. Moving to D1 would be a rewrite of everything that currently works.'],
-        ['Analytics', 'None', 'Cloudflare Web Analytics', 'No cookie, so no consent banner, so no third thing to build.'],
-      ],
-    },
+    { t: 'p', text: 'The Worker makes one branch and then a short series of decisions in a fixed order. This is the drawing to read before changing anything in the server boundary, because it is the only place where the route table, the shim and the handler guards are visible together.' },
+    { t: 'diagram', name: 'request-path.svg' },
+  ],
+},
+
+/* ================================================================= */
+{
+  id: 'target',
+  title: 'Where it is going',
+  blocks: [
+    { t: 'p', text: 'The same picture with the domain in front of it, and with the four things that only exist once the zone is on Cloudflare: Access on the previews, WAF rate limiting on the API, Web Analytics with no cookie, and a captcha that has a widget as well as a verifier.' },
+    { t: 'diagram', name: 'architecture-target.svg' },
     {
       t: 'callout', kind: 'learn', title: 'The rule that survives the choice',
-      text: 'Two environments, secrets per environment, a deploy that is one command and a rollback that is one more. Cloudflare Pages gives all four. If a platform ever makes one of them hard, that is the signal to look again rather than to work around it.',
+      text: 'Two environments, secrets per environment, a deploy that is one command and a rollback that is one more. If a platform ever makes one of those four hard, that is the signal to look again rather than to work around it.',
     },
-    { t: 'h4', text: 'What the owner does, and what the agent does' },
-    {
-      t: 'ol',
-      items: [
-        'The owner creates the Cloudflare account and turns on two-step sign-in.',
-        'The owner connects the Pages project to the repository, with build command npm run build:site and output directory dist. No API token is created: nothing in CI holds a credential (AD9).',
-        'The owner adds every value in section 9 to the Pages project, per environment. The agent names them; it does not hold them.',
-        'The owner enables the Google provider in Supabase and pastes in the OAuth client it created in Google Cloud. The sign-in button is already built and does nothing until that is done.',
-        'The owner turns on branch protection for main, requiring the Checks job. Without it nothing gates production.',
-        'The owner moves the crystalina.org nameservers to Cloudflare when, and only when, a preview has passed.',
-        'The agent does everything else, and lists in a handoff exactly which names were set and which were not.',
-      ],
-    },
-    { t: 'diagram', name: 'architecture-target.svg' },
-    { t: 'diagram', name: 'architecture-now.svg' },
+    { t: 'h3', text: 'What only the owner can do' },
+    { t: 'diagram', name: 'owner-tasks.svg' },
   ],
 },
 
 /* ================================================================= */
 {
-  id: 's4',
+  id: 'channels',
   title: 'Channels and accounts already held',
   blocks: [
-    { t: 'p', text: 'Crystalina is not a new project, so most of the "go and open an account" work in a normal build is already done. The domain is owned, Search Console is verified, the Meta Business account exists, and the WhatsApp number is live and linked from every page. The question for each one is not whether it exists; it is whether the site actually uses it, and whether the move breaks it.' },
+    { t: 'p', text: 'Crystalina is not a new project, so most of the "go and open an account" work is already done. The question on each card is not whether the account exists; it is whether the site uses it, and whether the move breaks it.' },
     { t: 'diagram', name: 'channels.svg' },
-    { t: 'h3', text: 'What the move must not break' },
     {
-      t: 'ul',
-      items: [
-        'Google Search Console is verified by a file served at /googlea4ca9585bd44aaf9.html. That file has to keep being served from the root on the new host, or verification lapses silently. Once the zone is on Cloudflare, adding the DNS TXT method as a second, host-independent proof costs nothing and is worth doing.',
-        'sitemap.xml lists seven URLs and no dates. It is missing /product/ and /checkout/ and has no lastmod on any entry. Worth fixing in the same change as the cutover.',
-        'The WhatsApp link is a plain wa.me link, so it is unaffected by hosting. It appears in the footer, in the hero and as a floating button on every page.',
-        'The footer social links and the schema.org sameAs list in index.html both name the same four profiles, in two places. That is a second copy; see section 13.',
-      ],
-    },
-    {
-      t: 'callout', kind: 'note', title: 'The gap worth naming',
-      text: 'Three accounts that are held and unconnected: there is no product feed for Google Merchant Center or the Meta catalogue, no analytics of any kind, and no Meta Pixel or Conversions API. Thirteen products with no feed is free traffic left on the table, and a pixel added after an ad campaign starts cannot report on the days before it. None of this blocks launch, and all of it is cheaper to decide now than to retrofit. Note that adding a pixel also turns the cookie banner into a real question; Cloudflare Web Analytics on its own does not.',
+      t: 'callout', kind: 'warn', title: 'One of these changed, and not for the better',
+      text: 'Google Workspace on the domain is suspended behind a Squarespace reseller lock, so info@crystalina.org is not receiving mail. The contact form still writes its row, so no enquiry is lost, but nobody is told one arrived. It also sits on the same DNS zone as the nameserver move, which is why it is recorded as U8 rather than as a nuisance.',
     },
   ],
 },
 
 /* ================================================================= */
 {
-  id: 's5',
+  id: 'pages',
+  title: 'Every page, and the state of the work behind it',
+  blocks: [
+    { t: 'p', text: 'The one picture that answers "how far along are we". Menu, search and footer links are left out on purpose: drawn, they turn the arrows into a web. Dashed arrows are staff actions that reach a customer page.' },
+    { t: 'diagram', name: 'sitemap.svg' },
+    { t: 'h3', text: 'The same thing as a table' },
+    { t: 'matrix' },
+  ],
+},
+
+/* ================================================================= */
+{
+  id: 'data',
   title: 'The content model',
   blocks: [
-    { t: 'p', text: 'Twenty three tables in one Supabase project, grouped by what they are for. The fields shown in the drawing are the ones another part of the system depends on, not every column.' },
+    { t: 'p', text: 'Twenty three tables in one Supabase project, grouped by what they are for. The fields shown are the ones another part of the system depends on, not every column. The panel at the foot of the drawing is the sentence the whole data design turns on.' },
     { t: 'diagram', name: 'data-model.svg' },
-    { t: 'h3', text: 'The privilege boundary' },
-    {
-      t: 'ul',
-      items: [
-        'The browser holds the publishable key only. Every read it makes passes row level security, and the key is safe in public for exactly that reason and no other.',
-        'Every privileged write goes through /api with the service role, or through a security definer function gated on private.has_role(). There is no third path.',
-        'Prices, totals and stock are recomputed in the database. The browser sends ids and quantities and never money. create_order prices stage options and faucet upgrades server-side, so the payment work in phase 3 reuses it rather than recalculating anything in JavaScript.',
-      ],
-    },
-    { t: 'h3', text: 'What is empty' },
-    {
-      t: 'table',
-      head: ['Table', 'State', 'Consequence'],
-      rows: [
-        ['products.stock', '0 on all 13 rows', 'Every product card reads as out of stock.'],
-        ['product_stage_options', 'No rows', 'No 5, 6 or 7 stage choice renders on any product page.'],
-        ['products where product_kind = faucet', 'No rows', 'available_as_upgrade and default_faucet_id have nothing to point at, so the upgrade control never appears.'],
-        ['reviews', 'No submission screen', 'The table is read but nothing writes to it.'],
-      ],
-    },
     {
       t: 'callout', kind: 'warn', title: 'Migrations',
       text: 'Additive and re-runnable: create or replace, if not exists, drop-then-create for policies. Forward only, numbered, applied as a job rather than by hand. Keep it that way: a migration that cannot be run twice will eventually be run twice.',
@@ -214,10 +155,10 @@ export const sections = [
 
 /* ================================================================= */
 {
-  id: 's6',
+  id: 'flows',
   title: 'The flows that carry money, identity or anything irreversible',
   blocks: [
-    { t: 'p', text: 'Five flows, each with the happy path numbered and the failure path drawn beside it rather than left in a footnote. These are the only flows drawn, because these are the only ones where being wrong costs something that cannot be undone with a reload.' },
+    { t: 'p', text: 'Five flows, each with the happy path numbered and the failure path drawn beside it rather than left in a footnote. These are the only flows drawn, because these are the only ones where being wrong costs something a reload cannot undo.' },
     { t: 'diagram', name: 'flow-order.svg' },
     { t: 'diagram', name: 'flow-payment.svg' },
     { t: 'diagram', name: 'flow-identity.svg' },
@@ -228,63 +169,23 @@ export const sections = [
 
 /* ================================================================= */
 {
-  id: 's7',
+  id: 'security',
   title: 'Security and privacy',
   blocks: [
-    { t: 'h3', text: 'The threats that actually apply' },
-    {
-      t: 'table',
-      head: ['Threat', 'What mitigates it', 'State'],
-      rows: [
-        ['A visitor reads another customer\'s orders', 'Row level security on every table, every query carrying the signed-in JWT', 'Implemented. Policies are in place and were checked on 2026-08-31.'],
-        ['A visitor pays less than the price', 'create_order reprices every line in the database. The browser sends ids and quantities only', 'Implemented, and unreachable until payment exists.'],
-        ['Staff text reaching another staff member as script', 'escapeHTML in js/main.js, used on every interpolation', 'Partial. The storefront paths are escaped; the four dashboards and the schedule modules are not. This is the open hole.'],
-        ['A customer opening a staff dashboard', 'A policy, not markup', 'Refactor. The data is protected; the gate in front of it is browser-side and has not been tested against a real customer account (U1).'],
-        ['Form spam and abuse', 'Turnstile, plus a rate limit', 'Partial. Server verification is wired and enforces as soon as the secret is set. No widget is on any form, and the rate limit does not survive a serverless instance.'],
-        ['A leaked key', 'Secrets per environment in the platform store, never in the repository', 'Partial. The .gitignore covers .env*. One Stripe test key was pasted into a chat transcript and has to be rolled.'],
-        ['Payment taken twice', 'A webhook write keyed on the Stripe event id', 'Missing, with the rest of payment. It has to exist before the first real charge, not after.'],
-      ],
-    },
+    { t: 'p', text: 'Every threat that actually applies, in the column that says whether anything stands in front of it. The right-hand column is the work, and two of the three cards in the middle column are the same single file.' },
+    { t: 'diagram', name: 'threats.svg' },
     { t: 'h3', text: 'Personal data held' },
-    {
-      t: 'table',
-      head: ['What', 'Where', 'How long'],
-      rows: [
-        ['Name, email, phone, delivery address', 'Supabase: profiles and orders.shipping_address', 'For the life of the account. No deletion flow exists yet; see section 12.'],
-        ['Contact form messages', 'Supabase: contact_messages, and a copy emailed to info@crystalina.org', 'Indefinite. Worth a retention rule before volume makes one urgent.'],
-        ['Newsletter addresses', 'Supabase: newsletter_subscribers', 'Until unsubscribed. No unsubscribe path is built.'],
-        ['Card details', 'Never touched. Stripe holds them on its own hosted page', 'Not applicable, and it must stay that way.'],
-        ['Staff hours, shifts, time off', 'Supabase workforce tables', 'For the life of employment, plus whatever payroll law requires. Unresolved: U5.'],
-      ],
-    },
+    { t: 'personal' },
     {
       t: 'callout', kind: 'note', title: 'Deliberately accepted',
-      text: 'The security headers in vercel.json (nosniff, strict referrer, DENY framing, a closed permissions policy, HSTS with preload) are carried over unchanged to Cloudflare as a _headers file. There is no Content-Security-Policy yet: the pages use inline handlers in places, so a policy added today would either break them or be weak enough to be theatre. It belongs with the XSS sweep in phase 6, not before it.',
+      text: 'The five security headers in _headers, carried over from the Vercel configuration unchanged, are nosniff, a strict referrer policy, DENY framing, a closed permissions policy and HSTS with preload. There is no Content-Security-Policy: the pages still use inline handlers, so a policy written today would either break them or be weak enough to be theatre. It belongs after the escaping sweep, not before it.',
     },
   ],
 },
 
 /* ================================================================= */
 {
-  id: 's8',
-  title: 'Performance budget',
-  blocks: [
-    { t: 'p', text: 'The targets are set. The bars are empty, because nothing has been measured on a served copy yet, and a guessed number in a budget is worse than an empty one: it gets believed. scripts/verify.mjs reports transferred weight per page and fills these in.' },
-    { t: 'diagram', name: 'performance-budget.svg' },
-    {
-      t: 'ul',
-      items: [
-        'The site is static HTML, CSS and JavaScript with no build step, so there is no bundler cost to argue about and no framework runtime to pay for.',
-        'Imagery is the whole budget. The hero is allowed to be the single heaviest asset on the site; everything below the fold is lazy.',
-        'Cache busting is not in place. Styles and scripts are referenced without a version or a hash, so a returning visitor can hold a stale stylesheet after a deploy. This is almost always the cause when a site "looks broken" for some people and not others, and it is worth fixing with the Cloudflare move rather than after it.',
-      ],
-    },
-  ],
-},
-
-/* ================================================================= */
-{
-  id: 's9',
+  id: 'deploy',
   title: 'Deployment, environments and secrets',
   blocks: [
     { t: 'diagram', name: 'deployment.svg' },
@@ -292,82 +193,24 @@ export const sections = [
     { t: 'secrets' },
     {
       t: 'callout', kind: 'warn', title: 'One deploy path, not two',
-      text: 'Cloudflare Pages can deploy from its own Git connection or from a workflow in the repository. Pick one. With both connected, every push deploys twice, the two race, and the one that wins is whichever finished last. The Git connection is the choice here, and GitHub Actions only gates it. See AD9.',
-    },
-    { t: 'h3', text: 'Rollback' },
-    { t: 'p', text: 'Promoting the previous Pages deployment, which takes seconds. It has to be practised once, deliberately, before launch, by someone who is not the person who built it. A rollback nobody has run is a rollback nobody can run at two in the morning.' },
-  ],
-},
-
-/* ================================================================= */
-{
-  id: 's10',
-  title: 'Site map and feature matrix',
-  blocks: [
-    { t: 'p', text: 'Every page, the state of the server work behind it, and what a visitor or a staff member actually clicks. Menu, search and footer links are left out on purpose: drawn, they turn the arrows into a web. Dashed arrows are staff actions that reach a customer page.' },
-    { t: 'diagram', name: 'sitemap.svg' },
-    { t: 'h3', text: 'The same thing as a table' },
-    { t: 'matrix' },
-  ],
-},
-
-/* ================================================================= */
-{
-  id: 's11',
-  title: 'Risks',
-  blocks: [
-    { t: 'diagram', name: 'risks.svg' },
-    {
-      t: 'callout', kind: 'note', title: 'How to read it',
-      text: 'Top right is what to fix first. Two of the top-row risks, the unescaped dashboards and the rate limit that does not survive its instance, are a day and an hour of work respectively. Neither is hard. Both get much more expensive the week after the site takes public traffic.',
+      text: 'Cloudflare can deploy from its own Git connection or from a workflow in the repository. Pick one. With both connected, every push deploys twice, the two race, and the one that wins is whichever finished last. The Git connection is the choice here, and GitHub Actions only gates it. See AD9, which is Partial rather than done: the branch protection the whole decision rests on is not switched on yet.',
     },
   ],
 },
 
 /* ================================================================= */
 {
-  id: 's12',
-  title: 'Build plan',
+  id: 'budget',
+  title: 'Performance budget',
   blocks: [
-    { t: 'p', text: 'Phases, not dates. An arrow means the phase it points at cannot honestly start before the one behind it has finished. Target windows are working-day estimates, not promises.' },
-    { t: 'diagram', name: 'build-plan.svg' },
-    { t: 'phases' },
-  ],
-},
-
-/* ================================================================= */
-{
-  id: 's13',
-  title: 'One definition, read everywhere',
-  blocks: [
-    { t: 'p', text: 'Anything that appears twice is built once, and a variation is a parameter rather than a second copy. This is the rule that the whole project runs on, and it is the rule that quietly breaks first.' },
-    { t: 'diagram', name: 'one-definition.svg' },
-    { t: 'p', text: 'The library can be looked at as well as read. docs/components.html is a page in the repository that loads the real stylesheet and the real script and renders every token, button, heading, band, card and icon the storefront is built from, with the real header above it. Serve the site and open /docs/components.html. It is outside the publish allow-list, so it never reaches a customer, and because it uses the live components rather than copies of them, it cannot drift from the site.' },
+    { t: 'p', text: 'The targets are set and the bars are empty, because nothing has been measured on a served copy yet. A guessed number in a budget is worse than an empty one: it gets believed. npm run verify reports transferred weight per page and fills these in.' },
+    { t: 'diagram', name: 'performance-budget.svg' },
     {
-      t: 'callout', kind: 'warn', title: 'Three that have no home yet',
-      text: 'The free shipping threshold is written in nine places, including the arithmetic in checkout. The font link and the stylesheet version are one identical string stored in fourteen page heads. The repeatable items inside home page sections, the trust list, the testimonials, the water facts and the process steps, are still in the HTML while everything around them is published from site_content; the category tiles left that list on 2026-11-02, when they became CATEGORIES in main.js and the menu, the footer and the tiles all started reading it. Each remaining one is a small, dull job. Each one becomes an incident the week a price changes in two places out of three.',
-    },
-  ],
-},
-
-/* ================================================================= */
-{
-  id: 's14',
-  title: 'Post-launch, deliberately not built',
-  blocks: [
-    { t: 'p', text: 'This section exists to prevent an argument later. Each item has the condition that should trigger it.' },
-    {
-      t: 'table',
-      head: ['Not building', 'Build it when'],
-      rows: [
-        ['Cloudflare R2 for images', 'Supabase Storage egress shows up on a bill, or image delivery becomes the slowest thing on a product page.'],
-        ['Cloudflare D1 instead of Supabase', 'Two writers need to scale independently, or the Supabase bill outgrows the cost of a rewrite. Not before. See AD3.'],
-        ['Cron Triggers for abandoned carts and reconciliation', 'Payment is live and there is at least a month of real order data to reconcile against.'],
-        ['Subscriptions and filter replacement reminders', 'The first cohort of customers reaches a filter change interval. The schema already carries compatibility, so the data is ready before the feature is.'],
-        ['A customer data deletion and export flow', 'Before any marketing to an EU or California audience, or on the first request, whichever comes first.'],
-        ['A Content-Security-Policy', 'After the XSS sweep in phase 6, when inline handlers are gone and a policy can be strict enough to be worth having.'],
-        ['Meta Pixel or Conversions API', 'Before the first paid campaign, and not before, because a pixel brings a consent banner with it.'],
-        ['Multi-language', 'No sign it is needed. NYC is multilingual; nobody has asked. U6.'],
+      t: 'ul',
+      items: [
+        'The site is static HTML, CSS and JavaScript with no build step, so there is no bundler cost to argue about and no framework runtime to pay for.',
+        'Imagery is the whole budget. The hero is allowed to be the single heaviest asset on the site; everything below the fold is lazy.',
+        'Cache busting is not in place. Styles and scripts are referenced with no version or hash, so a returning visitor can hold a stale stylesheet after a deploy. This is almost always the cause when a site looks broken for some people and not others.',
       ],
     },
   ],
@@ -375,260 +218,78 @@ export const sections = [
 
 /* ================================================================= */
 {
-  id: 's15',
+  id: 'plan',
+  title: 'Build plan',
+  blocks: [
+    { t: 'p', text: 'Phases, not dates. An arrow means the phase it points at cannot honestly start before the one behind it has finished. P2 is the first to finish, and it finished by changing a deploy target rather than a handler.' },
+    { t: 'diagram', name: 'build-plan.svg' },
+  ],
+},
+
+/* ================================================================= */
+{
+  id: 'risks',
+  title: 'Risks',
+  blocks: [
+    { t: 'diagram', name: 'risks.svg' },
+    {
+      t: 'callout', kind: 'note', title: 'What moved on 2026-11-02',
+      text: 'R1 dropped from high likelihood to medium when the other five dashboard files were checked and found to escape their record text. R10 and R11 both dropped: the Worker deploys inside the free plan, and the Vercel host that was publishing the repository has been deleted. Nothing got worse. R3 is still an hour of work and still in the top row.',
+    },
+  ],
+},
+
+/* ================================================================= */
+{
+  id: 'once',
+  title: 'One definition, read everywhere',
+  blocks: [
+    { t: 'p', text: 'Anything that appears twice is built once, and a variation is a parameter rather than a second copy. This is the rule the whole project runs on, and it is the rule that quietly breaks first.' },
+    { t: 'diagram', name: 'one-definition.svg' },
+    { t: 'p', text: 'The library can be looked at as well as read. docs/components.html is a page in the repository that loads the real stylesheet and the real script and renders every token, button, heading, band, card, wash and icon the storefront is built from, with the real header above it. Serve the site and open /docs/components.html. It is outside the publish allow-list, so it never reaches a customer, and because it uses the live components rather than copies of them, it cannot drift from the site.' },
+    {
+      t: 'callout', kind: 'warn', title: 'The one that is worse than it looked',
+      text: 'The free shipping threshold was recorded as living in three places. Checked on 2026-11-02 it is on ten lines across six files: six of them arithmetic, including both versions of create_order, and four of them sentences of customer-facing copy. The database is already authoritative, because create_order computes the shipping line. The other nine are copies of a number the database already knows.',
+    },
+  ],
+},
+
+/* ================================================================= */
+{
+  id: 'later',
+  title: 'Deliberately not built',
+  blocks: [
+    { t: 'p', text: 'This section exists to prevent an argument later. Every card is a decision not to build something, and the text on it is the condition that reverses that decision.' },
+    { t: 'diagram', name: 'postponed.svg' },
+  ],
+},
+
+/* ================================================================= */
+{
+  id: 'decisions',
   title: 'Architecture decisions',
   blocks: [
-    { t: 'p', text: 'Numbered, dated, never renumbered. The last two lines of each are the ones people skip and the ones that matter in a year.' },
-    {
-      t: 'decision',
-      id: 'AD1',
-      date: '2026-10-09',
-      title: 'Cloudflare Pages and Pages Functions, rather than staying on Vercel or on GitHub Pages',
-      fields: {
-        'What it does': 'One project serves the static pages and runs the three server routes, behind one DNS zone we control.',
-        'Why we need it': 'Today the domain points at a host that cannot run server code, and the host that can has never been given its keys. Any fix that leaves two hosts in place leaves the same confusion.',
-        'Why it belongs here': 'Turnstile is already the captcha and is a Cloudflare product. Access closes the preview for free. WAF rate limiting fixes a security finding that cannot be fixed in application code. Web Analytics needs no cookie and therefore no consent banner. All four come with the zone.',
-        'What it costs': 'A nameserver move, a port of three functions from the Node request and response style to the Workers fetch style, and a runtime that is not Node, so every library has to be checked. There are no libraries: the functions are dependency free.',
-        'Right for now': 'Three routes and a static site sit far inside the free plan. Workers Paid at five dollars a month is the ceiling, not the floor.',
-        'Replace when': 'The server work grows beyond what a Pages Function can do inside its CPU limit, or a long-running job appears that wants a real Node host.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD2',
-      date: '2026-10-09',
-      title: 'Pages Functions rather than a Worker with a framework',
-      fields: {
-        'What it does': 'Each route stays one file under functions/api/, matching the existing /api layout one to one.',
-        'Why we need it': 'The three routes are already written against standard web APIs and have no dependencies. They need a runtime, not a framework.',
-        'Why it belongs here': 'The site has no build step, and adding one to serve three endpoints would be the largest change in the project for the smallest reason.',
-        'What it costs': 'No file-based routing conveniences, and the Node request and response shim has to be written once and tested.',
-        'Right for now': 'Three endpoints. A framework earns its place somewhere around twenty.',
-        'Replace when': 'The server surface grows past roughly a dozen routes, or server-rendered pages become necessary.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD3',
-      date: '2026-10-09',
-      title: 'Supabase stays. The data does not move to D1',
-      fields: {
-        'What it does': 'Postgres, row level security, Auth and Storage stay exactly where they are. Only the serving layer moves.',
-        'Why we need it': 'Twenty three tables, twelve applied migrations, policies on every table, a server-authoritative order function and four staff-gated catalogue functions already exist and work.',
-        'Why it belongs here': 'D1 has no row level security. Moving would mean reimplementing every policy as application code behind a data access layer, with a test for every path, to gain a network hop. The security model is the most valuable thing in the project.',
-        'What it costs': 'A network hop from the Worker to Supabase, a second vendor, and a bill that grows with use.',
-        'Right for now': 'The database is nowhere near being the bottleneck, and the policies are the reason the browser can safely hold a key at all.',
-        'Replace when': 'The Supabase bill becomes material, or the latency of that hop shows up in a measurement rather than in a worry.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD4',
-      date: '2026-10-09',
-      title: 'The money is recomputed in the database, and the webhook is the source of truth',
-      fields: {
-        'What it does': 'The browser sends product ids and quantities. create_order prices every line, including stage options and faucet upgrades, checks stock and decrements it in one transaction. The Stripe webhook, not the browser redirect, marks an order paid.',
-        'Why we need it': 'A price that the browser can influence is a price a customer can choose. A redirect that the browser can skip is a payment that can be lost.',
-        'Why it belongs here': 'Half of it already exists and is tested. The payment work extends it rather than inventing a parallel path.',
-        'What it costs': 'The webhook has to verify its signature and be keyed on the event id, because Stripe will redeliver.',
-        'Right for now': 'This is the one flow that has to be right the first time. Being taken twice for the same order is not something you can apologise your way out of.',
-        'Replace when': 'Never, as long as the site takes money.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD5',
-      date: '2026-10-09',
-      title: 'Every diagram is generated from one data file',
-      fields: {
-        'What it does': 'docs/diagrams/model.mjs holds the system as data. scripts/diagrams.mjs draws every SVG from it, and this document is generated too. Nothing is hand placed.',
-        'Why we need it': 'A status picture that is two weeks old is worse than none, because it is believed. Hand-drawn diagrams are never updated after the second time.',
-        'Why it belongs here': 'The site map with a status on every page is the one picture that answers "how far along are we", and it is read by whoever is paying rather than by whoever is building.',
-        'What it costs': 'A renderer to maintain, and layout expressed as code rather than dragged into place.',
-        'Right for now': 'Fifteen drawings from one file, regenerated in under a second, with npm run diagrams:check failing a pull request where the picture and the model disagree.',
-        'Replace when': 'The drawings need art direction that layout code cannot express. Then export once to a design tool and accept that it is now a second copy.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD6',
-      date: '2026-10-09',
-      title: 'Icons are symbols, and diagram elements are components',
-      fields: {
-        'What it does': 'Every icon is one SVG symbol, instanced with use. Every repeated diagram element (the card, the zone panel, the page card, the table card, the sequence lane, the note panel, the connector) is one component in scripts/lib/components.mjs, with its variants listed in a manifest.',
-        'Why we need it': 'It is the same rule the site runs on, applied to the drawings. An icon copied into three diagrams is three icons to fix.',
-        'Why it belongs here': 'It is also what makes the set exportable: a symbol library and a component manifest map one to one onto a design tool\'s components and instances, so the set can be rebuilt in Figma without being redrawn.',
-        'What it costs': 'Layout maths lives in code, and a component change redraws everything, which is the point and is occasionally startling.',
-        'Right for now': 'Forty one symbols and six components carry sixteen drawings, and the library sheet in section 18 shows every one of them.',
-        'Replace when': 'The library is maintained in a design tool and exported into the repository, rather than the other way round.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD7',
-      date: '2026-10-09',
-      title: 'The site is published from an explicit allow-list, not from the repository root',
-      fields: {
-        'What it does': 'npm run build:site copies a named list of directories and files into dist/, refuses to finish if anything on a forbidden list made it in, and writes a manifest. Pages publishes dist/.',
-        'Why we need it': 'Serving the repository root publishes the repository. Verified on 2026-10-09 against the live Vercel host: the SQL migrations, the test files and the internal task list were all downloadable by anyone.',
-        'Why it belongs here': 'Cloudflare Pages has no special case for /api, so without this it would publish the server source as well. The move forces the question, which is the good time to answer it.',
-        'What it costs': 'Adding a file to the site means naming it in one list. That friction is the feature.',
-        'Right for now': 'Fifteen directories and nineteen files. Small enough to read in one screen.',
-        'Replace when': 'A real build step appears for another reason, and can own the same list.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD8',
-      date: '2026-10-09',
-      title: 'Montserrat for text, and Playfair Display for titles',
-      fields: {
-        'What it does': 'Replaces Inter and Poppins across the site and the blueprint. Two tokens in css/styles.css and one in scripts/lib/tokens.mjs.',
-        'Why we need it': 'The brand reads as a premium product and was set in two geometric sans faces, which read as a technology product.',
-        'Why it belongs here': 'Changing it costs two tokens and a font link while the site is pre-launch. After launch it is a visual regression test across every page.',
-        'What it costs': 'Montserrat is a wider face than Inter, so anything that was close to wrapping now wraps. Checked at 1280: the navigation still fits on one line.',
-        'Right for now': 'Both faces are on Google Fonts, so there is no licence to buy and no file to self-host yet.',
-        'Replace when': 'A licensed display face is bought and self-hosted. Canela was the intended face and was never licensed. On 2026-11-02 thirteen candidates were set in the headings of this site and compared, and Playfair Display was chosen on its merits: the two faces closest to Canela in shape, Marcellus and Gilda Display, carry a single weight each, which would have put synthetic bold back on the page.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD11',
-      date: '2026-11-02',
-      title: 'The voice turns to health, and New York water becomes the reason rather than the headline',
-      fields: {
-        'What it does': 'Rewrites the home page, the shop head, the editor defaults in store.js and the navigation. The subject is what a household drinks every day and the quiet confidence of having taken care of it. Affordability is said as value, speed as ease, the product as care. NYC Water Facts becomes Water Facts.',
-        'Why we need it': 'The previous copy led with the plumbing of the city and a problem. The owner wants to speak to people who care about their health and their family first, and to reach every household and budget, with New York water as the proof that we know what we are doing.',
-        'Why it belongs here': 'Copy that lives in index.html, in store.js and in site_content at once has to change in all three in one commit, or the editor quietly restores the old voice the next time it publishes.',
-        'What it costs': 'Rows already published in site_content still carry the old copy until they are republished from the editor. The hero now hides its first sentence on phones, which the editor must respect: the rule is in applyPageSections.',
-        'Right for now': 'One voice in one commit, recorded in CLAUDE.md under Voice.',
-        'Replace when': 'The owner changes the positioning again. Then the same three places move together.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD10',
-      date: '2026-11-02',
-      title: 'Four weights, and one rule for which face a thing is set in',
-      fields: {
-        'What it does': 'Names the four weights as tokens in css/styles.css and replaces all 135 numeric font-weight declarations with them. Montserrat sets everything that is read. Playfair Display sets titles, the button label, prices and the large storefront numerals, and nothing else. The content editor offers those two faces only, and main.js refuses any other face stored against a section.',
-        'Why we need it': 'Weight 800 was set in 32 places and neither family was ever loaded at 800, so the browser drew a synthetic bold in its place. The editor offered Inter, Poppins, Georgia, Helvetica Neue and system-ui, none of which the site loads. Prices were set in the display face in two components and in the body face in three.',
-        'Why it belongs here': 'A type rule that lives only in the head of whoever reviews the change is decided again, differently, the next time a component is added.',
-        'What it costs': 'Thirty two places are one step lighter than they were, which is the difference between a drawn bold and a real one. The page head asks for the same seven files as before, and every one of them is now a weight the stylesheet uses.',
-        'Right for now': 'Four weights carry every component on the site, and the whole rule is one comment block at the top of the stylesheet.',
-        'Replace when': 'A component genuinely needs a fifth weight. Add it to the token block and to the loader in every page head in the same commit, never as a literal.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD10',
-      date: '2026-11-02',
-      title: 'A Worker with static assets, because Cloudflare retired the Pages flow',
-      fields: {
-        'What it does': 'worker.js routes /api/* to the three handlers and hands everything else to the ASSETS binding, which serves dist. wrangler.toml declares main and [assets] rather than pages_build_output_dir.',
-        'Why we need it': 'Creating a project now goes through the Workers flow. It requires a deploy command, fills in wrangler deploy, and issues a build token with Workers permissions. Five builds failed: first on the wrong command, then on the Pages API refusing a Workers-scoped token. The platform had moved; the configuration had not.',
-        'Why it belongs here': 'The handlers in api/ did not change, and neither did functions/_shim.js. A Pages Function is handed { request, env } and so is this, so one adapter serves both. The files under functions/ still work if the Pages flow ever returns.',
-        'What it costs': 'Routing is now a table in worker.js rather than the filesystem, so a new endpoint means a line there as well as a file. Six tests pin that table down.',
-        'Right for now': 'Three routes. A table of three is easier to read than file-based routing anyway.',
-        'Replace when': 'The route list outgrows one screen, or Cloudflare offers file-based routing for Workers.',
-      },
-    },
-    {
-      t: 'decision',
-      id: 'AD9',
-      date: '2026-11-02',
-      title: 'Cloudflare deploys from its own Git connection, and GitHub Actions only gates it',
-      fields: {
-        'What it does': 'Cloudflare Pages clones the repository, runs npm run build:site and publishes dist. Every branch gets a preview and main goes to production. GitHub Actions deploys nothing: it runs the tests and both drift checks, and branch protection on main makes them required.',
-        'Why we need it': 'The first plan had the workflow do the deploying, which meant an API token in repository secrets and a hand-built approval step. Two weeks of elapsed time later none of it was set up, and the setup was the reason.',
-        'Why it belongs here': 'It removes the credential entirely. A workflow that holds no token cannot leak one, and the repository is public, so that is worth more here than it would be elsewhere. The gate moves from a deploy approval to the merge, which is where a person already has to think.',
-        'What it costs': 'Production deploys on every push to main with no second confirmation. That is only safe because nothing reaches main without a reviewed, green pull request, so branch protection is load bearing rather than optional.',
-        'Right for now': 'One person, one repository, and a build that is a file copy. The simpler path is the one that actually gets finished.',
-        'Replace when': 'Production needs to lag main deliberately, or a deploy needs to wait on something a merge cannot express, such as a migration run by a job rather than by hand. Then the workflow comes back, and AD1 stands as written.',
-      },
-    },
+    { t: 'p', text: 'Ten decisions, numbered, dated and never renumbered, grouped by what they decide rather than by when they were taken. Click a card for what it does, why it belongs here, what it costs and when it should be replaced. The last of those is the field people skip and the one that matters in a year.' },
+    { t: 'diagram', name: 'decisions.svg' },
   ],
 },
 
 /* ================================================================= */
 {
-  id: 's16',
+  id: 'unknowns',
   title: 'Questions and unknowns',
   blocks: [
-    { t: 'p', text: 'Numbered, owned, with what each one blocks. An unknown with no owner is a decision nobody is making. Answered ones stay here, marked answered with the date, rather than being deleted; the trail is the value.' },
-    {
-      t: 'unknown',
-      id: 'U1',
-      question: 'Does opening /admin/ or /manager/ while signed in as an ordinary customer expose anything at all?',
-      why: 'Row level security should mean the page renders and every query returns nothing. Should is not a result. Until someone signs in as a customer and looks, the browser-side gate is an assumption.',
-      how: 'Create a customer account on a preview, open each of the four dashboards, and read the network tab as well as the screen.',
-      owner: 'Claude Code',
-      blocks: 'Phase 6, and any claim that the dashboards are safe',
-    },
-    {
-      t: 'unknown',
-      id: 'U2',
-      question: 'Are the NYC water figures on /nyc-water/ defensible?',
-      why: 'They are presented as fact to a New York audience and were written as first-draft illustrative numbers. Publishing an unverified water quality claim is a different kind of mistake from a layout bug.',
-      how: 'Check every figure against the NYC DEP annual water quality reports and against lab data. Anything that cannot be sourced is either removed or labelled illustrative in the page itself.',
-      owner: 'Owner, with Claude Code',
-      blocks: 'Launch',
-    },
-    {
-      t: 'unknown',
-      id: 'U3',
-      question: 'Which Resend sending domain, and is it verified?',
-      why: 'EMAIL_FROM is set to noreply@crystalina.org. Mail from an unverified domain is either rejected or filed as spam, and order confirmations landing in spam look exactly like orders that were never taken.',
-      how: 'Verify crystalina.org in Resend, add the DNS records, and send one real test to an address outside the company.',
-      owner: 'Owner',
-      blocks: 'Phase 3 being believable, and phase 8',
-    },
-    {
-      t: 'unknown',
-      id: 'U4',
-      question: 'Is there a second Supabase project for preview, or does preview share production data?',
-      why: 'Two environments with one database is one environment. A test order placed on a preview would decrement real stock and send a real email.',
-      how: 'Decide. If the answer is one project, then preview must be read-only and say so, loudly, in the handoff.',
-      owner: 'Owner, with Claude Code',
-      blocks: 'Phase 1',
-    },
-    {
-      t: 'unknown',
-      id: 'U5',
-      question: 'What retention does the workforce data need, and under what rule?',
-      why: 'Ten tables hold staff hours, shifts, time off and an audit log. Payroll records carry statutory retention periods, and nobody has named one.',
-      how: 'Ask whoever handles payroll what the obligation is, then write it down as a retention policy with a job that enforces it.',
-      owner: 'Owner',
-      blocks: 'Nothing yet. It blocks the first audit.',
-    },
-    {
-      t: 'unknown',
-      id: 'U6',
-      question: 'Does the site need Spanish?',
-      why: 'The audience is New York City. Nobody has asked for it, and retrofitting language into a site with copy in the markup is considerably harder than planning for it.',
-      how: 'Ask. If the answer is yes or probably, lift the page copy out of the markup in the same pass as section 13 rather than twice.',
-      owner: 'Owner',
-      blocks: 'Nothing now. It doubles the cost of section 13 if the answer arrives late.',
-    },
-    {
-      t: 'unknown',
-      id: 'U7',
-      question: 'Who maintains this after launch, and how technical are they?',
-      why: 'It decides how much is editable from the admin console and how much is a developer task forever. The honest list of what is not editable is in section 10 and in DEPLOY_STEPS.md.',
-      how: 'Name the person. If they are not technical, the repeatable items in section 13 stop being tidy-up and become required work.',
-      owner: 'Owner',
-      blocks: 'Scope of phase 7 and of the handover',
-    },
+    { t: 'p', text: 'Numbered, owned, and drawn beside what each one is holding up. An unknown with no owner is a decision nobody is making. Answered ones stay here, marked answered with the date, rather than being deleted; the trail is the value.' },
+    { t: 'diagram', name: 'unknowns.svg' },
   ],
 },
 
 /* ================================================================= */
 {
-  id: 's17',
+  id: 'drawings',
   title: 'The drawing system',
   blocks: [
-    { t: 'p', text: 'Every drawing in this document is assembled from one icon library and six components, and coloured by a six-family palette where the colour carries meaning rather than decoration. This section is the key to reading all of them.' },
-    { t: 'h3', text: 'What the colours mean' },
+    { t: 'p', text: 'Every drawing is assembled from one icon library and nine components, and coloured by a palette where the colour carries meaning rather than decoration. Learn the seven families once and no drawing needs a legend.' },
     {
       t: 'table',
       head: ['Family', 'Stands for'],
@@ -649,33 +310,44 @@ export const sections = [
 
 /* ================================================================= */
 {
-  id: 's18',
+  id: 'index',
+  title: 'Everything, one card at a time',
+  blocks: [
+    { t: 'p', text: 'Every card in every drawing, as a panel. This is where the detail lives, and it is the same content the drawings open: clicking a card above and finding its entry here reach the same place. With scripting switched off this section is the document, and every dependency is an ordinary link.' },
+    { t: 'index' },
+  ],
+},
+
+/* ================================================================= */
+{
+  id: 'kept',
   title: 'How this document is kept true',
   blocks: [
     {
       t: 'ul',
       items: [
-        'The source is docs/blueprint-content.mjs and docs/diagrams/model.mjs. Three surfaces are generated from them and none is written by hand: the Artifact at https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo, which is the one to send anybody; docs/blueprint.html, the same page as a file that opens from the repository; and docs/blueprint.md, for reading in a pull request. Editing any of the three is work that the next regeneration silently destroys.',
-        'npm run blueprint rebuilds all three. npm run diagrams rebuilds every drawing. npm run check runs the tests, the publish allow-list and both drift checks, so a stale picture or a page that has drifted from its source cannot survive a pull request.',
+        'The source is docs/blueprint-content.mjs for the connecting sentences and docs/diagrams/model.mjs for everything else. Three surfaces are generated and none is written by hand: the Artifact, which is the one to send anybody; docs/blueprint.html, the same page as a file; and docs/blueprint.md, for reading in a pull request. Editing any of the three is work the next regeneration silently destroys.',
+        'Detail belongs on the node, not in the prose. If a paragraph in the content file is really about one thing, it belongs on that thing in the model, where it is one click from the card that names it.',
+        'Dependencies are never written out. Every "depends on" and "what depends on it" list is derived from the edges in the model by scripts/lib/graph.mjs, in both directions. A cross-reference that names a node which does not exist fails the build rather than becoming a dead link.',
+        'npm run docs rebuilds every drawing and all three surfaces. npm run check runs the tests, the publish allow-list and both drift checks, so a stale picture or a page that has drifted from its source cannot survive a pull request.',
         'Amend this in the same commit as the change it describes. A decision that changes in code and not here is a decision that will be made again, differently.',
-        'Mark an answered question answered, with the date and the answer. Do not delete it.',
-        'When a section is superseded, say so at the top of the section and point at what replaced it. Never renumber.',
+        'Mark an answered question answered, with the date and the answer. Do not delete it. Never renumber a decision or an unknown.',
         'More than one session commits to main. Read COORDINATION.md before editing, and pull before you start and before each push.',
       ],
     },
     {
       t: 'callout', kind: 'learn', title: 'Publish from one place',
-      text: 'The Artifact is published from this repository and nowhere else. Anyone republishing it pulls first and republishes to the same URL (https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo) rather than creating a second one. A generated document published from two places stops matching its own sources quietly, and the next person to rebuild wipes out work nobody remembers doing.',
+      text: 'The Artifact is published from this repository and nowhere else. Anyone republishing it pulls first and republishes to the same URL rather than creating a second one. A generated document published from two places stops matching its own sources quietly, and the next person to rebuild wipes out work nobody remembers doing.',
     },
   ],
 },
 
 /* ================================================================= */
 {
-  id: 's19',
+  id: 'screens',
   title: 'What every screen looks like today',
   blocks: [
-    { t: 'p', text: 'The site map in section 10 says what each page is for. This section shows what each one actually looks like, captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them.' },
+    { t: 'p', text: 'The site map says what each page is for. This section shows what each one actually looks like, captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them.' },
     { t: 'screens' },
     {
       t: 'callout', kind: 'learn', title: 'Refreshing the captures',

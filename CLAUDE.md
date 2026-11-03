@@ -1,8 +1,8 @@
 # Crystalina
 
 A premium home water filtration shop for New York City. Pure HTML, CSS and
-JavaScript with no bundler, Cloudflare Pages Functions for the server
-boundary, and Supabase for data and identity.
+JavaScript with no bundler, one Cloudflare Worker that serves `dist` and
+routes `/api/*` (AD10), and Supabase for data and identity.
 
 **Read the blueprint before changing anything structural.** It is the record
 of what exists, what is decided and why, and what is still unknown.
@@ -28,20 +28,23 @@ markup, look for the component. If it half exists, extend it.
 | Shared UI, icons, `escapeHTML` | `js/main.js` |
 | Local cache, hydrated from Supabase | `js/store.js` |
 | Supabase reads, writes and uploads | `js/data-remote.js` |
-| Server boundary | `api/*.mjs`, run by `functions/api/*.js` |
+| Server boundary | `api/*.mjs`, routed by `worker.js` |
 | Schema | `supabase/migrations/` |
-| The system as data, for the diagrams | `docs/diagrams/model.mjs` |
+| The system as data, and every detail panel | `docs/diagrams/model.mjs` |
+| Derived dependency lists, in both directions | `scripts/lib/graph.mjs` |
+| The blueprint's click-to-inspect viewer | `scripts/lib/viewer.mjs` |
 | Diagram components and icons | `scripts/lib/components.mjs`, `scripts/lib/icons.mjs` |
 
-Three things still have no single home and should get one:
-the free shipping threshold (written in three places), the navigation and
-social links (in every page head), and the repeatable items inside home page
-sections. See section 13 of the blueprint.
+Three things still have no single home and should get one: the free
+shipping threshold (written out ten times across six files, checked
+2026-11-02), the schema.org `sameAs` list that repeats the footer's social
+links, and the five blocks of repeatable items inside home page sections.
+See "One definition, read everywhere" in the blueprint.
 
 ## Commands
 
 ```bash
-npm test             # 29 tests, about a second
+npm test             # 35 tests over 6 files, about a second
 npm run serve        # the site on http://localhost:4321
 npm run build:site   # assemble dist/ from the publish allow-list
 npm run docs         # rebuild every diagram and the blueprint
@@ -89,7 +92,7 @@ never breathless. "Water Facts", not "NYC Water Facts".
   `--w-semibold` 600, `--w-bold` 700. **Never write a numeric font-weight.**
   Montserrat sets everything that is read, including all dashboard text.
   Playfair sets titles, the button label, prices and the large storefront
-  numerals. The rule is written out at the top of `css/styles.css` (AD10).
+  numerals. The rule is written out at the top of `css/styles.css` (AD12).
 - Paths are root-absolute (`/css/...`), URLs are clean folders.
 - Buttons use the unified centre-out fill hover. Do not reintroduce ad hoc
   button styles.
@@ -101,18 +104,19 @@ never breathless. "Water Facts", not "NYC Water Facts".
   gated on `private.has_role(...)`.
 - Prices, totals and stock are recomputed in the database. The browser sends
   ids and quantities, **never money**.
-- Everything that reaches `innerHTML` goes through `escapeHTML` first. The
-  dashboards do not yet, and that is an open finding, not a convention.
+- Everything that reaches `innerHTML` goes through `escapeHTML` first.
+  `js/admin.js` does not, in about thirty places, and that is an open
+  finding rather than a convention. The other dashboards were checked on
+  2026-11-02 and do escape their record text.
 - Migrations are additive and re-runnable: `create or replace`,
   `if not exists`, drop-then-create for policies.
-- Secrets live in the Cloudflare Pages dashboard, per environment. Never in
-  the repository, never in a variable that reaches the browser, never in
-  chat.
+- Secrets live in the Cloudflare dashboard, per environment. Never in the
+  repository, never in a variable that reaches the browser, never in chat.
 
 ## What is published
 
-`npm run build:site` copies an explicit list into `dist/`, and Pages
-publishes `dist/`. **Adding a file to the site means naming it in
+`npm run build:site` copies an explicit list into `dist/`, and the Worker
+serves `dist/` through its ASSETS binding. **Adding a file to the site means naming it in
 `scripts/build-site.mjs`.** Serving the repository root publishes the
 repository: on 2026-10-09 the live Vercel host was serving the SQL
 migrations, the tests and the internal task list to anyone who asked.
@@ -121,8 +125,9 @@ migrations, the tests and the internal task list to anyone who asked.
 
 - **Payment.** There is no Stripe integration. The checkout button is
   disabled on purpose. Do not enable it to "test the flow".
-- **Catalogue data.** Stock is 0 everywhere, `product_stage_options` is
-  empty, and no faucet products exist.
+- **Catalogue data.** Thirteen of the seventeen seeded products carry
+  stock 0, `product_stage_options` has no rows, and no faucet products
+  exist.
 - **Dashboard access control.** Row level security protects the data; the
   gate in front of the dashboards is browser-side and unproven (U1).
 

@@ -31,9 +31,49 @@ export const halo = (x, y, str, o = {}) => {
     + `>${esc(str)}</text>`;
 };
 
+/* Everything clickable in a drawing is wrapped in this, with the registry
+   key from scripts/lib/graph.mjs. The viewer adds tabindex, role and a
+   label at runtime, so a document read with scripting off contains no
+   buttons that do nothing. */
+export const nodeWrap = (key, svg, tip) => (key
+  ? `<g class="node" data-node="${esc(key)}">`
+    + (tip ? `<title>${esc(tip)}</title>` : '') + svg + '</g>'
+  : svg);
+
+/* An arrow, with the two keys it joins, so clicking either end can light
+   it up. Board writes these attributes on the path itself; a drawing that
+   draws its own arrows wraps them in this instead. */
+export const edgeWrap = (from, to, svg) =>
+  (from && to ? `<g class="edge" data-from="${esc(from)}" data-to="${esc(to)}">${svg}</g>` : svg);
+
+/* ---------------------------------------------------------------- *
+ * StepBadge: a filled disc carrying a step number or a short id,
+ * sitting on the leading edge of a card. Used by any drawing whose
+ * cards are an ordered sequence rather than a set.
+ * ---------------------------------------------------------------- */
+export function StepBadge(n, o = {}) {
+  const fam = familyOf(o.family || 'navy');
+  const rad = o.r || 12;
+  return {
+    h: rad * 2,
+    draw(cx, cy) {
+      return `<circle cx="${r(cx)}" cy="${r(cy)}" r="${r(rad)}" fill="${fam.solid}"/>`
+        + `<circle cx="${r(cx)}" cy="${r(cy)}" r="${r(rad + 3)}" fill="none"`
+        + ` stroke="${INK.paper}" stroke-width="2.5"/>`
+        + text(cx, cy + rad * 0.36, String(n), {
+          size: rad * 0.92, weight: 700, fill: INK.paper, anchor: 'middle',
+        });
+    },
+  };
+}
+
+/* `mute` is the word drawings use for a de-emphasised arrow. There is no
+   mute family, so it resolves to slate: without this the marker id was
+   m-mute, which does not exist, and the arrow lost its head. */
 export const toneOf = (family) => {
-  const f = familyOf(family || 'blue');
-  return { stroke: f.solid, marker: `m-${family || 'blue'}`, ink: f.ink, fam: f };
+  const name = !family || family === 'mute' ? (family ? 'slate' : 'blue') : family;
+  const f = familyOf(name);
+  return { stroke: f.solid, marker: `m-${name}`, ink: f.ink, fam: f };
 };
 
 /* A label over a hairline, to head a column or a band. */
@@ -135,7 +175,7 @@ export function PageCard(w, p) {
         });
         yy += 3;
       }
-      return s;
+      return nodeWrap(p.key, s);
     },
   };
 }
@@ -173,7 +213,7 @@ export function TableCard(w, t, o = {}) {
         yy += 3;
         for (const l of note) { s += text(x + pad, yy, l, { size: 9.4, fill: statusFam.ink, italic: true }); yy += 11.6; }
       }
-      return s;
+      return nodeWrap(t.key, s);
     },
   };
 }
@@ -244,7 +284,7 @@ export const FailurePanel = (w, items, o = {}) => NotePanel(w, items, {
  * whatever it is pointing at.
  * ---------------------------------------------------------------- */
 export function Connector(src, dst, o = {}) {
-  const tone = toneOf(o.family);
+  const tone = toneOf(o.family || o.tone);
   const opts = { stroke: tone.stroke, sw: o.sw || 1.7, marker: tone.marker, dash: o.dash || null };
   if (Math.abs(src.cx - dst.cx) < 4) {
     const edge = Math.max(src.x + src.w, dst.x + dst.w);
@@ -339,6 +379,19 @@ export const COMPONENTS = [
       { label: 'Pages Function', detail: '/api/orders/create', icon: 'bolt', family: 'amber' },
       { label: 'Postgres', detail: 'create_order()', icon: 'database', family: 'teal' },
       { label: 'Stripe', detail: 'Checkout', icon: 'card', family: 'green' },
+    ],
+  },
+  {
+    name: 'StepBadge',
+    purpose: 'A numbered disc on the leading edge of a card, for a drawing whose cards are an ordered sequence rather than a set. It carries a white ring so it reads on top of a card border or an arrow.',
+    render: (w, v) => {
+      const b = StepBadge(v.n, v);
+      return { h: 34, draw: (x, y) => b.draw(x + 17, y + 17) };
+    },
+    width: 46,
+    variants: [
+      { n: 1, family: 'blue' }, { n: 4, family: 'amber' },
+      { n: 7, family: 'rose' }, { n: 10, family: 'teal' },
     ],
   },
   {

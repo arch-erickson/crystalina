@@ -1,135 +1,242 @@
-# Crystalina — Image Generation Prompts (for Codex)
+# Crystalina — editorial image direction
 
-Generate each image below and save it to the exact path shown, then it appears on the site.
-Two images (hero background, exploded RO-10) are **already referenced in code** and will show
-the moment their files exist. The rest currently use temporary stock photos; once generated,
-swap the `<img src>` to the local path noted per image.
+Revised 2026-11-02 from the user's direct review. This file governs site imagery.
+Read sections 2–4 before generating. The previous emphasis on dirt and wear is retired.
 
-## Global art direction (apply to every prompt)
-- **Palette (strict):** deep navy `#15375D` / `#1F4C80`, vivid blue `#2A7BC4`, light blue `#53A4DA`,
-  cyan `#3DC7F4`, silver `#CFD2D3`, white. No teal-green, no purple, no warm/orange casts.
-- **Mood:** modern, clean, premium, trustworthy, clinical-but-warm. Think Apple-store-meets-water-science.
-- **Lighting:** soft studio light, gentle gradients, subtle depth of field.
-- **Format:** export **WebP**, quality ~82, sRGB. Optimize file size (< 400 KB where possible).
-- **Universal negative prompt:** `text, watermark, logo, letters, brand names, people's faces distorted,
-  extra fingers, low-res, jpeg artifacts, cluttered, busy background, garish colors, green tint, purple tint`.
+## 1. Direction
 
----
+Clean, attractive, well-kept middle-income New York apartments, photographed at
+editorial quality, with the filter as the visual focal point. Homes are comfortable
+and attainable, neither neglected nor luxury penthouses. Realism comes from
+natural materials, believable light and people, not grime. Minor imperfections
+are aesthetic and effectively unnoticeable at normal viewing size.
 
-## 1. Hero background — ACTIVE, FULL-BLEED (`/images/hero-bg.webp`)
-This image fills the **entire** hero (no image box). Text sits over the left third on a dark
-navy gradient; the right side stays visible, so the subject must live on the **right half**.
-- **Size:** 2600 × 1500 (landscape, 16:9-ish). Keep the composition's focal point on the right;
-  the left ~40% should be calmer/simpler (a wall, window light, or soft gradient) with room for text.
-- **Prompt:** "Editorial lifestyle photograph, a happy young family (two parents and a child)
-  together in a bright, airy modern New York City kitchen, smiling and sharing glasses of
-  crystal-clear water, grouped on the right side of the frame, warm genuine candid moment, soft
-  natural window light, shallow depth of field, calm and premium, cool blue color grade, the left
-  side of the frame is a softly lit neutral wall with gentle negative space for text, sophisticated
-  and aspirational, high-end brand photography, blue palette #15375D #2A7BC4 #3DC7F4."
-- **Alternate (product-forward) prompt:** "Premium under-sink reverse osmosis system with brushed
-  stainless canisters and blue tubing, dramatically lit on the right side of a dark studio scene,
-  water droplets and soft caustic reflections, deep navy to cyan gradient filling the left as
-  negative space, cinematic, high-end product photography, monochrome blue palette."
-- **Note:** deliver a version that reads well when the left ~40% is covered by a dark navy overlay.
+The user supplied two official logos and authorized applying them to actual
+products. This supersedes the prior blanket text/logo ban. Brand blue belongs on
+the supplied marks and genuine hardware, not on food, walls, wardrobe or lighting.
 
-## 2. Exploded RO-10 system — ACTIVE (`/images/exploded-filter.webp`)
-- **Size:** 1200 × 1400 (portrait), **transparent background**.
-- **Prompt:** "Exploded technical product view of an under-sink reverse osmosis water filtration
-  system, components separated and floating in a vertical stack with thin connecting lines:
-  three cylindrical filter canisters (sediment, two carbon blocks), a horizontal membrane housing,
-  a round pressurized storage tank, and a slim brushed-metal faucet, clean studio render, brushed
-  stainless steel and translucent blue housings, soft reflections, isolated on transparent background,
-  premium industrial design, navy and cyan accents #1F4C80 #3DC7F4."
-- **Note:** vertical stack from top (intake) to bottom (faucet); crisp edges for the transparent cutout.
+## 2. The standard
 
-## 3–8. Category tiles (`/images/cat-*.webp`, 800 × 600 each)
-Replace the six stock photos in the homepage "Shop By Category" grid.
-| File | Prompt focus |
-|---|---|
-| `/images/cat-reverse-osmosis.webp` | "Sleek under-sink reverse osmosis unit installed under a modern kitchen sink, tidy blue tubing, stainless canisters, clean cabinet interior, premium." |
-| `/images/cat-whole-house.webp` | "Large whole-house water filtration system mounted in a clean utility area of a NYC brownstone basement, big blue canisters, professional install." |
-| `/images/cat-countertop.webp` | "Modern countertop water dispenser on a bright minimalist kitchen counter, glass of clear water beside it, renter-friendly, navy and cyan accents." |
-| `/images/cat-shower.webp` | "Premium chrome shower head with soft water spray in a bright modern bathroom, clean tile, spa-like, blue tones, water droplets." |
-| `/images/cat-replacement.webp` | "Set of cylindrical replacement water filter cartridges standing in a row on a clean white surface, studio product shot, blue and silver." |
-| `/images/cat-accessories.webp` | "Flat lay of water testing accessories: a digital TDS meter, small UV lamp module, and mineral drops bottle on a clean light-blue surface, top-down." |
+### 2.1 Resolution and delivery
 
-## 10. Lifestyle / hydration (`/images/lifestyle-hydration.webp`)
-- **Size:** 900 × 700. Homepage "Why Crystalina" split section.
-- **Prompt:** "A happy, healthy family in a bright modern NYC apartment kitchen drinking clear water
-  from glasses, natural window light, candid and warm, lifestyle photography, cool clean color grade."
+Request native 4K or better (at least 3840 pixels on the long edge).
+The user explicitly approved installing the best built-in generator results below
+4K if their actual native resolution is documented. Never call an enlarged export
+native 4K. Deliver WebP, embedded sRGB, exact dimensions below, Lanczos resampling.
+P1 requires true transparency. Masters stay outside the repository; images/ publishes
+whole. Only final delivery files go there. References/logs stay in image-refs/.
 
-## 11. NYC skyline (`/images/nyc-skyline.webp`)
-- **Size:** 900 × 700. About page.
-- **Prompt:** "New York City skyline at soft blue hour, clean and crisp, subtle cool blue tone,
-  water reflections in the foreground (Hudson River), premium editorial photography."
+### 2.2 Clean editorial realism
 
-## 12. Point-of-use tap (`/images/point-of-use.webp`)
-- **Size:** 900 × 700. NYC Water page.
-- **Prompt:** "Clean filtered water flowing from a modern kitchen faucet into a glass, sharp focus on
-  the clear stream, bright kitchen bokeh background, cool blue palette, premium."
+- Clean, intact, aligned cabinetry; clean grout; wiped counters; clean sinks;
+  maintained hardware. No peeling paint, grime, stains, scale, rust or crumbs.
+- Restrained everyday objects: a glass, neatly folded linen towel or small fruit
+  bowl. Two or three useful objects, arranged without looking sterile or staged.
+- Texture means subtle wood grain, ceramic glaze, cloth weave and brushed steel.
+  Do not emphasize scratches, chipped edges or distressed surfaces.
+- People have natural skin, fine lines, pores, relaxed asymmetric expressions,
+  anatomically correct hands and real grip pressure. No harshly exaggerated age.
+- Generous soft daylight from a clear window source, natural bounce and falloff,
+  bright editorial exposure and readable shadows. No gloom or theatrical rimlight.
+- The filter is the sharpest, clearest and most salient subject. People and room
+  support it. Never hide it behind a body, door or foreground object.
+- Polished magazine photography, realistic lens perspective and materials,
+  restrained styling. No plastic CGI sheen, HDR grit or featureless background haze.
 
-## 13. Product photos (`/images/products/<id>.webp`, 1000 × 750 each)
-Studio product shots on a seamless very-light-blue (#F3FAFE) background, soft shadow, centered,
-navy/cyan/silver hardware. Load each into the Admin dashboard product image field (or set as the
-`image` in `js/store.js`).
-| Product id | Prompt focus |
-|---|---|
-| `ro-alkaline-10` | 10-stage under-sink RO system, multiple stainless canisters + tank + designer faucet, flagship. |
-| `ro-classic-5` | Compact 5-stage under-sink RO system with chrome faucet. |
-| `wh-3stage` | Three large blue whole-house filter canisters on a mounting bracket. |
-| `ct-luxe` | Modern countertop water dispenser, glossy white and navy, digital panel. |
-| `shower-12` | Chrome multi-stage shower filter attached to a shower arm, water spray. |
-| `faucet-pure` | Small twist-on faucet-mount filter on a kitchen tap, switch lever. |
-| `pitcher-glacier` | Clear 10-cup water filter pitcher with blue lid, full of clear water. |
-| `filters-ro-set` | Three replacement RO pre-filter cartridges in a row. |
-| `filters-wh-set` | Three heavy-duty whole-house replacement cartridges. |
-| `uv-guard` | Slim stainless UV sterilization chamber module with blue indicator. |
-| `tds-meter` | Handheld digital TDS water quality meter, screen showing a reading. |
-| `mineral-drops` | Small dropper bottle of trace mineral drops, navy label, on light surface. |
+### 2.3 Setting and product priority
 
----
+Use nicely maintained middle-income NYC apartments: modest renovated galley
+kitchens, white shaker cabinets, clean quartz or laminate counters, subway tile,
+oak accents, cared-for windows and a glimpse of neighbouring brick or fire escape.
+Old-building character does not mean decay. Show realistic scale and diverse households.
 
-### After Codex generates the files
-- Images **1 and 2** appear automatically (already wired).
-- For **3–12**, replace the `https://images.unsplash.com/...` `src` on the relevant page with the
-  local `/images/...` path (keep the existing `onerror` fallback).
-- For **13**, upload via the Admin dashboard, or set the `image` field in `js/store.js`.
+Lifestyle images show the actual filtration system, not just a generic glass or
+faucet. Under-sink models stay installed under the sink or in a proper utility
+cabinet; do not turn them into countertop dispensers. The About plate now shows
+a clean NYC apartment installation, with its existing filename retained.
 
----
+### 2.4 Colour
 
-## 14. H5-600 exploded flagship view (`/images/h5-600-exploded.webp`)
+Neutral white balance, accurate whites, true skin/material colours. No cool,
+warm, green, purple or amber grade. Actual wood, fruit and fitting colours are fine.
+No brand-blue set dressing. Official blue/silver artwork is allowed on the product.
 
-Replaces the generic RO-10 artwork in the homepage "Inside the Flagship" section.
-This one intentionally sits **outside** the blue brand palette: it is a technical
-cutaway, so a neutral studio look reads as more credible than brand colour.
+### 2.5 Official product branding
 
-- **Size:** 1400 x 1600 (portrait), **transparent background**.
-- **Reference images already in the repo** (match the real hardware, do not invent a
-  different product): `/images/products/h5-600-uv-transparent.webp`,
-  `h5-600-uv-studio.webp`, `h5-600-uv-editorial.webp`, `h5-600-uv.webp`.
-- **The real H5-600 hardware:** a black powder-coated open frame holding three
-  vertical clear-and-steel prefilter housings side by side, two round analogue
-  pressure gauges and a small digital monitoring panel across the top rail, a
-  horizontal cylindrical 600 GPD RO membrane housing, and a black LED-UVC module
-  mounted along the top.
+Use these supplied references, copied unchanged:
+- image-refs/brand/Crystalina-Logo.png — official wordmark and tagline.
+- image-refs/brand/Realistic-Logo.png — blue/silver C-and-water-drop emblem.
 
-- **Prompt:** "Technical exploded view of a black-frame high-flow reverse osmosis
-  water purification system, components separated vertically with clean thin grey
-  leader lines and generous spacing between parts: at the top a black cylindrical
-  LED-UVC sterilization module, below it a horizontal stainless reverse osmosis
-  membrane housing, then three vertical cartridge filters side by side (a white
-  pleated sediment cartridge, a black activated carbon block, and a mineral
-  alkaline cartridge), then the black powder-coated steel mounting frame with two
-  round pressure gauges and a small digital display panel, and at the bottom a
-  brushed stainless faucet. Neutral studio lighting, soft realistic shadows,
-  matte black and brushed steel and white materials, subtle grey and amber
-  accents, industrial product design render, isolated on a transparent
-  background, sharp focus, high detail."
+Apply the wordmark and/or emblem as a proportionate engraving, printed mark,
+fitted label, badge, embossing or texture ON THE PRODUCT. Follow its perspective,
+curvature, lighting and reflections. Preserve the reference's shape/proportions.
+Do not paste a white reference-image rectangle over hardware.
 
-- **Negative prompt:** `text, watermark, logo, letters, brand names, blue tint,
-  heavy colour grading, cluttered background, duplicated parts, floating debris,
-  low-res, jpeg artifacts`
+Use wordmark on a large panel/rail; use emblem alone on small chrome/curved parts.
+Monochrome engraving of the emblem is allowed. Omit the tagline when too small.
+If rendered, permitted wording is exactly CRYSTALINA and PURE WATER. PURE LIFE.
+No invented lettering, claims, specifications, numbers, UI or other brands.
+No floating logo/watermark; no branding on walls, clothes, people, food or unrelated
+appliances. Original product photographs remain protected; only generated assets
+receive this treatment. Category concepts are not verified catalogue products.
 
-- **Note:** keep the vertical stack order top-to-bottom so it reads as the water
-  path, and keep the silhouette narrow so it sits beside the numbered stage list.
+### 2.6 Negative prompt — include on every generation
+
+```text
+dirt, grime, mould, mildew, stained grout, peeling paint, chipped cabinets,
+water stains, limescale, rust, crumbs, rubbish, distressed surfaces, clutter,
+neglected apartment, gritty reportage, gloomy room, luxury penthouse,
+unauthorized text, numbers, signage, watermark, invented logo, misspelled branding,
+third-party brand, UI overlay, floating logo, oversized product label,
+airbrushed skin, poreless face, plastic skin, waxy skin, exaggerated wrinkles,
+identical expressions, extra fingers, malformed hands, fused fingers,
+blue colour grade, cool colour grade, warm colour grade, orange tint, green tint,
+purple tint, teal and orange, heavy vignette, lens flare, bokeh haze background,
+HDR halo, oversharpened, CGI render, 3D render, video game lighting,
+floating objects, duplicated parts, impossible plumbing, low-res, jpeg artifacts
+```
+
+Supplied Crystalina marks on products are allowed. P1's intentional exploded
+separation is the only exception to floating parts.
+
+## 3. References
+
+Scene references: image-refs/<target-filename>.<ext>, numbered for multiples.
+Brand references: image-refs/brand/. Real product photographs govern hardware;
+supplied logos govern branding. Scene references guide composition, but this user's
+clean-home correction overrides dirt, wear and clutter. Section 4 governs crop.
+If accurate hardware cannot fit the scene, flag it in COORDINATION.md rather than
+inventing components. User authorized all P1–P6 from written prompts when scene
+references are absent. image-refs/ stays outside the publish allow-list.
+
+## 4. Compose for the box
+
+### A. Product shots
+Full hardware with margins, neutral surface or required alpha, plausible lighting.
+Do not overwrite protected images/products/ photographs or their variants.
+
+### B. Category tiles
+Exactly 4:3. Entire focal hardware and logo in upper two thirds, ideally ending at
+60–62% image height. Bottom third quiet CLEAN counter, floor or tile for the CSS
+label gradient. Leave margins for scale(1.05) hover. Hardware readable at 380px.
+Do not make the product tiny in a vast room. Never bake in a gradient.
+
+### C. Lifestyle and About plates
+1200 x 900, 4:3. Filter sharp, prominent and unobstructed. People, if present,
+support the product story with natural activity at its dedicated faucet.
+No forced symmetry. No generic faucet-only composition.
+
+### D. Technical exploded view
+1400 x 1600, 7:8, true alpha; generous spacing, thin neutral grey leader lines.
+Top to bottom: UVC, membrane housing, three filter assemblies, empty frame with
+gauges/display, faucet. Preserve actual black/amber housing and cartridge geometry.
+Conceptual exploded illustration, not a certified flow schematic. Brand frame
+rail or casing. Do not duplicate the full system inside its empty frame.
+
+### E. Hero
+2600 x 1500, 26:15. Hardware and human activity on right half. Left 40% is clean
+real room, no painted gradient; CSS adds the overlay. Product branding is visible
+on right. Bodies and open doors must not obscure the filter.
+
+## 5. Weight and checks
+
+Quality first; no per-image byte ceiling. Efficient WebP, record sizes.
+The earlier 11 files totalled 2,500,482 bytes (historical, not a target).
+Responsive variants, lazy loading and hero preload belong to design owner.
+Run npm run check before pushing; tests/build must pass. Report unrelated drift.
+
+## 6. Protected hardware
+
+Never regenerate/overwrite these real photographs or their derived variants:
+```text
+images/products/h5-600-uv-studio.webp
+images/products/f5-600-uv-studio.webp
+images/products/x2a-600-studio.webp
+images/products/w5-400-alkaline-studio.webp
+```
+Use the matching model as reference. H5-600: black open frame, three clear bowls
+with black caps, two gauges, dark panel with three orange buttons, horizontal
+black membrane housing with amber collar, black UVC above. No invented features.
+Use filter-ppf-02.webp and filter-acm-10.webp for replacement cartridge geometry.
+
+## 7. Revised prompts
+
+Every entry includes sections 2.2, 2.4, 2.5 and full negative prompt 2.6.
+All targets below are under images/, WebP/sRGB. Product is the focus.
+
+### P1 — h5-600-exploded.webp
+1400 x 1600, 7:8, transparent. References: real H5-600 and both supplied logos.
+Precise photographic exploded view in section 4D order, neutral studio key,
+accurate material texture, grey leaders and generous margins. Official wordmark
+printed silver on right of frame rail, small supplied emblem beside it.
+Gauges unnumbered, display dark. Preserve hardware geometry and transparency.
+
+### P2 — hero-bg.webp
+2600 x 1500, 26:15. References: real H5-600 and official logos.
+Bright editorial photograph of a clean, attractive middle-income NYC apartment
+kitchen: modest white shaker cabinetry, pale counter, oak floor and cared-for
+window overlooking nearby brick. Right-side open under-sink cabinet reveals the
+real branded H5-600, primary focal point, with tidy connected plumbing. A woman
+fills a glass at its dedicated faucet, standing beside rather than in front of
+the unit. Teenager adds quiet context. Natural expressions and skin. Daylight
+from right window; folded linen and small ceramic bowl. Left 40% clean real wall
+and cabinetry. Wordmark/emblem on filter rail only. No painted gradient.
+
+### P3 — lifestyle-hydration.webp
+1200 x 900, 4:3. References: real H5-600 and official logos.
+Polished editorial home photograph in a comfortable clean NYC apartment kitchen,
+intact white cabinetry and oak accents. Branded H5-600 clearly visible, sharp and
+unobstructed in an open under-sink cabinet in foreground. Beside it an older man
+fills a glass at the dedicated filtered-water faucet for his grandchild. People
+farther back, supporting the product. Restrained fruit bowl, folded towel, pale
+clean counter, daylight. Natural fine skin texture and gentle candid expressions.
+Official supplied marks physically printed on filter rail.
+
+### P4 — point-of-use.webp
+1200 x 900, 4:3. References: real H5-600 and official logos.
+Editorial detail of the branded H5-600 installed in a beautifully clean open sink
+cabinet, dedicated brushed-steel drinking-water faucet visible above. Product
+foreground sharp and prominent; a hand filling a glass provides use context
+without hiding filter. Clean white interior, pale counter, tidy connected tubing,
+P-trap, neutral daylight and realistic clear water. Wordmark on filter rail,
+optional tiny supplied emblem engraved on faucet base. No soap clutter or grime.
+
+### P5 — nyc-skyline.webp (filename retained; new About subject)
+1200 x 900, 4:3. References: real H5-600 and official logos.
+Product-led editorial photograph of a real branded H5-600 installation in a clean
+utility cabinet beside a kitchen sink in a comfortable middle-income NYC apartment.
+Nearby well-maintained sash window offers a restrained glimpse of brownstone
+brick/fire escape. Filter fills foreground, sharp and central to the story. Tidy
+neutral room, daylight, white cabinetry, clean fittings, subtle oak grain.
+Official wordmark/emblem on rail. No people required, no rubbish or distressed
+architecture. Design owner updates skyline-specific alt text separately.
+
+### P6 — six category tiles
+All 1200 x 900, 4:3, rule 4B. Base: clean attractive middle-income NYC home,
+polished editorial photograph, soft natural daylight, neutral white balance,
+real texture, focal product, restrained everyday context. Hardware and branding
+above bottom third; no overlay. Apply only supplied marks to product.
+
+| Target | Prompt |
+| --- | --- |
+| cat-reverse-osmosis.webp | Real H5-600 in immaculate open under-sink cabinet, clean connected P-trap/shutoff/disposal with clearance, tidy tubing and intact cabinetry. Product dominates upper two thirds, clean floor foreground. Official wordmark/emblem on top rail. H5-600 reference mandatory. |
+| cat-whole-house.webp | Three neat white filter housings on steel wall bracket in clean cared-for utility room, orderly copper piping, shutoff/bypass valves, boiler incidental at edge. Fresh neutral wall, clean floor. Supplied emblem/wordmark as small fitted housing labels. Category concept, not verified SKU. |
+| cat-countertop.webp | Modest off-white countertop filter/dispenser with clear reservoir on clean pale counter, one ceramic mug, neat backsplash and small window. Product dominates, no luxury island. Supplied wordmark on casing and small integrated emblem. Category concept, not verified SKU. |
+| cat-shower.webp | Chrome inline filter correctly joined between shower arm and showerhead in attractive clean bathroom, white tile, clean grout, natural spray. Filter focal, quiet tile below. Supplied emblem engraved into chrome body, no giant sticker. Category concept, not verified SKU. |
+| cat-replacement.webp | Fresh clean cartridges matching filter-ppf-02.webp and filter-acm-10.webp, clean empty housing beside them, spotless neutral worktop. No stained used cartridge. Small official mark on end cap or housing; never cover active filter media with a solid label. Sharp product texture. |
+| cat-accessories.webp | Clean TDS pen with blank display beside clear glass on clean pale kitchen counter, hand setting it down. Supplied wordmark printed on casing, small emblem near cap. Instrument/glass upper two thirds, no clutter. |
+
+## 8. Scope and handoff
+
+User authorized rewriting this brief and regenerating site imagery with supplied
+branding. Edit IMAGE_PROMPTS.md, image-refs/, specified images/ assets and
+COORDINATION.md. Never change original product photos, markup, CSS, docs/, scripts/,
+functions/, api/, supabase/ or catalogue in this pass.
+
+Whole-house/countertop/shower currently lack catalogue products. Their imagery is
+a category concept, not verification of stock or actual manufactured branding.
+Catalogue/design owner decides continued use. No invented certifications or claims.
+Record actual prompts, references, sizes, brand treatment and checks. Earlier
+generation logs are historical and do not override this revision. Retired image
+deletion and old RO-10/skyline alt text remain design-owner work.
+
