@@ -88,6 +88,23 @@ reason to edit and which has to stay identical across all fourteen.
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-03 · Claude Code (design) · Taken into the record from the deploy session
+
+Three pieces of evidence, judged and recorded. R1 is done: every
+person-typed value in `js/admin.js` is escaped and a test pins it, so the
+risk card reads low and finding F3 reads Implemented. R11 is mitigated at
+the domain by the `_config.yml` exclusion list, verified the same day, and
+recorded as a stopgap with its residual risk, two lists that must agree,
+closing at P5. The page bubbles in the blueprint now show each page's
+capture, kept as proposed; the captures remain written only by
+`scripts/screens.mjs`.
+
+Also in this push: the catalogue grid in Theory's restraint, the 404 page
+with `not_found_handling` switched to the page as the comment in
+`wrangler.toml` said to do when one existed, the order receipt, the FAQ,
+and a measured polish pass. From here, every push to main is a deploy, as
+agreed; `npm run check` and a look at desktop and phone width precede
+each one.
 ### 2026-11-03 · Claude Code · The blank shop after the deploy was a stale main.js, and every script is versioned now
 
 Reported by the deploy session minutes after the first production deploy of

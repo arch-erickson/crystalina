@@ -107,10 +107,10 @@ never breathless. "Water Facts", not "NYC Water Facts".
   gated on `private.has_role(...)`.
 - Prices, totals and stock are recomputed in the database. The browser sends
   ids and quantities, **never money**.
-- Everything that reaches `innerHTML` goes through `escapeHTML` first.
-  `js/admin.js` does not, in about thirty places, and that is an open
-  finding rather than a convention. The other dashboards were checked on
-  2026-11-02 and do escape their record text.
+- Everything that reaches `innerHTML` goes through `escapeHTML` first. Every
+  dashboard does, as of 2026-11-03: `js/admin.js` was the last and
+  `tests/admin-escaping.test.cjs` pins it. A new interpolation of anything
+  a person typed is a finding, not a convention.
 - Migrations are additive and re-runnable: `create or replace`,
   `if not exists`, drop-then-create for policies.
 - Secrets live in the Cloudflare dashboard, per environment. Never in the

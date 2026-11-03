@@ -98,9 +98,9 @@ export const findings = [
   },
   {
     id: 'F3', severity: 'High', icon: 'alert', family: 'rose',
-    label: 'One dashboard interpolates record text unescaped',
-    detail: 'js/admin.js, about thirty sites',
-    status: 'Partial',
+    label: 'One dashboard interpolated record text unescaped',
+    detail: 'js/admin.js, swept 2026-11-03, pinned by a test',
+    status: 'Implemented',
     what: 'escapeHTML is defined once in js/main.js and used 37 times in js/admin.js, and about thirty other interpolations in the same file put record text straight into innerHTML: product names, order statuses, job addresses, campaign names, role names. Checked 2026-11-02: js/manager.js, js/sales.js, js/technician.js, js/technician-route.js, js/admin-schedule.js and js/staff-schedule.js all escape their record text, so the earlier claim that all four dashboards were unescaped was wrong.',
     why: 'Partial, and narrower than it was described as. One file is the whole finding. Row level security still decides who can read a row; this decides what happens to a row once it is on a staff screen.',
     fixedBy: ['phase:P6'],
@@ -1266,7 +1266,7 @@ export const phases = [
     rel: ['target:cfdns', 'unknown:U8', 'risk:R5'],
   },
   {
-    id: 'P6', family: 'rose', icon: 'shield', label: 'Security hardening', needs: ['P2'], status: 'Partial', col: 2, row: 1, owner: 'Claude Code', detail: 'Escape js/admin.js, Turnstile widgets, WAF rate limit',
+    id: 'P6', family: 'rose', icon: 'shield', label: 'Security hardening', needs: ['P2'], status: 'Partial', col: 2, row: 1, owner: 'Claude Code', detail: 'Turnstile widgets, WAF rate limit',
     what: 'The three findings that are each less than a day: sweep the thirty interpolations in js/admin.js, put the captcha widget on the three forms, and move the rate limit to the edge.',
     why: 'Partial. The scope shrank on 2026-11-02 when the other dashboards were checked and found to be escaping already.',
     rel: ['finding:F3', 'risk:R1', 'risk:R3', 'threat:xss'],
@@ -1303,10 +1303,10 @@ export const phases = [
 
 export const risks = [
   {
-    id: 'R1', label: 'Unescaped record text in js/admin.js', likelihood: 'medium', impact: 'high',
-    fix: 'Sweep about thirty interpolations in js/admin.js through escapeHTML. The other dashboards were checked on 2026-11-02 and already escape', effort: 'Half a day',
+    id: 'R1', label: 'Unescaped record text in js/admin.js', likelihood: 'low', impact: 'high',
+    fix: 'Done on 2026-11-03: every person-typed value js/admin.js puts in markup goes through escapeHTML, and tests/admin-escaping.test.cjs pins it. The other dashboards were checked on 2026-11-02 and already escaped', effort: 'Done',
     what: 'A staff edit that contains markup becomes markup on another staff screen. The sites are product names, order statuses, job addresses, campaign names and role names.',
-    why: 'Likelihood dropped from high to medium on 2026-11-02, when the other five dashboard files were checked and found to escape their record text. One file, about thirty sites.',
+    why: 'Likelihood dropped to low on 2026-11-03 when the sweep landed with a test behind it. What remains is the browser-side gate in front of the dashboards, which is U1, not this.',
     fixedBy: ['phase:P6'],
     rel: ['finding:F3', 'threat:xss'],
   },
@@ -1382,10 +1382,10 @@ export const risks = [
   },
   {
     id: 'R11', label: 'The repository is published with the site', likelihood: 'low', impact: 'medium',
-    fix: 'Publish from an explicit allow-list into dist/ rather than serving the repository root. Done, and checked again 2026-11-02: dist holds 128 files and no .sql, test or internal .md file', effort: 'Done',
+    fix: 'The Worker publishes from an explicit allow-list into dist/, done. The domain is another matter: on 2026-11-03 crystalina.org was still GitHub Pages, publishing the repository root on every push, with the migrations, the coordination log, the blueprint and the staff captures all answering 200. A _config.yml exclusion list mirrors the FORBIDDEN list and they now 404, verified the same day. That is a stopgap, two lists that must agree; it closes for good at P5, the nameserver move, or when Pages is switched off', effort: 'Owner action',
     what: 'On 2026-10-09 the live Vercel host served the SQL migrations, the test files and the internal task list to anyone who asked.',
-    why: 'Likelihood dropped to low: the Vercel project is deleted, the Worker serves dist only, and the build refuses to finish if a forbidden file reaches it. The repository being public is why this one mattered.',
-    rel: ['ad:AD7', 'now:worker'],
+    why: 'Likelihood is low at the Worker and low again at the domain since the exclusion list, but the residual risk is real: anything private added to the repository must be named in two lists until Pages is off. The repository being public is why this one mattered.',
+    rel: ['ad:AD7', 'now:worker', 'phase:P5'],
   },
 ];
 

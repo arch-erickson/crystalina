@@ -444,9 +444,9 @@ Partial. Every shape exists in the database and most of the shelf reads as sold 
 - **See also.** products; product_stage_options; Most of the shelf reads as sold out; Shop; Product; Product catalogue
 - **Severity.** High
 
-#### One dashboard interpolates record text unescaped · Partial
+#### One dashboard interpolated record text unescaped · Implemented
 
-_Finding · js/admin.js, about thirty sites._
+_Finding · js/admin.js, swept 2026-11-03, pinned by a test._
 
 escapeHTML is defined once in js/main.js and used 37 times in js/admin.js, and about thirty other interpolations in the same file put record text straight into innerHTML: product names, order statuses, job addresses, campaign names, role names. Checked 2026-11-02: js/manager.js, js/sales.js, js/technician.js, js/technician-route.js, js/admin-schedule.js and js/staff-schedule.js all escape their record text, so the earlier claim that all four dashboards were unescaped was wrong.
 
@@ -728,7 +728,7 @@ Where the catalogue and the published page content are edited, and where images 
 Partial. The writes are correct and gated in the database. The page around them is the one file in the project with an open escaping gap, and it has no screen for the two empty tables that F2 is about.
 
 - **Links to.** Home (publish to website); Shop (price, stock, copy)
-- **See also.** One dashboard interpolates record text unescaped; The gate in front of every private page is localStorage; Staff changing what a visitor sees; P7 · Seed the catalogue; Staff browser; Staff text reaching another staff member as script
+- **See also.** One dashboard interpolated record text unescaped; The gate in front of every private page is localStorage; Staff changing what a visitor sees; P7 · Seed the catalogue; Staff browser; Staff text reaching another staff member as script
 - **Design.** Implemented
 - **Server.** Partial
 - **Backend built.** Catalog writes through upsert_product and delete_product, gated on has_role Content editor publishes site_content Image upload to the site-media bucket
@@ -1707,7 +1707,7 @@ How a price, a photo or a paragraph gets from a staff screen to a visitor. Write
 
 Partial. The path works. What is wrong is at the two ends: unescaped record text on the way in, and no cache busting on the way out.
 
-- **See also.** Admin console; site_content; One dashboard interpolates record text unescaped; Published page sections; Supabase Storage; Home
+- **See also.** Admin console; site_content; One dashboard interpolated record text unescaped; Published page sections; Supabase Storage; Home
 - **Participants.** Admin browser, Postgres, Storage, Storefront
 
 #### A stranger sending something in · Partial
@@ -1754,7 +1754,7 @@ Stored cross-site scripting through a staff screen: an edit that contains markup
 Partial, and narrower than it was recorded as. js/admin.js has about thirty unescaped record-text sites; the other five dashboard files were checked on 2026-11-02 and escape theirs.
 
 - **Closed by.** P6 · Security hardening
-- **See also.** One dashboard interpolates record text unescaped; Unescaped record text in js/admin.js; Admin console
+- **See also.** One dashboard interpolated record text unescaped; Unescaped record text in js/admin.js; Admin console
 - **What stands in front of it.** escapeHTML in js/main.js, used on every interpolation
 
 #### A customer opening a staff page · Refactor
@@ -2030,12 +2030,12 @@ Missing. It is the step that makes everything already built visible to a visitor
 - **Waiting on the answer to.** U8 · How does Google Workspace on crystalina.org get unlocked, and what does the DNS move do to it?
 - **Closes.** The domain still points at the half that cannot run code
 - **Unblocks.** P9 · Backups and monitoring; P10 · Launch
-- **See also.** Cloudflare DNS; Cloudflare Worker; GitHub Pages; Squarespace DNS; Web Analytics; Supabase Auth; A request arrives; Move the nameservers to Cloudflare; Production; crystalina.org; sitemap.xml and robots.txt
+- **See also.** Cloudflare DNS; Cloudflare Worker; GitHub Pages; Squarespace DNS; Web Analytics; Supabase Auth; A request arrives; Move the nameservers to Cloudflare; Production; The repository is published with the site; crystalina.org; sitemap.xml and robots.txt
 - **Owner.** Owner
 
 #### P6 · Security hardening · Partial
 
-_Phase · Escape js/admin.js, Turnstile widgets, WAF rate limit._
+_Phase · Turnstile widgets, WAF rate limit._
 
 The three findings that are each less than a day: sweep the thirty interpolations in js/admin.js, put the captcha widget on the three forms, and move the rate limit to the edge.
 
@@ -2043,7 +2043,7 @@ Partial. The scope shrank on 2026-11-02 when the other dashboards were checked a
 
 - **Needs first.** P2 · Run /api on Cloudflare
 - **Waiting on the answer to.** U1 · Does opening /admin/ as an ordinary customer expose anything at all?
-- **Closes.** One dashboard interpolates record text unescaped; Unescaped record text in js/admin.js; Rate limit does not survive the instance; Staff text reaching another staff member as script; Form spam and abuse
+- **Closes.** One dashboard interpolated record text unescaped; Unescaped record text in js/admin.js; Rate limit does not survive the instance; Staff text reaching another staff member as script; Form spam and abuse
 - **Unblocks.** P10 · Launch
 - **See also.** Turnstile; Turnstile; WAF rate limiting; A third-party script changing the page; A Content-Security-Policy
 - **Owner.** Claude Code
@@ -2105,18 +2105,18 @@ Missing. Four phases have to finish first, and U2 and U7 have to be answered.
 
 #### Unescaped record text in js/admin.js
 
-_Risk · medium likelihood, high impact._
+_Risk · low likelihood, high impact._
 
 A staff edit that contains markup becomes markup on another staff screen. The sites are product names, order statuses, job addresses, campaign names and role names.
 
-Likelihood dropped from high to medium on 2026-11-02, when the other five dashboard files were checked and found to escape their record text. One file, about thirty sites.
+Likelihood dropped to low on 2026-11-03 when the sweep landed with a test behind it. What remains is the browser-side gate in front of the dashboards, which is U1, not this.
 
 - **Closed by.** P6 · Security hardening
-- **See also.** One dashboard interpolates record text unescaped; Staff text reaching another staff member as script
-- **Likelihood.** medium
+- **See also.** One dashboard interpolated record text unescaped; Staff text reaching another staff member as script
+- **Likelihood.** low
 - **Impact.** high
-- **What to do.** Sweep about thirty interpolations in js/admin.js through escapeHTML. The other dashboards were checked on 2026-11-02 and already escape
-- **Effort.** Half a day
+- **What to do.** Done on 2026-11-03: every person-typed value js/admin.js puts in markup goes through escapeHTML, and tests/admin-escaping.test.cjs pins it. The other dashboards were checked on 2026-11-02 and already escaped
+- **Effort.** Done
 
 #### Payment taken twice on a webhook redelivery
 
@@ -2257,13 +2257,13 @@ _Risk · low likelihood, medium impact._
 
 On 2026-10-09 the live Vercel host served the SQL migrations, the test files and the internal task list to anyone who asked.
 
-Likelihood dropped to low: the Vercel project is deleted, the Worker serves dist only, and the build refuses to finish if a forbidden file reaches it. The repository being public is why this one mattered.
+Likelihood is low at the Worker and low again at the domain since the exclusion list, but the residual risk is real: anything private added to the repository must be named in two lists until Pages is off. The repository being public is why this one mattered.
 
-- **See also.** AD7 · The site is published from an explicit allow-list, not from the repository root; Cloudflare Worker
+- **See also.** AD7 · The site is published from an explicit allow-list, not from the repository root; Cloudflare Worker; P5 · DNS cutover
 - **Likelihood.** low
 - **Impact.** medium
-- **What to do.** Publish from an explicit allow-list into dist/ rather than serving the repository root. Done, and checked again 2026-11-02: dist holds 128 files and no .sql, test or internal .md file
-- **Effort.** Done
+- **What to do.** The Worker publishes from an explicit allow-list into dist/, done. The domain is another matter: on 2026-11-03 crystalina.org was still GitHub Pages, publishing the repository root on every push, with the migrations, the coordination log, the blueprint and the staff captures all answering 200. A _config.yml exclusion list mirrors the FORBIDDEN list and they now 404, verified the same day. That is a stopgap, two lists that must agree; it closes for good at P5, the nameserver move, or when Pages is switched off
+- **Effort.** Owner action
 
 ### One definition
 
@@ -2286,7 +2286,7 @@ The header, the footer, the cart drawer, the icon set and escapeHTML. The footer
 
 Implemented. escapeHTML living here is why the gap in js/admin.js is a sweep rather than a rewrite.
 
-- **See also.** One dashboard interpolates record text unescaped; Navigation and social links
+- **See also.** One dashboard interpolated record text unescaped; Navigation and social links
 - **Lives in.** js/main.js
 - **Read by.** Storefront, Dashboards
 
