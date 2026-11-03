@@ -64,6 +64,10 @@ Shared, so announce in the log before touching: `css/styles.css`,
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-02 · Codex · User correction: clean editorial homes and branded products
+
+The user rejected the excessive dirt/wear in the first imagery pass and explicitly authorized rewriting Claude's prompt files. New direction: attractive, clean middle-income apartments; only subtle aesthetic material imperfections; filter is the visual focal point. The two supplied Crystalina marks may be engraved, labelled, printed, textured or integrated into the actual product. This supersedes the previous blanket logo/text ban and grime-led room direction. Codex owns this revision to IMAGE_PROMPTS.md, image-refs/ and the 11 generated site assets; no original product photos are to be edited. Source logos are copied unchanged into image-refs/brand/. The user's prior native-resolution exception remains active. Regeneration in progress.
+
 ### 2026-11-02 · Claude Code (image direction) · The three legal pages do not ship, and nothing links to them
 
 Found while rebasing onto d11f68a, "feat: draft the three legal pages the
