@@ -361,7 +361,7 @@ The library can be looked at as well as read. docs/components.html is a page in 
 
 > **The one that is worse than it looked**
 >
-> The free shipping threshold was recorded as living in three places. Checked on 2026-11-02 it was on ten lines across six files: six of them arithmetic, including both versions of create_order, and four of them sentences of customer-facing copy. On 2026-11-03 it moved to shipping_policy, one enforced row that create_order reads on the server and Store.shippingPolicy() reads in the browser, so the cart drawer and the checkout quote the figure the order is charged. What remains is prose: seven sentences on six pages still say "$99".
+> The free shipping threshold was recorded as living in three places. Checked on 2026-11-02 it was on ten lines across six files: six of them arithmetic, including both versions of create_order, and four of them sentences of customer-facing copy. On 2026-11-03 it moved to shipping_policy, one enforced row that create_order reads on the server and Store.shippingPolicy() reads in the browser, so the cart drawer and the checkout quote the figure the order is charged. The seven sentences of prose wrap the figure in a span that main.js fills from the same row, so the words and the arithmetic cannot disagree. The announcement bar is the one copy left, because staff edit it as a sentence.
 
 ---
 
@@ -2317,17 +2317,17 @@ Partial, and the gap matters most if whoever maintains this is not technical, wh
 - **Lives in.** Supabase site_content
 - **Read by.** Home
 
-#### Free shipping threshold · Partial
+#### Free shipping threshold · Implemented
 
 _One definition · shipping_policy, one row, read by create_order and by Store.shippingPolicy()._
 
 The $99 free delivery threshold and the $9.99 fee below it. Since 2026-11-03 they live in shipping_policy, a table of one enforced row, public under RLS because the figure is on the front of the site. create_order reads it on the server; the cart drawer and the checkout quote read it in the browser through Store.shippingPolicy(), cached in localStorage with the current figures as the offline fallback.
 
-Partial. The six arithmetic sites are now one row, so the figure the customer is quoted is the figure the order is charged. Seven sentences of copy on six pages still say "$99" in prose, and will until the copy is templated or the figure changes, whichever comes first.
+Implemented on 2026-11-03. The six arithmetic sites are one row, so the figure the customer is quoted is the figure the order is charged, and the seven sentences of prose wrap the figure in [data-ship-threshold], which main.js fills from the same row on every page. The one copy left is the announcement bar, which staff edit as a sentence and own as content.
 
 - **See also.** U7 · Who maintains this after launch, and how technical are they?; orders
 - **Lives in.** shipping_policy, one row, read by create_order and by Store.shippingPolicy()
-- **Read by.** Announcement bar, Cart drawer, Checkout, Shop copy, Home hero, create_order
+- **Read by.** Cart drawer, Checkout, Shop copy, Home trust list, Product page, Contact and shipping pages, create_order
 
 #### Navigation and social links · Partial
 

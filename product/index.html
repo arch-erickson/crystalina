@@ -148,7 +148,7 @@
       fitsText ? ['What it fits', `<p>${escapeHTML(fitsText)}</p>`] : null,
       (p.specs || []).length ? ['Specifications', `<ul>${p.specs.map(x => `<li>${escapeHTML(x)}</li>`).join('')}</ul>`] : null,
       compatible.length ? ['Replacement filters', `<ul class="pd-filters">${compatible.map(c => `<li><a href="/product/?id=${encodeURIComponent(c.product.id)}">${escapeHTML(c.product.name)}</a><small>${c.replacementIntervalDays ? 'every ' + Math.round(c.replacementIntervalDays / 30) + ' months' : ''}</small></li>`).join('')}</ul><p>When a filter is due we say so, and the replacement arrives at your door.</p>`] : null,
-      ['Delivery and returns', '<p>Free delivery in the five boroughs on orders over $99, in 1 to 2 business days. Sixty days to return it, and a one-year warranty.</p>'],
+      ['Delivery and returns', '<p>Free delivery in the five boroughs on orders over <span data-ship-threshold>$99</span>, in 1 to 2 business days. Sixty days to return it, and a one-year warranty.</p>'],
     ].filter(Boolean);
 
     layout.innerHTML = `
@@ -175,7 +175,7 @@
         <div class="pd-stock ${stockCls}">${stockMsg}</div>
         <a href="https://wa.me/19178094803?text=${encodeURIComponent('Hi, I have a question about the ' + p.name)}" target="_blank" rel="noopener" class="text-link pd-ask">Ask us about this system</a>
         <ul class="pd-facts">
-          <li>${icon('truck')} Free delivery in the five boroughs over $99</li>
+          <li>${icon('truck')} Free delivery in the five boroughs over <span data-ship-threshold>$99</span></li>
           <li>${icon('wrench')} Fitted by our own team, on request</li>
           <li>${icon('returns')} Sixty-day returns and a one-year warranty</li>
         </ul>
@@ -224,6 +224,7 @@
 
     const related = Store.getProducts().filter(x => x.id !== p.id && x.category === p.category);
     const fill = Store.getProducts().filter(x => x.id !== p.id && x.category !== p.category);
+    if (typeof applyShippingThreshold === 'function') applyShippingThreshold();
     document.getElementById('relatedHeading').textContent = related.length ? 'Also in ' + p.category : 'Also from Crystalina';
     document.getElementById('relatedGrid').innerHTML = [...related, ...fill].slice(0, 4).map(productCard).join('');
     bindAddButtons();

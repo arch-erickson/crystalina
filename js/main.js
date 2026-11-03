@@ -457,6 +457,19 @@ function updateCartBadge() {
   if (badge) { const n = Store.cartCount(); badge.textContent = n; badge.style.display = n ? 'flex' : 'none'; }
 }
 
+/* The free delivery threshold in prose. Every sentence that says it wraps
+   the figure in [data-ship-threshold], and this fills it from the policy
+   row, so the words and the arithmetic cannot disagree. Whole dollars
+   read "$99"; anything else reads with cents. */
+function shipThresholdText() {
+  const t = Store.shippingPolicy().threshold;
+  return Number.isInteger(t) ? '$' + t : money(t);
+}
+function applyShippingThreshold() {
+  const text = shipThresholdText();
+  document.querySelectorAll('[data-ship-threshold]').forEach(el => { if (el.textContent !== text) el.textContent = text; });
+}
+
 function renderCartItems() {
   const wrap = document.getElementById('cartItems');
   if (!wrap) return;
@@ -708,8 +721,9 @@ function initPage(activeNav = '') {
   bindNewsletter();
   // Refresh pricing, stock and publication state from Supabase.
   if (Store.hydrateFromSupabase) Store.hydrateFromSupabase();
-  if (Store.hydrateShippingPolicy) Store.hydrateShippingPolicy();
-  document.addEventListener('shipping:changed', () => renderCartItems());
+  applyShippingThreshold();
+  if (Store.hydrateShippingPolicy) Store.hydrateShippingPolicy().then(applyShippingThreshold);
+  document.addEventListener('shipping:changed', () => { renderCartItems(); applyShippingThreshold(); });
   // Pull published page layout and site settings, then repaint.
   if (Store.hydrateSiteContent) {
     Store.hydrateSiteContent().then(() => { applySiteSettings(); applyPageSections(); });

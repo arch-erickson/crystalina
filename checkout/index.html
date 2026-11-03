@@ -17,51 +17,62 @@
 <body>
 
 <main>
-  <section class="page-hero">
-    <div class="container"><h1>Checkout</h1><p>Secure checkout is being configured. Orders cannot be placed until payments and inventory are connected.</p></div>
+  <section class="page-hero page-hero--quiet">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/shop/">Shop</a><span>/</span><span>Checkout</span></nav>
+      <h1>Checkout</h1>
+      <p>Delivery in the five boroughs, free over <span data-ship-threshold>$99</span>. Fitted by our own team on request.</p>
+    </div>
   </section>
 
   <section class="section">
     <div class="container">
       <div class="checkout-layout" id="checkoutLayout">
-        <div class="panel">
-          <h3>Shipping Details</h3>
+        <form id="checkoutForm" class="co-form" novalidate>
           <div class="form-error" id="coError"></div>
-          <form id="checkoutForm">
+          <div class="co-section">
+            <h3>Delivery</h3>
             <div class="field-row">
-              <div class="field"><label>First name</label><input required id="fFirst"></div>
-              <div class="field"><label>Last name</label><input required id="fLast"></div>
+              <div class="field"><label for="fFirst">First name</label><input required id="fFirst" autocomplete="given-name"></div>
+              <div class="field"><label for="fLast">Last name</label><input required id="fLast" autocomplete="family-name"></div>
             </div>
-            <div class="field"><label>Email</label><input type="email" required id="fEmail"></div>
-            <div class="field"><label>Phone</label><input type="tel" id="fPhone" placeholder="(929) 555-0123"></div>
-            <div class="field"><label>Street address</label><input required id="fAddr" placeholder="Apt / unit included"></div>
+            <div class="field"><label for="fEmail">Email</label><input type="email" required id="fEmail" autocomplete="email"></div>
+            <div class="field"><label for="fPhone">Phone</label><input type="tel" id="fPhone" autocomplete="tel" placeholder="(929) 555-0123"></div>
+            <div class="field"><label for="fAddr">Street address, with apartment</label><input required id="fAddr" autocomplete="street-address"></div>
             <div class="field-row">
-              <div class="field"><label>Borough / City</label>
+              <div class="field"><label for="fBorough">Borough</label>
                 <select id="fBorough">
                   <option>Manhattan</option><option>Brooklyn</option><option>Queens</option>
-                  <option>The Bronx</option><option>Staten Island</option><option>Other (NY metro)</option>
+                  <option>The Bronx</option><option>Staten Island</option><option>Outside the five boroughs</option>
                 </select>
               </div>
-              <div class="field"><label>ZIP code</label><input required id="fZip" pattern="\d{5}"></div>
+              <div class="field"><label for="fZip">ZIP code</label><input required id="fZip" inputmode="numeric" pattern="\d{5}" autocomplete="postal-code"></div>
             </div>
-            <div class="field"><label>Add professional installation?</label>
+          </div>
+          <div class="co-section">
+            <h3>Fitting</h3>
+            <div class="field"><label for="fInstall">Who fits it</label>
               <select id="fInstall">
-                <option value="no">No, I'll install it myself</option>
-                <option value="yes">Yes, contact me to schedule (+$89, billed later)</option>
+                <option value="no">I will fit it myself</option>
+                <option value="yes">Crystalina fits it for me, $89, billed after the visit</option>
               </select>
             </div>
-            <h3 style="margin:22px 0 14px">Payment</h3>
-            <p style="font-size:.85rem;color:var(--muted);background:var(--ice-50);border:1px solid var(--silver);border-radius:10px;padding:14px 16px;margin-bottom:16px;display:flex;gap:10px;align-items:flex-start;">
-              <span class="ic" style="width:20px;height:20px;flex:none;color:var(--blue-500);margin-top:1px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.4"/><path d="M3 10h18"/></svg></span>
-              <span>Payments and inventory are being connected securely. Ordering is temporarily unavailable while this work is completed.</span></p>
-            <button type="submit" class="btn btn-primary btn-block" disabled>Checkout unavailable</button>
-          </form>
-        </div>
-        <div class="panel">
-          <h3>Order Summary</h3>
+          </div>
+          <div class="co-section">
+            <h3>Payment</h3>
+            <p class="co-note">We are not taking payment online yet. Message us on WhatsApp or call (917) 809-4803 and we arrange the order with you, at the same price and with the same delivery.</p>
+            <div class="co-actions">
+              <button type="submit" class="btn btn-primary btn-block" disabled>Pay online</button>
+              <a class="btn btn-outline btn-block" href="https://wa.me/19178094803?text=Hi%2C%20I%20would%20like%20to%20order" target="_blank" rel="noopener">Order on WhatsApp</a>
+            </div>
+          </div>
+        </form>
+        <aside class="co-summary" aria-labelledby="summaryHeading">
+          <h3 id="summaryHeading">Your order</h3>
           <div id="summaryItems"></div>
           <div id="summaryTotals"></div>
-        </div>
+          <p class="co-fine">Every figure is confirmed by us before anything is charged.</p>
+        </aside>
       </div>
       <div class="order-success" id="orderSuccess" style="display:none"></div>
     </div>
@@ -88,27 +99,25 @@
     const { items, subtotal } = Store.cartDetails();
     const layout = document.getElementById('checkoutLayout');
     if (!items.length && document.getElementById('orderSuccess').style.display === 'none') {
-      layout.innerHTML = `<div class="panel" style="grid-column:1/-1;text-align:center;padding:60px;">
-        <h3>Your cart is empty</h3>
-        <p style="color:var(--muted);margin:10px 0 22px;">Add a filtration system before checking out.</p>
-        <a href="/shop/" class="btn btn-primary">Shop Filters</a></div>`;
+      layout.innerHTML = `<div class="receipt-notice" style="grid-column:1/-1">
+        <h2>Your cart is empty</h2>
+        <p>Add a system, or the filters that keep one running, and come back here.</p>
+        <div class="notice-actions"><a href="/shop/" class="btn btn-primary">Shop the systems</a></div></div>`;
       return;
     }
     const policy = Store.shippingPolicy();
     const shipping = subtotal >= policy.threshold ? 0 : policy.fee;
     const tax = subtotal * 0.08875;
     document.getElementById('summaryItems').innerHTML = items.map(i => `
-      <div class="summary-line">
-        <span style="display:flex;gap:10px;align-items:center;">
-          <img src="${i.product.image}" style="width:42px;height:42px;border-radius:8px;object-fit:cover;">
-          ${i.product.name} × ${i.qty}
-        </span>
+      <div class="summary-item">
+        <img src="${i.product.image}" alt="">
+        <span>${escapeHTML(i.product.name)}<small>Quantity ${i.qty}</small></span>
         <strong>${money(i.product.price * i.qty)}</strong>
       </div>`).join('');
     document.getElementById('summaryTotals').innerHTML = `
       <div class="summary-line"><span>Subtotal</span><span>${money(subtotal)}</span></div>
-      <div class="summary-line"><span>Shipping</span><span>${shipping === 0 ? 'FREE' : money(shipping)}</span></div>
-      <div class="summary-line"><span>NYC sales tax (8.875%)</span><span>${money(tax)}</span></div>
+      <div class="summary-line"><span>Delivery</span><span>${shipping === 0 ? 'Free' : money(shipping)}</span></div>
+      <div class="summary-line"><span>Sales tax, 8.875%</span><span>${money(tax)}</span></div>
       <div class="summary-total"><span>Total</span><span>${money(subtotal + shipping + tax)}</span></div>`;
   }
 

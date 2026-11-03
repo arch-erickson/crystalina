@@ -40,8 +40,9 @@ markup, look for the component. If it half exists, extend it.
 
 The free shipping threshold has one home since 2026-11-03: the
 `shipping_policy` row, read by `create_order` and `Store.shippingPolicy()`.
-Never write `99` or `9.99` into arithmetic again; the sentences of copy
-that say "$99" are the last copies. Two things still have no single home:
+Never write `99` or `9.99` into arithmetic again, and in prose wrap the
+figure as `<span data-ship-threshold>$99</span>`, which `main.js` fills from
+the row. Two things still have no single home:
 the schema.org `sameAs` list that repeats the footer's social links, and
 the five blocks of repeatable items inside home page sections.
 See "One definition, read everywhere" in the blueprint.

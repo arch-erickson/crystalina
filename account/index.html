@@ -71,16 +71,11 @@
   document.getElementById('signOutBtn').addEventListener('click', () => { Store.signOut(); location.href = '/'; });
 
   const ordersWrap = document.getElementById('ordersWrap');
-  const emptyState = '<p style="color:var(--muted);font-size:.9rem;">No orders yet. <a href="/shop/" class="link">Start shopping →</a></p>';
-
-  const STATUS_LABELS = {
-    pending_payment: 'Pending payment', paid: 'Paid', processing: 'Processing',
-    shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded'
-  };
+  const emptyState = '<p style="color:var(--muted);font-size:.9rem;">No orders yet. <a href="/shop/" class="text-link">Shop the systems</a></p>';
 
   /* Orders come from Supabase and are scoped to this customer by RLS. */
   async function renderOrders() {
-    ordersWrap.innerHTML = '<p style="color:var(--muted);font-size:.9rem;">Loading your orders...</p>';
+    ordersWrap.innerHTML = '<p style="color:var(--muted);font-size:.9rem;">Finding your orders.</p>';
     try {
       const orders = await window.CrystalinaData.myOrders();
       if (!orders.length) { ordersWrap.innerHTML = emptyState; return; }
@@ -88,7 +83,7 @@
         <div class="order-card">
           <div class="order-head">
             <strong>Order ${escapeHTML(o.id)}</strong>
-            <span class="status-pill status-${escapeHTML(o.status)}">${escapeHTML(STATUS_LABELS[o.status] || o.status)}</span>
+            <span class="status-pill status-${escapeHTML(o.status)}">${escapeHTML(orderStatusLabel(o.status))}</span>
           </div>
           <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;">${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })} &middot; ${o.items.reduce((n, i) => n + i.qty, 0)} item(s) &middot; ${money(o.total)}</div>
           <div style="font-size:.84rem;">${o.items.map(i => `${escapeHTML(i.name)} &times; ${i.qty}`).join('<br>')}</div>
