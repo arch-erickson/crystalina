@@ -369,7 +369,6 @@ body.nav-open { overflow: hidden; }
 .testi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .testi { background: var(--silver-50); padding: 34px 30px 30px; display: flex; flex-direction: column; }
 .testi .quote-mark { font-family: var(--font-head); font-weight: var(--w-regular); font-size: 3rem; line-height: .5; color: var(--silver); display: block; height: 22px; }
-.testi .stars { color: var(--blue-400); letter-spacing: 3px; font-size: .8rem; margin-bottom: 16px; }
 .testi p { font-family: var(--font-head); font-size: 1.08rem; line-height: 1.55; color: var(--navy-800); margin-bottom: 22px; flex: 1; }
 .testi .who { display: flex; align-items: center; gap: 12px; }
 .testi .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--navy-800); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: var(--w-semibold); font-size: .78rem; letter-spacing: .06em; }
@@ -2299,8 +2298,6 @@ body.viewer-open { overflow: hidden; }
 .quiz-opts button:hover .quiz-opt-ic { background: var(--navy-800); color: #fff; }
 
 /* ---------- product perks with icons ---------- */
-.pd-perk { display: flex; align-items: center; gap: 11px; font-size: .88rem; color: var(--ink); }
-.pd-perk .ic { color: var(--blue-500); width: 1.35em; height: 1.35em; flex: none; }
 
 /* ---------- scroll reveal (subtle, always-on) ---------- */
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s var(--wipe-ease), transform .7s var(--wipe-ease); will-change: opacity, transform; }
