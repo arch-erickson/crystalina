@@ -167,7 +167,7 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | Order receipt | /order/?id= | Implemented | Implemented | No order can be placed until payment exists, so the page has only its signed-out, missing and not-found states to show today Checkout should land here once an order is created |
 | Not found | /404.html | Implemented | Implemented | Nothing. No server work needed |
 | Sign in | /signin/ | Implemented | Implemented | Store.signUp and Store.signIn stubs are still exported from js/store.js and must be retired |
-| Account | /account/ | Implemented | Refactor | Gates on Store.currentUser() from localStorage and does not load js/auth.js at all |
+| Account | /account/ | Implemented | Refactor | The first gate is still the local key, read before the page paints; the real answer comes from Supabase a moment later. Browser-side either way, which is U1 |
 | Admin console | /admin/ | Implemented | Partial | About thirty record-text interpolations reach innerHTML unescaped (F3) Gated on localStorage, not on the session (F4, U1) No screen for stage options or faucet assignment |
 | Manager | /manager/ | Implemented | Partial | Same localStorage gate as every other private page (F4) |
 | Sales | /sales/ | Implemented | Partial | Cart recovery sends nothing: no scheduled job exists Same localStorage gate (F4) |
@@ -469,7 +469,7 @@ _Finding · Store.currentUser(), not a session._
 
 The five staff pages and /account/ decide what to show by reading Store.currentUser() out of localStorage and checking a roles array on it. js/auth.js, which holds the real Supabase session, is loaded on the staff pages for sign-out, the role switcher and the staff directory only, and /account/ does not load it at all. Row level security still refuses the data, so the exposure is what the page draws before any query returns, not the rows themselves.
 
-Refactor. The protection that matters is in the database and is in place. The gate in front of it is markup, and markup is a suggestion. Nobody has yet signed in as an ordinary customer and looked, which is U1.
+Refactor. The protection that matters is in the database and is in place, and since 2026-11-03 tests/data-boundary.test.mjs proves it on every build. The gate in front of it is markup, and markup is a suggestion. /account/ now asks Supabase as well as localStorage and signs out of the Supabase session, which was the one place a customer could be left signed in on a shared machine; the staff pages already did both. What remains of U1 is the call of the owner on Cloudflare Access.
 
 - **Waiting on the answer to.** U1 · Does opening /admin/ as an ordinary customer expose anything at all?
 - **Closed by.** P4 · Finish the auth migration
@@ -717,14 +717,14 @@ _Page · /account/._
 
 A customer's own orders. The rows come back under row level security, so the data is right even though the gate is not.
 
-Refactor. It is the clearest example of F4: the page decides whether to render from localStorage, and signs out by deleting a local key rather than ending the Supabase session.
+Refactor, and no longer the clearest example of F4. Fixed 2026-11-03 (c17e6aa): the page loads js/auth.js, asks Supabase whether anyone is signed in and clears a stale local key when the answer is no, and Sign out ends the Supabase session before clearing the local keys, in a finally, so a failed network call still signs the person out of this browser. Before that, Sign out deleted the local key and left the refresh token, so the next person at a shared machine was signed in as the last. Checked here with no session and with a stale key: both redirect to sign in and the key is cleared. The sign-out path itself needs a real customer session to exercise.
 
 - **Reached from.** Checkout (order placed); Sign in (customer)
 - **See also.** The gate in front of every private page is localStorage; P4 · Finish the auth migration; Order receipt
 - **Design.** Implemented
 - **Server.** Refactor
 - **Backend built.** Order history read under row level security Since 2026-11-03: who you are on the left with text links, orders as hairline rows with the shared status pill and a link to the receipt and where it is; the status words come from ORDER_STATUS_LABELS
-- **Remaining.** Gates on Store.currentUser() from localStorage and does not load js/auth.js at all
+- **Remaining.** The first gate is still the local key, read before the page paints; the real answer comes from Supabase a moment later. Browser-side either way, which is U1
 
 #### Admin console · Partial
 

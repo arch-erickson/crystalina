@@ -112,7 +112,7 @@ export const findings = [
     detail: 'Store.currentUser(), not a session',
     status: 'Refactor',
     what: 'The five staff pages and /account/ decide what to show by reading Store.currentUser() out of localStorage and checking a roles array on it. js/auth.js, which holds the real Supabase session, is loaded on the staff pages for sign-out, the role switcher and the staff directory only, and /account/ does not load it at all. Row level security still refuses the data, so the exposure is what the page draws before any query returns, not the rows themselves.',
-    why: 'Refactor. The protection that matters is in the database and is in place, and since 2026-11-03 tests/data-boundary.test.mjs proves it on every build. The gate in front of it is markup, and markup is a suggestion. /account/ now asks Supabase as well as localStorage and signs out of the Supabase session, which was the one place a customer could be left signed in on a shared machine; the staff pages already did both. What remains of U1 is the owner's call on Cloudflare Access.',
+    why: 'Refactor. The protection that matters is in the database and is in place, and since 2026-11-03 tests/data-boundary.test.mjs proves it on every build. The gate in front of it is markup, and markup is a suggestion. /account/ now asks Supabase as well as localStorage and signs out of the Supabase session, which was the one place a customer could be left signed in on a shared machine; the staff pages already did both. What remains of U1 is the call of the owner on Cloudflare Access.',
     fixedBy: ['phase:P4'],
     rel: ['unknown:U1', 'risk:R4', 'flow:identity'],
   },
