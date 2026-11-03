@@ -33,7 +33,7 @@ const Store = (() => {
       heroEyebrow: "NYC's Home Water Filtration Company",
       heroHeading: 'Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.',
       heroBody: "NYC's water is great at the reservoir, but old mains, aging building pipes, and pre-1961 lead solder stand between it and your glass. Crystalina filters are engineered for exactly that.",
-      heroImage: '/images/hero-bg.webp', announcement: 'Free shipping on orders over $99, delivered anywhere in the five boroughs'
+      heroImage: '/images/hero-bg.webp', announcement: 'Free delivery in the five boroughs on orders over $99'
     };
   }
 

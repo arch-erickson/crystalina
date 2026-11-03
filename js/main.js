@@ -153,7 +153,7 @@ function renderHeader(active = '') {
   el.className = 'site-top' + (overlay ? ' site-top--overlay' : '');
   el.innerHTML = `
   <div class="announce-bar">
-    <span>${icon('droplet')} Free shipping on orders over $99, delivered anywhere in the five boroughs</span>
+    <span>${icon('droplet')} Free delivery in the five boroughs on orders over $99</span>
   </div>
   <header class="site-header${overlay ? ' is-transparent' : ''}">
     <div class="container header-inner">
@@ -548,7 +548,7 @@ function renderFooter() {
     <div class="container footer-cta-inner">
       <div>
         <h3>Join the Crystalina Club</h3>
-        <p>Filter change reminders, NYC water quality alerts, and members-only pricing.</p>
+        <p>A note when a filter is due, and the Water Facts as they change. Nothing else.</p>
       </div>
       <form class="newsletter" id="newsletterForm">
         <input type="email" placeholder="Your email address" required>
@@ -572,8 +572,8 @@ function renderFooter() {
     <div>
       <h4>Learn</h4>
       <a href="/nyc-water/">Water Facts</a>
-      <a href="/quiz/">Find Your Filter</a>
-      <a href="/about/">Our Story</a>
+      <a href="/quiz/">Find your filter</a>
+      <a href="/about/">About</a>
       <a href="/contact/#faq">FAQ</a>
     </div>
     <div>
