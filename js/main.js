@@ -614,7 +614,7 @@ function renderFooter() {
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
       <span>© ${new Date().getFullYear()} ${escapeHTML(companyName.replace(/\.$/, ''))}. All rights reserved. Proudly serving the five boroughs.</span>
-      <span class="footer-links"><a href="/privacy/">Privacy Policy</a> · <a href="/terms/">Terms of Service</a> · <a href="/shipping-returns/">Shipping and Returns</a> · <a href="/signin/?mode=staff">Staff sign in</a></span>
+      <span class="footer-links"><a href="/signin/?mode=staff">Staff sign in</a></span>
     </div>
   </div>`;
   document.body.appendChild(el);

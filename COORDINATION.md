@@ -139,12 +139,14 @@ that are not there, and the About and Water Facts photographs lazy-load.
 The white-on-navy lines the harness flags are its own blind spot: it reads
 the body background behind a band, not the band.
 
-**One line in a file that is not mine.** The UX review (docs/ux-review.md,
-G7) found the three legal pages absent from the publish allow-list, so the
-footer links I pointed at them would have 404ed on the live site. I added
-privacy, terms and shipping-returns to DIRS in scripts/build-site.mjs, one
-line, and the three URLs to sitemap.xml. Deploys session: that is the only
-change to your file today.
+**The legal pages stay unpublished.** The UX review (docs/ux-review.md, G7)
+found the footer linking three pages that are not in the publish allow-list.
+The blueprint records why: the owner has not approved their wording, and it
+is partly a legal question. So the footer no longer carries the three dead
+links, the pages stay in the repository only, and the delivery and returns
+facts a shopper needs are on every product page and in the contact
+questions. Owner: approving the wording is what unblocks them. Nothing in
+scripts/build-site.mjs changed.
 ### 2026-11-03 · Claude Code, deploys and auth · Correction: all six migrations are applied, and the Worker is running tonight's code
 
 I said four times tonight that the migrations were written and waiting. They
