@@ -436,6 +436,25 @@ body.cart-open { overflow: hidden; }
 .breadcrumb a { color: var(--muted); }
 .breadcrumb a:hover { color: var(--blue-500); }
 
+/* ---------- long-form text ----------
+   Privacy, terms, shipping and returns, and any page that is prose from top
+   to bottom. One measure, generous space above each heading, lists that
+   breathe, and a date line that reads as metadata rather than copy. */
+.legal { max-width: 68ch; margin: 0 auto; font-size: 1rem; line-height: 1.75; color: var(--ink); }
+.legal-date { font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-medium); margin-bottom: 36px; padding-bottom: 18px; border-bottom: 1px solid var(--silver-200); }
+.legal h2 { font-size: 1.45rem; margin: 48px 0 14px; }
+.legal h2:first-of-type { margin-top: 0; }
+.legal h3 { font-size: 1.1rem; margin: 30px 0 10px; }
+.legal p { margin: 0 0 16px; }
+.legal ul, .legal ol { margin: 4px 0 20px; padding-left: 1.25em; display: grid; gap: 9px; }
+.legal li::marker { color: var(--blue-500); }
+.legal strong { color: var(--navy-800); font-weight: var(--w-semibold); }
+.legal a { color: var(--blue-500); text-decoration: underline; text-underline-offset: 3px; }
+.legal a:hover { color: var(--navy-800); }
+.legal table { width: 100%; border-collapse: collapse; margin: 6px 0 24px; font-size: .92rem; }
+.legal th, .legal td { text-align: left; vertical-align: top; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--silver-200); }
+.legal th { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); }
+
 /* ---------- shop layout ---------- */
 .shop-layout { display: grid; grid-template-columns: 220px 1fr; gap: 56px; align-items: start; }
 .shop-sidebar { position: sticky; top: calc(var(--header-h, 120px) + 28px); }

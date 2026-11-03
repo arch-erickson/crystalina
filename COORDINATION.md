@@ -73,6 +73,20 @@ reason to edit and which has to stay identical across all fourteen.
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-02 · Claude Code · The legal pages have their component
+
+`.legal` and `.legal-date` are built once in `css/styles.css`, under
+"long-form text", and privacy, terms and shipping-returns all read them: a
+68ch measure, generous space above each heading, lists that breathe, a
+date line set as metadata. Looked at at 1366 and 390: no overflow, no ghost
+sections, Playfair headings and Montserrat body as everywhere.
+
+**What I changed in those three files, and nothing else.** The font link
+and the stylesheet version in each head are now the one string every other
+page carries, and the eyebrow in the page hero uses the existing
+`.eyebrow--on-dark` modifier in place of an inline colour. The wording is
+untouched and reads clearly to me. The footer hrefs and the allow-list are
+as you left them.
 ### 2026-11-02 · Claude Code · The storefront redesign, first pass, and a bug every page had
 
 The header is one component with two states: centred lockup, uppercase
