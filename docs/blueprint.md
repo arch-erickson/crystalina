@@ -190,6 +190,9 @@ Captured 2026-11-03 at 1366, 834, 390 pixels wide.
 - **Account /account/**: [desktop](screens/page-account-desktop.webp), [tablet](screens/page-account-tablet.webp), [mobile](screens/page-account-mobile.webp)
 - **About /about/**: [desktop](screens/page-about-desktop.webp), [tablet](screens/page-about-tablet.webp), [mobile](screens/page-about-mobile.webp)
 - **Contact /contact/**: [desktop](screens/page-contact-desktop.webp), [tablet](screens/page-contact-tablet.webp), [mobile](screens/page-contact-mobile.webp)
+- **Manuals and guides /manuals/**: [desktop](screens/page-manuals-desktop.webp), [tablet](screens/page-manuals-tablet.webp), [mobile](screens/page-manuals-mobile.webp)
+- **Order receipt /order/**: [desktop](screens/page-order-desktop.webp), [tablet](screens/page-order-tablet.webp), [mobile](screens/page-order-mobile.webp)
+- **Not found /404.html**: [desktop](screens/page-not-found-desktop.webp), [tablet](screens/page-not-found-tablet.webp), [mobile](screens/page-not-found-mobile.webp)
 - **Privacy policy /privacy/**: [desktop](screens/page-privacy-desktop.webp), [tablet](screens/page-privacy-tablet.webp), [mobile](screens/page-privacy-mobile.webp)
 - **Terms of service /terms/**: [desktop](screens/page-terms-desktop.webp), [tablet](screens/page-terms-tablet.webp), [mobile](screens/page-terms-mobile.webp)
 - **Shipping and returns /shipping-returns/**: [desktop](screens/page-shipping-desktop.webp), [tablet](screens/page-shipping-tablet.webp), [mobile](screens/page-shipping-mobile.webp)
@@ -1989,13 +1992,13 @@ Implemented as of 2026-11-02 and verified against the live Worker. It is the fir
 - **See also.** AD10 · A Worker with static assets, because Cloudflare retired the Pages flow; Cloudflare Worker; Worker routes
 - **Owner.** Claude Code
 
-#### P3 · Stripe checkout and webhook · Missing
+#### P3 · Stripe checkout and webhook · Partial
 
-_Phase · Server repricing, signature check, idempotent write._
+_Phase · Built and deliberately off: two routes live, webhook is the source of truth, eighteen tests; keys, endpoint and migration are owner work._
 
 Two routes, a signature check and a write keyed on the Stripe event id, reusing create_order rather than recalculating anything in JavaScript.
 
-Missing, and it is now the largest thing between here and an open shop. Nothing else in the plan is blocked on anything that is not already done.
+Partial as of 2026-11-03. /api/checkout/session and /api/stripe/webhook answer on the Worker, create_order prices and holds stock first, Stripe is told only the total the database arrived at, and every write is keyed on the Stripe event id. The checkout button stays disabled until the owner sets the keys, registers the endpoint, applies the migration and rolls the old test key.
 
 - **Needs first.** P2 · Run /api on Cloudflare
 - **Waiting on the answer to.** U3 · Which Resend sending domain, and is it verified?; U8 · How does Google Workspace on crystalina.org get unlocked, and what does the DNS move do to it?
@@ -2589,7 +2592,7 @@ _Decision · Decided 2026-11-02._
 
 Rewrites the home page, the shop head, the editor defaults in store.js and the navigation. The subject is what a household drinks every day and the quiet confidence of having taken care of it. Affordability is said as value, speed as ease, the product as care. NYC Water Facts becomes Water Facts.
 
-One voice in one commit, recorded in CLAUDE.md under Voice.
+One voice in one commit, recorded in CLAUDE.md under Voice, and tested against docs/voice-guide.md: facts over adjectives, never a tier or grade on our own products, every number with a source or on the claims register, half the words. The customer is mid-income New York, two thirds of it renting.
 
 - **See also.** Home; Shop
 - **Why we need it.** The previous copy led with the plumbing of the city and a problem. The owner wants to speak to people who care about their health and their family first, and to reach every household and budget, with New York water as the proof that we know what we are doing.

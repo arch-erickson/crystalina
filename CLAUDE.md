@@ -72,7 +72,10 @@ designer. The subject is health: what a household drinks every day, and the
 quiet confidence of having taken care of it. New York water is why we know
 what we are doing, not the headline. Affordability is said as value, never
 as cheapness; speed as ease; the product as care. Subtle and eloquent,
-never breathless. "Water Facts", not "NYC Water Facts".
+never breathless. "Water Facts", not "NYC Water Facts". **Every customer-facing
+line is checked against `docs/voice-guide.md` before it ships**: facts over
+adjectives, never a grade or a tier on our own products, every number with a
+source we can produce, half the words of the first draft.
 
 - **No em dashes or en dashes.** Use commas and full stops. Ranges read
   "1961 to 1990".

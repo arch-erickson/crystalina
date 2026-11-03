@@ -11,9 +11,11 @@
  * The site has to be served first:   npm run serve
  *
  * Every page and every home section is captured three times, at the three
- * viewports below, as webp. Pages are full height, sections are the element
- * alone. Scroll reveals are forced visible and transitions are switched off,
- * so the capture is the settled page and not a frame of it.
+ * viewports below, as webp. A page is captured as the device frame, what the
+ * screen shows at that size, not the whole scrollable strip; a home section
+ * is captured as the element alone, so anything further down that matters
+ * has its own frame. Scroll reveals are forced visible and transitions are
+ * switched off, so the capture is the settled page and not a frame of it.
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -101,8 +103,8 @@ for (const vp of VIEWPORTS) {
   for (const p of manifest.pages) {
     await settle(BASE + p.path);
     const file = `page-${p.slug}-${vp.name}.webp`;
-    await page.screenshot({ path: join(OUT, file), type: 'webp', quality: 82, fullPage: true });
-    const height = await page.evaluate(() => document.documentElement.scrollHeight);
+    await page.screenshot({ path: join(OUT, file), type: 'webp', quality: 82 });
+    const height = vp.height;
     if (vp.name === 'desktop') p.h1 = await page.evaluate(() => document.querySelector('h1')?.textContent.trim() || '');
     p.shots[vp.name] = { file, width: vp.width, height };
     console.log(`${vp.name.padEnd(8)} page     ${p.path.padEnd(14)} ${String(height).padStart(5)}px  ${file}`);

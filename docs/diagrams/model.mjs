@@ -1248,9 +1248,9 @@ export const phases = [
     rel: ['ad:AD10', 'now:worker', 'target:cffn'],
   },
   {
-    id: 'P3', family: 'green', icon: 'card', label: 'Stripe checkout and webhook', needs: ['P2'], status: 'Missing', col: 2, row: 0, owner: 'Claude Code', detail: 'Server repricing, signature check, idempotent write',
+    id: 'P3', family: 'green', icon: 'card', label: 'Stripe checkout and webhook', needs: ['P2'], status: 'Partial', col: 2, row: 0, owner: 'Claude Code', detail: 'Built and deliberately off: two routes live, webhook is the source of truth, eighteen tests; keys, endpoint and migration are owner work',
     what: 'Two routes, a signature check and a write keyed on the Stripe event id, reusing create_order rather than recalculating anything in JavaScript.',
-    why: 'Missing, and it is now the largest thing between here and an open shop. Nothing else in the plan is blocked on anything that is not already done.',
+    why: 'Partial as of 2026-11-03. /api/checkout/session and /api/stripe/webhook answer on the Worker, create_order prices and holds stock first, Stripe is told only the total the database arrived at, and every write is keyed on the Stripe event id. The checkout button stays disabled until the owner sets the keys, registers the endpoint, applies the migration and rolls the old test key.',
     rel: ['finding:F1', 'flow:payment', 'ad:AD4', 'risk:R2'],
   },
   {
@@ -1656,7 +1656,7 @@ export const decisions = [
     need: 'The previous copy led with the plumbing of the city and a problem. The owner wants to speak to people who care about their health and their family first, and to reach every household and budget, with New York water as the proof that we know what we are doing.',
     here: 'Copy that lives in index.html, in store.js and in site_content at once has to change in all three in one commit, or the editor quietly restores the old voice the next time it publishes.',
     costs: 'Rows already published in site_content still carry the old copy until they are republished from the editor. The hero hides its first sentence on phones, which the editor must respect: the rule is in applyPageSections.',
-    now: 'One voice in one commit, recorded in CLAUDE.md under Voice.',
+    now: 'One voice in one commit, recorded in CLAUDE.md under Voice, and tested against docs/voice-guide.md: facts over adjectives, never a tier or grade on our own products, every number with a source or on the claims register, half the words. The customer is mid-income New York, two thirds of it renting.',
     replace: 'The owner changes the positioning again. Then the same three places move together.',
     rel: ['page:home', 'page:shop'],
   },
