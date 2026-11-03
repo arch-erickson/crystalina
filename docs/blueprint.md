@@ -164,6 +164,7 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | Privacy policy | /privacy/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
 | Terms of service | /terms/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
 | Shipping and returns | /shipping-returns/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
+| Manuals and guides | /manuals/ | Implemented | Missing | No manual file exists yet: each product resolves to /manuals/files/<slug>.pdf and the page checks the address when it loads Nothing on the server. No server work needed |
 | Sign in | /signin/ | Implemented | Implemented | Store.signUp and Store.signIn stubs are still exported from js/store.js and must be retired |
 | Account | /account/ | Implemented | Refactor | Gates on Store.currentUser() from localStorage and does not load js/auth.js at all |
 | Admin console | /admin/ | Implemented | Partial | About thirty record-text interpolations reach innerHTML unescaped (F3) Gated on localStorage, not on the session (F4, U1) No screen for stage options or faucet assignment |
@@ -463,7 +464,7 @@ Implemented on the server side, and reading as mostly sold out because of the da
 
 - **Reached from.** Home (browse); NYC water (shop); Admin console (price, stock, copy)
 - **Links to.** Product (open)
-- **See also.** The catalogue is schema-complete and data-empty; products; P7 · Seed the catalogue; Customer browser; AD11 · The voice turns to health, and New York water becomes the reason rather than the headline
+- **See also.** The catalogue is schema-complete and data-empty; products; P7 · Seed the catalogue; Customer browser; Manuals and guides; AD11 · The voice turns to health, and New York water becomes the reason rather than the headline
 - **Design.** Implemented
 - **Server.** Implemented
 - **Backend built.** Catalog, filter, search and sort read from Supabase
@@ -479,7 +480,7 @@ Partial. Both configuration controls are built, priced server-side in create_ord
 
 - **Reached from.** Shop (open); Find your filter (recommended)
 - **Links to.** Checkout (add to cart); Sign in (sign in to buy)
-- **See also.** The catalogue is schema-complete and data-empty; product_stage_options; P7 · Seed the catalogue
+- **See also.** The catalogue is schema-complete and data-empty; product_stage_options; P7 · Seed the catalogue; Manuals and guides
 - **Design.** Implemented
 - **Server.** Partial
 - **Backend built.** Product, specs, compatibility and bundle relationships Related products
@@ -600,6 +601,20 @@ Drafted and styled, not published. The wording is under review and is partly a l
 - **Server.** Missing
 - **Backend built.** Delivery areas, timing, the free shipping threshold and the return window Set in the long-form text component shared by every legal page
 - **Remaining.** Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed
+
+#### Manuals and guides · Missing
+
+_Page · /manuals/._
+
+The manual for every system, found by product, model or category, read in the page or kept as a file.
+
+Implemented as a page; empty as a library. The files are the owner's to add, one per product slug, and the page needs no change when they arrive.
+
+- **See also.** Product; Shop
+- **Design.** Implemented
+- **Server.** Missing
+- **Backend built.** Every product listed with its picture, model code and category, searchable by any of them A manual is read in a dialog or downloaded; one that is not on the server yet can be requested by email
+- **Remaining.** No manual file exists yet: each product resolves to /manuals/files/<slug>.pdf and the page checks the address when it loads Nothing on the server. No server work needed
 
 #### Sign in · Implemented
 

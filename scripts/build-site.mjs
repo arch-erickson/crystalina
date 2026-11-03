@@ -31,7 +31,7 @@ const DIST = join(ROOT, 'dist');
 const DIRS = [
   'css', 'js', 'images',
   'about', 'account', 'admin', 'checkout', 'contact', 'manager', 'nyc-water',
-  'product', 'quiz', 'sales', 'shop', 'signin', 'technician',
+  'manuals', 'product', 'quiz', 'sales', 'shop', 'signin', 'technician',
 ];
 
 /* Single files at the root. Each one is here because something depends on it

@@ -682,6 +682,15 @@ export const pages = [
     rel: ['page:home'],
   },
   {
+    id: 'manuals', icon: 'page', label: 'Manuals and guides', route: '/manuals/', area: 'client', col: 1, row: 3,
+    design: 'Implemented', server: 'Missing',
+    built: ['Every product listed with its picture, model code and category, searchable by any of them', 'A manual is read in a dialog or downloaded; one that is not on the server yet can be requested by email'],
+    remaining: ['No manual file exists yet: each product resolves to /manuals/files/<slug>.pdf and the page checks the address when it loads', 'Nothing on the server. No server work needed'],
+    what: 'The manual for every system, found by product, model or category, read in the page or kept as a file.',
+    why: 'Implemented as a page; empty as a library. The files are the owner\'s to add, one per product slug, and the page needs no change when they arrive.',
+    rel: ['page:product', 'page:shop'],
+  },
+  {
     id: 'signin', icon: 'key', label: 'Sign in', route: '/signin/', area: 'client', col: 2, row: 1,
     design: 'Implemented', server: 'Implemented',
     built: ['CrystalinaAuth on Supabase Auth: a code by email, or Continue with Google', 'Real sessions and a JWT on every query'],

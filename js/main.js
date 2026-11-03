@@ -99,6 +99,7 @@ const NAV_LINKS = [
       { title: 'Help choosing', links: [
         { label: 'Find your filter', href: '/quiz/', desc: 'Five questions, one answer' },
         { label: 'Water facts', href: '/nyc-water/', desc: 'What is in the tap, and why it matters' },
+        { label: 'Manuals and guides', href: '/manuals/', desc: 'Every manual, to read or keep' },
         { label: 'Talk to us', href: '/contact/', desc: 'Call, WhatsApp or visit' },
       ] },
     ],
@@ -553,6 +554,7 @@ function renderFooter() {
     </div>
     <div>
       <h4>Support</h4>
+      <a href="/manuals/">Manuals and Guides</a>
       <a href="/contact/">Contact Us</a>
       <a href="/account/">My Account</a>
       <a href="${telHref}">${escapeHTML(companyPhone)}</a>
