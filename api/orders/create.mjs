@@ -1,7 +1,22 @@
 /* POST /api/orders/create
-   Server-authoritative order creation. The browser sends product ids and
-   quantities only; the database recomputes every price and total, enforces
-   stock, and decrements inventory in one transaction. */
+ *
+ * Server-authoritative order creation. The browser sends product ids and
+ * quantities only; the database recomputes every price and total,
+ * enforces stock, and decrements inventory in one transaction.
+ *
+ * **This route closes itself when payment exists.** It creates an order
+ * and holds the stock without taking any money, which was harmless while
+ * nothing could take money: an unpaid order is not shipped. The moment
+ * Stripe is configured it stops being harmless, because anyone with an
+ * account could call it in a loop and hold every unit in the catalogue
+ * without ever paying, and that is a shop with nothing left to sell.
+ *
+ * So once STRIPE_SECRET_KEY is set, this answers 410 and the only way to
+ * an order is /api/checkout/session, which creates the order and the
+ * payment together. The gate is the presence of the key rather than a
+ * separate switch, so it cannot be forgotten: turning payment on turns
+ * this off, in the same action.
+ */
 import { json, methodGuard, readJson, clientIp, rateLimit, durableRateLimit, cleanText } from '../_lib/http.mjs';
 import { verifyTurnstile } from '../_lib/turnstile.mjs';
 import { userFromToken, rpcAsUser } from '../_lib/supabase.mjs';
@@ -11,6 +26,13 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 
 export default async function handler(req, res) {
   if (!methodGuard(req, res)) return;
+
+  if (process.env.STRIPE_SECRET_KEY) {
+    return json(res, 410, {
+      error: 'Checkout has moved. Please refresh the page and try again.',
+    });
+  }
+
   const ip = clientIp(req);
   if (!(await durableRateLimit(`order:${ip}`, { limit: 10, windowMs: 10 * 60000 })).allowed) {
     return json(res, 429, { error: 'Too many attempts in a short time. Wait a minute and try again.' });
