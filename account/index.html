@@ -26,16 +26,18 @@
 
   <section class="section">
     <div class="container account-grid" id="acctGrid">
-      <div class="panel">
+      <aside class="acct-side">
         <h3 id="acctName"></h3>
-        <p style="font-size:.86rem;color:var(--muted);" id="acctEmail"></p>
-        <hr style="border:none;border-top:1px solid #e4ecf6;margin:18px 0;">
-        <a href="/shop/" class="btn btn-outline btn-block btn-sm" style="margin-bottom:10px;">Shop Filters</a>
-        <a href="/quiz/" class="btn btn-outline btn-block btn-sm" style="margin-bottom:10px;">Find Your Filter</a>
-        <button class="btn btn-danger btn-block btn-sm" id="signOutBtn">Sign Out</button>
-      </div>
-      <div class="panel">
-        <h3>Order History</h3>
+        <p class="acct-email" id="acctEmail"></p>
+        <ul class="acct-links">
+          <li><a href="/shop/" class="text-link">The systems</a></li>
+          <li><a href="/manuals/" class="text-link">Manuals and guides</a></li>
+          <li><a href="/quiz/" class="text-link">Find your filter</a></li>
+          <li><button type="button" class="text-link text-link--quiet" id="signOutBtn">Sign out</button></li>
+        </ul>
+      </aside>
+      <div class="acct-orders">
+        <h3>Your orders</h3>
         <div id="ordersWrap"></div>
       </div>
     </div>
@@ -74,11 +76,11 @@
   document.getElementById('signOutBtn').addEventListener('click', () => { Store.signOut(); location.href = '/'; });
 
   const ordersWrap = document.getElementById('ordersWrap');
-  const emptyState = '<p style="color:var(--muted);font-size:.9rem;">No orders yet. <a href="/shop/" class="text-link">Shop the systems</a></p>';
+  const emptyState = '<p class="acct-empty">No orders yet. When you place one, its receipt and where it is appear here.</p>';
 
   /* Orders come from Supabase and are scoped to this customer by RLS. */
   async function renderOrders() {
-    ordersWrap.innerHTML = '<p style="color:var(--muted);font-size:.9rem;">Finding your orders.</p>';
+    ordersWrap.innerHTML = '<p class="acct-empty">Finding your orders.</p>';
     try {
       const orders = await window.CrystalinaData.myOrders();
       if (!orders.length) { ordersWrap.innerHTML = emptyState; return; }
@@ -88,9 +90,9 @@
             <strong>Order ${escapeHTML(o.id)}</strong>
             <span class="status-pill status-${escapeHTML(o.status)}">${escapeHTML(orderStatusLabel(o.status))}</span>
           </div>
-          <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;">${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })} &middot; ${o.items.reduce((n, i) => n + i.qty, 0)} item(s) &middot; ${money(o.total)}</div>
-          <div style="font-size:.84rem;">${o.items.map(i => `${escapeHTML(i.name)} &times; ${i.qty}`).join('<br>')}</div>
-          <p style="margin-top:10px;"><a class="text-link" href="/order/?id=${encodeURIComponent(o.dbId)}">View receipt</a></p>
+          <div class="order-meta">${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })} &middot; ${o.items.reduce((n, i) => n + i.qty, 0)} item${o.items.reduce((n, i) => n + i.qty, 0) === 1 ? '' : 's'} &middot; ${money(o.total)}</div>
+          <div class="order-items">${o.items.map(i => `${escapeHTML(i.name)} &times; ${i.qty}`).join('<br>')}</div>
+          <p class="order-link"><a class="text-link" href="/order/?id=${encodeURIComponent(o.dbId)}">Receipt and where it is</a></p>
         </div>`).join('');
     } catch (error) {
       console.error('[account] order load failed', error);

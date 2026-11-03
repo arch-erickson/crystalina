@@ -728,9 +728,22 @@ body.viewer-open { overflow: hidden; }
 .order-success .big-check { width: 84px; height: 84px; border-radius: 50%; background: var(--success); color: #fff; font-size: 2.4rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 22px; }
 
 /* ---------- account ---------- */
-.account-grid { display: grid; grid-template-columns: 260px 1fr; gap: 32px; align-items: start; }
-.order-card { border: 1px solid #e4ecf6; border-radius: var(--radius-sm); padding: 18px 22px; margin-bottom: 14px; }
-.order-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; font-size: .86rem; }
+/* ---------- account ----------
+   Who you are on the left, your orders on the right as hairline rows. */
+.account-grid { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 64px; align-items: start; }
+.acct-side h3 { font-size: 1.15rem; margin-bottom: 4px; }
+.acct-email { color: var(--muted); font-size: .88rem; margin-bottom: 22px; word-break: break-word; }
+.acct-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; border-top: 1px solid var(--silver-200); padding-top: 18px; }
+.acct-links .text-link { background: none; border-top: 0; border-left: 0; border-right: 0; cursor: pointer; }
+.text-link--quiet { color: var(--muted); }
+.acct-orders h3 { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 4px; }
+.acct-empty { color: var(--muted); font-size: .92rem; padding: 18px 0; border-top: 1px solid var(--silver-200); }
+.order-card { padding: 18px 0; border-top: 1px solid var(--silver-200); }
+.order-card:last-child { border-bottom: 1px solid var(--silver-200); }
+.order-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; font-size: .95rem; color: var(--navy-800); }
+.order-meta { font-size: .82rem; color: var(--muted); margin-bottom: 8px; }
+.order-items { font-size: .88rem; line-height: 1.6; }
+.order-link { margin-top: 12px; }
 /* The status pill, in the palette: silver for what is waiting, blue tint
    for what is moving, navy for what has arrived, and muted for what
    stopped. The class is the database value. */
@@ -2354,7 +2367,7 @@ body.viewer-open { overflow: hidden; }
   .cta-band--image { min-height: 480px; }
   .nyc-grid, .split, .pd-layout, .checkout-layout, .contact-grid, .account-grid { grid-template-columns: 1fr; }
   .pd-layout { gap: 28px; }
-  .checkout-layout, .contact-grid { gap: 36px; }
+  .checkout-layout, .contact-grid, .account-grid { gap: 36px; }
   .quiz-result { grid-template-columns: 120px minmax(0, 1fr); gap: 16px; }
   .co-summary { position: static; }
   .pd-media { position: static; }
