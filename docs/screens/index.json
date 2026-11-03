@@ -28,20 +28,20 @@
         "desktop": {
           "file": "page-home-desktop.webp",
           "width": 1366,
-          "height": 7997
+          "height": 7912
         },
         "tablet": {
           "file": "page-home-tablet.webp",
           "width": 834,
-          "height": 11487
+          "height": 11378
         },
         "mobile": {
           "file": "page-home-mobile.webp",
           "width": 390,
-          "height": 15064
+          "height": 14664
         }
       },
-      "h1": "Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem."
+      "h1": "Most of what your family drinks is water. Make it the purest thing in the house."
     },
     {
       "slug": "shop",
@@ -52,17 +52,17 @@
         "desktop": {
           "file": "page-shop-desktop.webp",
           "width": 1366,
-          "height": 4351
+          "height": 4114
         },
         "tablet": {
           "file": "page-shop-tablet.webp",
           "width": 834,
-          "height": 6911
+          "height": 6639
         },
         "mobile": {
           "file": "page-shop-mobile.webp",
           "width": 390,
-          "height": 12050
+          "height": 18859
         }
       },
       "h1": "Shop Filtration Systems"
@@ -76,17 +76,17 @@
         "desktop": {
           "file": "page-product-desktop.webp",
           "width": 1366,
-          "height": 1404
+          "height": 1324
         },
         "tablet": {
           "file": "page-product-tablet.webp",
           "width": 834,
-          "height": 1644
+          "height": 1564
         },
         "mobile": {
           "file": "page-product-mobile.webp",
           "width": 390,
-          "height": 2272
+          "height": 2192
         }
       },
       "h1": "Product not found"
@@ -100,17 +100,17 @@
         "desktop": {
           "file": "page-checkout-desktop.webp",
           "width": 1366,
-          "height": 1346
+          "height": 1266
         },
         "tablet": {
           "file": "page-checkout-tablet.webp",
           "width": 834,
-          "height": 1602
+          "height": 1522
         },
         "mobile": {
           "file": "page-checkout-mobile.webp",
           "width": 390,
-          "height": 2276
+          "height": 2196
         }
       },
       "h1": "Checkout"
@@ -124,20 +124,20 @@
         "desktop": {
           "file": "page-nyc-water-desktop.webp",
           "width": 1366,
-          "height": 4412
+          "height": 4316
         },
         "tablet": {
           "file": "page-nyc-water-tablet.webp",
           "width": 834,
-          "height": 5827
+          "height": 5684
         },
         "mobile": {
           "file": "page-nyc-water-mobile.webp",
           "width": 390,
-          "height": 7534
+          "height": 7372
         }
       },
-      "h1": "What's Really in NYC Tap Water?"
+      "h1": "What is in New York's water, and why it matters at home"
     },
     {
       "slug": "quiz",
@@ -148,17 +148,17 @@
         "desktop": {
           "file": "page-quiz-desktop.webp",
           "width": 1366,
-          "height": 1617
+          "height": 1537
         },
         "tablet": {
           "file": "page-quiz-tablet.webp",
           "width": 834,
-          "height": 1873
+          "height": 1793
         },
         "mobile": {
           "file": "page-quiz-mobile.webp",
           "width": 390,
-          "height": 2489
+          "height": 2409
         }
       },
       "h1": "Find Your Perfect Filter"
@@ -172,17 +172,17 @@
         "desktop": {
           "file": "page-signin-desktop.webp",
           "width": 1366,
-          "height": 1396
+          "height": 1316
         },
         "tablet": {
           "file": "page-signin-tablet.webp",
           "width": 834,
-          "height": 1682
+          "height": 1602
         },
         "mobile": {
           "file": "page-signin-mobile.webp",
           "width": 390,
-          "height": 2321
+          "height": 2241
         }
       },
       "h1": "Welcome back"
@@ -196,17 +196,17 @@
         "desktop": {
           "file": "page-account-desktop.webp",
           "width": 1366,
-          "height": 1396
+          "height": 1316
         },
         "tablet": {
           "file": "page-account-tablet.webp",
           "width": 834,
-          "height": 1682
+          "height": 1602
         },
         "mobile": {
           "file": "page-account-mobile.webp",
           "width": 390,
-          "height": 2321
+          "height": 2241
         }
       },
       "h1": "Welcome back"
@@ -220,17 +220,17 @@
         "desktop": {
           "file": "page-about-desktop.webp",
           "width": 1366,
-          "height": 2582
+          "height": 2485
         },
         "tablet": {
           "file": "page-about-tablet.webp",
           "width": 834,
-          "height": 3677
+          "height": 3534
         },
         "mobile": {
           "file": "page-about-mobile.webp",
           "width": 390,
-          "height": 4566
+          "height": 4382
         }
       },
       "h1": "Pure Water. Pure Life. Pure New York."
@@ -244,17 +244,17 @@
         "desktop": {
           "file": "page-contact-desktop.webp",
           "width": 1366,
-          "height": 1722
+          "height": 1642
         },
         "tablet": {
           "file": "page-contact-tablet.webp",
           "width": 834,
-          "height": 2616
+          "height": 2536
         },
         "mobile": {
           "file": "page-contact-mobile.webp",
           "width": 390,
-          "height": 3456
+          "height": 3376
         }
       },
       "h1": "Talk to a Real New Yorker"
@@ -268,17 +268,17 @@
         "desktop": {
           "file": "page-privacy-desktop.webp",
           "width": 1366,
-          "height": 2861
+          "height": 2781
         },
         "tablet": {
           "file": "page-privacy-tablet.webp",
           "width": 834,
-          "height": 3116
+          "height": 3036
         },
         "mobile": {
           "file": "page-privacy-mobile.webp",
           "width": 390,
-          "height": 4547
+          "height": 4467
         }
       },
       "h1": "Privacy Policy"
@@ -292,17 +292,17 @@
         "desktop": {
           "file": "page-terms-desktop.webp",
           "width": 1366,
-          "height": 2826
+          "height": 2746
         },
         "tablet": {
           "file": "page-terms-tablet.webp",
           "width": 834,
-          "height": 3082
+          "height": 3002
         },
         "mobile": {
           "file": "page-terms-mobile.webp",
           "width": 390,
-          "height": 4485
+          "height": 4405
         }
       },
       "h1": "Terms of Service"
@@ -316,17 +316,17 @@
         "desktop": {
           "file": "page-shipping-desktop.webp",
           "width": 1366,
-          "height": 2780
+          "height": 2700
         },
         "tablet": {
           "file": "page-shipping-tablet.webp",
           "width": 834,
-          "height": 3036
+          "height": 2956
         },
         "mobile": {
           "file": "page-shipping-mobile.webp",
           "width": 390,
-          "height": 4328
+          "height": 4248
         }
       },
       "h1": "Shipping and Returns"
@@ -340,17 +340,17 @@
         "desktop": {
           "file": "page-admin-desktop.webp",
           "width": 1366,
-          "height": 1326
+          "height": 1246
         },
         "tablet": {
           "file": "page-admin-tablet.webp",
           "width": 834,
-          "height": 1670
+          "height": 1590
         },
         "mobile": {
           "file": "page-admin-mobile.webp",
           "width": 390,
-          "height": 2251
+          "height": 2171
         }
       },
       "h1": "Staff sign in"
@@ -364,17 +364,17 @@
         "desktop": {
           "file": "page-manager-desktop.webp",
           "width": 1366,
-          "height": 1326
+          "height": 1246
         },
         "tablet": {
           "file": "page-manager-tablet.webp",
           "width": 834,
-          "height": 1670
+          "height": 1590
         },
         "mobile": {
           "file": "page-manager-mobile.webp",
           "width": 390,
-          "height": 2251
+          "height": 2171
         }
       },
       "h1": "Staff sign in"
@@ -388,17 +388,17 @@
         "desktop": {
           "file": "page-sales-desktop.webp",
           "width": 1366,
-          "height": 1326
+          "height": 1246
         },
         "tablet": {
           "file": "page-sales-tablet.webp",
           "width": 834,
-          "height": 1670
+          "height": 1590
         },
         "mobile": {
           "file": "page-sales-mobile.webp",
           "width": 390,
-          "height": 2251
+          "height": 2171
         }
       },
       "h1": "Staff sign in"
@@ -412,17 +412,17 @@
         "desktop": {
           "file": "page-technician-desktop.webp",
           "width": 1366,
-          "height": 1326
+          "height": 1246
         },
         "tablet": {
           "file": "page-technician-tablet.webp",
           "width": 834,
-          "height": 1670
+          "height": 1590
         },
         "mobile": {
           "file": "page-technician-mobile.webp",
           "width": 390,
-          "height": 2251
+          "height": 2171
         }
       },
       "h1": "Staff sign in"
@@ -431,7 +431,7 @@
   "sections": [
     {
       "slug": "hero",
-      "heading": "Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.",
+      "heading": "Most of what your family drinks is water. Make it the purest thing in the house.",
       "shots": {
         "desktop": {
           "file": "section-hero-desktop.webp",
@@ -457,12 +457,12 @@
         "desktop": {
           "file": "section-trust-desktop.webp",
           "width": 1366,
-          "height": 219
+          "height": 239
         },
         "tablet": {
           "file": "section-trust-tablet.webp",
           "width": 834,
-          "height": 257
+          "height": 350
         },
         "mobile": {
           "file": "section-trust-mobile.webp",
@@ -473,12 +473,12 @@
     },
     {
       "slug": "categories",
-      "heading": "The Right Filter for Every NYC Home",
+      "heading": "A system for every home, and every household.",
       "shots": {
         "desktop": {
           "file": "section-categories-desktop.webp",
           "width": 1366,
-          "height": 1190
+          "height": 1235
         },
         "tablet": {
           "file": "section-categories-tablet.webp",
@@ -488,55 +488,55 @@
         "mobile": {
           "file": "section-categories-mobile.webp",
           "width": 390,
-          "height": 2308
+          "height": 2335
         }
       }
     },
     {
       "slug": "anatomy",
-      "heading": "Crystalina H5-600 High-Flow UV Alkaline RO, Component by Component",
+      "heading": "Component by Component",
       "shots": {
         "desktop": {
           "file": "section-anatomy-desktop.webp",
           "width": 1366,
-          "height": 1025
+          "height": 980
         },
         "tablet": {
           "file": "section-anatomy-tablet.webp",
           "width": 834,
-          "height": 1487
+          "height": 1462
         },
         "mobile": {
           "file": "section-anatomy-mobile.webp",
           "width": 390,
-          "height": 1539
+          "height": 1502
         }
       }
     },
     {
       "slug": "best-sellers",
-      "heading": "Best Sellers in the Five Boroughs",
+      "heading": "What New York households choose",
       "shots": {
         "desktop": {
           "file": "section-best-sellers-desktop.webp",
           "width": 1366,
-          "height": 790
+          "height": 763
         },
         "tablet": {
           "file": "section-best-sellers-tablet.webp",
           "width": 834,
-          "height": 1486
+          "height": 1434
         },
         "mobile": {
           "file": "section-best-sellers-mobile.webp",
           "width": 390,
-          "height": 2582
+          "height": 2505
         }
       }
     },
     {
       "slug": "water-facts",
-      "heading": "NYC Water Is Famous. It's Also Complicated.",
+      "heading": "Good water is treated at the source. The last mile is yours.",
       "shots": {
         "desktop": {
           "file": "section-water-facts-desktop.webp",
@@ -551,13 +551,13 @@
         "mobile": {
           "file": "section-water-facts-mobile.webp",
           "width": 390,
-          "height": 1831
+          "height": 1694
         }
       }
     },
     {
       "slug": "process",
-      "heading": "From Tap to Crystal Clear in 4 Steps",
+      "heading": "Better water in four unhurried steps",
       "shots": {
         "desktop": {
           "file": "section-process-desktop.webp",
@@ -567,18 +567,18 @@
         "tablet": {
           "file": "section-process-tablet.webp",
           "width": 834,
-          "height": 689
+          "height": 644
         },
         "mobile": {
           "file": "section-process-mobile.webp",
           "width": 390,
-          "height": 1135
+          "height": 1090
         }
       }
     },
     {
       "slug": "why-crystalina",
-      "heading": "Built for the City. Backed for Life in It.",
+      "heading": "Made for New York, by people who drink it too.",
       "shots": {
         "desktop": {
           "file": "section-why-crystalina-desktop.webp",
@@ -593,13 +593,13 @@
         "mobile": {
           "file": "section-why-crystalina-mobile.webp",
           "width": 390,
-          "height": 1216
+          "height": 1165
         }
       }
     },
     {
       "slug": "testimonials",
-      "heading": "What Our Neighbors Are Saying",
+      "heading": "What our neighbors say",
       "shots": {
         "desktop": {
           "file": "section-testimonials-desktop.webp",
@@ -620,7 +620,7 @@
     },
     {
       "slug": "cta",
-      "heading": "Not Sure Which System Fits Your Home?",
+      "heading": "Not sure where to begin?",
       "shots": {
         "desktop": {
           "file": "section-cta-desktop.webp",

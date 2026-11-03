@@ -663,16 +663,16 @@ Captured 2026-11-03 at 1366, 834, 390 pixels wide.
 - **Technician /technician/**: [desktop](screens/page-technician-desktop.webp), [tablet](screens/page-technician-tablet.webp), [mobile](screens/page-technician-mobile.webp)
 
 ### The home page, section by section
-- **Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.**: [desktop](screens/section-hero-desktop.webp), [tablet](screens/section-hero-tablet.webp), [mobile](screens/section-hero-mobile.webp)
+- **Most of what your family drinks is water. Make it the purest thing in the house.**: [desktop](screens/section-hero-desktop.webp), [tablet](screens/section-hero-tablet.webp), [mobile](screens/section-hero-mobile.webp)
 - **trust**: [desktop](screens/section-trust-desktop.webp), [tablet](screens/section-trust-tablet.webp), [mobile](screens/section-trust-mobile.webp)
-- **The Right Filter for Every NYC Home**: [desktop](screens/section-categories-desktop.webp), [tablet](screens/section-categories-tablet.webp), [mobile](screens/section-categories-mobile.webp)
-- **Crystalina H5-600 High-Flow UV Alkaline RO, Component by Component**: [desktop](screens/section-anatomy-desktop.webp), [tablet](screens/section-anatomy-tablet.webp), [mobile](screens/section-anatomy-mobile.webp)
-- **Best Sellers in the Five Boroughs**: [desktop](screens/section-best-sellers-desktop.webp), [tablet](screens/section-best-sellers-tablet.webp), [mobile](screens/section-best-sellers-mobile.webp)
-- **NYC Water Is Famous. It's Also Complicated.**: [desktop](screens/section-water-facts-desktop.webp), [tablet](screens/section-water-facts-tablet.webp), [mobile](screens/section-water-facts-mobile.webp)
-- **From Tap to Crystal Clear in 4 Steps**: [desktop](screens/section-process-desktop.webp), [tablet](screens/section-process-tablet.webp), [mobile](screens/section-process-mobile.webp)
-- **Built for the City. Backed for Life in It.**: [desktop](screens/section-why-crystalina-desktop.webp), [tablet](screens/section-why-crystalina-tablet.webp), [mobile](screens/section-why-crystalina-mobile.webp)
-- **What Our Neighbors Are Saying**: [desktop](screens/section-testimonials-desktop.webp), [tablet](screens/section-testimonials-tablet.webp), [mobile](screens/section-testimonials-mobile.webp)
-- **Not Sure Which System Fits Your Home?**: [desktop](screens/section-cta-desktop.webp), [tablet](screens/section-cta-tablet.webp), [mobile](screens/section-cta-mobile.webp)
+- **A system for every home, and every household.**: [desktop](screens/section-categories-desktop.webp), [tablet](screens/section-categories-tablet.webp), [mobile](screens/section-categories-mobile.webp)
+- **Component by Component**: [desktop](screens/section-anatomy-desktop.webp), [tablet](screens/section-anatomy-tablet.webp), [mobile](screens/section-anatomy-mobile.webp)
+- **What New York households choose**: [desktop](screens/section-best-sellers-desktop.webp), [tablet](screens/section-best-sellers-tablet.webp), [mobile](screens/section-best-sellers-mobile.webp)
+- **Good water is treated at the source. The last mile is yours.**: [desktop](screens/section-water-facts-desktop.webp), [tablet](screens/section-water-facts-tablet.webp), [mobile](screens/section-water-facts-mobile.webp)
+- **Better water in four unhurried steps**: [desktop](screens/section-process-desktop.webp), [tablet](screens/section-process-tablet.webp), [mobile](screens/section-process-mobile.webp)
+- **Made for New York, by people who drink it too.**: [desktop](screens/section-why-crystalina-desktop.webp), [tablet](screens/section-why-crystalina-tablet.webp), [mobile](screens/section-why-crystalina-mobile.webp)
+- **What our neighbors say**: [desktop](screens/section-testimonials-desktop.webp), [tablet](screens/section-testimonials-tablet.webp), [mobile](screens/section-testimonials-mobile.webp)
+- **Not sure where to begin?**: [desktop](screens/section-cta-desktop.webp), [tablet](screens/section-cta-tablet.webp), [mobile](screens/section-cta-mobile.webp)
 
 > **Refreshing the captures**
 >

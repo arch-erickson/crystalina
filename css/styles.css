@@ -222,19 +222,33 @@ body.nav-open { overflow: hidden; }
 .band--silver { background: var(--silver-50); }
 .band--silver .section-head p { color: var(--muted); }
 
-/* ---------- hero (full-bleed background image) ---------- */
+/* ---------- photo wash ----------
+   The navy gradient that sits over a photograph so type can stand on it.
+   One component for any element that holds an image. The direction and
+   depth are the --wash property, so a variation is a value, never a second
+   gradient, and the photograph beneath can be replaced without touching it.
+   Children sit above the wash; the element itself only holds the image. */
+.wash { position: relative; isolation: isolate; }
+.wash::before { content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none; background: var(--wash); }
+.wash > * { position: relative; z-index: 1; }
+.wash { --wash: linear-gradient(90deg, rgba(11,30,54,.86) 0%, rgba(15,38,64,.62) 42%, rgba(21,55,93,.22) 74%, rgba(21,55,93,.06) 100%); }
+/* From the left, with a band at the top for the bar and at the bottom for the copy. */
+.wash--hero { --wash:
+  linear-gradient(90deg, rgba(11,30,54,.86) 0%, rgba(15,38,64,.62) 42%, rgba(21,55,93,.22) 74%, rgba(21,55,93,.06) 100%),
+  linear-gradient(180deg, rgba(11,30,54,.64) 0%, rgba(11,30,54,.2) 22%, rgba(11,30,54,.1) 46%, rgba(11,30,54,.42) 100%); }
+/* From the bottom, for copy that sits low on a portrait or a phone. */
+.wash--up { --wash: linear-gradient(180deg, rgba(11,30,54,.42) 0%, rgba(11,30,54,.12) 32%, rgba(11,30,54,.5) 62%, rgba(11,30,54,.94) 100%); }
+/* A light tint that only steadies a photograph, for images with a caption beneath. */
+.wash--soft { --wash: linear-gradient(180deg, rgba(11,30,54,.04) 0%, rgba(11,30,54,.18) 100%); }
+
+/* ---------- hero (full-bleed photograph) ---------- */
 .hero {
-  position: relative; color: #fff; overflow: hidden;
+  color: #fff; overflow: hidden;
   min-height: min(88vh, 820px); display: flex; align-items: center;
-  background:
-    linear-gradient(90deg, rgba(11,30,54,.86) 0%, rgba(15,38,64,.62) 42%, rgba(21,55,93,.22) 74%, rgba(21,55,93,.06) 100%),
-    linear-gradient(180deg, rgba(11,30,54,.64) 0%, rgba(11,30,54,.2) 22%, rgba(11,30,54,.1) 46%, rgba(11,30,54,.42) 100%),
-    var(--hero-image, none) center / cover no-repeat,
-    linear-gradient(120deg, var(--navy-900) 0%, var(--navy-700) 55%, var(--blue-500) 120%);
-  background-color: var(--navy-900);
+  background: var(--hero-image, none) center / cover no-repeat var(--navy-900);
 }
 .hero--full { min-height: 100svh; align-items: flex-end; }
-.hero-inner { padding: 72px 0; position: relative; z-index: 1; }
+.hero-inner { padding: 72px 0; }
 .hero--full .hero-inner { padding: 0 0 clamp(56px, 9vh, 112px); }
 .hero-content { max-width: 640px; }
 .hero-content h1, .hero-content .lead { text-shadow: 0 1px 18px rgba(7,20,40,.35); }
@@ -358,7 +372,7 @@ body.nav-open { overflow: hidden; }
 .cta-band h2 { color: #fff; font-size: clamp(1.5rem, 2.8vw, 2.2rem); margin-bottom: 8px; }
 .cta-band p { color: #cfe3fb; max-width: 560px; }
 .cta-section { padding: 0; }
-.cta-band--image { border-radius: 0; box-shadow: none; padding: 0; display: flex; align-items: flex-end; min-height: 560px; background: linear-gradient(90deg, rgba(11,30,54,.82) 0%, rgba(21,55,93,.45) 55%, rgba(21,55,93,.15) 100%), var(--cta-image, none) center / cover no-repeat, var(--navy-900); }
+.cta-band--image { border-radius: 0; box-shadow: none; padding: 0; display: flex; align-items: flex-end; min-height: 560px; background: var(--cta-image, none) center / cover no-repeat var(--navy-900); }
 .cta-inner { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex-wrap: wrap; padding: 0 0 72px; }
 .cta-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
@@ -2462,14 +2476,8 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
   .section { padding: 56px 0; }
   .band { padding: 60px 0; }
   .section-head--left, .section-head--row { margin-bottom: 26px; }
-  .hero--full {
-    min-height: 100svh;
-    background:
-      linear-gradient(180deg, rgba(11,30,54,.42) 0%, rgba(11,30,54,.12) 32%, rgba(11,30,54,.5) 62%, rgba(11,30,54,.94) 100%),
-      var(--hero-image, none) 60% 28% / cover no-repeat,
-      var(--navy-900);
-  }
-  .hero--full::after { display: none; }
+  .hero--full { min-height: 100svh; background-position: 60% 28%; }
+  .hero--full.wash--hero { --wash: linear-gradient(180deg, rgba(11,30,54,.42) 0%, rgba(11,30,54,.12) 32%, rgba(11,30,54,.5) 62%, rgba(11,30,54,.94) 100%); }
   .hero--full .hero-inner { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
   .hero-eyebrow { font-size: .66rem; letter-spacing: .16em; }
   .hero h1 { font-size: 2.3rem; margin: 12px 0 14px; }
