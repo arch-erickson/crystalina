@@ -176,6 +176,69 @@ floating objects, duplicated parts, impossible plumbing, low-res, jpeg artifacts
 Retry prepended: "Generate this exact technical exploded product photograph at native 3584 x 4096 pixel resolution. Required long edge at least 3840 pixels; this is a production master, not a thumbnail. Preserve composition with extra transparent margin above and below." References were the first draft and H5-600 studio photograph.
 
 
+### 2026-11-02 · Claude Code · The blueprint is now an inspector, and four of its claims were wrong
+
+**What changed.** `docs/diagrams/model.mjs` was rewritten, `scripts/lib/graph.mjs`
+and `scripts/lib/viewer.mjs` are new, and the blueprint went from 18 sections
+and 16 drawings to 20 sections and 23. Every card in every drawing now carries
+a registry key and opens a detail panel: what the thing is, why it has the
+status it has, what it depends on and what depends on it. Both dependency
+lists are derived from the edges in the model, never written out, so they
+cannot drift. The page still works with scripting off: the panels are real
+articles in an index at the foot.
+
+**Four claims the blueprint was carrying that are not true.** I checked each
+against the repository or the live hosts on 2026-11-02 and corrected them:
+
+1. **Only `js/admin.js` interpolates record text unescaped**, about thirty
+   times. `js/manager.js`, `js/sales.js`, `js/technician.js`,
+   `js/technician-route.js`, `js/admin-schedule.js` and `js/staff-schedule.js`
+   all escape theirs. The XSS finding is one file, not four. **This narrows
+   your sweep considerably.**
+2. **The free shipping threshold is on ten lines across six files**, not
+   three: six arithmetic sites including both versions of `create_order`, and
+   four sentences of copy. The `$9.99` flat fee is duplicated three times
+   beside it.
+3. **There are seventeen seeded products, not thirteen.** Four systems carry
+   `stock_quantity` 1; the nine filters and four bundles carry 0.
+4. **The server boundary works.** All three routes answer on
+   `crystalina.crystalina.workers.dev`: 405 on GET, 400 from the validators,
+   401 from the order route, 404 for an unknown `/api` path. P2 is
+   Implemented. `crystalina.vercel.app` is gone (404 DEPLOYMENT_NOT_FOUND),
+   so R11 drops to low.
+
+**What you need to do about it.**
+
+- **U8 is new and it is yours to raise with the owner, not to fix.** Google
+  Workspace on the domain is suspended behind a Squarespace reseller lock, so
+  `info@crystalina.org` is not receiving mail. Every contact notification is
+  being written and not read. It also sits on the same zone as the phase 5
+  nameserver move: record MX, SPF, DKIM and DMARC before that move.
+- **Turnstile is worse than absent, and this changes the order of your work.**
+  The verifier skips while the secret is unset, and no page renders a widget,
+  while `contact/index.html:102` reads a token from one that does not exist.
+  Setting `TURNSTILE_SECRET_KEY` today would refuse every real submission.
+  The widget has to land before the secret.
+- **`wrangler.toml` declares no environments at all.** If preview and
+  production are meant to differ, nothing in the repository says so yet. That
+  is U4 territory and it is yours.
+- **Whoever added `privacy/` and `terms/`: neither is published yet.**
+  Checked 2026-11-02: neither directory is named in `scripts/build-site.mjs`,
+  so neither reaches `dist/` and neither would answer on the live Worker.
+  `js/main.js:436` also still points all three footer legal links at `"#"`,
+  and there is no `shipping/` page for the third one. Two lines in the
+  allow-list and one line in the footer finish it. I did not make those
+  changes because that work is plainly in flight.
+- Nothing under `api/`, `functions/`, `supabase/`, `worker.js`,
+  `wrangler.toml`, `css/`, `js/` or any page outside `docs/` was touched. I
+  only read them.
+
+**What I could not verify.** Whether the Supabase keys are actually set on
+the Worker: my probes stop at the validator, before any Supabase call. The
+owner reports a 200 from both forms on the same day, and that is recorded as
+their report rather than as my check. The live database is still on the
+2026-08-31 reading, so the live rows may have moved away from the migrations.
+
 ### 2026-11-02 · Claude Code · The deploy path changed, and the token is gone
 
 Cloudflare Pages now deploys from its own Git connection. `.github/workflows/deploy.yml`

@@ -21,14 +21,38 @@ import {
 } from './lib/svg.mjs';
 import {
   Card, StatusCard, PageCard, TableCard, Lane, FailurePanel, NotePanel,
-  ZonePanel, Connector, SectionRule, halo, toneOf, COMPONENTS,
+  ZonePanel, Connector, SectionRule, halo, toneOf, nodeWrap, edgeWrap,
+  StepBadge, COMPONENTS,
 } from './lib/components.mjs';
+import { key as K, buildGraph } from './lib/graph.mjs';
 import { beginDoc, spriteUsed, usedNames, iconNames, use as useIcon } from './lib/icons.mjs';
 import { Board, sequence, roundPath } from './lib/board.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = join(HERE, '..', 'docs', 'diagrams');
 const asOf = M.meta.asOf;
+
+/* The registry, so a drawing can label a card that belongs to another
+   drawing without writing that label out a second time. */
+const G = buildGraph(M);
+const labelOf = (key) => (G.get(key) ? G.get(key).label : key);
+const statusOf = (key) => (G.get(key) ? G.get(key).status : null);
+
+/* The short name a cross-reference chip carries. Where a thing already has
+   a number the project uses in conversation, that number is the clearest
+   label there is; everything else gets the first few words of its name. */
+function shortOf(key) {
+  const tail = key.slice(key.indexOf(':') + 1);
+  if (/^(F|P|R|U|AD)\d+$/.test(tail)) return tail;
+  const label = labelOf(key).split(' · ').pop();
+  const words = label.split(/[,(:]/)[0].trim().split(' ');
+  let out = words.shift();
+  for (const word of words) {
+    if ((out + ' ' + word).length > 24) break;
+    out += ' ' + word;
+  }
+  return out;
+}
 const CHECK = process.argv.includes('--check');
 let WRITE = true;
 
@@ -70,7 +94,7 @@ function architecture(key, phase) {
   const w = x - GAPX + 34;
 
   const fr = frame({ title: phase.title, note: phase.note, asOf, w });
-  const board = new Board(w);
+  const board = new Board(w, { ns: `${key}:` });
   const colY = {};
   for (const c of cols) colY[c] = fr.bottom + 58;
 
@@ -161,7 +185,9 @@ function channels() {
     bodyCards += line(x, top - 6, x + CARD, top - 6, { stroke: T.blueLight });
     let yy = top + 12;
     for (const item of g.items) {
-      const card = StatusCard(CARD, { ...item, status: item.wired }, { titleSize: 12.5 });
+      const card = StatusCard(CARD, {
+        ...item, id: K.asset(item.id), status: item.wired, note: null,
+      }, { titleSize: 12.5 });
       bodyCards += card.draw(x, yy);
       yy += card.h + 10;
     }
@@ -193,7 +219,7 @@ function sitemap() {
   const note = 'Every page, the state of the server work behind it, and what a visitor or a staff member actually clicks. Menu, search and footer links are left out on purpose: drawn, they turn the arrows into a web. Dashed arrows are staff actions that reach a customer page.';
   const fr = frame({ title: 'Site map, with a status on every page', note, asOf, w });
 
-  const made = M.pages.map((p) => ({ p, card: PageCard(CARD, p) }));
+  const made = M.pages.map((p) => ({ p, card: PageCard(CARD, { ...p, key: K.page(p.id) }) }));
   const areas = [
     { id: 'client', label: 'What a customer sees', top: fr.bottom + 52 },
     { id: 'staff', label: 'What the staff see', top: 0 },
@@ -224,32 +250,46 @@ function sitemap() {
     cursor = yy + 46;
   }
 
+  /* Several arrows leave the same card downwards. Each one gets its own
+     lane in the gap below the row, in the order the edges are listed, so
+     two arrows out of Home do not share a leg and read as one. */
   let edgesSvg = '';
+  const laneUse = {};
   for (const e of M.pageEdges) {
     const a = rects[e.from];
     const b = rects[e.to];
     if (!a || !b) continue;
     const tone = e.status === 'Missing' ? 'mute' : (e.cross ? 'mute' : 'blue');
     const t = toneOf(tone);
-    const opts = { stroke: t.stroke, sw: e.cross ? 1.2 : 1.5, marker: t.marker, dash: e.cross ? '5 4' : null };
+    const opts = {
+      stroke: t.stroke, sw: e.cross ? 1.2 : 1.6, marker: t.marker,
+      dash: e.cross ? '5 4' : null,
+    };
     const sameRow = Math.abs(a.cy - b.cy) < 6;
+    let svg = '';
     if (sameRow) {
-      const left = a.x < b.x ? a : b;
-      const right = a.x < b.x ? b : a;
       const y = a.cy;
-      edgesSvg += (a.x < b.x
-        ? line(a.x + a.w, y, b.x - 3, y, opts)
-        : line(a.x, y, b.x + b.w + 3, y, opts));
-      edgesSvg += halo((left.x + left.w + right.x) / 2, y - 7, e.label, { fill: t.ink });
+      svg += (a.x < b.x
+        ? line(a.x + a.w, y, b.x - 4, y, opts)
+        : line(a.x, y, b.x + b.w + 4, y, opts));
+      const mid = a.x < b.x ? (a.x + a.w + b.x) / 2 : (b.x + b.w + a.x) / 2;
+      svg += halo(mid, y - 8, e.label, { fill: t.ink });
     } else {
       const down = a.cy < b.cy;
-      const x1 = a.cx;
+      const lk = `${Math.min(a.y, b.y)}`;
+      const slot = laneUse[lk] = (laneUse[lk] || 0);
+      laneUse[lk] += 1;
+      /* Leave and arrive off centre, by lane, so the two legs are visibly
+         two arrows rather than one thick one. */
+      const nudge = (slot % 3 - 1) * 46;
+      const x1 = a.cx + nudge;
       const y1 = down ? a.y + a.h : a.y;
-      const x2 = b.cx;
-      const y2 = down ? b.y - 3 : b.y + b.h + 3;
-      edgesSvg += vElbow(x1, y1, x2, y2, opts);
-      edgesSvg += halo((x1 + x2) / 2, (y1 + y2) / 2 + 3, e.label, { fill: t.ink });
+      const x2 = b.cx + nudge;
+      const y2 = down ? b.y - 4 : b.y + b.h + 4;
+      svg += vElbow(x1, y1, x2, y2, opts);
+      svg += halo((x1 + x2) / 2, (y1 + y2) / 2 + 3.5, e.label, { fill: t.ink });
     }
+    edgesSvg += edgeWrap(K.page(e.from), K.page(e.to), svg);
   }
 
   const h = cursor + 20;
@@ -286,7 +326,7 @@ function dataModel() {
     cardsSvg += line(x, top - 6, x + CARD, top - 6, { stroke: T.blueLight });
     let yy = top + 10;
     for (const t of g.tables) {
-      const card = TableCard(CARD, t);
+      const card = TableCard(CARD, { ...t, key: K.table(t.name) }, { family: g.family });
       cardsSvg += card.draw(x, yy);
       rects[t.name] = { x, y: yy, w: CARD, h: card.h, cx: x + CARD / 2, cy: yy + card.h / 2 };
       yy += card.h + 10;
@@ -294,12 +334,20 @@ function dataModel() {
     maxY = Math.max(maxY, yy);
   });
 
+  /* Several relations cross the same gap. `at` slides each label along its
+     own curve so they fan out instead of stacking. */
   let edgesSvg = '';
+  const spread = {};
   for (const rel of M.entities.relations) {
     const a = rects[rel.from];
     const b = rects[rel.to];
     if (!a || !b) continue;
-    edgesSvg += Connector(a, b, { label: rel.card, tone: 'mute', sw: 1.1 });
+    const gap = `${Math.min(a.x, b.x)}`;
+    const n = spread[gap] = (spread[gap] || 0);
+    spread[gap] += 1;
+    edgesSvg += edgeWrap(K.table(rel.from), K.table(rel.to), Connector(a, b, {
+      label: rel.card, tone: 'mute', sw: 1.1, at: 0.3 + (n % 3) * 0.2,
+    }));
   }
 
   /* The sentence the whole data design turns on. */
@@ -400,7 +448,7 @@ function deployment() {
   let svg = bandLabel(32, top - 14, 'One deploy path', { size: 10.5, fill: T.navy });
   svg += line(32, top - 6, w - 32, top - 6, { stroke: T.blueLight });
 
-  const made = d.stages.map((s) => StatusCard(CARD, s, { titleSize: 12.5 }));
+  const made = d.stages.map((s) => StatusCard(CARD, { ...s, id: K.stage(s.id) }, { titleSize: 12.5 }));
   const rowH = Math.max(...made.map((m) => m.h));
   const rects = [];
   made.forEach((m, i) => {
@@ -408,17 +456,31 @@ function deployment() {
     svg += m.draw(x, top + 12, rowH);
     rects.push({ x, cy: top + 12 + rowH / 2, w: CARD });
   });
-  for (let i = 0; i < rects.length - 1; i += 1) {
+  /* The last leg is the rollback, which runs the other way: it is drawn
+     back along the row rather than forward, because that is what it does. */
+  for (let i = 0; i < rects.length - 2; i += 1) {
     const a = rects[i];
     const b = rects[i + 1];
-    const mute = i >= rects.length - 2;
-    svg += line(a.x + a.w, a.cy, b.x - 3, b.cy, {
-      stroke: mute ? T.mute : T.blue, sw: 1.6, marker: mute ? 'arrow-mute' : 'arrow', dash: mute ? '5 4' : null,
-    });
+    const t = toneOf(i >= rects.length - 3 ? 'mute' : 'blue');
+    svg += edgeWrap(K.stage(d.stages[i].id), K.stage(d.stages[i + 1].id),
+      line(a.x + a.w, a.cy, b.x - 4, b.cy, {
+        stroke: t.stroke, sw: 1.6, marker: t.marker,
+        dash: i >= rects.length - 3 ? '5 4' : null,
+      }));
+  }
+  {
+    const back = rects[rects.length - 1];
+    const prod = rects[rects.length - 2];
+    const t = toneOf('slate');
+    const y = top + 12 + rowH + 20;
+    svg += edgeWrap(K.stage('rollback'), K.stage('prod'), path(
+      `M${r(back.x + back.w / 2)} ${r(top + 12 + rowH)} V${r(y)} H${r(prod.x + prod.w / 2)} V${r(top + 12 + rowH + 4)}`,
+      { stroke: t.stroke, sw: 1.5, marker: t.marker, dash: '5 4' },
+    ) + halo((back.x + prod.x + prod.w) / 2, y + 14, 'promote the previous deployment', { fill: T.mute }));
   }
 
   /* Environments. */
-  let y = top + 12 + rowH + 46;
+  let y = top + 12 + rowH + 76;
   svg += bandLabel(32, y, 'Two environments, from the first deploy', { size: 10.5, fill: T.navy });
   svg += line(32, y + 8, w - 32, y + 8, { stroke: T.blueLight });
   y += 22;
@@ -470,10 +532,10 @@ function deployment() {
   const body = fr.svg + svg + statusLegend(32, h - 22);
 
   emit('deployment.svg', {
-    w, h, title: 'Deployment, environments and secrets', desc: d.note, body,
-      title: 'Deployment, environments and secrets',
+    w, h, desc: d.note, body,
+    title: 'Deployment, environments and secrets',
     caption: 'One deploy path, two environments, and the three places a value is allowed to live. The middle column is the one that ends a project if it leaks.',
-    });
+  });
 }
 
 /* ================================================================ *
@@ -543,7 +605,10 @@ function buildPlan() {
 
   const made = M.phases.map((p) => ({
     p,
-    card: StatusCard(CARD, { label: `${p.id} · ${p.label}`, detail: p.detail, note: 'Owner: ' + p.owner, status: p.status }, { titleSize: 12 }),
+    card: StatusCard(CARD, {
+      id: K.phase(p.id), label: `${p.id} · ${p.label}`, detail: p.detail,
+      note: 'Owner: ' + p.owner, status: p.status, family: p.family,
+    }, { titleSize: 12 }),
   }));
   const rowsIdx = [...new Set(M.phases.map((p) => p.row))].sort((a, b) => a - b);
   const rowY = {};
@@ -572,7 +637,8 @@ function buildPlan() {
       const a = rects[need];
       const b = rects[p.id];
       if (!a || !b) continue;
-      edgesSvg += Connector(a, b, { label: '', tone: 'mute', sw: 1.3 });
+      edgesSvg += edgeWrap(K.phase(need), K.phase(p.id),
+        Connector(a, b, { tone: 'mute', sw: 1.4 }));
     }
   }
 
@@ -592,14 +658,14 @@ function buildPlan() {
  * ================================================================ */
 function riskMatrix() {
   beginDoc();
-  const w = 1320;
-  const note = 'Placed by how likely it is and what it costs if ignored. Top right is what to fix first. Position carries the severity as well as the colour does, so a monochrome printout loses nothing.';
+  const w = 1060;
+  const note = 'Placed by how likely it is and what it costs if ignored. Top right is what to fix first, and position carries the severity as well as the colour does, so a monochrome printout loses nothing. Click any risk for what to do about it.';
   const fr = frame({ title: 'Risks', note, asOf, w });
   const top = fr.bottom + 50;
   const impacts = ['low', 'medium', 'high'];
   const likelihoods = ['high', 'medium', 'low'];
-  const cellW = 236;
-  const cellH = 148;
+  const cellW = 300;
+  const cellH = 152;
   const gridX = 32 + 86;
 
   let svg = bandLabel(gridX, top - 14, 'Impact if ignored', { size: 10, fill: T.mute });
@@ -622,42 +688,35 @@ function riskMatrix() {
         fill: fills[weightIdx], stroke: weightIdx >= 3 ? fam.line : T.rule, rx: 9,
       });
       const here = M.risks.filter((rk) => rk.likelihood === lk && rk.impact === im);
-      let yy = y + 24;
+      let yy = y + 26;
       for (const rk of here) {
-        const lines = wrap(rk.label, cellW - 54, 10.2);
-        svg += circle(x + 18, yy - 4, 9, { fill: fam.solid });
-        svg += text(x + 18, yy - 0.5, rk.id, { size: 8.5, weight: 700, fill: T.paper, anchor: 'middle' });
-        lines.forEach((l, i) => { svg += text(x + 34, yy + i * 12.4, l, { size: 10.2, fill: INK.title }); });
-        yy += lines.length * 12.4 + 10;
+        const lines = wrap(rk.label, cellW - 108, 10.6);
+        let one = circle(x + 18, yy - 4, 9.5, { fill: fam.solid });
+        one += text(x + 18, yy - 0.3, rk.id, { size: 8.6, weight: 700, fill: T.paper, anchor: 'middle' });
+        lines.forEach((l, i) => {
+          one += text(x + 35, yy + i * 12.6, l, { size: 10.6, fill: INK.title });
+        });
+        /* The effort sits on the card, because "an hour" changes what you
+           do about a risk more than its exact coordinates do. */
+        one += text(x + cellW - 20, yy, rk.effort, {
+          size: 9.4, weight: 600, fill: fam.ink, anchor: 'end',
+        });
+        svg += nodeWrap(K.risk(rk.id), one);
+        yy += lines.length * 12.6 + 12;
       }
-      if (!here.length) svg += text(x + 18, y + 26, 'none', { size: 10, fill: T.faint, italic: true });
+      if (!here.length) svg += text(x + 18, y + 28, 'none', { size: 10, fill: T.faint, italic: true });
     });
   });
 
   svg += text(32, top + 14 + 3 * cellH + 2, 'Likelihood', { size: 10, fill: T.mute, letter: 0.4 });
 
-  /* The list under the matrix, because a dot in a cell is not a plan. */
-  let y = top + 14 + 3 * cellH + 36;
-  svg += bandLabel(32, y, 'What to do about each one', { size: 10.5, fill: T.navy });
-  svg += line(32, y + 8, w - 32, y + 8, { stroke: T.blueLight });
-  y += 26;
-  for (const rk of M.risks) {
-    const fixLines = wrap(rk.fix, w - 420, 10.8);
-    svg += circle(42, y - 4, 9, { fill: T.navy });
-    svg += text(42, y - 0.5, rk.id, { size: 8.5, weight: 700, fill: T.paper, anchor: 'middle' });
-    svg += text(60, y, rk.label, { size: 11.2, weight: 600, fill: T.navy });
-    fixLines.forEach((l, i) => { svg += text(380, y + i * 13, l, { size: 10.8, fill: T.mute }); });
-    svg += text(w - 32, y, rk.effort, { size: 10.5, fill: T.blue, anchor: 'end', weight: 600 });
-    y += Math.max(fixLines.length * 13, 15) + 11;
-  }
-
-  const h = y + 34;
+  const h = top + 14 + 3 * cellH + 44;
   const body = fr.svg + svg;
   emit('risks.svg', {
     w, h, desc: note, body,
     title: 'Risks',
-    caption: 'Top right is what to fix first. R1 and R3 are both one short task each and both are top row.',
-    });
+    caption: 'Eleven risks by likelihood and impact, with the effort on each one. R3 is an hour of work and sits in the top row; R11 moved to the bottom left on 2026-11-02 when the Vercel host was deleted.',
+  });
 }
 
 /* ================================================================ *
@@ -666,7 +725,7 @@ function riskMatrix() {
 function oneDefinition() {
   beginDoc();
   const w = 1180;
-  const note = 'Anything that appears twice is built once, and a variation is a parameter rather than a second copy. Three rows below have no single home yet; each one is a small, dull job that gets expensive the week a price changes in two of three places.';
+  const note = 'Anything that appears twice is built once, and a variation is a parameter rather than a second copy. Three rows below have a second copy: the free shipping threshold, written out ten times in six files; the schema.org list of social profiles; and the five blocks of home page items still sitting in the markup.';
   const fr = frame({ title: 'One definition, read everywhere', note, asOf, w });
   const top = fr.bottom + 50;
   let svg = '';
@@ -680,26 +739,24 @@ function oneDefinition() {
   for (const d of M.definitions) {
     const st = STATUS[d.status] || STATUS.Missing;
     const homeLines = wrap(d.home, 400, 10.8);
-    const readers = d.readers.join(', ');
-    const readerLines = wrap(readers, 320, 10.8);
-    const noteLines = d.note ? wrap(d.note, 560, 10) : [];
-    const h = Math.max(homeLines.length, readerLines.length) * 14 + 24 + noteLines.length * 13;
-    svg += box(32, y, w - 64, h, { fill: st.fill, stroke: st.stroke, rx: 9, dash: st.dash });
-    svg += text(48, y + 20, d.thing, { size: 12.5, weight: 600, family: T.head, fill: st.ink });
-    homeLines.forEach((l, i) => { svg += text(48, y + 38 + i * 14, l, { size: 10.8, fill: T.mute }); });
-    readerLines.forEach((l, i) => { svg += text(486, y + 20 + i * 14, l, { size: 10.8, fill: T.navy2 }); });
-    noteLines.forEach((l, i) => { svg += text(48, y + 38 + homeLines.length * 14 + i * 13, l, { size: 10, fill: st.stroke, italic: true }); });
-    svg += chip(w - 48 - measure(d.status, 9.5, 600) - 14, y + 10, d.status, { status: d.status }).svg;
+    const readerLines = wrap(d.readers.join(', '), 330, 10.8);
+    const h = Math.max(homeLines.length, readerLines.length) * 14 + 26;
+    let one = box(32, y, w - 64, h, { fill: st.fill, stroke: st.stroke, rx: 9, dash: st.dash });
+    one += text(48, y + 21, d.thing, { size: 12.5, weight: 600, family: T.head, fill: st.ink });
+    homeLines.forEach((l, i) => { one += text(48, y + 39 + i * 14, l, { size: 10.8, fill: T.mute }); });
+    readerLines.forEach((l, i) => { one += text(486, y + 21 + i * 14, l, { size: 10.8, fill: T.navy2 }); });
+    one += chip(w - 48 - measure(d.status, 9.5, 600) - 14, y + 11, d.status, { status: d.status }).svg;
+    svg += nodeWrap(K.def(d.id), one);
     y += h + 10;
   }
 
   const h = y + 50;
   const body = fr.svg + svg + statusLegend(32, h - 22);
   emit('one-definition.svg', {
-    w, h, title: 'One definition, read everywhere', desc: note, body,
-      title: 'One definition, read everywhere',
-    caption: 'Where each shared fact lives, who reads it, and the three that still have no home.',
-    });
+    w, h, desc: note, body,
+    title: 'One definition, read everywhere',
+    caption: 'Where each shared fact lives and who reads it. The three marked Refactor or Partial are the ones with a second copy; click one for where the copies are.',
+  });
 }
 
 /* ================================================================ *
@@ -754,6 +811,334 @@ function componentSheet() {
     w, h, desc: note, body,
     title: 'Icon and component library',
     caption: 'The vocabulary the other fourteen drawings are assembled from: every symbol, and every component in each state it is used in.',
+  });
+}
+
+/* ================================================================ *
+ * A ranked column of cards, each with a step badge, a status and a row
+ * of chips naming what it blocks. Three drawings are this shape: the
+ * findings, the owner's tasks and the postponed list, so it is one
+ * function with the chip row as a parameter.
+ * ================================================================ */
+function rankedColumn({
+  name, title, note, caption, items, badgeFamily, cardW = 700, chipsFor,
+  keyOf, chipLabel = 'Blocks',
+}) {
+  beginDoc();
+  const BX = 34;
+  const CX = BX + 40;
+  const w = CX + cardW + 372;
+  const fr = frame({ title, note, asOf, w });
+  let y = fr.bottom + 46;
+  let svg = '';
+
+  items.forEach((it, i) => {
+    const card = Card(cardW, {
+      id: keyOf(it), label: it.label, detail: it.detail || it.trigger || it.mitigation,
+      status: it.status, family: it.family, icon: it.icon,
+    });
+    const h = Math.max(card.h, 62);
+    svg += card.draw(CX, y, h);
+    svg += StepBadge(i + 1, { family: badgeFamily || it.family || 'navy', r: 13 }).draw(CX, y + 22);
+
+    /* The chip row says, in one line, what this card is holding up. The
+       chips are other cards in other drawings, and each one is clickable. */
+    const chips = chipsFor ? chipsFor(it) : [];
+    if (chips.length) {
+      const gx = CX + cardW + 28;
+      svg += bandLabel(gx, y + 15, chipLabel, { size: 8.4, fill: T.faint });
+      let cx = gx;
+      let cy = y + 24;
+      for (const k of chips) {
+        const made = chip(cx, cy, shortOf(k), { family: (G.get(k) || {}).family || 'navy', size: 9.4, h: 18 });
+        if (cx > gx && cx + made.width > w - 30) { cx = gx; cy += 23; }
+        svg += nodeWrap(k, chip(cx, cy, shortOf(k), {
+          family: (G.get(k) || {}).family || 'navy', size: 9.4, h: 18,
+        }).svg, labelOf(k));
+        cx += made.width + 6;
+      }
+      y = Math.max(y + h, cy + 24) - h;
+    }
+    y += h + 14;
+  });
+
+  const h = y + 44;
+  const body = fr.svg + svg + statusLegend(BX, h - 22);
+  emit(name, { w, h, desc: note, body, title, caption });
+}
+
+/* ================================================================ *
+ * The five findings, in the order they should be dealt with.
+ * ================================================================ */
+function findings() {
+  rankedColumn({
+    name: 'findings.svg',
+    title: 'The five findings, in the order to deal with them',
+    note: 'One card per finding, ranked. The chips on the right are the phases, risks and flows each one is holding up, and every one of them is clickable. The severity is on the chip; what the finding actually is, and why it carries that status, is one click away rather than in a paragraph here.',
+    caption: 'Ranked by what to do first, not by severity alone: F2 is half a day of data entry and is blocked on nothing, while F1 is the largest remaining piece of work.',
+    items: M.findings,
+    cardW: 660,
+    keyOf: (f) => K.finding(f.id),
+    chipLabel: 'Closed by, and tied to',
+    chipsFor: (f) => [...(f.fixedBy || []),
+      ...f.rel.filter((k) => /^(phase|risk|flow|threat|unknown):/.test(k))],
+  });
+}
+
+/* ================================================================ *
+ * What the owner does, and what an agent cannot do for them.
+ * ================================================================ */
+function ownerTasks() {
+  rankedColumn({
+    name: 'owner-tasks.svg',
+    title: 'What only the owner can do',
+    note: M.ownerSteps.note,
+    caption: 'Seven dashboard tasks, in dependency order. An agent can name every value and write every line of configuration; it cannot create an account, accept terms or move a nameserver.',
+    items: M.ownerSteps.steps,
+    cardW: 620,
+    badgeFamily: 'navy',
+    keyOf: (s) => s.id,
+    chipLabel: 'Unblocks',
+    chipsFor: (s) => s.rel.filter((k) => /^(phase|stage|target|unknown|asset|ad):/.test(k)),
+  });
+}
+
+/* ================================================================ *
+ * Deliberately not built, and the condition that changes that.
+ * ================================================================ */
+function postponed() {
+  rankedColumn({
+    name: 'postponed.svg',
+    title: 'Deliberately not built, and what would change that',
+    note: 'This drawing exists to prevent an argument later. Every card is a decision not to build something, and the text on it is the condition that reverses that decision. Nothing here is an oversight.',
+    caption: 'Eight things that are not being built, each with the trigger that would start it. The chips name what each one touches.',
+    items: M.triggers,
+    cardW: 640,
+    badgeFamily: 'slate',
+    keyOf: (t) => K.trigger(t.id),
+    chipLabel: 'Touches',
+    chipsFor: (t) => t.rel,
+  });
+}
+
+/* ================================================================ *
+ * How a request actually travels, now that the site is a Worker.
+ * ================================================================ */
+function requestPath() {
+  beginDoc();
+  const CARD = 326;
+  const COL = [34, 390, 746];
+  const w = COL[2] + CARD + 34;
+  const fr = frame({ title: 'How one request travels', note: M.requestPath.note, asOf, w });
+  const board = new Board(w);
+  const top = fr.bottom + 54;
+
+  const byId = Object.fromEntries(M.requestPath.steps.map((s) => [s.id, s]));
+  const place = (id, col, y) => {
+    const s = byId[id];
+    return board.card({
+      id: s.id, label: s.label, detail: s.detail, status: s.status,
+      family: s.family, icon: s.icon, x: COL[col], y, w: CARD,
+    });
+  };
+
+  /* The spine, and the one branch in the Worker: a path either is under
+     /api/ or it is a file. */
+  const chainIds = ['rq-route', 'rq-shim', 'rq-guard', 'rq-validate', 'rq-captcha', 'rq-write', 'rq-notify'];
+  place('rq-arrive', 1, top);
+  place('rq-split', 1, top + 96);
+  place('rq-asset', 0, top + 206);
+  let y = top + 206;
+  for (const id of chainIds) {
+    const c = place(id, 2, y);
+    y += c.h + 26;
+  }
+
+  board.edge({ from: 'rq-arrive', to: 'rq-split', family: 'blue' });
+  board.edge({ from: 'rq-split', to: 'rq-asset', label: 'no, it is a file', family: 'amber' });
+  board.edge({ from: 'rq-split', to: 'rq-route', label: 'yes, /api/', family: 'rose' });
+  for (let i = 0; i < chainIds.length - 1; i += 1) {
+    board.edge({ from: chainIds[i], to: chainIds[i + 1], family: byId[chainIds[i + 1]].family });
+  }
+
+  const { svg, maxY } = board.body();
+
+  /* Numbers on the API chain only, because the file path is one step and
+     then it is over. */
+  let badges = '';
+  chainIds.forEach((id, i) => {
+    const c = board.nodes[id];
+    badges += StepBadge(i + 1, { family: 'navy', r: 12 }).draw(c.x, c.y + 20);
+  });
+
+  const panel = NotePanel(CARD, [
+    'Everything that is not an /api path is a file out of dist, and dist is built from a named list, so the server source is not published with the site.',
+    'The route table holds exact paths. A path that looks like an endpoint and is not gets a JSON 404 rather than a page.',
+  ], { family: 'amber', icon: 'eye', title: 'The two rules this follows' });
+  const panelY = top + 206 + board.nodes['rq-asset'].h + 34;
+  const extra = panel.draw(COL[0], panelY);
+
+  const h = Math.max(maxY, panelY + panel.h) + 52;
+  const body = fr.svg + svg + badges + extra + statusLegend(34, h - 22);
+  emit('request-path.svg', {
+    w, h, desc: M.requestPath.note, body,
+    title: 'How one request travels',
+    caption: 'The order the Worker decides things in. Verified against worker.js and its six tests, and against the live Worker, on 2026-11-02.',
+  });
+}
+
+/* ================================================================ *
+ * The threats that apply, sorted by whether anything stands in front
+ * of them. Three columns, so the answer to "what is not covered" is
+ * a position rather than a sentence.
+ * ================================================================ */
+function threats() {
+  beginDoc();
+  const CARD = 330;
+  const PAD = 20;
+  const COLW = CARD + PAD * 2;
+  const GAP = 40;
+  const bands = [
+    { id: 'held', family: 'green', label: 'Standing up', test: (t) => t.status === 'Implemented' },
+    { id: 'part', family: 'amber', label: 'Partly covered', test: (t) => t.status === 'Partial' || t.status === 'Refactor' },
+    { id: 'open', family: 'rose', label: 'Nothing in front of it yet', test: (t) => t.status === 'Missing' || t.status === 'Post-MVP' },
+  ];
+  const w = 34 * 2 + bands.length * COLW + (bands.length - 1) * GAP;
+  const note = 'Every threat that actually applies to this project, in the column that says whether anything stands in front of it. The text on each card is the mitigation. Click a card for why it carries that status and what it is tied to.';
+  const fr = frame({ title: 'The threats that apply, and what stands in front of each', note, asOf, w });
+  const board = new Board(w);
+  const top = fr.bottom + 56;
+
+  bands.forEach((band, i) => {
+    const g = board.group({
+      id: `g-${band.id}`, x: 34 + i * (COLW + GAP), y: top, w: COLW,
+      family: band.family, label: band.label,
+    });
+    board.stack(g.id, M.threats.filter(band.test).map((t) => ({
+      id: K.threat(t.id), label: t.label, detail: t.mitigation,
+      status: t.status, family: t.family, icon: t.icon,
+    })), { top: 58, gap: 16, pad: PAD });
+  });
+
+  const { svg, maxY } = board.body();
+  const h = maxY + 52;
+  const body = fr.svg + svg + statusLegend(34, h - 22);
+  emit('threats.svg', {
+    w, h, desc: note, body,
+    title: 'The threats that apply, and what stands in front of each',
+    caption: 'The right-hand column is the work. Two of the three cards in the middle column are the same one file.',
+  });
+}
+
+/* ================================================================ *
+ * The decisions, grouped by what they decide rather than by date, with
+ * an arrow where one decision rests on another.
+ * ================================================================ */
+function decisionMap() {
+  beginDoc();
+  const CARD = 300;
+  const PAD = 20;
+  const COLW = CARD + PAD * 2;
+  const GAP = 44;
+  const themes = [...new Set(M.decisions.map((d) => d.theme))];
+  const w = 34 * 2 + themes.length * COLW + (themes.length - 1) * GAP;
+  const note = 'Ten decisions, grouped by what they decide. An arrow means the decision it points at rests on the one behind it, so a decision cannot be reopened without reading what sits on top of it. Every card carries the date it was taken and the state it is in today.';
+  const fr = frame({ title: 'Architecture decisions, and what rests on what', note, asOf, w });
+  const board = new Board(w);
+  const top = fr.bottom + 56;
+  const family = { Platform: 'amber', 'Data and money': 'teal', 'Shipping it': 'blue', 'How this is written': 'violet' };
+
+  themes.forEach((theme, i) => {
+    const g = board.group({
+      id: `g-${i}`, x: 34 + i * (COLW + GAP), y: top, w: COLW,
+      family: family[theme] || 'slate', label: theme,
+    });
+    board.stack(g.id, M.decisions.filter((d) => d.theme === theme).map((d) => ({
+      id: K.ad(d.id), label: `${d.id} · ${d.title}`, detail: `Decided ${d.date}`,
+      status: d.status, family: d.family, icon: d.icon,
+    })), { top: 58, gap: 18, pad: PAD });
+  });
+
+  /* An arrow only where one decision names another, so the drawing cannot
+     claim a dependency the model does not hold. */
+  const seen = new Set();
+  for (const d of M.decisions) {
+    for (const k of d.rel) {
+      if (!k.startsWith('ad:')) continue;
+      const pair = [K.ad(d.id), k].sort().join('>');
+      if (seen.has(pair)) continue;
+      seen.add(pair);
+      if (!board.nodes[K.ad(d.id)] || !board.nodes[k]) continue;
+      board.edge({ from: k, to: K.ad(d.id), family: 'slate', dashed: true });
+    }
+  }
+
+  const { svg, maxY } = board.body();
+  const h = maxY + 52;
+  const body = fr.svg + svg + statusLegend(34, h - 22);
+  emit('decisions.svg', {
+    w, h, desc: note, body,
+    title: 'Architecture decisions, and what rests on what',
+    caption: 'AD1 to AD10, never renumbered. AD10 replaced the platform half of AD1 without changing anything else, which is the test of whether a decision was recorded at the right size.',
+  });
+}
+
+/* ================================================================ *
+ * The unknowns, and what each one is holding up. The right-hand cards
+ * belong to other drawings, so this is where the document joins up.
+ * ================================================================ */
+function unknownMap() {
+  beginDoc();
+  const QW = 430;
+  const BW = 250;
+  const PAD = 20;
+  const GAP = 150;
+  const w = 34 * 2 + QW + PAD * 2 + GAP + BW + PAD * 2;
+  const note = 'Eight open questions on the left, and what each one is holding up on the right. The right-hand cards are the same cards as in the build plan and the findings, so clicking one moves to that thing rather than to a copy of it. An unknown with nothing on its right is not urgent; it is simply unanswered.';
+  const fr = frame({ title: 'What is unknown, and what it blocks', note, asOf, w });
+  const board = new Board(w);
+  const top = fr.bottom + 56;
+
+  const qg = board.group({
+    id: 'g-q', x: 34, y: top, w: QW + PAD * 2, family: 'violet',
+    label: 'The question, and who owns it',
+  });
+  board.stack(qg.id, M.unknowns.map((u) => ({
+    id: K.unknown(u.id), label: `${u.id} · ${u.question}`,
+    detail: `Owner: ${u.owner}`, status: u.blocks.length ? 'Missing' : 'Post-MVP',
+    family: u.family, icon: u.icon,
+  })), { top: 58, gap: 16, pad: PAD });
+
+  /* One card per thing that is blocked, placed beside the first unknown
+     that blocks it, and reused by any other unknown that blocks it too. */
+  const blocked = [...new Set(M.unknowns.flatMap((u) => u.blocks))];
+  const bg = board.group({
+    id: 'g-b', x: 34 + QW + PAD * 2 + GAP, y: top, w: BW + PAD * 2, family: 'amber',
+    label: 'What it holds up',
+  });
+  board.stack(bg.id, blocked.map((k) => ({
+    id: k, label: labelOf(k), detail: (G.get(k) || {}).kind || '',
+    status: statusOf(k), family: (G.get(k) || {}).family || 'slate',
+    icon: (G.get(k) || {}).icon,
+  })), { top: 58, gap: 14, pad: PAD });
+
+  for (const u of M.unknowns) {
+    for (const k of u.blocks) {
+      if (!board.nodes[k]) continue;
+      board.edge({
+        from: K.unknown(u.id), to: k, family: 'rose',
+        fs: 'right', ts: 'left', dashed: true,
+      });
+    }
+  }
+
+  const { svg, maxY } = board.body();
+  const h = maxY + 52;
+  const body = fr.svg + svg + statusLegend(34, h - 22, ['Missing', 'Post-MVP']);
+  emit('unknowns.svg', {
+    w, h, desc: note, body,
+    title: 'What is unknown, and what it blocks',
+    caption: 'U8 is new on 2026-11-02 and is the most entangled: a suspended mailbox that also sits on the DNS move. U5 and U6 block nothing and are still worth answering.',
   });
 }
 
@@ -854,17 +1239,24 @@ export function buildAll({ write = true } = {}) {
   written.length = 0;
   drift.length = 0;
 
+  findings();
   architecture('now', M.architecture.now);
+  requestPath();
   architecture('target', M.architecture.target);
   channels();
   sitemap();
   dataModel();
   for (const f of M.flows) flow(f);
+  threats();
   deployment();
+  ownerTasks();
   performance();
   buildPlan();
   riskMatrix();
   oneDefinition();
+  postponed();
+  decisionMap();
+  unknownMap();
   componentSheet();
   contactSheet();
 

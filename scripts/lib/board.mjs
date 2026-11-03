@@ -61,10 +61,14 @@ const isVertical = (side) => side === 'top' || side === 'bottom';
  * ---------------------------------------------------------------- */
 
 export class Board {
-  constructor(w, { label, asOf } = {}) {
+  /* `ns` is the registry namespace every card and arrow on this board is
+     keyed under, so `data-node` carries a key the whole document shares
+     rather than one that is only unique inside this drawing. */
+  constructor(w, { label, asOf, ns = '' } = {}) {
     this.w = w;
     this.label = label;
     this.asOf = asOf;
+    this.ns = ns;
     this.groups = [];
     this.cards = [];
     this.edges = [];
@@ -216,7 +220,9 @@ export class Board {
     const dash = e.dashed ? ' stroke-dasharray="6 5"' : '';
     const end = e.noArrow ? '' : ` marker-end="url(#m-${e.family || 'slate'})"`;
     const start = e.both ? ` marker-start="url(#m-${e.family || 'slate'})"` : '';
-    const link = e.from ? ` data-from="${esc(e.from)}" data-to="${esc(e.to)}"` : '';
+    const link = e.from
+      ? ` data-from="${esc(this.ns + e.from)}" data-to="${esc(this.ns + e.to)}"`
+      : '';
     const path = `<path${link} d="${roundPath(pts)}" fill="none" stroke="${fam.arrow}"`
       + ` stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"${dash}${end}${start}/>`;
 
@@ -262,7 +268,10 @@ export class Board {
   renderCard(c) {
     const fam = familyOf(c.family);
     const dash = c.status === 'Missing' || c.status === 'Post-MVP';
-    let s = c.id ? `<g class="node" data-node="${esc(c.id)}">` : '<g>';
+    /* Only `data-node` is written here. The viewer adds tabindex, role and
+       a label at runtime, so a document read with scripting off has no
+       buttons in it that do nothing. */
+    let s = c.id ? `<g class="node" data-node="${esc(this.ns + c.id)}">` : '<g>';
     /* The offset twin is what gives the card its weight. A dashed card does
        not get one: it is not there yet, so it should not cast a shadow. */
     if (!dash) {
