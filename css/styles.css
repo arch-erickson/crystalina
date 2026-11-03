@@ -19,6 +19,7 @@
   --silver-100: #ECEEF0; /* silver for image panels and quiet bands */
   --silver-200: #DFE2E5; /* silver for hairlines */
   --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --gutter: 4%;           /* page margin either side; 28px on tablets, 22px on phones */
   --ink: #16233A;
   --muted: #5B6B84;
   --white: #FFFFFF;
@@ -66,7 +67,11 @@ button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; font-size: 1rem; }
 :focus-visible { outline: none; box-shadow: var(--ring); border-radius: 6px; }
 
-.container { width: min(1200px, 92%); margin: 0 auto; }
+.container { width: min(1200px, calc(100% - 2 * var(--gutter))); margin: 0 auto; }
+/* Copy that reads in full on a wide screen and is left out on a phone. The
+   hero wraps everything before its last sentence in this, so a phone shows
+   one short headline and one short line over the photograph. */
+.phone-hide { display: inline; }
 
 h1, h2, h3, h4 { line-height: 1.18; color: var(--navy-800); font-weight: var(--w-bold); font-family: var(--font-head); letter-spacing: -0.01em; }
 .section { padding: 72px 0; }
@@ -2131,6 +2136,11 @@ body.cart-open { overflow: hidden; }
   .shop-toolbar { margin-bottom: 22px; }
   .facts-stats { gap: 28px; }
   .trust-list { grid-template-columns: 1fr 1fr; }
+  :root { --gutter: 28px; }
+  .section { padding: 64px 0; }
+  .band { padding: 72px 0; }
+  .anatomy-inner { grid-template-columns: 1fr; gap: 36px; }
+  .anatomy-figure img { max-width: 380px; }
   .cat-grid--editorial .cat-tile, .cat-grid--editorial .cat-tile:nth-child(-n+2) { grid-column: span 6; }
   .cat-grid--editorial .cat-tile:nth-child(n+3) .ct-media { aspect-ratio: 4/3; }
   .steps--editorial { grid-template-columns: 1fr 1fr; gap: 0 28px; }
@@ -2289,7 +2299,6 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
 /* ---------------- large phones ---------------- */
 @media (max-width: 620px) {
   .section { padding: 52px 0; }
-  .container { width: min(1200px, 94%); }
 
   /* Comfortable touch targets. */
   .btn { padding: 13px 22px; min-height: 46px; }
@@ -2451,6 +2460,45 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
 @media (max-width: 620px) {
   .edit-savebar { flex-direction: column; align-items: stretch; }
   .edit-savebar-actions .btn { flex: 1; }
+}
+
+/* ---------- phones ----------
+   The hero carries one short headline and one short line, low on the screen,
+   on a band darkened for the type, with the faces in the photograph kept in
+   the upper half and the actions at the bottom. Everything before the last
+   sentence of the headline and the lead is left out here and nowhere else. */
+@media (max-width: 600px) {
+  :root { --gutter: 22px; }
+  .phone-hide { display: none; }
+  .section { padding: 56px 0; }
+  .band { padding: 60px 0; }
+  .section-head--left, .section-head--row { margin-bottom: 26px; }
+  .hero--full {
+    min-height: 100svh;
+    background:
+      linear-gradient(180deg, rgba(11,30,54,.42) 0%, rgba(11,30,54,.12) 32%, rgba(11,30,54,.5) 62%, rgba(11,30,54,.94) 100%),
+      var(--hero-image, none) 60% 28% / cover no-repeat,
+      var(--navy-900);
+  }
+  .hero--full::after { display: none; }
+  .hero--full .hero-inner { padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)); }
+  .hero-eyebrow { font-size: .66rem; letter-spacing: .16em; }
+  .hero h1 { font-size: 2.3rem; margin: 12px 0 14px; }
+  .hero p.lead { font-size: .98rem; line-height: 1.55; margin-bottom: 26px; max-width: 30ch; }
+  .hero-cta { gap: 10px; }
+  .facts-inner { padding: 36px 0 28px; gap: 22px; }
+  .facts-stats { gap: 22px 28px; }
+  .cat-grid--editorial { gap: 26px 16px; }
+  .cat-tile .ct-label { font-size: .9rem; }
+  .product-grid { gap: 28px 16px; }
+  .testi { padding: 28px 24px 26px; }
+  .cta-band--image { min-height: 440px; }
+  .cta-inner { padding-bottom: 40px; }
+  /* The WhatsApp float waits until the page has scrolled, so it never sits on
+     the hero actions at rest. */
+  .wa-float { width: 50px; height: 50px; bottom: 18px; right: 18px; opacity: 0; transform: translateY(24px); pointer-events: none; transition: opacity .3s var(--ease-out), transform .3s var(--ease-out); }
+  .wa-float svg { width: 26px; height: 26px; }
+  body.is-scrolled .wa-float { opacity: 1; transform: none; pointer-events: auto; }
 }
 
 /* Hero calls to action stack full width on small phones so both remain easy

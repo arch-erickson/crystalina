@@ -326,6 +326,25 @@ function applySectionTypography(el, typography) {
   if (touched) el.classList.add('has-custom-type');
 }
 
+/* Hero copy from the editor, written so a phone can leave out everything
+   before the last sentence: those sentences are wrapped in .phone-hide. The
+   accent, when given, is set in an em wherever it appears. */
+function setHeroText(el, text, accent) {
+  const appendWithAccent = (parent, str) => {
+    if (!accent || !str.includes(accent)) { parent.append(document.createTextNode(str)); return; }
+    str.split(accent).forEach((part, i) => {
+      if (i) { const em = document.createElement('em'); em.textContent = accent; parent.append(em); }
+      if (part) parent.append(document.createTextNode(part));
+    });
+  };
+  el.replaceChildren();
+  const sentences = String(text || '').match(/[^.!?]+[.!?]+\s*|[^.!?]+$/g) || [];
+  const head = sentences.slice(0, -1).join('');
+  const tail = sentences[sentences.length - 1] || '';
+  if (head) { const span = document.createElement('span'); span.className = 'phone-hide'; appendWithAccent(span, head); el.append(span); }
+  appendWithAccent(el, tail);
+}
+
 function applyPageSections() {
   const main = document.querySelector('main');
   const sections = Store.getAdminData?.().pageSections || [];
@@ -357,14 +376,8 @@ function applyPageSections() {
       const heading = section.querySelector('#homeHeroHeading');
       const body = section.querySelector('#homeHeroBody');
       if (eyebrow) eyebrow.textContent = config.eyebrow || '';
-      if (heading) {
-        heading.replaceChildren();
-        (config.heading || '').split(/(50 Feet)/).forEach(part => {
-          if (part === '50 Feet') { const accent = document.createElement('em'); accent.textContent = part; heading.append(accent); }
-          else heading.append(document.createTextNode(part));
-        });
-      }
-      if (body) body.textContent = config.body || '';
+      if (heading) setHeroText(heading, config.heading, '50 Feet');
+      if (body) setHeroText(body, config.body);
     } else {
       const eyebrow = section.querySelector('.section-head .eyebrow') || section.querySelector('.split .eyebrow');
       const heading = section.querySelector('.section-head h2') || section.querySelector('.split h2') || section.querySelector('.cta-band h2');
@@ -653,6 +666,10 @@ function initPage(activeNav = '') {
   renderCartDrawer();
   renderFooter();
   renderCategoryTiles();
+  // One class says whether the page has scrolled; phone-only rules read it.
+  const markScrolled = () => document.body.classList.toggle('is-scrolled', window.scrollY > 120);
+  markScrolled();
+  window.addEventListener('scroll', markScrolled, { passive: true });
   autoReveal();
   requestAnimationFrame(() => initReveal());
   bindNewsletter();
