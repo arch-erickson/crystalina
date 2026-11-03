@@ -140,6 +140,14 @@ Better pictures do not fix either one.
 **`image-refs/` is not published**, and must stay that way. `DIRS` in
 `scripts/build-site.mjs` does not list it. References are named after their
 target, so `image-refs/hero-bg.png` feeds `images/hero-bg.webp`.
+### 2026-11-02 · Codex · P1–P5 delivered; resolution exception approved
+
+User explicitly approved: "Install best results; document resolution shortfall". Installed images/h5-600-exploded.webp (1400 x 1600, alpha), hero-bg.webp (2600 x 1500), lifestyle-hydration.webp, point-of-use.webp and nyc-skyline.webp (each 1200 x 900). All WebP with embedded sRGB profiles. Built-in generator native outputs: P1 1174 x 1340; hero 1650 x 953; three editorial plates 1448 x 1086. These are NOT native 4K; P1 and hero required Lanczos enlargement, the plates were downsampled. Generation masters remain outside the repository. P1 uses the previously generated second draft, real black/amber housing and cartridge geometry overriding contradictory prose. No real product photo changed. Category generation and final checks still in progress. Markup follow-ups remain with design owner as previously recorded.
+
+### 2026-11-02 · Codex · Full imagery pass in progress
+
+User explicitly requested all currently needed images, authorizing written-prompt generation for P2–P6 without waiting for references. Fetched origin and read current coordination and the revised brief from origin/main; no reference images have landed (only image-refs/README.md remotely). Codex is producing the 11 assets in the P1–P6 queue. Scope remains images/, image-refs/ and this log; protected product photos, page markup and other agents' work are untouched. Native resolution will be verified and reported, not inferred from the requested prompt size. Pending a resolution exception, sub-4K outputs remain review drafts outside published images/.
+
 ### 2026-11-02 · Codex · P1 generation blocked by native resolution
 
 User authorized imagery work and this log. Read the revised IMAGE_PROMPTS.md in full from origin/main at c4598ce794d6a97cabc921648d43af1c1438050d; the working-tree brief is older. Inspected all four protected studio photographs and all H5-600 variants. Protected photographs were not edited.
