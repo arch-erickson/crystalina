@@ -38,6 +38,7 @@ A readable version of this document, with every drawing inline, is at
 16. [Questions and unknowns](#16-questions-and-unknowns)
 17. [The drawing system](#17-the-drawing-system)
 18. [How this document is kept true](#18-how-this-document-is-kept-true)
+19. [What every screen looks like today](#19-what-every-screen-looks-like-today)
 
 ---
 
@@ -599,8 +600,50 @@ _**Icon and component library.** The vocabulary the other fourteen drawings are 
 - Amend this in the same commit as the change it describes. A decision that changes in code and not here is a decision that will be made again, differently.
 - Mark an answered question answered, with the date and the answer. Do not delete it.
 - When a section is superseded, say so at the top of the section and point at what replaced it. Never renumber.
-- Two assistants commit to main. Read COORDINATION.md before editing, and pull before you start and before each push.
+- More than one session commits to main. Read COORDINATION.md before editing, and pull before you start and before each push.
 
 > **Publish from one place**
 >
 > The Artifact is published from this repository and nowhere else. Anyone republishing it pulls first and republishes to the same URL (https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo) rather than creating a second one. A generated document published from two places stops matching its own sources quietly, and the next person to rebuild wipes out work nobody remembers doing.
+
+---
+
+## 19. What every screen looks like today
+
+The site map in section 10 says what each page is for. This section shows what each one actually looks like, captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them.
+
+Captured 2026-11-03 at 1366, 834, 390 pixels wide.
+
+### What a customer sees
+- **Home /**: [desktop](screens/page-home-desktop.webp), [tablet](screens/page-home-tablet.webp), [mobile](screens/page-home-mobile.webp)
+- **Shop /shop/**: [desktop](screens/page-shop-desktop.webp), [tablet](screens/page-shop-tablet.webp), [mobile](screens/page-shop-mobile.webp)
+- **Product /product/**: [desktop](screens/page-product-desktop.webp), [tablet](screens/page-product-tablet.webp), [mobile](screens/page-product-mobile.webp)
+- **Checkout /checkout/**: [desktop](screens/page-checkout-desktop.webp), [tablet](screens/page-checkout-tablet.webp), [mobile](screens/page-checkout-mobile.webp)
+- **NYC water /nyc-water/**: [desktop](screens/page-nyc-water-desktop.webp), [tablet](screens/page-nyc-water-tablet.webp), [mobile](screens/page-nyc-water-mobile.webp)
+- **Find your filter /quiz/**: [desktop](screens/page-quiz-desktop.webp), [tablet](screens/page-quiz-tablet.webp), [mobile](screens/page-quiz-mobile.webp)
+- **Sign in /signin/**: [desktop](screens/page-signin-desktop.webp), [tablet](screens/page-signin-tablet.webp), [mobile](screens/page-signin-mobile.webp)
+- **Account /account/**: [desktop](screens/page-account-desktop.webp), [tablet](screens/page-account-tablet.webp), [mobile](screens/page-account-mobile.webp)
+- **About /about/**: [desktop](screens/page-about-desktop.webp), [tablet](screens/page-about-tablet.webp), [mobile](screens/page-about-mobile.webp)
+- **Contact /contact/**: [desktop](screens/page-contact-desktop.webp), [tablet](screens/page-contact-tablet.webp), [mobile](screens/page-contact-mobile.webp)
+
+### What the staff see
+- **Admin console /admin/**: [desktop](screens/page-admin-desktop.webp), [tablet](screens/page-admin-tablet.webp), [mobile](screens/page-admin-mobile.webp)
+- **Manager /manager/**: [desktop](screens/page-manager-desktop.webp), [tablet](screens/page-manager-tablet.webp), [mobile](screens/page-manager-mobile.webp)
+- **Sales /sales/**: [desktop](screens/page-sales-desktop.webp), [tablet](screens/page-sales-tablet.webp), [mobile](screens/page-sales-mobile.webp)
+- **Technician /technician/**: [desktop](screens/page-technician-desktop.webp), [tablet](screens/page-technician-tablet.webp), [mobile](screens/page-technician-mobile.webp)
+
+### The home page, section by section
+- **Your Tap Water Travels 125 Miles. The Last 50 Feet Are the Problem.**: [desktop](screens/section-hero-desktop.webp), [tablet](screens/section-hero-tablet.webp), [mobile](screens/section-hero-mobile.webp)
+- **trust**: [desktop](screens/section-trust-desktop.webp), [tablet](screens/section-trust-tablet.webp), [mobile](screens/section-trust-mobile.webp)
+- **The Right Filter for Every NYC Home**: [desktop](screens/section-categories-desktop.webp), [tablet](screens/section-categories-tablet.webp), [mobile](screens/section-categories-mobile.webp)
+- **Crystalina H5-600 High-Flow UV Alkaline RO, Component by Component**: [desktop](screens/section-anatomy-desktop.webp), [tablet](screens/section-anatomy-tablet.webp), [mobile](screens/section-anatomy-mobile.webp)
+- **Best Sellers in the Five Boroughs**: [desktop](screens/section-best-sellers-desktop.webp), [tablet](screens/section-best-sellers-tablet.webp), [mobile](screens/section-best-sellers-mobile.webp)
+- **NYC Water Is Famous. It's Also Complicated.**: [desktop](screens/section-water-facts-desktop.webp), [tablet](screens/section-water-facts-tablet.webp), [mobile](screens/section-water-facts-mobile.webp)
+- **From Tap to Crystal Clear in 4 Steps**: [desktop](screens/section-process-desktop.webp), [tablet](screens/section-process-tablet.webp), [mobile](screens/section-process-mobile.webp)
+- **Built for the City. Backed for Life in It.**: [desktop](screens/section-why-crystalina-desktop.webp), [tablet](screens/section-why-crystalina-tablet.webp), [mobile](screens/section-why-crystalina-mobile.webp)
+- **What Our Neighbors Are Saying**: [desktop](screens/section-testimonials-desktop.webp), [tablet](screens/section-testimonials-tablet.webp), [mobile](screens/section-testimonials-mobile.webp)
+- **Not Sure Which System Fits Your Home?**: [desktop](screens/section-cta-desktop.webp), [tablet](screens/section-cta-tablet.webp), [mobile](screens/section-cta-mobile.webp)
+
+> **Refreshing the captures**
+>
+> Serve the site, then run npm run screens. The script captures the fourteen pages and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.

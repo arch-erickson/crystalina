@@ -631,12 +631,26 @@ export const sections = [
         'Amend this in the same commit as the change it describes. A decision that changes in code and not here is a decision that will be made again, differently.',
         'Mark an answered question answered, with the date and the answer. Do not delete it.',
         'When a section is superseded, say so at the top of the section and point at what replaced it. Never renumber.',
-        'Two assistants commit to main. Read COORDINATION.md before editing, and pull before you start and before each push.',
+        'More than one session commits to main. Read COORDINATION.md before editing, and pull before you start and before each push.',
       ],
     },
     {
       t: 'callout', kind: 'learn', title: 'Publish from one place',
       text: 'The Artifact is published from this repository and nowhere else. Anyone republishing it pulls first and republishes to the same URL (https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo) rather than creating a second one. A generated document published from two places stops matching its own sources quietly, and the next person to rebuild wipes out work nobody remembers doing.',
+    },
+  ],
+},
+
+/* ================================================================= */
+{
+  id: 's19',
+  title: 'What every screen looks like today',
+  blocks: [
+    { t: 'p', text: 'The site map in section 10 says what each page is for. This section shows what each one actually looks like, captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them.' },
+    { t: 'screens' },
+    {
+      t: 'callout', kind: 'learn', title: 'Refreshing the captures',
+      text: 'Serve the site, then run npm run screens. The script captures the fourteen pages and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.',
     },
   ],
 },
