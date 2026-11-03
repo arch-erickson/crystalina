@@ -3,9 +3,12 @@ Revised 2026-11-03 following the user's latest visual review. This complete revi
 supersedes the logo-heavy, oversized-product and invented-kitchen prompts.
 
 ## 1. Direction
-Latest user correction: "we are currently not selling water filters." Do not
-treat the product concepts below as evidence of current offerings. Broader
-imagery direction is awaiting clarification. P5 is now a non-product NYC scene.
+Latest clarification: imagery should show people drinking water or RO filters.
+This is visual direction, not a claim about current inventory. Do not generate
+additional whole-house, shower or countertop category concepts. Those older
+entries below are historical pending design-owner retirement. P5 remains the
+recent non-product NYC About replacement.
+Kitchen scenes must show exactly ONE faucet per sink, as requested by the user.
 Original editorial photographs in clean, attractive, attainable middle-income
 apartments. Start with an actual photographed apartment kitchen, inspect its
 architecture, then generate an original scene grounded in that layout.
@@ -48,8 +51,7 @@ artwork or decor. Do not claim a generated room is a real installation.
 Do not enlarge hardware to make it prominent. Preserve product proportions and
 leave fitting/service clearance. A filter may occupy a separate adjacent utility
 cabinet when an actual sink bowl/drain would prevent an under-sink fit.
-The filtration story is clear through the installed unit or dedicated drinking
-tap and water use; do not force an open oversized unit into every family scene.
+The filtration story is clear through the installed unit or water use; do not force an open oversized unit into every family scene.
 Product detail plates carry the close-up hardware story.
 
 ### 2.4 Colour
@@ -79,7 +81,8 @@ distressed surfaces, neglected apartment, luxury penthouse, blue colour grade,
 cool colour grade, warm colour grade, orange tint, green tint, purple tint,
 teal and orange, heavy vignette, lens flare, artificial background haze,
 HDR halo, oversharpened, CGI render, 3D render, video game lighting,
-floating objects, duplicated parts, low-res, jpeg artifacts
+floating objects, duplicated parts, duplicate faucets, extra spouts, melted objects,
+fused utensils, low-res, jpeg artifacts
 ```
 P1 intentional exploded separation is the sole floating-parts exception.
 
@@ -110,6 +113,16 @@ empty wall by including naturally quiet room detail.
 Other editorial plates: 4:3; coherent scene and useful background context.
 
 ## 5. Validation
+Before installing EVERY candidate, visually inspect the full-resolution image
+and final delivery crop. Record object counts and issues in image-refs/.
+Count faucets (one per sink), people (hero exactly five), limbs, glasses and
+product components. Trace hand grips, baby support, spout-to-basin placement,
+water streams, cabinet clearance, door swings and visible tubing continuity.
+Reject extra/melted/fused objects, broken perspective and implausible placement.
+Compare hardware silhouette with protected references. Treat unverified plumbing
+as illustrative, never an installation guide. Check no added text/icons and
+CSS-safe crop. Inspect corrected output again; do not assume the edit succeeded.
+Automated dimensions/build checks supplement, but never replace, visual review.
 Inspect architecture, hands, faces, baby support, family count, product proportions,
 plumbing, typography absence and crop at final size. Reject impossible layouts.
 Record source/native dimensions/delivery dimensions and generation prompts.
@@ -143,11 +156,11 @@ window-lit dining area, adapted from observed spatial relationships.
 Camera from dining/living side, eye-level35mm, coherent perspective.
 Exactly five people: father about40, mother about37, older son14, younger
 daughter7, baby boy9months. Father safely supports baby with forearm under
-bottom and hand at torso; baby looks at family. Mother uses drinking-water tap
+bottom and hand at torso; baby looks at family. Mother uses the single sink faucet
 from its working side; son and daughter naturally interact at dining counter or
 table. Separate readable faces, natural expressions, ordinary clothes and poses.
 Do not arrange five smiling heads in a row. Make interaction intimate enough to
-see expressions, with clear water/glass and dedicated tap as foreground subject.
+see expressions, with clear water/glass as foreground subject and exactly one sink faucet.
 A full H5 need not be exposed in this family image; keep installation concealed
 if revealing it would distort architecture or force a product collage.
 Left40% real quiet room, action right. Clean middle-income home, daylight, neutral
@@ -156,7 +169,7 @@ white balance, real texture, no added text, icons or logos.
 ### P3 — lifestyle-hydration.webp
 1200x900. Real-kitchen-reference-led original photograph. Older grandfather and
 young granddaughter share an ordinary water moment at a modest dining counter,
-dedicated tap and clear glass visible. Anatomically convincing grips, relaxed
+one sink faucet and clear glass visible. Anatomically convincing grips, relaxed
 individual expressions, natural fine lines, clean practical kitchen background.
 Use an intimate eye-level50mm view. Do not expose an enormous unit at their knees.
 No text, icons or logos.
@@ -165,7 +178,7 @@ No text, icons or logos.
 1200x900. Real-reference-based detail of H5 installed inside a clean adjacent
 utility cabinet or under a sink only with credible bowl/drain clearance.
 Three-quarter view shows cabinet depth, tidy actual connections, full unit at
-normal scale, small drinking tap above/nearby. No person required. Ordinary
+normal scale, one sink faucet above/nearby. No person required. Ordinary
 materials, soft daylight, accurate hardware. No text/icons/logos.
 
 ### P5 — nyc-skyline.webp

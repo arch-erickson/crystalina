@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-03",
+  "direction": "People drinking water or RO filters. One faucet per sink.",
+  "method": "Manual visual inspection of all 11 installed images and each corrected generation; file validation separately. Not a guarantee of engineering correctness.",
+  "corrections": [
+    {
+      "target": "hero-bg",
+      "source": "c8d6b437-2d12-48bd-96f5-fd7ab0d906f9",
+      "prompt": "Precise local edit to this photograph: REMOVE the small secondary curved faucet at the far right of the sink, in front of the teenage son's glass, including its base and lever. Restore seamless natural countertop in that exact spot. Leave exactly ONE faucet: the existing larger central brushed-metal mixer, correctly mounted with its spout directed into the sink. Keep everything else unchanged: same father mother older son younger daughter baby boy, same faces hands glasses baby support, real kitchen layout, positions, left40% quiet room, light and colours. No new objects, no duplicated fixtures. Keep26:15 landscape and request native4K. No text icons logos. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts, duplicate faucets, second faucet, extra spouts, melted objects, fused utensils.",
+      "review": "One faucet, five family members, two glasses, baby supported, left overlay area clear.",
+      "native": [
+        1650,
+        953
+      ],
+      "delivery": [
+        2600,
+        1500
+      ],
+      "sha256": "b596f9faf5112bff83a95f8557aea599579bd5c60329d955a6fe36cea71554f7"
+    },
+    {
+      "target": "lifestyle-hydration",
+      "source": "20fd1ca1-a016-4829-8372-8a6f165b5e25",
+      "prompt": "Precise edit: remove ONLY small secondary faucet at far-right background of sink, including base and lever, restore matching uninterrupted countertop. Keep one existing large sink mixer. Preserve grandfather granddaughter faces hands two glasses, kitchen composition, texture, neutral daylight. No new objects. Native4K4:3 requested. No text/icons/logos. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts, duplicate faucets, extra spouts.",
+      "review": "One background faucet, two people, two glasses; no new visible fixture duplication.",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "sha256": "bf977978881a5f916c975663c4de0aca98c9eaff67b0c186a97435dad4bb46bd"
+    },
+    {
+      "target": "point-of-use",
+      "source": "a6e37d29-1b4a-4e48-9e93-5c2ea02cd932",
+      "prompt": "Precise edit: remove ONLY small curved secondary drinking faucet in upper-left area of counter, beside soap bottle, including base. Keep the existing larger main sink mixer at far left edge. Restore seamless matching counter and tile behind removed fixture. Exactly one faucet. Preserve RO hardware, three clear bowls, twin gauges, dark display three orange buttons, black membrane amber collar, cabinet proportions and tubing. No added or duplicated objects, no texture smears. Neutral daylight and original composition preserved. Native4K4:3. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts, duplicate faucets, extra spouts.",
+      "review": "One partially framed main faucet; three bowls/two gauges/three buttons retained. Installation illustrative, fit not verified.",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "sha256": "c92f93e5f657a00013abf10be2647382faf8b86c59ca6be3c3e9f81b04a9155d"
+    }
+  ],
+  "otherAssets": {
+    "cat-reverse-osmosis": "One faucet and three bowls; visible plumbing is illustrative and not manufacturer-verified. Do not use as technical installation instructions.",
+    "cat-whole-house": "Outside clarified imagery direction; recommend design-owner retirement. No further generation.",
+    "cat-countertop": "Outside clarified imagery direction; recommend design-owner retirement. No further generation.",
+    "cat-shower": "Outside clarified imagery direction; recommend design-owner retirement. No further generation.",
+    "cat-replacement": "Three cartridges plus separate empty housing; no evident accidental duplicate; RO accessory context.",
+    "cat-accessories": "One pen, detached cap, one glass, one hand; generic concept not verified product.",
+    "h5-600-exploded": "Intentional component separation, one empty frame and three assemblies. Fine alpha edge artifacts visible at large scale; conceptual, not certified schematic.",
+    "nyc-skyline": "No product installation; contextual About exception, generated skyline not exact documentary geography."
+  }
+}

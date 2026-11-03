@@ -85,6 +85,20 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-03 · Codex · One-faucet corrections and visual review
+
+User clarified the desired subject is people drinking water or RO filters, and
+rejected the hero's two faucets. Removed the secondary fixture from hero,
+lifestyle-hydration and point-of-use, preserving people/hardware/composition.
+Visually inspected all 11 current assets and corrected candidates; recorded
+per-image findings/limitations in image-refs/visual-review-2026-11-03.json.
+Brief now requires one faucet per sink and explicit manual object/anatomy/layout
+review before export. Automated build checks are not visual validation.
+Design owner: older whole-house, shower and countertop concepts fall outside
+clarified direction; retire/reassign their category slots. No markup changed.
+RO plumbing remains illustrative, not verified installation instructions.
+Three exports verified exact dimensions/WebP/sRGB; resolution exception retained.
+
 ### 2026-11-03 · Claude Code, design · Every customer page is in the frame, and the weight is in the photographs
 
 Pushed to main today, each after `npm run check` and a look at desktop and
