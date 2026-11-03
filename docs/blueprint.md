@@ -160,9 +160,9 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | NYC water | /nyc-water/ | Implemented | Missing | The microplastics card makes no numeric claim, by design, because none we found had a source we could stand behind |
 | About | /about/ | Implemented | Missing | Nothing. No server work needed |
 | Contact | /contact/ | Implemented | Implemented | No Turnstile widget, and the page reads a token from one that does not exist The notification lands in a suspended inbox (U8) |
-| Privacy policy | /privacy/ | Implemented | Missing | Not in the publish allow-list until the owner has approved the wording. Since 2026-11-03 the footer no longer carries a dead link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
-| Terms of service | /terms/ | Implemented | Missing | Not in the publish allow-list until the owner has approved the wording. Since 2026-11-03 the footer no longer carries a dead link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
-| Shipping and returns | /shipping-returns/ | Implemented | Missing | Not in the publish allow-list until the owner has approved the wording. Since 2026-11-03 the footer no longer carries a dead link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
+| Privacy policy | /privacy/ | Implemented | Missing | Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
+| Terms of service | /terms/ | Implemented | Missing | Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
+| Shipping and returns | /shipping-returns/ | Implemented | Missing | Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
 | Manuals and guides | /manuals/ | Implemented | Missing | No manual file exists yet. A manual belongs in the site-media bucket, named on the product row as manualUrl, which the page trusts; only the guessed /manuals/files/<slug>.pdf address is checked when the page loads Nothing on the server. No server work needed |
 | Order receipt | /order/?id= | Implemented | Implemented | No order can be placed until payment exists, so the page has only its signed-out, missing and not-found states to show today Checkout should land here once an order is created |
 | Not found | /404.html | Implemented | Implemented | Nothing. No server work needed |
@@ -617,13 +617,13 @@ _Page · /privacy/._
 
 The privacy policy, in plain language: what the shop collects, which services see it, and how to have it removed.
 
-Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Until P5, keeping it private means excluding it in _config.yml, which the deploy session has been asked to do.
+Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Since 0ecd26f, later the same day, it is excluded in _config.yml as well, and answers 404 at crystalina.org; publishing it on approval means both lists at once, the three lines out of _config.yml and the three paths into scripts/build-site.mjs, or it goes live on one host and missing from the other.
 
 - **See also.** Home
 - **Design.** Implemented
 - **Server.** Missing
 - **Backend built.** What is collected, who handles it, how to have it removed Set in the long-form text component shared by every legal page
-- **Remaining.** Not in the publish allow-list until the owner has approved the wording. Since 2026-11-03 the footer no longer carries a dead link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed
+- **Remaining.** Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed
 
 #### Terms of service · Missing
 
@@ -631,13 +631,13 @@ _Page · /terms/._
 
 The terms of service: orders, pricing, warranty, returns and disputes.
 
-Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Until P5, keeping it private means excluding it in _config.yml, which the deploy session has been asked to do.
+Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Since 0ecd26f, later the same day, it is excluded in _config.yml as well, and answers 404 at crystalina.org; publishing it on approval means both lists at once, the three lines out of _config.yml and the three paths into scripts/build-site.mjs, or it goes live on one host and missing from the other.
 
 - **See also.** Home
 - **Design.** Implemented
 - **Server.** Missing
 - **Backend built.** Orders, pricing, warranty, returns and disputes in plain language Set in the long-form text component shared by every legal page
-- **Remaining.** Not in the publish allow-list until the owner has approved the wording. Since 2026-11-03 the footer no longer carries a dead link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed
+- **Remaining.** Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed
 
 #### Shipping and returns · Missing
 
@@ -645,13 +645,13 @@ _Page · /shipping-returns/._
 
 Shipping and returns: where we deliver, how fast, the free shipping threshold and the return window.
 
-Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Until P5, keeping it private means excluding it in _config.yml, which the deploy session has been asked to do.
+Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Since 0ecd26f, later the same day, it is excluded in _config.yml as well, and answers 404 at crystalina.org; publishing it on approval means both lists at once, the three lines out of _config.yml and the three paths into scripts/build-site.mjs, or it goes live on one host and missing from the other.
 
 - **See also.** Home
 - **Design.** Implemented
 - **Server.** Missing
 - **Backend built.** Delivery areas, timing, the free shipping threshold and the return window Set in the long-form text component shared by every legal page
-- **Remaining.** Not in the publish allow-list until the owner has approved the wording. Since 2026-11-03 the footer no longer carries a dead link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed
+- **Remaining.** Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed
 
 #### Manuals and guides · Missing
 
