@@ -1,0 +1,223 @@
+{
+  "date": "2026-11-03",
+  "revision": "real-apartment-reference-no-added-text-icons",
+  "generator": "built-in image_gen",
+  "brief": "IMAGE_PROMPTS.md",
+  "resolutionApproval": "User authorized installing best native sub-4K results with resolution shortfall documented; delivery upscaling is not native 4K.",
+  "selected": {
+    "h5-600-exploded": "e36dacf0-e608-4afc-a1d4-5407c48585a1",
+    "hero-bg": "4d6a72dd-60f5-4de2-8a65-7bc8e18c04b2",
+    "lifestyle-hydration": "7d841319-df3f-46e0-bc0e-012510fb6998",
+    "point-of-use": "0cc95b12-8812-44c4-92e6-57982460735a",
+    "nyc-skyline": "61884e4e-9da9-4c7a-8ca6-ad11f953b34b",
+    "cat-reverse-osmosis": "c4dff9dc-44b4-409a-b887-919304570e7e",
+    "cat-whole-house": "4c42710c-e091-4629-8e60-f199a3e8e458",
+    "cat-countertop": "a4a25833-9df6-4ab6-b30b-402e274dacbd",
+    "cat-shower": "0d4d0588-fbbf-477b-b8d9-8cf834134448",
+    "cat-replacement": "7044458e-96f9-44d3-8f9d-16bcb8111d9d",
+    "cat-accessories": "8514b193-c14b-4741-94aa-0cae7e08e844"
+  },
+  "sourceDirectory": "C:/Users/erick/.codex/generated_images/01a19ee5-03e6-7ce2-91cc-53e0ce4e4539",
+  "architecture": {
+    "file": "image-refs/architecture/brooklyn-kitchen-reference.jpg",
+    "source": "https://www.apartmenttherapy.com/oyin-antwi-brooklyn-small-apartment-tour-photos-36821702",
+    "credit": "Angelene Coronel Photography and Erwin Pajarillo via Apartment Therapy",
+    "use": "Unpublished architectural inspiration, not installation evidence"
+  },
+  "prompts": {
+    "heroV3Prompt": "Create an ORIGINAL high-detail editorial family photograph in a real-looking middle-income apartment kitchen. Native4K requested, 26:15 landscape delivery2600x1500. Input1 is an ACTUAL Brooklyn apartment kitchen architectural reference: study its real appliance wall, sink peninsula, working-side aisle and nearby dining table. Use these physical relationships to construct a different family-sized apartment; do not copy its art/clock/decor. Input2 is photographic inspiration for natural faces, skin, hands and close family interaction; do not copy identities or exact pose. No text, icons, logos or symbols anywhere.\nCompose a medium-wide eye-level35mm photo from dining side of a modest peninsula, family in RIGHT60%, left40% naturally quiet continuation of room/counter/cabinetry for website copy, no gradient and no blank artificial wall. Sink peninsula at right foreground with brushed steel main tap and a slender separate filtered drinking-water tap; real sink bowl, believable tap mounting and sink/counter depth. Kitchen working aisle BEHIND peninsula, with wall oven/stove/hood and fridge further back, white modest cabinets and wooden accents. Window daylight from right. Keep appliances realistically proportioned, no two counters merging, no person trapped behind wall-backed sink. Do not expose a filter unit: the system is properly concealed inside cabinet; foreground filtration cue is the separate drinking tap and fresh clear water in glass. No product cutout, no giant equipment on counter.\nExactly FIVE family members with distinct readable faces and plausible age differences: mother37 on WORKING side of peninsula holding a partly filled glass at chest level after using drinking tap, looking gently toward daughter; father40 beside her at right, securely holding baby boy9months on hip, forearm supporting bottom and other hand supporting back, baby in plain cream romper looks toward mother. Older son14 sits on dining side at far right, leaning naturally on counter and holding a glass with believable grip; younger daughter7 stands beside him, hand on countertop, listening to mother. All five faces visible and fully in frame, no identical smiles, quiet candid familial ease, father slight smile, son neutral attentive expression, mother speaking softly. Family occupies enough frame for lifelike eyes, fine facial hair, natural teeth, pores, skin folds and subtly imperfect hair. Clothing ordinary cotton, realistic folds, varied natural colours without matching coordinated uniform.\nUse reference2's photographic detail and natural humanity; avoid glossy AI models. Clean but genuinely used nice apartment: discreet kettle and wooden chopping board by back wall, bowl with real red apples, one folded tea towel. No extravagant marble, no grime, no excessive clutter. Bright neutral daylight with natural falloff, actual material colours, no colour grading or orange cast, controlled reflections in glass and stainless steel. Moderate depth of field, background architecture still clear. Single coherent photograph, not advertising composite. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "heroV3CropPrompt": "Edit this family kitchen photograph, preserve same five identities, ages, anatomically correct bodies, baby support, natural expressions and real kitchen architecture. Reframe camera slightly farther back and to LEFT so entire family including young daughter's head is RIGHT of45% image width. Keep faces medium-size and readable; do not turn family into tiny figures. Add quiet real cabinets/counter continuation at left, no gradient, no empty enormous wall. Father mother teen son younger daughter baby boy all heads fully inside frame. Family together on right with dedicated slim water tap foreground right and main sink mixer. Original warm natural interactions, realistic pores, hands and hair, modest practical room from real architectural reference. The left40% should contain only quiet ordinary kitchen architecture, no people. Maintain26:15 aspect, native4K requested. Neutral daylight white balance, no colour grade. No text logos icons. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "hydrationV3Prompt": "Original editorial photograph, native4K requested,4:3 landscape. First reference is actual apartment kitchen architecture: preserve credible wall appliance run, separate peninsula working aisle and dining side, normal cabinet scale. Second reference is photographic human/detail inspiration only. Create different clean modest middle-income apartment, realistic stainless stove/hood and refrigerator, white cabinets, wood dining table, quiet useful kitchen objects. Older Black grandfather in his late60s and granddaughter about8 at dining counter, medium intimate50mm view, faces large enough to resolve pores and natural fine lines. Grandfather gently sets a clear drinking-water glass down in front of granddaughter with correct grip; girl looks up at him, one hand around her own glass. Distinct relaxed expressions, not toothy matching smiles. Dedicated slender filtered-water tap mounted beside ordinary main sink mixer visible at frame side, no giant exposed filtration unit. The filter is concealed where normally installed. Window light soft from right, neutral white balance, ordinary cotton clothing, subtle folds, realistic wood and ceramic textures. Background legible, no fake heavy blur. Real usable walkway, no person inside or behind wall-backed cabinetry. No added logo, text, icon or appliance branding. Original identities and composition, do not copy people. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "pointV3Prompt": "Original editorial installation detail photograph,4:3 native4K requested. Reference1 actual Brooklyn kitchen establishes ordinary material and cabinet scale; reference2 is exact H5 hardware geometry only. Camera at cabinet height three-quarter view, clean maintained middle-income apartment. Open adjacent utility base cabinet to RIGHT of a separate sink cabinet, normal pale worktop above. H5 black open frame three clear canisters two gauges dark panel three orange buttons horizontal black membrane amber collar top UVC, reference accurate. Full unit fits with ample visible space above and both sides, cabinet realistically deep. Unit is NOT under the sink bowl, adjacent sink occupies separate left cabinet. Tidy thin connected tubing passes left through grommet toward sink, no invented thick manifold. A sliver of sink and separate slim drinking tap visible above left. No people. Clean white cabinet interior, ordinary intact hinges, realistic cabinet shadows, neutral window daylight from right, natural clear plastic reflections. Product clear and sharp foreground, not giant or photoshopped. Remove all lettering and labels from generated hardware: unmarked black cylinders/rail, dark screen, unnumbered gauge ticks. Do not change hardware silhouette. Real practical apartment context with simple tile, one dish towel. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "aboutV3Prompt": "Original editorial NYC apartment kitchen photograph,4:3 native4K. Use first reference as actual apartment architecture evidence: practical appliance wall, sink peninsula, dining window, modest finishes, separate working aisle. New original room not copy, no art/clock copied. Second reference exact H5 hardware only. Photograph from three-quarter doorway angle, no people. Clean comfortable middle-income apartment, white upper cabinets, subtle oak base cabinets, stainless fridge/stove realistic scale, simple pale countertop. Side window gives glimpse of nearby New York brick and fire escape, neutral daylight no golden grade. Filtration focal point on right: dedicated small drinking tap beside normal sink mixer, clear glass on countertop. Below and ADJACENT to sink, open utility cabinet reveals H5 at realistic domestic size with clearance above/around, visible black frame three transparent bowls two gauges dark display three orange buttons membrane with amber collar and top black UVC. All housing/rail surfaces plain unmarked, no copied reference labels. Thin tubing neatly passes through side partition toward separate sink cabinet; don't put sink/drain inside filter clearance. Show useful room context and depth, do not crop to a giant product. Counter has small cutting board and folded linen, no clutter or flowers obscuring filter. Crisp photographic materials, natural exposure, subtle lived-in cloth folds, no damage. No logos text or icons. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "aboutV3Cleanup": "Edit reference1 photograph only: keep this exact credible apartment layout, materials, perspective, product placement and proportions. Remove ALL tiny white/gold technical printing from both black horizontal filter cylinders; plain matte black surfaces, retain amber collar. Gauges have ticks but no digits. No text labels logos icons anywhere, including appliances and bottles; remove bottle label. Switch off pendant bulbs and ceiling lamp, illuminate room with neutral soft window daylight only, no warm colour cast. Preserve clean comfortable room, cabinet clearance, dedicated tap and three clear bowls. Native4K4:3. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "wholeV3Prompt": "Edit this category photograph: remove all CRYSTALINA lettering and C-drop emblems from white housings. Keep clean white uninterrupted surfaces. Preserve exactly existing three housings, mounting brackets, connected copper plumbing, practical utility room, light, image composition. Entire focal housings must end above62% image height; bottom third quiet clean floor/wall for website label. No text numbers icons logos anywhere. Neutral white balance, realistic editorial photo, native4K4:3 requested. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "counterV3Prompt": "Edit first image category countertop dispenser photograph. Remove all wordmark and emblem from dispenser casing, leave plain off-white surface and blank controls. Second image is actual apartment kitchen architectural reference: ground background in its ordinary cabinetry/counter scale and practical appliance run, use restrained small section of clean real-looking apartment counter, no invented luxury showroom. Keep first image dispenser design, clear reservoir, ordinary mug, believable reflections. Product entirely upper62% frame, bottom38% quiet clean pale countertop,4:3 native4K. Soft neutral window daylight, realistic photo detail, no colour cast. No added text icons logos numbers. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "counterV3CropPrompt": "Reframe this countertop category photo only. Keep same unmarked off-white dispenser, mug, reservoir, real apartment kitchen background, neutral daylight and realistic materials. Pull camera back enough that dispenser BASE ends at58% image height, entire product between8% and58% height. Lower42% image must be uninterrupted clean countertop, no objects. Product centered horizontally, no stretching or design changes. Remove any appliance logos/letters/icons. Landscape4:3 native4K. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "showerV3Prompt": "Edit this clean chrome inline shower filter photograph. Remove engraved emblem completely; seamless plain chrome with natural reflections. Preserve correct arm-filter-head connection, head shape, natural spray, clean tile, neutral daylight and photographic texture. Focal hardware entirely upper two thirds with quiet tile below,4:3 native4K. No text icons logos numbers. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "replacementV3Prompt": "Edit this replacement cartridge photograph. Remove all wordmarks, emblems, labels and printed markings from housing and cartridge end caps; keep plain clean surfaces. Preserve cartridge geometry, realistic media texture, clear empty bowl and black cap, camera perspective and clean neutral counter. Entire product group stays above60% image height, bottom40% quiet countertop. Neutral daylight, sharp editorial product photography,4:3 native4K. No text icons logos numbers. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "accessoriesV3Prompt": "Edit first image TDS accessory photograph. Remove all lettering and logo from pen casing. Blank dark LCD, plain plastic casing. Preserve natural hand grip, anatomy, glass and product perspective. Second image actual apartment kitchen spatial/material reference: background a modest clean counter corner with ordinary cabinet scale, no abstract showroom. Product and glass entire upper60% frame, bottom40% quiet pale counter for website overlay. Photographic detail, real daylight neutral white balance,4:3 native4K. No text icons logos numbers. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "roV3Prompt": "Derive category tile from this clean H5 installation photograph. Preserve exact unmarked hardware geometry and realistic side-by-side sink/utility cabinets, neutral daylight and clean materials. Reframe for4:3 so FULL filtration unit lies in upper two thirds, its base ends at60% of image height, with generous quiet clean oak floor occupying lower third. Camera farther back and lower, product remains prominent and recognizable, not tiny. Cabinet has clearance above and beside unit; separate sink cabinet to left. No additional parts or people. Plain black housings, blank display, unnumbered gauges, three orange buttons, amber collar, three clear bowls. Native4K requested. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "roV3FinalPrompt": "Edit this category tile without changing its framing or product positions: remove all logos/emblems/lettering from frame rail and top black cylinders, plain matte black. No numbers on gauge faces; preserve ticks. Preserve the entire H5 silhouette exactly, three transparent bowls, amber collar, empty clearance and connected plumbing. Keep full product above62% image height, quiet floor lower38%. Clean cabinet, neutral window daylight, realistic materials. Native4K4:3. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+    "explodedV3Prompt": "Edit this transparent exploded H5 diagram. Remove Crystalina wordmark and C emblem from frame rail completely, leaving clean matte black rail. Remove any other letters numbers logos icons. Keep all components, exact geometry, layout and thin neutral grey leaders unchanged: upper UVC, membrane amber collar, three filter assemblies, empty frame twin unnumbered gauges dark display three orange buttons, faucet. TRUE alpha background everywhere between components, no grey clouds or backdrop, preserve clear plastic semi-transparency and clean edges. Native4K portrait7:8 requested. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts. Intentional exploded separation permitted."
+  },
+  "notes": [
+    "Generated scenes are original concepts, not verified installations.",
+    "Earlier logo-heavy drafts superseded.",
+    "Hero depicts father, mother, older son, younger daughter, baby boy.",
+    "Original product photographs not modified.",
+    "Some tiny background appliance control marks may remain; no editorial text or graphic overlays added."
+  ],
+  "exports": [
+    {
+      "file": "images\\h5-600-exploded.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-e36dacf0-e608-4afc-a1d4-5407c48585a1.png",
+      "native": [
+        1173,
+        1341
+      ],
+      "delivery": [
+        1400,
+        1600
+      ],
+      "bytes": 177650,
+      "sha256": "ddc9c67f21394fda0f3cfa32ebdaf9bf83fd6ff6de03aa67ab7f230c7e6f9303",
+      "srgb": true,
+      "alphaExtrema": [
+        0,
+        255
+      ]
+    },
+    {
+      "file": "images\\hero-bg.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-4d6a72dd-60f5-4de2-8a65-7bc8e18c04b2.png",
+      "native": [
+        1651,
+        953
+      ],
+      "delivery": [
+        2600,
+        1500
+      ],
+      "bytes": 411958,
+      "sha256": "1d3c61e7f260125b0343743578d32e59fb41130f17d1be3c233d14947f0fdcdc",
+      "srgb": true
+    },
+    {
+      "file": "images\\lifestyle-hydration.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-7d841319-df3f-46e0-bc0e-012510fb6998.png",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "bytes": 205190,
+      "sha256": "096cf7b2a3f5b2ae6aaba71948e40bb9f63cb55373b65cdc594f621b4a0ac87d",
+      "srgb": true
+    },
+    {
+      "file": "images\\point-of-use.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-0cc95b12-8812-44c4-92e6-57982460735a.png",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "bytes": 121208,
+      "sha256": "eb2d363c4f78e8e943eacc174a7025939f674319fc3c7a685ef65e17eccb5c9c",
+      "srgb": true
+    },
+    {
+      "file": "images\\nyc-skyline.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-61884e4e-9da9-4c7a-8ca6-ad11f953b34b.png",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "bytes": 157566,
+      "sha256": "62c395fe45644a502abf43ce1a0d2baa8c097ff9cd2307d0573bad6c06caf457",
+      "srgb": true
+    },
+    {
+      "file": "images\\cat-reverse-osmosis.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-c4dff9dc-44b4-409a-b887-919304570e7e.png",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "bytes": 112782,
+      "sha256": "8b1cb63d46cd517c19fba21358aa46186cb41a5c4bee86ff78d239a53f4642d7",
+      "srgb": true
+    },
+    {
+      "file": "images\\cat-whole-house.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-4c42710c-e091-4629-8e60-f199a3e8e458.png",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "bytes": 72206,
+      "sha256": "22f12a28332d9f17cc680fe52f634a0a2ee5e293549e6cf6dcabdd53b6319501",
+      "srgb": true
+    },
+    {
+      "file": "images\\cat-countertop.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-a4a25833-9df6-4ab6-b30b-402e274dacbd.png",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "bytes": 108440,
+      "sha256": "f3bff6ccc6cf0304b21d4e1e706c9437a83bc59824826934336e85a23b0d9e5b",
+      "srgb": true
+    },
+    {
+      "file": "images\\cat-shower.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-0d4d0588-fbbf-477b-b8d9-8cf834134448.png",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "bytes": 94184,
+      "sha256": "3a65020d9a1fc54e37b0a500efa56e67f2be59b4f4e3a31881952d196e8e0487",
+      "srgb": true
+    },
+    {
+      "file": "images\\cat-replacement.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-7044458e-96f9-44d3-8f9d-16bcb8111d9d.png",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "bytes": 140150,
+      "sha256": "e754b339f8841fee0435bf74c48476c870670e2bf8ef85444b6f3c2058ed1563",
+      "srgb": true
+    },
+    {
+      "file": "images\\cat-accessories.webp",
+      "source": "C:\\Users\\erick\\.codex\\generated_images\\01a19ee5-03e6-7ce2-91cc-53e0ce4e4539\\exec-8514b193-c14b-4741-94aa-0cae7e08e844.png",
+      "native": [
+        1448,
+        1086
+      ],
+      "delivery": [
+        1200,
+        900
+      ],
+      "bytes": 99956,
+      "sha256": "7da44284726bf305d0b021852075f699eff7522a2cb6f36b606c3edbf8be4137",
+      "srgb": true
+    }
+  ],
+  "totalBytes": 1701290
+}

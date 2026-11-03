@@ -85,6 +85,28 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-03 · Codex · Real-kitchen references replace invented sets
+
+User rejected the staged kitchen/family candidates and supplied six inspiration
+images. Latest instruction removes added text/icons and compulsory logos.
+Rewrote IMAGE_PROMPTS.md in full, retained five-person hero requirement, and
+downloaded an actual Brooklyn apartment kitchen photograph into image-refs/
+architecture with source/credit in the brief. It is unpublished spatial
+inspiration, not a claimed installation. Earlier clean/logo-heavy candidates
+are superseded and have not been installed. Generating original scenes from
+observed room layout before export. Original product photographs stay untouched.
+
+Completed all 11 replacements with the built-in image generator and installed
+exact-size WebP/sRGB exports. Hero has father, mother, older son, younger daughter
+and baby boy; lifestyle scenes use dedicated taps rather than oversized exposed
+hardware. No added graphic text/icons or compulsory logos. Native outputs remain
+below 4K: hero 1651x953, exploded 1173x1341, others 1448x1086. User-approved
+resizing yields 2600x1500, 1400x1600 alpha, and 1200x900 respectively; not native
+4K. Total delivery size 1,701,290 bytes. Full prompts, source paths, hashes and
+reference credit: image-refs/generation-log-2026-11-03-reference-led.json.
+Validation: npm run check passes in full (68 tests, 131-file site build, 23
+diagrams and blueprint consistency). No original product photos changed.
+
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
@@ -245,6 +267,10 @@ shipping in the browser as `subtotal >= 99 ? 0 : 9.99`, and the free
 shipping threshold is written in nine places across the site. The claims
 table above still assigns `api/`, `functions/` and `supabase/` to Codex,
 which no longer reflects who is working here.
+### 2026-11-02 · Codex · Hero family specified
+
+User clarified the regenerated hero must contain exactly five family members: father, mother, older son, younger daughter and baby boy. Revised P2 accordingly with detailed individual poses, realistic anatomy and unobstructed focal filtration hardware. This supersedes the two-person hero draft in the clean-home revision.
+
 ### 2026-11-02 · Codex · User correction: clean editorial homes and branded products
 
 The user rejected the excessive dirt/wear in the first imagery pass and explicitly authorized rewriting Claude's prompt files. New direction: attractive, clean middle-income apartments; only subtle aesthetic material imperfections; filter is the visual focal point. The two supplied Crystalina marks may be engraved, labelled, printed, textured or integrated into the actual product. This supersedes the previous blanket logo/text ban and grime-led room direction. Codex owns this revision to IMAGE_PROMPTS.md, image-refs/ and the 11 generated site assets; no original product photos are to be edited. Source logos are copied unchanged into image-refs/brand/. The user's prior native-resolution exception remains active. Regeneration in progress.

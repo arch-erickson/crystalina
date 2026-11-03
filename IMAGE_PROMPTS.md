@@ -1,242 +1,195 @@
-# Crystalina — editorial image direction
-
-Revised 2026-11-02 from the user's direct review. This file governs site imagery.
-Read sections 2–4 before generating. The previous emphasis on dirt and wear is retired.
+# Crystalina — reference-led editorial imagery
+Revised 2026-11-03 following the user's latest visual review. This complete revision
+supersedes the logo-heavy, oversized-product and invented-kitchen prompts.
 
 ## 1. Direction
-
-Clean, attractive, well-kept middle-income New York apartments, photographed at
-editorial quality, with the filter as the visual focal point. Homes are comfortable
-and attainable, neither neglected nor luxury penthouses. Realism comes from
-natural materials, believable light and people, not grime. Minor imperfections
-are aesthetic and effectively unnoticeable at normal viewing size.
-
-The user supplied two official logos and authorized applying them to actual
-products. This supersedes the prior blanket text/logo ban. Brand blue belongs on
-the supplied marks and genuine hardware, not on food, walls, wardrobe or lighting.
+Original editorial photographs in clean, attractive, attainable middle-income
+apartments. Start with an actual photographed apartment kitchen, inspect its
+architecture, then generate an original scene grounded in that layout.
+The user's examples guide detail, photographic quality, background and natural
+family interaction. They do not authorize copying competitor products, text,
+icons, certification marks or pasted product collages.
 
 ## 2. The standard
+### 2.1 Delivery
+Request native 4K or better. If the built-in generator returns less, the user
+authorized installing the best result with its true native size documented.
+Never describe an enlarged export as native 4K. Deliver exact dimensions below,
+WebP with embedded sRGB; Lanczos resizing. P1 has true alpha. Masters stay outside
+the repository; only delivery WebPs go in images/.
 
-### 2.1 Resolution and delivery
+### 2.2 Photographic realism
+Clean cabinets, counters, sinks and grout. Minor aesthetic irregularities:
+cloth folds, subtle wood grain, normal hair flyaways, gentle material variation.
+No grime, chips, rust, scale, crumbs or distressed surfaces. A home can contain
+useful objects: kettle, chopping board, fruit bowl, dish towel, glassware.
+Choose objects appropriate to the observed real kitchen, not a sterile showroom.
+Natural pores, fine lines, asymmetry, individual expressions and normal teeth.
+Hands grip with real pressure; bodies have believable weight and support.
+People do ordinary actions, not simultaneous advertising smiles or a lineup.
+Keep faces large enough to resolve. Avoid tiny figures in a huge artificial room.
+One dominant window source, realistic bounce, soft shadows and accurate exposure.
+Use believable 35–50mm perspective, restrained depth of field and fine detail.
+No synthetic shine, excessive sharpening, skin smoothing or simulated HDR.
 
-Request native 4K or better (at least 3840 pixels on the long edge).
-The user explicitly approved installing the best built-in generator results below
-4K if their actual native resolution is documented. Never call an enlarged export
-native 4K. Deliver WebP, embedded sRGB, exact dimensions below, Lanczos resampling.
-P1 requires true transparency. Masters stay outside the repository; images/ publishes
-whole. Only final delivery files go there. References/logs stay in image-refs/.
-
-### 2.2 Clean editorial realism
-
-- Clean, intact, aligned cabinetry; clean grout; wiped counters; clean sinks;
-  maintained hardware. No peeling paint, grime, stains, scale, rust or crumbs.
-- Restrained everyday objects: a glass, neatly folded linen towel or small fruit
-  bowl. Two or three useful objects, arranged without looking sterile or staged.
-- Texture means subtle wood grain, ceramic glaze, cloth weave and brushed steel.
-  Do not emphasize scratches, chipped edges or distressed surfaces.
-- People have natural skin, fine lines, pores, relaxed asymmetric expressions,
-  anatomically correct hands and real grip pressure. No harshly exaggerated age.
-- Generous soft daylight from a clear window source, natural bounce and falloff,
-  bright editorial exposure and readable shadows. No gloom or theatrical rimlight.
-- The filter is the sharpest, clearest and most salient subject. People and room
-  support it. Never hide it behind a body, door or foreground object.
-- Polished magazine photography, realistic lens perspective and materials,
-  restrained styling. No plastic CGI sheen, HDR grit or featureless background haze.
-
-### 2.3 Setting and product priority
-
-Use nicely maintained middle-income NYC apartments: modest renovated galley
-kitchens, white shaker cabinets, clean quartz or laminate counters, subway tile,
-oak accents, cared-for windows and a glimpse of neighbouring brick or fire escape.
-Old-building character does not mean decay. Show realistic scale and diverse households.
-
-Lifestyle images show the actual filtration system, not just a generic glass or
-faucet. Under-sink models stay installed under the sink or in a proper utility
-cabinet; do not turn them into countertop dispensers. The About plate now shows
-a clean NYC apartment installation, with its existing filename retained.
+### 2.3 Architecture before styling
+Before each kitchen scene, inspect a real apartment reference and record its
+source, layout and relevant observations in image-refs/. Establish walls,
+cabinet fronts, sink position, working side, appliance locations and a continuous
+walkway before placing people. A person never stands between a wall-backed sink
+and its backsplash. Peninsula seating and working sides must be distinguishable.
+Keep cabinet doors, drawers, chairs and walking routes usable.
+Retain practical stove/hood/fridge context where the view would show it.
+Use a new original room inspired by the reference, not an exact copy of its
+artwork or decor. Do not claim a generated room is a real installation.
+Do not enlarge hardware to make it prominent. Preserve product proportions and
+leave fitting/service clearance. A filter may occupy a separate adjacent utility
+cabinet when an actual sink bowl/drain would prevent an under-sink fit.
+The filtration story is clear through the installed unit or dedicated drinking
+tap and water use; do not force an open oversized unit into every family scene.
+Product detail plates carry the close-up hardware story.
 
 ### 2.4 Colour
+Neutral white balance and natural colours; no warm, cool, green or purple cast.
+Real wood, fruit, clothing and fittings retain their colours. No blue apples or
+brand-coloured set dressing. Warmth comes from people and materials, not grading.
 
-Neutral white balance, accurate whites, true skin/material colours. No cool,
-warm, green, purple or amber grade. Actual wood, fruit and fitting colours are fine.
-No brand-blue set dressing. Official blue/silver artwork is allowed on the product.
+### 2.5 No added text or icons
+Latest user instruction: no text or icons. Do not add logos, wordmarks, taglines,
+badges, certification symbols, diagrams, captions, numbers or UI to this new set.
+Do not force Crystalina branding into every photograph. Generate clean unmarked
+surfaces; keep necessary controls physically present but displays dark and gauge
+faces unnumbered. Original product photographs remain untouched.
+Supplied brand files remain historical references, not inputs for this revision.
 
-### 2.5 Official product branding
-
-Use these supplied references, copied unchanged:
-- image-refs/brand/Crystalina-Logo.png — official wordmark and tagline.
-- image-refs/brand/Realistic-Logo.png — blue/silver C-and-water-drop emblem.
-
-Apply the wordmark and/or emblem as a proportionate engraving, printed mark,
-fitted label, badge, embossing or texture ON THE PRODUCT. Follow its perspective,
-curvature, lighting and reflections. Preserve the reference's shape/proportions.
-Do not paste a white reference-image rectangle over hardware.
-
-Use wordmark on a large panel/rail; use emblem alone on small chrome/curved parts.
-Monochrome engraving of the emblem is allowed. Omit the tagline when too small.
-If rendered, permitted wording is exactly CRYSTALINA and PURE WATER. PURE LIFE.
-No invented lettering, claims, specifications, numbers, UI or other brands.
-No floating logo/watermark; no branding on walls, clothes, people, food or unrelated
-appliances. Original product photographs remain protected; only generated assets
-receive this treatment. Category concepts are not verified catalogue products.
-
-### 2.6 Negative prompt — include on every generation
-
+### 2.6 Negative prompt — append in full to every generation
 ```text
-dirt, grime, mould, mildew, stained grout, peeling paint, chipped cabinets,
-water stains, limescale, rust, crumbs, rubbish, distressed surfaces, clutter,
-neglected apartment, gritty reportage, gloomy room, luxury penthouse,
-unauthorized text, numbers, signage, watermark, invented logo, misspelled branding,
-third-party brand, UI overlay, floating logo, oversized product label,
-airbrushed skin, poreless face, plastic skin, waxy skin, exaggerated wrinkles,
-identical expressions, extra fingers, malformed hands, fused fingers,
-blue colour grade, cool colour grade, warm colour grade, orange tint, green tint,
-purple tint, teal and orange, heavy vignette, lens flare, bokeh haze background,
+text, letters, numbers, logos, wordmarks, icons, certification badges, signage,
+watermark, captions, labels, UI overlay, floating product cutout, pasted collage,
+giant filter, distorted hardware, impossible plumbing, blocked walkway,
+people behind wall-backed countertop, impossible kitchen geometry,
+matching advertising smiles, identical faces, plastic skin, airbrushed skin,
+waxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,
+duplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,
+peeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,
+distressed surfaces, neglected apartment, luxury penthouse, blue colour grade,
+cool colour grade, warm colour grade, orange tint, green tint, purple tint,
+teal and orange, heavy vignette, lens flare, artificial background haze,
 HDR halo, oversharpened, CGI render, 3D render, video game lighting,
-floating objects, duplicated parts, impossible plumbing, low-res, jpeg artifacts
+floating objects, duplicated parts, low-res, jpeg artifacts
 ```
-
-Supplied Crystalina marks on products are allowed. P1's intentional exploded
-separation is the only exception to floating parts.
+P1 intentional exploded separation is the sole floating-parts exception.
 
 ## 3. References
-
-Scene references: image-refs/<target-filename>.<ext>, numbered for multiples.
-Brand references: image-refs/brand/. Real product photographs govern hardware;
-supplied logos govern branding. Scene references guide composition, but this user's
-clean-home correction overrides dirt, wear and clutter. Section 4 governs crop.
-If accurate hardware cannot fit the scene, flag it in COORDINATION.md rather than
-inventing components. User authorized all P1–P6 from written prompts when scene
-references are absent. image-refs/ stays outside the publish allow-list.
+Architecture: image-refs/architecture/brooklyn-kitchen-reference.jpg.
+Source: https://www.apartmenttherapy.com/oyin-antwi-brooklyn-small-apartment-tour-photos-36821702
+Photo credit: Angelene Coronel Photography and Erwin Pajarillo, via Apartment Therapy.
+Use only as unpublished architectural inspiration. It depicts an actual Brooklyn
+apartment: wall cooking/appliance run, compact sink peninsula with separate
+working/seating sides, dining table next to window, ordinary storage and utensils.
+Do not copy wall art, clock, fixtures or the complete furnished composition.
+It is spatial evidence, not proof that the room fits the H5 or a five-person household.
+Adapt modestly for a family-sized apartment and retain plausible circulation.
+User inspiration: image-refs/inspiration/family-cooking.png and family-water.png.
+Use their convincing interaction, fine detail and layered backgrounds, not
+identities, exact poses, grading, logos or product configurations.
+Hardware photographs govern shape whenever a Crystalina unit is visible.
+No scene reference overrides anatomy, neutral colour, physical layout or crop.
 
 ## 4. Compose for the box
+P1: full exploded hardware, margins, true alpha, 7:8. No text or icons.
+Category tiles: 4:3; entire focal subject in upper two thirds, ideally base at
+60–62% height. Bottom third quiet real counter/floor/tile for CSS labels.
+Leave hover-crop margins; do not bake in gradient.
+Hero: 26:15; left40% quiet real room for CSS copy overlay. Family/action at right,
+all five faces readable and fully framed. No painted gradient. Avoid enormous
+empty wall by including naturally quiet room detail.
+Other editorial plates: 4:3; coherent scene and useful background context.
 
-### A. Product shots
-Full hardware with margins, neutral surface or required alpha, plausible lighting.
-Do not overwrite protected images/products/ photographs or their variants.
+## 5. Validation
+Inspect architecture, hands, faces, baby support, family count, product proportions,
+plumbing, typography absence and crop at final size. Reject impossible layouts.
+Record source/native dimensions/delivery dimensions and generation prompts.
+Run npm run check before pushing; tests and site build must pass.
+Report unrelated existing drift without changing other owners' files.
 
-### B. Category tiles
-Exactly 4:3. Entire focal hardware and logo in upper two thirds, ideally ending at
-60–62% image height. Bottom third quiet CLEAN counter, floor or tile for the CSS
-label gradient. Leave margins for scale(1.05) hover. Hardware readable at 380px.
-Do not make the product tiny in a vast room. Never bake in a gradient.
+## 6. Protected product references
+Never overwrite these photographs or any originals/variants in images/products/:
+- images/products/h5-600-uv-studio.webp
+- images/products/f5-600-uv-studio.webp
+- images/products/x2a-600-studio.webp
+- images/products/w5-400-alkaline-studio.webp
+H5: black frame, three clear bowls/black caps, twin gauges, dark display/three
+orange buttons, black membrane with amber collar, upper black UVC housing.
+Match geometry but omit printed labels in generated scenes.
+Replacement geometry: filter-ppf-02.webp and filter-acm-10.webp.
 
-### C. Lifestyle and About plates
-1200 x 900, 4:3. Filter sharp, prominent and unobstructed. People, if present,
-support the product story with natural activity at its dedicated faucet.
-No forced symmetry. No generic faucet-only composition.
-
-### D. Technical exploded view
-1400 x 1600, 7:8, true alpha; generous spacing, thin neutral grey leader lines.
-Top to bottom: UVC, membrane housing, three filter assemblies, empty frame with
-gauges/display, faucet. Preserve actual black/amber housing and cartridge geometry.
-Conceptual exploded illustration, not a certified flow schematic. Brand frame
-rail or casing. Do not duplicate the full system inside its empty frame.
-
-### E. Hero
-2600 x 1500, 26:15. Hardware and human activity on right half. Left 40% is clean
-real room, no painted gradient; CSS adds the overlay. Product branding is visible
-on right. Bodies and open doors must not obscure the filter.
-
-## 5. Weight and checks
-
-Quality first; no per-image byte ceiling. Efficient WebP, record sizes.
-The earlier 11 files totalled 2,500,482 bytes (historical, not a target).
-Responsive variants, lazy loading and hero preload belong to design owner.
-Run npm run check before pushing; tests/build must pass. Report unrelated drift.
-
-## 6. Protected hardware
-
-Never regenerate/overwrite these real photographs or their derived variants:
-```text
-images/products/h5-600-uv-studio.webp
-images/products/f5-600-uv-studio.webp
-images/products/x2a-600-studio.webp
-images/products/w5-400-alkaline-studio.webp
-```
-Use the matching model as reference. H5-600: black open frame, three clear bowls
-with black caps, two gauges, dark panel with three orange buttons, horizontal
-black membrane housing with amber collar, black UVC above. No invented features.
-Use filter-ppf-02.webp and filter-acm-10.webp for replacement cartridge geometry.
-
-## 7. Revised prompts
-
-Every entry includes sections 2.2, 2.4, 2.5 and full negative prompt 2.6.
-All targets below are under images/, WebP/sRGB. Product is the focus.
+## 7. Per-image prompts
+Every prompt inherits sections2–4 and full negative prompt2.6.
 
 ### P1 — h5-600-exploded.webp
-1400 x 1600, 7:8, transparent. References: real H5-600 and both supplied logos.
-Precise photographic exploded view in section 4D order, neutral studio key,
-accurate material texture, grey leaders and generous margins. Official wordmark
-printed silver on right of frame rail, small supplied emblem beside it.
-Gauges unnumbered, display dark. Preserve hardware geometry and transparency.
+1400x1600 transparent. Precise photographic exploded H5 using real hardware.
+Top-to-bottom UVC, membrane, three filter assemblies, empty frame/gauges/panel,
+faucet. Neutral studio light, accurate black/clear/amber materials. No duplicate
+assembled system in frame. Fine grey leaders only, no arrows/icons/text/branding.
 
 ### P2 — hero-bg.webp
-2600 x 1500, 26:15. References: real H5-600 and official logos.
-Bright editorial photograph of a clean, attractive middle-income NYC apartment
-kitchen: modest white shaker cabinetry, pale counter, oak floor and cared-for
-window overlooking nearby brick. Right-side open under-sink cabinet reveals the
-real branded H5-600, primary focal point, with tidy connected plumbing. A woman
-fills a glass at its dedicated faucet, standing beside rather than in front of
-the unit. Teenager adds quiet context. Natural expressions and skin. Daylight
-from right window; folded linen and small ceramic bowl. Left 40% clean real wall
-and cabinetry. Wordmark/emblem on filter rail only. No painted gradient.
+2600x1500. First inspect actual apartment architecture reference. Original clean
+family apartment with wall appliance run, usable sink peninsula and nearby
+window-lit dining area, adapted from observed spatial relationships.
+Camera from dining/living side, eye-level35mm, coherent perspective.
+Exactly five people: father about40, mother about37, older son14, younger
+daughter7, baby boy9months. Father safely supports baby with forearm under
+bottom and hand at torso; baby looks at family. Mother uses drinking-water tap
+from its working side; son and daughter naturally interact at dining counter or
+table. Separate readable faces, natural expressions, ordinary clothes and poses.
+Do not arrange five smiling heads in a row. Make interaction intimate enough to
+see expressions, with clear water/glass and dedicated tap as foreground subject.
+A full H5 need not be exposed in this family image; keep installation concealed
+if revealing it would distort architecture or force a product collage.
+Left40% real quiet room, action right. Clean middle-income home, daylight, neutral
+white balance, real texture, no added text, icons or logos.
 
 ### P3 — lifestyle-hydration.webp
-1200 x 900, 4:3. References: real H5-600 and official logos.
-Polished editorial home photograph in a comfortable clean NYC apartment kitchen,
-intact white cabinetry and oak accents. Branded H5-600 clearly visible, sharp and
-unobstructed in an open under-sink cabinet in foreground. Beside it an older man
-fills a glass at the dedicated filtered-water faucet for his grandchild. People
-farther back, supporting the product. Restrained fruit bowl, folded towel, pale
-clean counter, daylight. Natural fine skin texture and gentle candid expressions.
-Official supplied marks physically printed on filter rail.
+1200x900. Real-kitchen-reference-led original photograph. Older grandfather and
+young granddaughter share an ordinary water moment at a modest dining counter,
+dedicated tap and clear glass visible. Anatomically convincing grips, relaxed
+individual expressions, natural fine lines, clean practical kitchen background.
+Use an intimate eye-level50mm view. Do not expose an enormous unit at their knees.
+No text, icons or logos.
 
 ### P4 — point-of-use.webp
-1200 x 900, 4:3. References: real H5-600 and official logos.
-Editorial detail of the branded H5-600 installed in a beautifully clean open sink
-cabinet, dedicated brushed-steel drinking-water faucet visible above. Product
-foreground sharp and prominent; a hand filling a glass provides use context
-without hiding filter. Clean white interior, pale counter, tidy connected tubing,
-P-trap, neutral daylight and realistic clear water. Wordmark on filter rail,
-optional tiny supplied emblem engraved on faucet base. No soap clutter or grime.
+1200x900. Real-reference-based detail of H5 installed inside a clean adjacent
+utility cabinet or under a sink only with credible bowl/drain clearance.
+Three-quarter view shows cabinet depth, tidy actual connections, full unit at
+normal scale, small drinking tap above/nearby. No person required. Ordinary
+materials, soft daylight, accurate hardware. No text/icons/logos.
 
-### P5 — nyc-skyline.webp (filename retained; new About subject)
-1200 x 900, 4:3. References: real H5-600 and official logos.
-Product-led editorial photograph of a real branded H5-600 installation in a clean
-utility cabinet beside a kitchen sink in a comfortable middle-income NYC apartment.
-Nearby well-maintained sash window offers a restrained glimpse of brownstone
-brick/fire escape. Filter fills foreground, sharp and central to the story. Tidy
-neutral room, daylight, white cabinetry, clean fittings, subtle oak grain.
-Official wordmark/emblem on rail. No people required, no rubbish or distressed
-architecture. Design owner updates skyline-specific alt text separately.
+### P5 — nyc-skyline.webp
+1200x900; filename retained. Original NYC apartment kitchen detail grounded in
+real architecture, clean sink/drinking tap and modest window with brick outside.
+H5 visible in practical adjacent utility cabinet, actual scale and clearance.
+No staged luxury, no giant appliance, no text/icons/logos.
+Design owner handles old skyline-specific alt text.
 
 ### P6 — six category tiles
-All 1200 x 900, 4:3, rule 4B. Base: clean attractive middle-income NYC home,
-polished editorial photograph, soft natural daylight, neutral white balance,
-real texture, focal product, restrained everyday context. Hardware and branding
-above bottom third; no overlay. Apply only supplied marks to product.
+All1200x900. Upper-two-thirds product placement; clean quiet lower third.
+- cat-reverse-osmosis.webp: actual-reference H5, clean utility/sink cabinet,
+  credible drain and service clearance, tidy connections, no oversized hardware.
+- cat-whole-house.webp: three plain white housings, steel bracket and connected
+  copper bypass plumbing in a maintained modest utility room. No branding.
+- cat-countertop.webp: plain modest off-white dispenser, clear reservoir,
+  clean real-reference apartment counter, one ordinary mug, no text or UI.
+- cat-shower.webp: chrome inline filter correctly connected between arm/head,
+  clean ordinary bathroom tile, natural spray/daylight, no engraving or icons.
+- cat-replacement.webp: fresh cartridges matching protected PPF/ACM references,
+  clean empty housing beside them, sharp real media texture, unmarked end caps.
+- cat-accessories.webp: plain TDS pen, dark blank display, clear glass, natural
+  hand setting pen down on real apartment counter; correct fingers, no markings.
+Whole-house, countertop and shower are category concepts, not verified SKUs.
 
-| Target | Prompt |
-| --- | --- |
-| cat-reverse-osmosis.webp | Real H5-600 in immaculate open under-sink cabinet, clean connected P-trap/shutoff/disposal with clearance, tidy tubing and intact cabinetry. Product dominates upper two thirds, clean floor foreground. Official wordmark/emblem on top rail. H5-600 reference mandatory. |
-| cat-whole-house.webp | Three neat white filter housings on steel wall bracket in clean cared-for utility room, orderly copper piping, shutoff/bypass valves, boiler incidental at edge. Fresh neutral wall, clean floor. Supplied emblem/wordmark as small fitted housing labels. Category concept, not verified SKU. |
-| cat-countertop.webp | Modest off-white countertop filter/dispenser with clear reservoir on clean pale counter, one ceramic mug, neat backsplash and small window. Product dominates, no luxury island. Supplied wordmark on casing and small integrated emblem. Category concept, not verified SKU. |
-| cat-shower.webp | Chrome inline filter correctly joined between shower arm and showerhead in attractive clean bathroom, white tile, clean grout, natural spray. Filter focal, quiet tile below. Supplied emblem engraved into chrome body, no giant sticker. Category concept, not verified SKU. |
-| cat-replacement.webp | Fresh clean cartridges matching filter-ppf-02.webp and filter-acm-10.webp, clean empty housing beside them, spotless neutral worktop. No stained used cartridge. Small official mark on end cap or housing; never cover active filter media with a solid label. Sharp product texture. |
-| cat-accessories.webp | Clean TDS pen with blank display beside clear glass on clean pale kitchen counter, hand setting it down. Supplied wordmark printed on casing, small emblem near cap. Instrument/glass upper two thirds, no clutter. |
-
-## 8. Scope and handoff
-
-User authorized rewriting this brief and regenerating site imagery with supplied
-branding. Edit IMAGE_PROMPTS.md, image-refs/, specified images/ assets and
-COORDINATION.md. Never change original product photos, markup, CSS, docs/, scripts/,
-functions/, api/, supabase/ or catalogue in this pass.
-
-Whole-house/countertop/shower currently lack catalogue products. Their imagery is
-a category concept, not verification of stock or actual manufactured branding.
-Catalogue/design owner decides continued use. No invented certifications or claims.
-Record actual prompts, references, sizes, brand treatment and checks. Earlier
-generation logs are historical and do not override this revision. Retired image
-deletion and old RO-10/skyline alt text remain design-owner work.
+## 8. Scope
+Only IMAGE_PROMPTS.md, image-refs/, the11 delivery images and COORDINATION.md.
+No code/CSS/markup/docs/scripts changes. Keep original product images untouched.
+Earlier logs and generated candidates are historical; latest user direction wins.
 

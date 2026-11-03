@@ -18,12 +18,19 @@ import { toPagesFunction } from './functions/_shim.js';
 import contact from './api/contact.mjs';
 import newsletter from './api/newsletter.mjs';
 import createOrder from './api/orders/create.mjs';
+import checkoutSession from './api/checkout/session.mjs';
+import stripeWebhook from './api/stripe/webhook.mjs';
 
 /* Exact paths only. A prefix match would route /api/contact-us here too. */
 const ROUTES = new Map([
   ['/api/contact', toPagesFunction(contact)],
   ['/api/newsletter', toPagesFunction(newsletter)],
   ['/api/orders/create', toPagesFunction(createOrder)],
+  ['/api/checkout/session', toPagesFunction(checkoutSession)],
+  /* Stripe calls this one, not a browser. It verifies a signature rather
+     than a session, so it is deliberately outside everything that
+     expects a signed-in user. */
+  ['/api/stripe/webhook', toPagesFunction(stripeWebhook)],
 ]);
 
 const json = (status, body) => new Response(JSON.stringify(body), {

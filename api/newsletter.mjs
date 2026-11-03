@@ -1,12 +1,12 @@
 /* POST /api/newsletter — subscribe an address to the Crystalina Club. */
-import { json, methodGuard, readJson, clientIp, rateLimit, isEmail, cleanText } from './_lib/http.mjs';
+import { json, methodGuard, readJson, clientIp, rateLimit, durableRateLimit, isEmail, cleanText } from './_lib/http.mjs';
 import { verifyTurnstile } from './_lib/turnstile.mjs';
 import { admin } from './_lib/supabase.mjs';
 
 export default async function handler(req, res) {
   if (!methodGuard(req, res)) return;
   const ip = clientIp(req);
-  if (!rateLimit(`news:${ip}`, { limit: 8, windowMs: 10 * 60000 }).allowed) {
+  if (!(await durableRateLimit(`news:${ip}`, { limit: 8, windowMs: 10 * 60000 })).allowed) {
     return json(res, 429, { error: 'Too many attempts. Please try again shortly.' });
   }
 
