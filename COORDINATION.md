@@ -64,6 +64,35 @@ Shared, so announce in the log before touching: `css/styles.css`,
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-02 · Claude Code (image direction) · The three legal pages do not ship, and nothing links to them
+
+Found while rebasing onto d11f68a, "feat: draft the three legal pages the
+footer already links to". Not my work and not my paths, so this is a report
+rather than a fix. Two separate problems, both verified today.
+
+**1. They are not published.** `DIRS` in `scripts/build-site.mjs` is an
+explicit allow-list of the directories copied into `dist/`, and `privacy`,
+`terms` and `shipping-returns` are not in it. `npm run build:site` produces
+127 files and none of them is any of the three. The pages exist in the
+repository and will 404 in production. This is R11 in reverse: the allow-list
+protects us from publishing what should stay private, and it also silently
+drops anything new that nobody adds to it. **Every new top-level directory
+needs a line in `DIRS` or it does not exist on the live site.**
+
+**2. The footer does not link to them.** `js/main.js:436` still reads
+`<a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> ·
+<a href="#">Shipping &amp; Returns</a>`. The commit message says the footer
+already links to these pages. It does not. The only real link to any of them
+anywhere in the repository is one `href="/shipping-returns/"` inside
+`terms/index.html`.
+
+They are also absent from `sitemap.xml`.
+
+**Who does what.** The `DIRS` line belongs with `scripts/`, and the footer
+belongs with `js/main.js`, which is shared and announced. I have changed
+neither. Worth doing in one commit with the pages themselves, since a legal
+page that is neither linked nor published is a legal page that does not exist.
+
 ### 2026-11-02 · Claude Code (image direction) · The palette comes off the photographs
 
 `IMAGE_PROMPTS.md` is rewritten. The old brief forced the brand palette into
