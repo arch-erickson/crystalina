@@ -17,8 +17,11 @@
 <body>
 
 <main>
-  <section class="page-hero">
-    <div class="container"><h1 id="acctTitle">My Account</h1><p id="acctSub"></p></div>
+  <section class="page-hero page-hero--quiet">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Account</span></nav>
+      <h1 id="acctTitle">Your account</h1><p id="acctSub"></p>
+    </div>
   </section>
 
   <section class="section">
@@ -65,7 +68,7 @@
     document.querySelector('#acctTitle').insertAdjacentElement('afterend', link);
   }
 
-  document.getElementById('acctSub').textContent = 'Welcome back, ' + user.name.split(' ')[0] + '!';
+  document.getElementById('acctSub').textContent = 'Welcome back, ' + user.name.split(' ')[0] + '.';
   document.getElementById('acctName').textContent = user.name;
   document.getElementById('acctEmail').textContent = user.email;
   document.getElementById('signOutBtn').addEventListener('click', () => { Store.signOut(); location.href = '/'; });

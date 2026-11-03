@@ -19,11 +19,11 @@
 <main>
   <div class="auth-wrap">
     <div class="auth-card">
-      <h1 id="authTitle">Welcome back</h1>
-      <p class="auth-sub" id="authSub">Enter your email and we’ll send an eight-digit verification code.</p>
+      <h1 id="authTitle">Sign in</h1>
+      <p class="auth-sub" id="authSub">Your email, and we send an eight-digit code.</p>
       <div class="auth-tabs" id="customerTabs">
-        <button id="tabSignin" class="active">Sign In</button>
-        <button id="tabSignup">Create Account</button>
+        <button id="tabSignin" class="active" type="button">Sign in</button>
+        <button id="tabSignup" type="button">Create an account</button>
       </div>
       <div class="form-error" id="authError" role="alert" aria-live="polite"></div>
 
@@ -44,20 +44,20 @@
           <label for="aEmail">Email</label>
           <input id="aEmail" type="email" required placeholder="you@example.com">
         </div>
-        <button type="submit" class="btn btn-primary btn-block" id="authSubmit">Send Verification Code</button>
+        <button type="submit" class="btn btn-primary btn-block" id="authSubmit">Send the code</button>
       </form>
 
       <form id="codeForm" hidden>
         <div class="field"><label for="aCode">Eight-digit verification code</label><input id="aCode" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" autocomplete="one-time-code" required placeholder="12345678"></div>
         <p class="verification-help" id="codeStatus" role="status" aria-live="polite">Codes expire after 60 seconds.</p>
         <div class="code-actions">
-          <button type="submit" class="btn btn-primary btn-block">Verify &amp; Continue</button>
-          <button type="button" class="btn btn-outline btn-block" id="resendCode" disabled>Resend Verification Code in 60s</button>
+          <button type="submit" class="btn btn-primary btn-block">Continue</button>
+          <button type="button" class="btn btn-outline btn-block" id="resendCode" disabled>Send a new code in 60s</button>
           <button type="button" class="btn btn-ghost btn-block" id="changeEmail">Use another email</button>
         </div>
       </form>
 
-      <p class="auth-alt" id="modeToggle">Crystalina staff? <button type="button" class="link auth-mode-link" id="staffLink">Staff sign in →</button></p>
+      <p class="auth-alt" id="modeToggle">Crystalina staff? <button type="button" class="link auth-mode-link" id="staffLink">Staff sign in</button></p>
 
     </div>
   </div>
@@ -108,14 +108,14 @@
   function refresh() {
     el('tabSignin').classList.toggle('active', mode === 'signin');
     el('tabSignup').classList.toggle('active', mode === 'signup');
-    el('authSubmit').textContent = 'Send verification code';
-    el('authTitle').textContent = staffMode ? 'Staff sign in' : (mode === 'signin' ? 'Welcome back' : 'Create your account');
+    el('authSubmit').textContent = 'Send the code';
+    el('authTitle').textContent = staffMode ? 'Staff sign in' : (mode === 'signin' ? 'Sign in' : 'Create an account');
     el('authSub').textContent = staffMode
-      ? 'Enter your staff email. We’ll detect your assigned dashboards after verification.'
-      : (mode === 'signin' ? 'Enter your email and we’ll send an eight-digit verification code.' : 'Create an account with an eight-digit verification code sent to your email.');
+      ? 'Your staff email, and we send an eight-digit code. Your dashboards open once it is checked.'
+      : (mode === 'signin' ? 'Your email, and we send an eight-digit code.' : 'Your email, and we send an eight-digit code to open the account.');
     el('modeToggle').innerHTML = staffMode
-      ? 'Customer? <button type="button" class="link auth-mode-link" id="staffLink">Back to customer sign in →</button>'
-      : 'Crystalina staff? <button type="button" class="link auth-mode-link" id="staffLink">Staff sign in →</button>';
+      ? 'Customer? <button type="button" class="link auth-mode-link" id="staffLink">Back to customer sign in</button>'
+      : 'Crystalina staff? <button type="button" class="link auth-mode-link" id="staffLink">Staff sign in</button>';
     document.getElementById('staffLink').addEventListener('click', () => { staffMode = !staffMode; if (staffMode) mode = 'signin'; refresh(); });
     el('customerTabs').style.display = staffMode ? 'none' : '';
     err.classList.remove('show');
@@ -133,12 +133,12 @@
     const submit = el('authSubmit');
     try {
       const auth = await window.CrystalinaAuth;
-      submit.disabled = true; submit.textContent = 'Sending code…';
+      submit.disabled = true; submit.textContent = 'Sending the code';
       await auth.sendCode(pendingEmail, { allowSignup: pendingAllowSignup });
       el('authForm').hidden = true; el('codeForm').hidden = false; el('modeToggle').hidden = true;
       startResendTimer(); el('aCode').focus();
     } catch (error) { err.textContent = error.message || 'Unable to send a verification code.'; err.classList.add('show'); }
-    finally { submit.disabled = false; submit.textContent = 'Send verification code'; }
+    finally { submit.disabled = false; submit.textContent = 'Send the code'; }
   });
 
   el('codeForm').addEventListener('submit', async e => {
@@ -154,7 +154,7 @@
     err.classList.remove('show');
     const button = el('resendCode');
     try {
-      button.disabled = true; button.textContent = 'Sending New Code…';
+      button.disabled = true; button.textContent = 'Sending a new code';
       const auth = await window.CrystalinaAuth;
       await auth.sendCode(pendingEmail, { allowSignup: pendingAllowSignup });
       el('aCode').value = '';
@@ -190,7 +190,7 @@
     const button = el('googleSignIn');
     try {
       button.disabled = true;
-      el('googleLabel').textContent = 'Opening Google…';
+      el('googleLabel').textContent = 'Opening Google';
       const auth = await window.CrystalinaAuth;
       await auth.signInWithGoogle({ next: staffMode ? 'staff' : null });
       /* The browser leaves for Google here, so nothing below runs on the
