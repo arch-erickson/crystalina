@@ -28,9 +28,9 @@
   <section class="section">
     <div class="container">
       <div class="checkout-layout" id="checkoutLayout">
-        <form id="checkoutForm" class="co-form" novalidate>
+        <form id="checkoutForm" class="form-sections" novalidate>
           <div class="form-error" id="coError"></div>
-          <div class="co-section">
+          <div class="form-section">
             <h3>Delivery</h3>
             <div class="field-row">
               <div class="field"><label for="fFirst">First name</label><input required id="fFirst" autocomplete="given-name"></div>
@@ -49,7 +49,7 @@
               <div class="field"><label for="fZip">ZIP code</label><input required id="fZip" inputmode="numeric" pattern="\d{5}" autocomplete="postal-code"></div>
             </div>
           </div>
-          <div class="co-section">
+          <div class="form-section">
             <h3>Fitting</h3>
             <div class="field"><label for="fInstall">Who fits it</label>
               <select id="fInstall">
@@ -58,10 +58,10 @@
               </select>
             </div>
           </div>
-          <div class="co-section">
+          <div class="form-section">
             <h3>Payment</h3>
-            <p class="co-note">We are not taking payment online yet. Message us on WhatsApp or call (917) 809-4803 and we arrange the order with you, at the same price and with the same delivery.</p>
-            <div class="co-actions">
+            <p class="form-note">We are not taking payment online yet. Message us on WhatsApp or call (917) 809-4803 and we arrange the order with you, at the same price and with the same delivery.</p>
+            <div class="form-actions">
               <button type="submit" class="btn btn-primary btn-block" disabled>Pay online</button>
               <a class="btn btn-outline btn-block" href="https://wa.me/19178094803?text=Hi%2C%20I%20would%20like%20to%20order" target="_blank" rel="noopener">Order on WhatsApp</a>
             </div>
