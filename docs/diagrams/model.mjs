@@ -1262,7 +1262,7 @@ export const phases = [
   {
     id: 'P5', family: 'amber', icon: 'globe', label: 'DNS cutover', needs: ['P2', 'P3'], status: 'Missing', col: 3, row: 0, owner: 'Owner', detail: 'Nameservers, then the Supabase redirect allow-list',
     what: 'Point crystalina.org at Cloudflare, retire GitHub Pages, and teach Supabase the new origin.',
-    why: 'Missing. It is the step that makes everything already built visible to a visitor, and it has to not break Workspace mail, which is U8.',
+    why: 'Missing, and the only server-side item that matters until it is done. Checked 2026-11-03: crystalina.org still answers with Server: GitHub.com, so every /api route, the contact form, the newsletter, the health endpoint and the whole order lifecycle exist only at crystalina.crystalina.workers.dev, an address no customer will type. Everything built on the server is invisible until the owner turns Pages off and points the domain at the Worker, without breaking Workspace mail, which is U8.',
     rel: ['target:cfdns', 'unknown:U8', 'risk:R5'],
   },
   {

@@ -2027,7 +2027,7 @@ _Phase · Nameservers, then the Supabase redirect allow-list._
 
 Point crystalina.org at Cloudflare, retire GitHub Pages, and teach Supabase the new origin.
 
-Missing. It is the step that makes everything already built visible to a visitor, and it has to not break Workspace mail, which is U8.
+Missing, and the only server-side item that matters until it is done. Checked 2026-11-03: crystalina.org still answers with Server: GitHub.com, so every /api route, the contact form, the newsletter, the health endpoint and the whole order lifecycle exist only at crystalina.crystalina.workers.dev, an address no customer will type. Everything built on the server is invisible until the owner turns Pages off and points the domain at the Worker, without breaking Workspace mail, which is U8.
 
 - **Needs first.** P2 · Run /api on Cloudflare; P3 · Stripe checkout and webhook
 - **Waiting on the answer to.** U8 · How does Google Workspace on crystalina.org get unlocked, and what does the DNS move do to it?

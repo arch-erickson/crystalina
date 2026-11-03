@@ -2505,7 +2505,7 @@ body.dg-lock{overflow:hidden}
 <p class="np-kind">Phase · Nameservers, then the Supabase redirect allow-list</p>
 
 <h4>What it is</h4><p>Point crystalina.org at Cloudflare, retire GitHub Pages, and teach Supabase the new origin.</p>
-<h4>Why it is where it is</h4><p>Missing. It is the step that makes everything already built visible to a visitor, and it has to not break Workspace mail, which is U8.</p>
+<h4>Why it is where it is</h4><p>Missing, and the only server-side item that matters until it is done. Checked 2026-11-03: crystalina.org still answers with Server: GitHub.com, so every /api route, the contact form, the newsletter, the health endpoint and the whole order lifecycle exist only at crystalina.crystalina.workers.dev, an address no customer will type. Everything built on the server is invisible until the owner turns Pages off and points the domain at the Worker, without breaking Workspace mail, which is U8.</p>
 <h4>Needs first</h4>
 <ul class="np-dep"><li><a href="#n-phase-P2" data-go="phase:P2">P2 · Run /api on Cloudflare</a><span class="st s-implemented">Implemented</span></li><li><a href="#n-phase-P3" data-go="phase:P3">P3 · Stripe checkout and webhook</a><span class="st s-partial">Partial</span></li></ul><h4>Waiting on the answer to</h4>
 <ul class="np-dep"><li><a href="#n-unknown-U8" data-go="unknown:U8">U8 · How does Google Workspace on crystalina.org get unlocked, and what does the DNS move do to it?</a><span class="st s-missing">Missing</span></li></ul><h4>Closes</h4>
