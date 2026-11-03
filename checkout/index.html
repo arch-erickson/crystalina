@@ -94,7 +94,8 @@
         <a href="/shop/" class="btn btn-primary">Shop Filters</a></div>`;
       return;
     }
-    const shipping = subtotal >= 99 ? 0 : 9.99;
+    const policy = Store.shippingPolicy();
+    const shipping = subtotal >= policy.threshold ? 0 : policy.fee;
     const tax = subtotal * 0.08875;
     document.getElementById('summaryItems').innerHTML = items.map(i => `
       <div class="summary-line">

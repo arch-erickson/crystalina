@@ -452,11 +452,12 @@ function renderCartItems() {
   if (!wrap) return;
   const { items, subtotal } = Store.cartDetails();
   const shipBar = document.getElementById('cartShipBar');
-  const remaining = 99 - subtotal;
-  shipBar.innerHTML = subtotal >= 99
-    ? `<span class="ship-msg ship-ok">${icon('sparkle')} You've unlocked <strong>FREE shipping</strong></span>`
-    : `<span class="ship-msg">Add <strong>${money(Math.max(remaining, 0))}</strong> more for free shipping</span>
-       <div class="ship-track"><div class="ship-fill" style="width:${Math.min(subtotal / 99 * 100, 100)}%"></div></div>`;
+  const { threshold } = Store.shippingPolicy();
+  const remaining = threshold - subtotal;
+  shipBar.innerHTML = subtotal >= threshold
+    ? `<span class="ship-msg ship-ok">${icon('truck')} Delivery is free on this order</span>`
+    : `<span class="ship-msg">Add <strong>${money(Math.max(remaining, 0))}</strong> more for free delivery</span>
+       <div class="ship-track"><div class="ship-fill" style="width:${Math.min(subtotal / threshold * 100, 100)}%"></div></div>`;
 
   if (!items.length) {
     wrap.innerHTML = `<div class="cart-empty">
@@ -697,6 +698,8 @@ function initPage(activeNav = '') {
   bindNewsletter();
   // Refresh pricing, stock and publication state from Supabase.
   if (Store.hydrateFromSupabase) Store.hydrateFromSupabase();
+  if (Store.hydrateShippingPolicy) Store.hydrateShippingPolicy();
+  document.addEventListener('shipping:changed', () => renderCartItems());
   // Pull published page layout and site settings, then repaint.
   if (Store.hydrateSiteContent) {
     Store.hydrateSiteContent().then(() => { applySiteSettings(); applyPageSections(); });

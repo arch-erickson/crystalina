@@ -65,7 +65,7 @@ export const sections = [
       t: 'callout', kind: 'warn', title: 'Four things this document used to say that were not true',
       items: [
         'That all four staff dashboards interpolated record text unescaped. One does, about thirty times: js/admin.js. The other five files escape theirs.',
-        'That the free shipping threshold was written in three places. It is written on ten lines across six files, six of them arithmetic.',
+        'That the free shipping threshold was written in three places. It was written on ten lines across six files, six of them arithmetic; since 2026-11-03 the arithmetic reads one database row.',
         'That stock was 0 on all thirteen products. There are seventeen published rows; four systems carry stock 1 and the other thirteen carry 0.',
         'That the environment variables were unset and every server call returned 500. The Worker answers, and the method guards and validators on all three routes were exercised against the live host today.',
       ],
@@ -256,7 +256,7 @@ export const sections = [
     { t: 'p', text: 'The library can be looked at as well as read. docs/components.html is a page in the repository that loads the real stylesheet and the real script and renders every token, button, heading, band, card, wash and icon the storefront is built from, with the real header above it. Serve the site and open /docs/components.html. It is outside the publish allow-list, so it never reaches a customer, and because it uses the live components rather than copies of them, it cannot drift from the site.' },
     {
       t: 'callout', kind: 'warn', title: 'The one that is worse than it looked',
-      text: 'The free shipping threshold was recorded as living in three places. Checked on 2026-11-02 it is on ten lines across six files: six of them arithmetic, including both versions of create_order, and four of them sentences of customer-facing copy. The database is already authoritative, because create_order computes the shipping line. The other nine are copies of a number the database already knows.',
+      text: 'The free shipping threshold was recorded as living in three places. Checked on 2026-11-02 it was on ten lines across six files: six of them arithmetic, including both versions of create_order, and four of them sentences of customer-facing copy. On 2026-11-03 it moved to shipping_policy, one enforced row that create_order reads on the server and Store.shippingPolicy() reads in the browser, so the cart drawer and the checkout quote the figure the order is charged. What remains is prose: seven sentences on six pages still say "$99".',
     },
   ],
 },

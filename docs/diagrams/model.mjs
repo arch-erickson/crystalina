@@ -603,10 +603,10 @@ export const pages = [
   {
     id: 'product', icon: 'box', label: 'Product', route: '/product/?id=', area: 'client', col: 2, row: 0,
     design: 'Implemented', server: 'Partial',
-    built: ['Product, specs, compatibility and bundle relationships', 'Related products'],
-    remaining: ['product_stage_options is empty, so no 5, 6 or 7 stage choice renders', 'No faucet rows exist, so the upgrade control has nothing to offer'],
+    built: ['Product, specs, compatibility and bundle relationships', 'Related products, four across, headed "Also in <category>"', 'Redesigned 2026-11-03: the photograph large and bare on the left, sticky while the buying column scrolls; Playfair on the name and price with one cyan rule, the only cyan on the page; the choices as hairline rows; one button; three facts; then the product explained in accordions built only from catalogue fields: what it removes (the home chart, same figures, one register line), what it fits, specifications, replacement filters with their interval, delivery and returns'],
+    remaining: ['product_stage_options is empty, so no 5, 6 or 7 stage choice renders', 'No faucet rows exist, so the upgrade control has nothing to offer', 'Low stock reads as a count, never a warning; a rating shows only with its review count, and no product has one yet'],
     what: 'One product, its specifications, which systems a filter fits, what a bundle contains, and two configuration controls: how many stages, and whether to add a faucet.',
-    why: 'Partial. Both configuration controls are built, priced server-side in create_order, and invisible, because neither has any rows behind it.',
+    why: 'Partial. The page is in the frame of a fashion house with the system explained, and both configuration controls are built, priced server-side in create_order, and invisible, because neither has any rows behind it.',
     rel: ['finding:F2', 'table:product_stage_options', 'phase:P7'],
   },
   {
@@ -1319,10 +1319,10 @@ export const risks = [
     rel: ['flow:payment', 'ad:AD4'],
   },
   {
-    id: 'R3', label: 'Rate limit does not survive the instance', likelihood: 'high', impact: 'medium',
-    fix: 'Cloudflare WAF rate limiting on /api/*, which the move makes free', effort: 'An hour',
-    what: 'The limit is an in-process Map. Worker instances are short lived and unshared, so each one counts from zero.',
-    why: 'It blunts casual abuse and an accidental double submit, and nothing more. It cannot be fixed in application code.',
+    id: 'R3', label: 'Rate limit does not survive the instance', likelihood: 'low', impact: 'medium',
+    fix: 'Done in application code on 2026-11-03: the limit is checked against a durable store and falls back to the in-process Map only when that store is unreachable. Closed fully by Cloudflare WAF rate limiting on /api/* at P5, which the move makes free', effort: 'Done at the application layer; an hour at P5',
+    what: 'The limit was an in-process Map. Worker instances are short lived and unshared, so each one counted from zero.',
+    why: 'Now low likelihood. The durable check survives the isolate; what remains is the edge limit the WAF gives for free once the domain is on Cloudflare (P5).',
     fixedBy: ['phase:P6'],
     rel: ['target:cfwaf', 'threat:spam'],
   },
@@ -1786,10 +1786,10 @@ export const definitions = [
     rel: ['unknown:U7', 'table:site_content', 'page:home'],
   },
   {
-    id: 'shipping', thing: 'Free shipping threshold', home: 'Nowhere. Written out ten times in six files', readers: ['Announcement bar', 'Cart drawer', 'Checkout', 'Shop copy', 'Home hero', 'create_order'], status: 'Refactor',
-    note: 'Six arithmetic sites and four sentences of copy, with no shared constant',
-    what: 'The $99 free delivery threshold. Checked 2026-11-02: it appears on ten lines across six files, six of them arithmetic and four of them prose, and the $9.99 flat fee is duplicated three times alongside it.',
-    why: 'Refactor, and worse than the three places it was recorded as. The database is authoritative because create_order computes shipping; the other nine are copies of a number that the database already knows.',
+    id: 'shipping', thing: 'Free shipping threshold', home: 'shipping_policy, one row, read by create_order and by Store.shippingPolicy()', readers: ['Announcement bar', 'Cart drawer', 'Checkout', 'Shop copy', 'Home hero', 'create_order'], status: 'Partial',
+    note: 'Every arithmetic site reads the row; the sentences of copy still carry the figure',
+    what: 'The $99 free delivery threshold and the $9.99 fee below it. Since 2026-11-03 they live in shipping_policy, a table of one enforced row, public under RLS because the figure is on the front of the site. create_order reads it on the server; the cart drawer and the checkout quote read it in the browser through Store.shippingPolicy(), cached in localStorage with the current figures as the offline fallback.',
+    why: 'Partial. The six arithmetic sites are now one row, so the figure the customer is quoted is the figure the order is charged. Seven sentences of copy on six pages still say "$99" in prose, and will until the copy is templated or the figure changes, whichever comes first.',
     rel: ['table:orders', 'unknown:U7'],
   },
   {

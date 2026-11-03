@@ -10,7 +10,7 @@ const Store = (() => {
     session: 'crystalina_session', staffSession: 'crystalina_staff_session',
     staffChallenge: 'crystalina_staff_challenge', orders: 'crystalina_orders',
     adminData: 'crystalina_admin_data', dataVersion: 'crystalina_data_version',
-    catalogSeedCount: 'crystalina_catalog_seed_count'
+    catalogSeedCount: 'crystalina_catalog_seed_count', shipping: 'crystalina_shipping_policy'
   };
   const DATA_VERSION = 'manufacturer-catalog-v6';
   const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
@@ -248,6 +248,31 @@ const Store = (() => {
   }
   const isHydrated = () => hydrated;
 
+  /* ---------- shipping policy ----------
+     The free delivery threshold and the fee below it live in one row of
+     shipping_policy, which create_order also reads, so the figure the
+     customer is quoted in the cart is the figure the order is charged.
+     The values here are the cache and the offline fallback, never the
+     authority: the server recomputes every total. */
+  const SHIPPING_FALLBACK = { threshold: 99, fee: 9.99 };
+  function shippingPolicy() {
+    const cached = read(KEYS.shipping, null);
+    return cached && typeof cached.threshold === 'number' && typeof cached.fee === 'number' ? cached : SHIPPING_FALLBACK;
+  }
+  let shippingHydrated = false;
+  async function hydrateShippingPolicy({ force = false } = {}) {
+    if (shippingHydrated && !force) return shippingPolicy();
+    if (!window.CrystalinaData?.loadShippingPolicy) return shippingPolicy();
+    const remote = await window.CrystalinaData.loadShippingPolicy();
+    if (remote) {
+      const before = shippingPolicy();
+      write(KEYS.shipping, remote);
+      shippingHydrated = true;
+      if (before.threshold !== remote.threshold || before.fee !== remote.fee) document.dispatchEvent(new CustomEvent("shipping:changed", { detail: remote }));
+    }
+    return shippingPolicy();
+  }
+
   /* ---------- site content hydration ----------
      Page layout and site settings are published to Supabase so every visitor
      sees what staff edit. The local copy is a cache and an offline fallback. */
@@ -282,7 +307,7 @@ const Store = (() => {
 
   syncManufacturerCatalog();
   return {
-    placeholder, hydrateFromSupabase, isHydrated, hydrateSiteContent, publishSiteContent, getProducts, getProduct, getBundlesForSystem, getBundleComponents, getCompatibleFilters,
+    placeholder, hydrateFromSupabase, isHydrated, shippingPolicy, hydrateShippingPolicy, hydrateSiteContent, publishSiteContent, getProducts, getProduct, getBundlesForSystem, getBundleComponents, getCompatibleFilters,
     upsertProduct, deleteProduct, deleteAllProducts,
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
     getUsers, currentUser, setCurrentUser, signUp, signIn, signOut, currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,

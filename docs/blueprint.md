@@ -76,7 +76,7 @@ _**The five findings, in the order to deal with them.** Ranked by what to do fir
 > **Four things this document used to say that were not true**
 >
 > - That all four staff dashboards interpolated record text unescaped. One does, about thirty times: js/admin.js. The other five files escape theirs.
-> - That the free shipping threshold was written in three places. It is written on ten lines across six files, six of them arithmetic.
+> - That the free shipping threshold was written in three places. It was written on ten lines across six files, six of them arithmetic; since 2026-11-03 the arithmetic reads one database row.
 > - That stock was 0 on all thirteen products. There are seventeen published rows; four systems carry stock 1 and the other thirteen carry 0.
 > - That the environment variables were unset and every server call returned 500. The Worker answers, and the method guards and validators on all three routes were exercised against the live host today.
 
@@ -154,7 +154,7 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | --- | --- | --- | --- | --- |
 | Home | / | Implemented | Partial | Trust list, testimonials, water facts and process steps are still in the HTML; the category tiles read CATEGORIES in main.js |
 | Shop | /shop/ | Implemented | Implemented | Thirteen of seventeen rows carry stock 0, so most cards read out of stock |
-| Product | /product/?id= | Implemented | Partial | product_stage_options is empty, so no 5, 6 or 7 stage choice renders No faucet rows exist, so the upgrade control has nothing to offer |
+| Product | /product/?id= | Implemented | Partial | product_stage_options is empty, so no 5, 6 or 7 stage choice renders No faucet rows exist, so the upgrade control has nothing to offer Low stock reads as a count, never a warning; a rating shows only with its review count, and no product has one yet |
 | Checkout | /checkout/ | Implemented | Partial | No payment: the submit button carries a static disabled attribute No Turnstile widget, though the server expects a token |
 | Find your filter | /quiz/ | Implemented | Implemented | Nothing. No server work needed |
 | NYC water | /nyc-water/ | Implemented | Missing | Figures are illustrative and unverified against NYC DEP reports (U2) |
@@ -361,7 +361,7 @@ The library can be looked at as well as read. docs/components.html is a page in 
 
 > **The one that is worse than it looked**
 >
-> The free shipping threshold was recorded as living in three places. Checked on 2026-11-02 it is on ten lines across six files: six of them arithmetic, including both versions of create_order, and four of them sentences of customer-facing copy. The database is already authoritative, because create_order computes the shipping line. The other nine are copies of a number the database already knows.
+> The free shipping threshold was recorded as living in three places. Checked on 2026-11-02 it was on ten lines across six files: six of them arithmetic, including both versions of create_order, and four of them sentences of customer-facing copy. On 2026-11-03 it moved to shipping_policy, one enforced row that create_order reads on the server and Store.shippingPolicy() reads in the browser, so the cart drawer and the checkout quote the figure the order is charged. What remains is prose: seven sentences on six pages still say "$99".
 
 ---
 
@@ -523,15 +523,15 @@ _Page · /product/?id=._
 
 One product, its specifications, which systems a filter fits, what a bundle contains, and two configuration controls: how many stages, and whether to add a faucet.
 
-Partial. Both configuration controls are built, priced server-side in create_order, and invisible, because neither has any rows behind it.
+Partial. The page is in the frame of a fashion house with the system explained, and both configuration controls are built, priced server-side in create_order, and invisible, because neither has any rows behind it.
 
 - **Reached from.** Shop (open); Find your filter (recommended)
 - **Links to.** Checkout (add to cart); Sign in (sign in to buy)
 - **See also.** The catalogue is schema-complete and data-empty; product_stage_options; P7 · Seed the catalogue; Manuals and guides
 - **Design.** Implemented
 - **Server.** Partial
-- **Backend built.** Product, specs, compatibility and bundle relationships Related products
-- **Remaining.** product_stage_options is empty, so no 5, 6 or 7 stage choice renders No faucet rows exist, so the upgrade control has nothing to offer
+- **Backend built.** Product, specs, compatibility and bundle relationships Related products, four across, headed "Also in <category>" Redesigned 2026-11-03: the photograph large and bare on the left, sticky while the buying column scrolls; Playfair on the name and price with one cyan rule, the only cyan on the page; the choices as hairline rows; one button; three facts; then the product explained in accordions built only from catalogue fields: what it removes (the home chart, same figures, one register line), what it fits, specifications, replacement filters with their interval, delivery and returns
+- **Remaining.** product_stage_options is empty, so no 5, 6 or 7 stage choice renders No faucet rows exist, so the upgrade control has nothing to offer Low stock reads as a count, never a warning; a rating shows only with its review count, and no product has one yet
 
 #### Checkout · Partial
 
@@ -2138,18 +2138,18 @@ It does not exist yet, which is the only reason it has not happened. It has to b
 
 #### Rate limit does not survive the instance
 
-_Risk · high likelihood, medium impact._
+_Risk · low likelihood, medium impact._
 
-The limit is an in-process Map. Worker instances are short lived and unshared, so each one counts from zero.
+The limit was an in-process Map. Worker instances are short lived and unshared, so each one counted from zero.
 
-It blunts casual abuse and an accidental double submit, and nothing more. It cannot be fixed in application code.
+Now low likelihood. The durable check survives the isolate; what remains is the edge limit the WAF gives for free once the domain is on Cloudflare (P5).
 
 - **Closed by.** P6 · Security hardening
 - **See also.** WAF rate limiting; Form spam and abuse; Method, rate limit, body cap
-- **Likelihood.** high
+- **Likelihood.** low
 - **Impact.** medium
-- **What to do.** Cloudflare WAF rate limiting on /api/*, which the move makes free
-- **Effort.** An hour
+- **What to do.** Done in application code on 2026-11-03: the limit is checked against a durable store and falls back to the in-process Map only when that store is unreachable. Closed fully by Cloudflare WAF rate limiting on /api/* at P5, which the move makes free
+- **Effort.** Done at the application layer; an hour at P5
 
 #### Every private page gated in the browser only
 
@@ -2317,16 +2317,16 @@ Partial, and the gap matters most if whoever maintains this is not technical, wh
 - **Lives in.** Supabase site_content
 - **Read by.** Home
 
-#### Free shipping threshold · Refactor
+#### Free shipping threshold · Partial
 
-_One definition · Nowhere. Written out ten times in six files._
+_One definition · shipping_policy, one row, read by create_order and by Store.shippingPolicy()._
 
-The $99 free delivery threshold. Checked 2026-11-02: it appears on ten lines across six files, six of them arithmetic and four of them prose, and the $9.99 flat fee is duplicated three times alongside it.
+The $99 free delivery threshold and the $9.99 fee below it. Since 2026-11-03 they live in shipping_policy, a table of one enforced row, public under RLS because the figure is on the front of the site. create_order reads it on the server; the cart drawer and the checkout quote read it in the browser through Store.shippingPolicy(), cached in localStorage with the current figures as the offline fallback.
 
-Refactor, and worse than the three places it was recorded as. The database is authoritative because create_order computes shipping; the other nine are copies of a number that the database already knows.
+Partial. The six arithmetic sites are now one row, so the figure the customer is quoted is the figure the order is charged. Seven sentences of copy on six pages still say "$99" in prose, and will until the copy is templated or the figure changes, whichever comes first.
 
 - **See also.** U7 · Who maintains this after launch, and how technical are they?; orders
-- **Lives in.** Nowhere. Written out ten times in six files
+- **Lives in.** shipping_policy, one row, read by create_order and by Store.shippingPolicy()
 - **Read by.** Announcement bar, Cart drawer, Checkout, Shop copy, Home hero, create_order
 
 #### Navigation and social links · Partial

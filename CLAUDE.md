@@ -38,10 +38,12 @@ markup, look for the component. If it half exists, extend it.
 | The blueprint's click-to-inspect viewer | `scripts/lib/viewer.mjs` |
 | Diagram components and icons | `scripts/lib/components.mjs`, `scripts/lib/icons.mjs` |
 
-Three things still have no single home and should get one: the free
-shipping threshold (written out ten times across six files, checked
-2026-11-02), the schema.org `sameAs` list that repeats the footer's social
-links, and the five blocks of repeatable items inside home page sections.
+The free shipping threshold has one home since 2026-11-03: the
+`shipping_policy` row, read by `create_order` and `Store.shippingPolicy()`.
+Never write `99` or `9.99` into arithmetic again; the sentences of copy
+that say "$99" are the last copies. Two things still have no single home:
+the schema.org `sameAs` list that repeats the footer's social links, and
+the five blocks of repeatable items inside home page sections.
 See "One definition, read everywhere" in the blueprint.
 
 ## Commands

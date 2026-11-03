@@ -386,7 +386,8 @@ body.cart-open { overflow: hidden; }
 .cart-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid #e4ecf6; }
 .cart-close { background: none; border: none; font-size: 1.7rem; color: var(--muted); line-height: 1; }
 .cart-shipbar { padding: 12px 22px; background: var(--ice-50); border-bottom: 1px solid #e4ecf6; font-size: .82rem; }
-.ship-ok { color: var(--success); font-weight: var(--w-semibold); }
+.ship-ok { color: var(--navy-800); font-weight: var(--w-semibold); display: inline-flex; align-items: center; gap: 8px; }
+.ship-ok .ic { width: 18px; height: 18px; }
 .ship-track { height: 7px; background: #dbe7f5; border-radius: 999px; margin-top: 8px; overflow: hidden; }
 .ship-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-300), var(--blue-500)); border-radius: 999px; transition: width .4s; }
 .cart-items { flex: 1; overflow-y: auto; padding: 16px 22px; }

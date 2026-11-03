@@ -175,6 +175,22 @@ window.CrystalinaData = (() => {
      --------------------------------------------------------------- */
   const CONTENT_KEYS = ['pageSections', 'siteSettings'];
 
+  /* The free delivery threshold and the fee below it, from the one row of
+     shipping_policy. Dollars, because that is what the storefront shows;
+     the database keeps cents. Null when the read fails, so the caller
+     keeps its cached figure. */
+  async function loadShippingPolicy() {
+    try {
+      const rows = await SB.restGet('shipping_policy?select=threshold_cents,fee_cents&limit=1');
+      const row = Array.isArray(rows) ? rows[0] : null;
+      if (!row || typeof row.threshold_cents !== 'number' || typeof row.fee_cents !== 'number') return null;
+      return { threshold: row.threshold_cents / 100, fee: row.fee_cents / 100 };
+    } catch (error) {
+      console.warn('[Crystalina] Shipping policy unavailable; using the cached figure.', error);
+      return null;
+    }
+  }
+
   async function loadSiteContent() {
     try {
       const rows = await SB.restGet('site_content?select=key,value');
@@ -285,6 +301,6 @@ window.CrystalinaData = (() => {
   const saveStageOption = option => rpc('upsert_stage_option', { p_option: option });
   const removeStageOption = id => rpc('delete_stage_option', { p_id: id });
 
-  return { loadProducts, myOrders, myOrder, createOrder, mapRow, loadSiteContent, saveSiteContent, uploadImage,
+  return { loadProducts, myOrders, myOrder, createOrder, mapRow, loadShippingPolicy, loadSiteContent, saveSiteContent, uploadImage,
            saveProduct, removeProduct, saveStageOption, removeStageOption };
 })();
