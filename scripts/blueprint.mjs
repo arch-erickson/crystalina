@@ -157,6 +157,50 @@ const tableHTML = (t) => `<div class="tbl"><table>
 const SCREENS_FILE = join(DOCS, 'screens', 'index.json');
 const SCREENS = existsSync(SCREENS_FILE) ? JSON.parse(readFileSync(SCREENS_FILE, 'utf8')) : null;
 
+/* Join the captures to the page nodes, so a page's own bubble shows what
+   that page looks like. The site map says what a page is for and what is
+   left to do on it; the capture says what it actually looks like today.
+   Those were two sections saying the same thing in different ways.
+
+   Joined on the route, falling back to the slug, and silent when there is
+   no capture: a page added since the last `npm run screens` simply has no
+   picture rather than a broken one. */
+function attachShots() {
+  if (!SCREENS) return 0;
+  const byPath = new Map(SCREENS.pages.map((p) => [p.path, p]));
+  const bySlug = new Map(SCREENS.pages.map((p) => [p.slug, p]));
+  let joined = 0;
+  for (const p of M.pages) {
+    const node = G.get(`page:${p.id}`);
+    if (!node) continue;
+    const shot = byPath.get(p.route.split('?')[0]) || bySlug.get(p.id);
+    if (!shot) continue;
+    node.shot = shot;
+    joined += 1;
+  }
+  return joined;
+}
+const SHOTS_JOINED = attachShots();
+
+/* The capture inside a bubble: the desktop frame, cropped to something a
+   panel can hold, with the other two widths a click away. */
+function shotHTML(n) {
+  if (!n.shot) return '';
+  const vps = SCREENS.viewports;
+  const desktop = n.shot.shots.desktop;
+  if (!desktop) return '';
+  const others = vps.filter((v) => v.name !== 'desktop' && n.shot.shots[v.name]);
+  return `<figure class="np-shot">
+<a href="screens/${desktop.file}" target="_blank" rel="noopener" title="Open the full capture">
+  <img src="screens/${desktop.file}" alt="${esc(n.label)} as it looks today"
+       loading="lazy" width="${desktop.width}" height="${desktop.height}">
+</a>
+<figcaption>Captured ${esc(SCREENS.captured)}${others.length
+    ? ` · ${others.map((v) => `<a href="screens/${n.shot.shots[v.name].file}" target="_blank" rel="noopener">${esc(v.name)}</a>`).join(' · ')}`
+    : ''}</figcaption>
+</figure>`;
+}
+
 function screensHTML() {
   if (!SCREENS) return '<p class="cap">No captures yet. Serve the site and run <code>npm run screens</code>.</p>';
   const vps = SCREENS.viewports;
@@ -259,6 +303,7 @@ function panelHTML(n) {
   return `<article class="np" id="${domId(n.key)}" data-np="${esc(n.key)}">
 <h3>${esc(n.label)}${n.status ? statusPill(n.status) : ''}</h3>
 <p class="np-kind">${esc(n.kind)}${n.sub ? ` · ${esc(n.sub)}` : ''}</p>
+${shotHTML(n)}
 ${n.what ? `<h4>What it is</h4><p>${esc(n.what)}</p>` : ''}
 ${n.why ? `<h4>Why it is where it is</h4><p>${esc(n.why)}</p>` : ''}
 ${depList(n.in, (r) => (r === 'After' ? 'Comes after' : 'Then'))}

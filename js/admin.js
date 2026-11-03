@@ -29,7 +29,9 @@
   showView(location.hash.slice(1) || 'overview', false);
 
   const customerButton = (name, email = '') => `<button class="entity-link" onclick="AdminUI.openCustomerByName('${encodeURIComponent(name)}')">${escapeHTML(name)}</button>${email ? `<br><small>${escapeHTML(email)}</small>` : ''}`;
-  const initials = name => name.split(/\s+/).map(part => part[0]).join('').slice(0, 2).toUpperCase();
+  /* Escaped, because the first character of a word can be "<". These go
+     straight into an avatar in innerHTML. */
+  const initials = name => escapeHTML(String(name || '').split(/\s+/).map(part => part[0] || '').join('').slice(0, 2).toUpperCase());
 
   /* ---------- overview ---------- */
   function renderOverview() {
@@ -47,7 +49,7 @@
 
     document.getElementById('lowStockWrap').innerHTML = low.length
       ? `<table class="admin-table"><thead><tr><th>Product</th><th>Stock</th><th></th></tr></thead><tbody>` +
-        low.map(p => `<tr><td>${p.name}</td>
+        low.map(p => `<tr><td>${escapeHTML(p.name)}</td>
           <td class="${p.stock === 0 ? 'out-stock' : 'low-stock'}">${p.stock === 0 ? 'OUT OF STOCK' : p.stock + ' left'}</td>
           <td><button class="btn btn-sm btn-outline" onclick="AdminUI.editProduct('${p.id}')">Restock</button></td></tr>`).join('') +
         `</tbody></table>`
@@ -64,12 +66,12 @@
   let productFilters = { search: '', category: '', stock: '' };
   function renderProducts() {
     const tbody = document.querySelector('#productsTable tbody');
-    const products = Store.getProducts().filter(product => (!productFilters.search || `${product.name} ${product.short}`.toLowerCase().includes(productFilters.search)) && (!productFilters.category || product.category === productFilters.category) && (!productFilters.stock || productFilters.stock === 'low' && product.stock > 0 && product.stock <= 15 || productFilters.stock === 'out' && product.stock === 0 || productFilters.stock === 'available' && product.stock > 15));
+    const products = Store.getProducts().filter(product => (!productFilters.search || `${escapeHTML(product.name)} ${product.short}`.toLowerCase().includes(productFilters.search)) && (!productFilters.category || product.category === productFilters.category) && (!productFilters.stock || productFilters.stock === 'low' && product.stock > 0 && product.stock <= 15 || productFilters.stock === 'out' && product.stock === 0 || productFilters.stock === 'available' && product.stock > 15));
     tbody.innerHTML = products.map(p => `
       <tr>
         <td><img src="${p.image}" alt=""></td>
-        <td style="max-width:280px;"><strong>${p.name}</strong><br><small style="color:var(--muted)">${p.short || ''}</small></td>
-        <td>${p.category}</td>
+        <td style="max-width:280px;"><strong>${escapeHTML(p.name)}</strong><br><small style="color:var(--muted)">${escapeHTML(p.short || '')}</small></td>
+        <td>${escapeHTML(p.category)}</td>
         <td>${money(p.price)}${p.comparePrice ? `<br><small style="color:var(--muted);text-decoration:line-through">${money(p.comparePrice)}</small>` : ''}</td>
         <td class="${p.stock === 0 ? 'out-stock' : p.stock <= 15 ? 'low-stock' : ''}">${p.stock}</td>
         <td>${p.installationMinutes || 30} min</td>
@@ -93,7 +95,7 @@
         <td><strong>${o.id}</strong></td>
         <td>${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })}</td>
         <td>${customerButton(o.customer.name, o.customer.email)}</td>
-        <td>${o.customer.borough || ', '}${o.customer.installation ? '<br><small style="color:var(--blue-500)">+ installation</small>' : ''}</td>
+        <td>${escapeHTML(o.customer.borough || ', ')}${o.customer.installation ? '<br><small style="color:var(--blue-500)">+ installation</small>' : ''}</td>
         <td style="max-width:240px;font-size:.8rem;">${o.items.map(i => `${i.name} × ${i.qty}`).join('<br>')}</td>
         <td><strong>${money(o.total)}</strong></td>
         <td>
@@ -222,7 +224,7 @@
   };
 
   function statCard(label, value, hint) {
-    return `<div class="stat-card"><div class="sc-label">${label}</div><div class="sc-value">${value}</div><div class="sc-hint">${hint}</div></div>`;
+    return `<div class="stat-card"><div class="sc-label">${escapeHTML(label)}</div><div class="sc-value">${value}</div><div class="sc-hint">${escapeHTML(hint)}</div></div>`;
   }
 
   let subscriptionFilters = { search: '', status: '', date: '' };
@@ -237,7 +239,7 @@
     document.getElementById('replacementCount').textContent = `${active.length} upcoming`;
     document.querySelector('#subscriptionsTable tbody').innerHTML = list.map(s => `<tr>
       <td>${customerButton(s.customer, s.email)}</td>
-      <td>${s.system}</td><td>${s.cadence}</td><td>${formatDate(s.nextDate)}</td><td>${s.replacement}</td>
+      <td>${escapeHTML(s.system)}</td><td>${s.cadence}</td><td>${formatDate(s.nextDate)}</td><td>${s.replacement}</td>
       <td><span class="record-status ${statusClass(s.status)}">${s.status}</span></td>
       <td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.toggleSubscription('${s.id}')">${s.status === 'Paused' ? 'Resume' : 'Pause'}</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('subscription','${s.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('subscriptions','${s.id}','${encodeURIComponent(s.id)}')">Delete</button></div></td>
     </tr>`).join('');
@@ -258,7 +260,7 @@
       const pct = Math.round((j.checklistDone / j.checklistTotal) * 100);
       return `<tr>
         <td><strong>${formatDate(j.date)}</strong><br><small>${j.time}</small></td>
-        <td>${customerButton(j.customer)}<br><small>${j.address}, ${j.borough}</small></td>
+        <td>${customerButton(j.customer)}<br><small>${escapeHTML(j.address)}, ${escapeHTML(j.borough)}</small></td>
         <td><strong>${escapeHTML(j.product || j.type)}</strong><br><small>${escapeHTML(j.requirements || 'See technician checklist for requirements.')}</small></td>
         <td><select class="admin-select" onchange="AdminUI.assignTechnician('${j.id}',this.value)"><option ${j.technician === 'Needs assignment' ? 'selected' : ''}>Needs assignment</option>${Store.getAdminData().staff.filter(s => (s.roles || [s.role]).includes('Technician') || s.role.includes('Technician')).map(s => `<option ${s.name === j.technician ? 'selected' : ''}>${s.name}</option>`).join('')}</select></td>
         <td><span class="record-status ${statusClass(j.status)}">${j.status}</span><br><small>Updated by technician</small></td>
@@ -296,7 +298,7 @@
     document.getElementById('supplierDirectoryCount').textContent = `${profiles.length} suppliers`;
     document.querySelector('#supplierProfilesTable tbody').innerHTML = profiles.map(profile => `<tr><td>${supplierButton(profile.name)}<br><small>${escapeHTML(profile.email)} · ${escapeHTML(profile.phone)}</small></td><td>${escapeHTML(profile.categories)}</td><td>${escapeHTML(profile.leadTime)}</td><td>${profile.rating}</td><td><span class="record-status ${statusClass(profile.status)}">${escapeHTML(profile.status)}</span></td><td><div class="table-actions"><button class="btn btn-sm btn-outline" onclick="AdminUI.openSupplierProfile('${profile.id}')">View</button><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('supplierProfile','${profile.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('supplierProfiles','${profile.id}','${encodeURIComponent(profile.name)}')">Delete</button></div></td></tr>`).join('') || '<tr><td colspan="6">No suppliers match this filter.</td></tr>';
     document.querySelector('#suppliersTable tbody').innerHTML = list.map(p => `<tr>
-      <td><strong>${p.id}</strong></td><td>${supplierButton(p.supplier)}<br><small>${p.contact}</small></td><td>${p.category}</td><td>${money(p.amount)}</td><td>${formatDate(p.eta)}</td><td><span class="admin-badge">${p.tracking}</span></td>
+      <td><strong>${p.id}</strong></td><td>${supplierButton(p.supplier)}<br><small>${escapeHTML(p.contact)}</small></td><td>${escapeHTML(p.category)}</td><td>${money(p.amount)}</td><td>${formatDate(p.eta)}</td><td><span class="admin-badge">${escapeHTML(p.tracking)}</span></td>
       <td><select class="admin-select" onchange="AdminUI.setSupplierStatus('${p.id}',this.value)">${['Draft', 'Confirmed', 'In transit', 'Delayed', 'Delivered'].map(s => `<option ${s === p.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('supplier','${p.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('suppliers','${p.id}','${encodeURIComponent(p.id)}')">Delete</button></div></td>
     </tr>`).join('');
   }
@@ -314,7 +316,7 @@
     const stages = ['New', 'Qualified', 'Quote sent', 'Won'];
     document.getElementById('leadPipeline').innerHTML = stages.map(stage => `<div class="pipeline-stage"><span>${stage}</span><strong>${allLeads.filter(l => l.stage === stage).length}</strong></div>`).join('');
     document.querySelector('#leadsTable tbody').innerHTML = leads.map(l => `<tr>
-      <td>${customerButton(l.name, l.email)}</td><td>${l.interest}</td><td>${l.source}</td><td>${l.borough}</td><td><strong>${money(Number(l.value))}</strong></td><td>${formatDate(l.followUp)}</td>
+      <td>${customerButton(l.name, l.email)}</td><td>${escapeHTML(l.interest)}</td><td>${escapeHTML(l.source)}</td><td>${escapeHTML(l.borough)}</td><td><strong>${money(Number(l.value))}</strong></td><td>${formatDate(l.followUp)}</td>
       <td><select class="admin-select" onchange="AdminUI.setLeadStage('${l.id}',this.value)">${['New', 'Qualified', 'Quote sent', 'Won', 'Lost'].map(s => `<option ${s === l.stage ? 'selected' : ''}>${s}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('lead','${l.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('leads','${l.id}','${encodeURIComponent(l.name)}')">Delete</button></div></td>
     </tr>`).join('') || '<tr><td colspan="8">No leads match these filters.</td></tr>';
   }
@@ -329,7 +331,7 @@
       statCard('Referral sales', money(7260), 'this quarter') +
       statCard('Abandoned carts', pendingCarts.length, `${money(pendingCarts.reduce((sum, cart) => sum + Number(cart.total), 0))} recoverable value`);
     document.querySelector('#campaignsTable tbody').innerHTML = data.campaigns.map(c => `<tr>
-      <td><strong>${c.name}</strong><br><small>${c.channel}</small></td><td>${c.audience}</td><td>${Number(c.sent).toLocaleString()}</td><td><strong>${c.conversion}%</strong></td>
+      <td><strong>${escapeHTML(c.name)}</strong><br><small>${c.channel}</small></td><td>${c.audience}</td><td>${Number(c.sent).toLocaleString()}</td><td><strong>${c.conversion}%</strong></td>
       <td><select class="admin-select" onchange="AdminUI.setCampaignStatus('${c.id}',this.value)">${['Draft', 'Scheduled', 'Active', 'Paused', 'Completed'].map(s => `<option ${s === c.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('campaign','${c.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('campaigns','${c.id}','${encodeURIComponent(c.name)}')">Delete</button></div></td>
     </tr>`).join('');
     document.querySelector('#discountsTable tbody').innerHTML = data.discounts.map(d => `<tr><td><strong>${d.id}</strong></td><td>${d.type}</td><td>${d.usage}${Number(d.limit) ? ` / ${d.limit}` : ''}</td><td>${formatDate(d.expires)}</td><td><span class="record-status ${statusClass(d.status)}">${d.status}</span></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('discount','${d.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('discounts','${d.id}','${encodeURIComponent(d.id)}')">Delete</button></div></td></tr>`).join('');
@@ -345,7 +347,7 @@
       statCard('Warranty claims', allTickets.filter(t => t.type === 'Warranty' && t.status !== 'Resolved').length, 'awaiting resolution') +
       statCard('Average response', '1h 18m', 'during business hours');
     document.querySelector('#ticketsTable tbody').innerHTML = tickets.map(t => `<tr>
-      <td><strong>${t.id}</strong><br><small>${t.channel}</small></td><td>${customerButton(t.customer)}</td><td><strong>${t.subject}</strong><br><button class="link-button" onclick="AdminUI.openCustomerByName('${encodeURIComponent(t.customer)}')">View notes &amp; history</button></td><td>${t.type}</td><td><span class="record-status ${t.priority === 'High' ? 'is-danger' : t.priority === 'Normal' ? 'is-warning' : ''}">${t.priority}</span></td><td>${formatDate(t.updated)}</td>
+      <td><strong>${t.id}</strong><br><small>${t.channel}</small></td><td>${customerButton(t.customer)}</td><td><strong>${escapeHTML(t.subject)}</strong><br><button class="link-button" onclick="AdminUI.openCustomerByName('${encodeURIComponent(t.customer)}')">View notes &amp; history</button></td><td>${t.type}</td><td><span class="record-status ${t.priority === 'High' ? 'is-danger' : t.priority === 'Normal' ? 'is-warning' : ''}">${t.priority}</span></td><td>${formatDate(t.updated)}</td>
       <td><select class="admin-select" onchange="AdminUI.setTicketStatus('${t.id}',this.value)">${['Open', 'In progress', 'Waiting on customer', 'Resolved'].map(s => `<option ${s === t.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td><td><div class="table-actions"><button class="btn btn-sm btn-ghost" onclick="AdminUI.editRecord('ticket','${t.id}')">Edit</button><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteRecord('tickets','${t.id}','${encodeURIComponent(t.id)}')">Delete</button></div></td>
     </tr>`).join('') || `<tr><td colspan="7">No tickets match this filter.</td></tr>`;
   }
@@ -1049,9 +1051,9 @@
     }).join('');
     const areaTotal = finance.areas.reduce((sum, area) => sum + area.revenue, 0);
     document.querySelector('#boroughDonut span').innerHTML = `${money(areaTotal / 1000).replace('.00', '')}k<small>Total sales</small>`;
-    document.getElementById('boroughLegend').innerHTML = `<div class="borough-legend">${finance.areas.map(area => `<div><span>${area.name}</span><strong>${Math.round((area.revenue / areaTotal) * 100)}%</strong></div>`).join('')}</div>`;
-    document.querySelector('#areaSalesTable tbody').innerHTML = finance.areas.map(area => { const share = Math.round((area.revenue / areaTotal) * 100); return `<tr><td><strong>${area.name}</strong></td><td>${area.orders}</td><td>${money(area.revenue)}</td><td><div class="share-bar"><i style="width:${share}%"></i></div><small>${share}%</small></td></tr>`; }).join('');
-    document.querySelector('#productSalesTable tbody').innerHTML = finance.products.map(product => `<tr><td><strong>${product.name}</strong></td><td>${product.units}</td><td>${money(product.revenue)}</td><td>${product.margin}%</td></tr>`).join('');
+    document.getElementById('boroughLegend').innerHTML = `<div class="borough-legend">${finance.areas.map(area => `<div><span>${escapeHTML(area.name)}</span><strong>${Math.round((area.revenue / areaTotal) * 100)}%</strong></div>`).join('')}</div>`;
+    document.querySelector('#areaSalesTable tbody').innerHTML = finance.areas.map(area => { const share = Math.round((area.revenue / areaTotal) * 100); return `<tr><td><strong>${escapeHTML(area.name)}</strong></td><td>${area.orders}</td><td>${money(area.revenue)}</td><td><div class="share-bar"><i style="width:${share}%"></i></div><small>${share}%</small></td></tr>`; }).join('');
+    document.querySelector('#productSalesTable tbody').innerHTML = finance.products.map(product => `<tr><td><strong>${escapeHTML(product.name)}</strong></td><td>${product.units}</td><td>${money(product.revenue)}</td><td>${escapeHTML(product.margin)}%</td></tr>`).join('');
     const averageOrder = revenue / orders;
     document.querySelector('#marketingFinanceTable tbody').innerHTML = adminData.campaigns.map(campaign => { const estimatedOrders = Math.round(Number(campaign.sent) * Number(campaign.conversion) / 100); return `<tr><td><strong>${escapeHTML(campaign.name)}</strong></td><td>${escapeHTML(campaign.channel)}</td><td>${Number(campaign.sent).toLocaleString()}</td><td>${campaign.conversion}%</td><td>${estimatedOrders}</td><td><strong>${money(estimatedOrders * averageOrder)}</strong></td></tr>`; }).join('');
   }
@@ -1297,8 +1299,8 @@
 
   function fieldMarkup(field, value = '') {
     const [name, label, type, options] = field;
-    if (type === 'select') return `<div class="field"><label for="record-${name}">${label}</label><select id="record-${name}" name="${name}" required>${options.map(option => `<option ${option === value ? 'selected' : ''}>${option}</option>`).join('')}</select></div>`;
-    return `<div class="field"><label for="record-${name}">${label}</label><input id="record-${name}" name="${name}" type="${type}" value="${value || ''}" ${type === 'number' ? 'min="0" step="0.01"' : ''} required></div>`;
+    if (type === 'select') return `<div class="field"><label for="record-${escapeHTML(name)}">${escapeHTML(label)}</label><select id="record-${escapeHTML(name)}" name="${escapeHTML(name)}" required>${options.map(option => `<option ${option === value ? 'selected' : ''}>${escapeHTML(option)}</option>`).join('')}</select></div>`;
+    return `<div class="field"><label for="record-${escapeHTML(name)}">${escapeHTML(label)}</label><input id="record-${escapeHTML(name)}" name="${escapeHTML(name)}" type="${type}" value="${escapeHTML(value || '')}" ${type === 'number' ? 'min="0" step="0.01"' : ''} required></div>`;
   }
 
   function openRecordModal(type, id = null) {
@@ -1383,7 +1385,7 @@
 
   function renderTagList(targetId, tags, label) {
     document.getElementById(targetId).innerHTML = tags.length
-      ? tags.map(tag => `<button type="button" class="tag-chip" data-tag-list="${targetId}" data-tag="${escapeMarkup(tag)}" aria-label="Remove ${label} ${escapeMarkup(tag)}">${escapeMarkup(tag)} <span aria-hidden="true">&times;</span></button>`).join('')
+      ? tags.map(tag => `<button type="button" class="tag-chip" data-tag-list="${targetId}" data-tag="${escapeMarkup(tag)}" aria-label="Remove ${escapeMarkup(label)} ${escapeMarkup(tag)}">${escapeMarkup(tag)} <span aria-hidden="true">&times;</span></button>`).join('')
       : `<span class="tag-empty">No tags added yet.</span>`;
   }
 
@@ -1613,7 +1615,7 @@
     },
     async removeProduct(id) {
       const p = Store.getProduct(id);
-      if (!p || !confirm(`Delete "${p.name}"? This cannot be undone.`)) return;
+      if (!p || !confirm(`Delete "${escapeHTML(p.name)}"? This cannot be undone.`)) return;
       const result = await window.CrystalinaData.removeProduct(id);
       if (!result.ok) { toast(result.error); return; }
       Store.deleteProduct(id);

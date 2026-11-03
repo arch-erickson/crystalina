@@ -1,0 +1,64 @@
+# GitHub Pages build settings for crystalina.org.
+#
+# This exists for one reason: GitHub Pages publishes the repository root,
+# so every push put the whole repository on the public domain. Verified on
+# 2026-11-03, all returning 200 at crystalina.org: COORDINATION.md,
+# CODEX_TASKS.md, wrangler.toml, package.json, docs/blueprint.html, the
+# screen captures of the staff dashboards, and the SQL migrations.
+#
+# Nothing credential-shaped is in the repository, so nothing leaked that
+# can be used directly. What did leak is a map: the blueprint names the
+# stored-XSS route and every open unknown, the coordination log says what
+# is unfinished, and the captures show what the staff pages look like.
+# That is reconnaissance handed over for free.
+#
+# This is a stopgap, not the fix. The fix is one of two owner actions:
+# turn GitHub Pages off, or move the nameservers to Cloudflare so the
+# Worker takes the domain, which is phase 5 and the plan anyway. The
+# Worker already serves only dist/, assembled from an explicit allow-list
+# by scripts/build-site.mjs, and has never had this problem.
+#
+# Until then: the list below mirrors the FORBIDDEN list in
+# scripts/build-site.mjs. Adding something private to the repository means
+# adding it in both places, which is a duplication worth removing the day
+# Pages is switched off.
+
+exclude:
+  # Everything that builds, tests or documents the site, but is not the site.
+  - api/
+  - design/
+  - dist/
+  - docs/
+  - functions/
+  - node_modules/
+  - output/
+  - scripts/
+  - supabase/
+  - tests/
+  - .design-check/
+  - .vercel/
+
+  # Working notes and briefs. None of these are for a visitor.
+  - CLAUDE.md
+  - CODEX_BRIEF.md
+  - CODEX_TASKS.md
+  - COORDINATION.md
+  - DEPLOY_STEPS.md
+  - IMAGE_PROMPTS.md
+  - LAUNCH_CHECKLIST.md
+  - README.md
+  - design-qa.md
+
+  # Build and deploy configuration.
+  - package.json
+  - package-lock.json
+  - worker.js
+  - wrangler.toml
+  - _headers
+  - _routes.json
+
+# Kept deliberately, because something depends on each one being served:
+#   CNAME                          the custom domain
+#   googlea4ca9585bd44aaf9.html    Search Console verification
+#   robots.txt, sitemap.xml        crawlers
+#   css/, js/, images/, the page folders and the icons
