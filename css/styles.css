@@ -2109,14 +2109,26 @@ body.cart-open { overflow: hidden; }
   .main-nav { position: fixed; top: 0; right: 0; width: min(320px, 88vw); height: 100dvh; overflow-y: auto; background: #fff; display: block; padding: 88px 28px 40px; box-shadow: -12px 0 40px rgba(7,29,64,.18); visibility: hidden; transform: translateX(110%); transition: transform .3s, visibility 0s .3s; z-index: 95; }
   .main-nav.open { visibility: visible; transform: translateX(0); transition-delay: 0s; }
   .main-nav > ul { flex-direction: column; gap: 4px; }
-  .nav-link { display: block; padding: 12px 0; font-size: .82rem; color: var(--ink) !important; border-bottom-color: transparent !important; }
+  .nav-link { display: block; padding: 14px 0; min-height: 44px; font-size: .82rem; color: var(--ink) !important; border-bottom-color: transparent !important; }
   .mega { position: static; opacity: 1; visibility: visible; transform: none; box-shadow: none; border: 0; display: none; }
   .has-menu.is-open > .mega { display: block; }
   .mega-inner { grid-template-columns: 1fr; gap: 20px; padding: 4px 0 18px 14px; }
   .mega-feature { display: none; }
   .header-side--left { display: none; }
+  /* Two columns at phone width: the lockup leads, the actions trail. A centred
+     lockup has no room beside three actions at 390. */
+  .header-row { grid-template-columns: auto 1fr; gap: 12px; }
+  .brand { justify-self: start; }
+  .icon-btn { min-height: 44px; justify-content: center; }
   .header-inner { padding: 10px 0; }
-  .hamburger { display: flex; }
+  .hamburger { display: flex; min-height: 44px; }
+  /* The shop filter rail becomes one scrolling row of names above the grid. */
+  .shop-layout { gap: 18px; }
+  .shop-sidebar h4 { display: none; }
+  .cat-filter { display: flex; gap: 22px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--silver-200); }
+  .cat-filter::-webkit-scrollbar { display: none; }
+  .cat-filter button { white-space: nowrap; min-height: 44px; }
+  .shop-toolbar { margin-bottom: 22px; }
   .facts-stats { gap: 28px; }
   .trust-list { grid-template-columns: 1fr 1fr; }
   .cat-grid--editorial .cat-tile, .cat-grid--editorial .cat-tile:nth-child(-n+2) { grid-column: span 6; }
@@ -2282,7 +2294,7 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
   /* Comfortable touch targets. */
   .btn { padding: 13px 22px; min-height: 46px; }
   .btn-sm { min-height: 40px; }
-  .nav-link { padding: 12px 0; }
+  .nav-link { padding: 14px 0; }
   .cat-filter button, .side-link, .quiz-opts button { min-height: 46px; }
   .admin-select, .field input, .field select, .field textarea, .shop-toolbar input, .shop-toolbar select { min-height: 46px; font-size: 16px; }
 
