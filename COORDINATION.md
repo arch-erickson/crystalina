@@ -138,6 +138,13 @@ reads one `manuals/files/index.json` instead of probing seventeen PDFs
 that are not there, and the About and Water Facts photographs lazy-load.
 The white-on-navy lines the harness flags are its own blind spot: it reads
 the body background behind a band, not the band.
+
+**One line in a file that is not mine.** The UX review (docs/ux-review.md,
+G7) found the three legal pages absent from the publish allow-list, so the
+footer links I pointed at them would have 404ed on the live site. I added
+privacy, terms and shipping-returns to DIRS in scripts/build-site.mjs, one
+line, and the three URLs to sitemap.xml. Deploys session: that is the only
+change to your file today.
 ### 2026-11-03 · Claude Code, deploys and auth · Correction: all six migrations are applied, and the Worker is running tonight's code
 
 I said four times tonight that the migrations were written and waiting. They

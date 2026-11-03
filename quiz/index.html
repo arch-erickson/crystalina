@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<main>
+<main id="main">
   <section class="page-hero page-hero--quiet">
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Find your filter</span></nav>
@@ -27,7 +27,7 @@
 
   <section class="section">
     <div class="container">
-      <div class="quiz-card" id="quizCard"></div>
+      <div class="quiz-card" id="quizCard" aria-live="polite" aria-atomic="true"></div>
     </div>
   </section>
 </main>
@@ -136,11 +136,12 @@
     if (step < QUESTIONS.length) {
       const { q, opts } = QUESTIONS[step];
       card.innerHTML = `
-        <div class="quiz-progress"><div style="width:${step / QUESTIONS.length * 100}%"></div></div>
+        <div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${QUESTIONS.length}" aria-valuenow="${step}" aria-label="Question ${step + 1} of ${QUESTIONS.length}"><div style="width:${(step + 1) / (QUESTIONS.length + 1) * 100}%"></div></div>
         <p class="quiz-step">Question ${step + 1} of ${QUESTIONS.length}</p>
-        <h2 class="quiz-q">${q}</h2>
-        <div class="quiz-opts">${opts.map((o, i) => `<button data-i="${i}"><span class="quiz-opt-ic">${svgIcon(o.ic)}</span><span>${o.t}</span></button>`).join('')}</div>
+        <h2 class="quiz-q" id="quizQuestion" tabindex="-1">${q}</h2>
+        <div class="quiz-opts" role="group" aria-labelledby="quizQuestion">${opts.map((o, i) => `<button data-i="${i}"><span class="quiz-opt-ic">${svgIcon(o.ic)}</span><span>${o.t}</span></button>`).join('')}</div>
         ${step > 0 ? '<p class="quiz-back"><button type="button" class="text-link" id="quizBack">Back</button></p>' : ''}`;
+      if (step > 0) document.getElementById('quizQuestion').focus({ preventScroll: false });
       card.querySelectorAll('.quiz-opts button').forEach(b =>
         b.addEventListener('click', () => { answers[step] = opts[b.dataset.i].tag; step++; render(); }));
       const back = document.getElementById('quizBack');
@@ -153,9 +154,9 @@
       const overBudget = p && ceiling !== Infinity && p.price > ceiling;
       if (!p) { card.innerHTML = '<h2 class="quiz-q">The catalogue is loading</h2><p class="quiz-note">Try again in a moment, or <a class="link" href="/shop/">see every system</a>.</p>'; return; }
       card.innerHTML = `
-        <div class="quiz-progress"><div style="width:100%"></div></div>
+        <div class="quiz-progress" role="progressbar" aria-valuemin="0" aria-valuemax="${QUESTIONS.length}" aria-valuenow="${QUESTIONS.length}" aria-label="Finished"><div style="width:100%"></div></div>
         <p class="quiz-step">For your home</p>
-        <h2 class="quiz-q">${escapeHTML(p.name)}</h2>
+        <h2 class="quiz-q" id="quizQuestion" tabindex="-1">${escapeHTML(p.name)}</h2>
         <div class="quiz-result">
           <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}">
           <div>

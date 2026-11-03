@@ -31,7 +31,7 @@
   --shadow: 0 12px 34px rgba(21, 55, 93, .10);
   --shadow-lg: 0 26px 64px rgba(21, 55, 93, .18);
   --shadow-card: 0 4px 14px rgba(21, 55, 93, .06), 0 18px 40px rgba(21, 55, 93, .09);
-  --ring: 0 0 0 3px rgba(42, 123, 196, .35);
+  --ring: 0 0 0 2px #fff, 0 0 0 4px var(--navy-800);
   /* ---------- type ----------
      Two faces, four weights, and one rule for which gets used where.
      Recorded as AD8.
@@ -131,6 +131,10 @@ h1, h2, h3, h4 { line-height: 1.18; color: var(--navy-800); font-weight: var(--w
    navigation sits beneath it, and any item with a menu opens a full width
    panel on hover, on focus, or on a first tap where there is no hover. */
 .site-top { position: sticky; top: 0; z-index: 90; }
+/* The first thing a keyboard reaches: hidden until focused, then pinned
+   top left above everything, so the header and its menus can be skipped. */
+.skip-link { position: absolute; left: 16px; top: -100px; z-index: 200; background: var(--navy-800); color: #fff; padding: 12px 18px; border-radius: 999px; font-size: .86rem; font-weight: var(--w-semibold); text-decoration: none; }
+.skip-link:focus { top: 12px; outline: none; box-shadow: var(--ring); }
 .site-top--overlay { position: fixed; left: 0; right: 0; }
 .announce-bar { background: var(--navy-900); color: #cfe3fb; font-size: .76rem; letter-spacing: .02em; display: flex; justify-content: center; gap: 28px; align-items: center; padding: 8px 16px; flex-wrap: wrap; }
 .announce-bar .ic { color: var(--cyan-300); }
@@ -164,7 +168,7 @@ h1, h2, h3, h4 { line-height: 1.18; color: var(--navy-800); font-weight: var(--w
 .mega { position: absolute; left: 0; right: 0; top: 100%; background: #fff; border-top: 1px solid var(--silver-200); border-bottom: 1px solid var(--silver-200); box-shadow: 0 30px 60px rgba(21,55,93,.12); opacity: 0; visibility: hidden; transform: translateY(-6px); transition: opacity .22s var(--ease-out), transform .22s var(--ease-out), visibility 0s .22s; }
 .has-menu:hover > .mega, .has-menu:focus-within > .mega, .has-menu.is-open > .mega { opacity: 1; visibility: visible; transform: none; transition-delay: .09s, .09s, 0s; }
 .mega-inner { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.25fr); gap: 44px; padding: 36px 0 42px; }
-.mega-col h4 { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); margin-bottom: 16px; }
+.mega-col h4, .mega-col-title { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); margin-bottom: 16px; }
 .mega-col ul { list-style: none; display: grid; gap: 12px; margin: 0; padding: 0; }
 .mega-col a { display: block; color: var(--navy-800); font-size: .95rem; font-weight: var(--w-medium); line-height: 1.3; transition: color .2s; }
 .mega-col a small { display: block; color: var(--muted); font-size: .76rem; font-weight: var(--w-regular); margin-top: 2px; }
@@ -203,7 +207,7 @@ h1, h2, h3, h4 { line-height: 1.18; color: var(--navy-800); font-weight: var(--w
 .notification-item p { color: var(--muted); font-size: .76rem; line-height: 1.45; margin: 3px 0; }
 .notification-item small, .notification-empty { color: var(--muted); font-size: .68rem; }
 .notification-empty { padding: 22px; text-align: center; }
-.hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 8px; position: relative; z-index: 96; }
+.hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; padding: 8px; min-width: 44px; min-height: 44px; justify-content: center; align-items: center; position: relative; z-index: 96; }
 .nav-close, .nav-overlay { display: none; }
 body.nav-open { overflow: hidden; }
 .hamburger span { width: 24px; height: 2px; background: var(--navy-800); border-radius: 2px; transition: background .35s var(--ease-out); }
@@ -329,8 +333,9 @@ body.nav-open { overflow: hidden; }
 .bar-row { display: grid; grid-template-columns: 150px 1fr 46px; align-items: center; gap: 12px; margin-bottom: 13px; font-size: .82rem; }
 .bar-track { background: rgba(255,255,255,.16); height: 8px; overflow: hidden; }
 .bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-300), var(--blue-400)); width: 0; transition: width 1.2s cubic-bezier(.2,.7,.3,1); }
-.bar-val { font-weight: var(--w-bold); color: var(--cyan-300); text-align: right; }
-.chart-note { font-size: .7rem; color: #8aa8ce; margin-top: 14px; }
+.bar-val { font-weight: var(--w-bold); color: #80DAFA; text-align: right; }
+.chart-note { font-size: .7rem; color: #cfe0f5; margin-top: 14px; }
+.nyc-band strong { color: #fff; }
 .chart-note a { color: #cfe0f5; text-decoration: underline; text-underline-offset: 3px; }
 /* Arithmetic shown in full on the navy band: a term, then its figure. */
 .arith { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 20px; margin: 0; font-size: .9rem; }
@@ -401,7 +406,8 @@ body.cart-open .cart-overlay { opacity: 1; pointer-events: auto; }
 body.cart-open .cart-drawer { visibility: visible; transform: translateX(0); transition-delay: 0s; }
 body.cart-open { overflow: hidden; }
 .cart-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid #e4ecf6; }
-.cart-close { background: none; border: none; font-size: 1.7rem; color: var(--muted); line-height: 1; }
+.cart-close { background: none; border: none; color: var(--navy-800); line-height: 1; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+.cart-close .ic { width: 20px; height: 20px; }
 .cart-shipbar { padding: 12px 22px; background: var(--ice-50); border-bottom: 1px solid #e4ecf6; font-size: .82rem; }
 .ship-ok { color: var(--navy-800); font-weight: var(--w-semibold); display: inline-flex; align-items: center; gap: 8px; }
 .ship-ok .ic { width: 18px; height: 18px; }
@@ -414,7 +420,7 @@ body.cart-open { overflow: hidden; }
 .ci-name { font-size: .84rem; font-weight: var(--w-semibold); color: var(--navy-800); display: block; line-height: 1.3; }
 .ci-price { font-size: .8rem; color: var(--muted); margin: 3px 0; }
 .ci-qty { display: flex; align-items: center; gap: 8px; }
-.ci-qty button { width: 24px; height: 24px; border: 1px solid #d7e2f0; background: #fff; border-radius: 6px; font-weight: var(--w-bold); color: var(--navy-800); }
+.ci-qty button { width: 32px; height: 32px; min-width: 32px; border: 1px solid #d7e2f0; background: #fff; border-radius: 6px; font-weight: var(--w-bold); color: var(--navy-800); }
 .ci-qty .ci-remove { width: auto; border: none; font-size: .74rem; color: var(--danger); background: none; font-weight: var(--w-medium); }
 .ci-line { font-weight: var(--w-bold); font-size: .9rem; color: var(--navy-800); }
 .cart-foot { border-top: 1px solid #e4ecf6; padding: 18px 22px; display: grid; gap: 10px; }
@@ -446,7 +452,7 @@ body.cart-open { overflow: hidden; }
 .socials svg { width: 18px; height: 18px; }
 .footer-bottom { border-top: 1px solid rgba(255,255,255,.09); }
 .footer-bottom-inner { display: flex; justify-content: space-between; gap: 12px; padding: 18px 0; font-size: .76rem; flex-wrap: wrap; }
-.footer-links a { color: #b8cbe6; }
+.footer-links a { color: #b8cbe6; display: inline-block; padding: 6px 0; }
 .footer-links a:hover { color: var(--cyan-300); }
 
 /* ---------- page hero (inner pages) ---------- */
@@ -488,12 +494,12 @@ body.cart-open { overflow: hidden; }
 /* The filter bar: categories in a row, search and sort at the right, one
    hairline beneath, and the grid under it. On phones the row scrolls. */
 .cat-filter { display: flex; gap: 26px; flex-wrap: wrap; }
-.cat-filter button { text-align: left; background: none; border: none; padding: 9px 0; font-size: .86rem; color: var(--ink); font-weight: var(--w-regular); white-space: nowrap; transition: color .2s; }
+.cat-filter button { text-align: left; background: none; border: none; padding: 9px 0; min-width: 44px; font-size: .86rem; color: var(--ink); font-weight: var(--w-regular); white-space: nowrap; transition: color .2s; }
 .cat-filter button:hover { color: var(--blue-500); }
 .cat-filter button.active { color: var(--navy-800); font-weight: var(--w-semibold); text-decoration: underline; text-underline-offset: 6px; text-decoration-color: var(--blue-500); }
 .shop-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 30px; padding-bottom: 14px; border-bottom: 1px solid var(--silver-200); flex-wrap: wrap; }
 .shop-toolbar input, .shop-toolbar select { padding: 10px 2px; border: 0; border-bottom: 1px solid transparent; background: transparent; font-size: .9rem; color: var(--ink); transition: border-color .2s; }
-.shop-toolbar input:focus, .shop-toolbar select:focus { outline: none; box-shadow: none; border-bottom-color: var(--blue-500); border-radius: 0; }
+.shop-toolbar input:focus, .shop-toolbar select:focus { outline: none; border-bottom-color: var(--blue-500); border-radius: 0; }
 .shop-toolbar input { flex: 1; min-width: 200px; }
 .cat-filter { flex: 1 1 auto; min-width: 0; }
 .shop-tools { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-left: auto; flex: 0 0 auto; }
@@ -676,6 +682,7 @@ body.viewer-open { overflow: hidden; }
 .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--blue-500); }
 .form-error { background: #fdecec; color: var(--danger); font-size: .84rem; padding: 10px 14px; border-radius: var(--radius-sm); margin-bottom: 16px; display: none; }
 .form-error.show { display: block; }
+.newsletter-error { flex-basis: 100%; margin: 8px 0 0; background: rgba(255,255,255,.1); color: #fff; }
 /* Sign in with Google. The four-colour G is Google's own mark and is the
    one place on the site where colours outside the Crystalina palette are
    allowed: their brand guidelines require it, and a recoloured G reads as
@@ -2369,6 +2376,8 @@ body.viewer-open { overflow: hidden; }
   .nyc-grid, .split, .pd-layout, .checkout-layout, .contact-grid, .account-grid { grid-template-columns: 1fr; }
   .pd-layout { gap: 28px; }
   .checkout-layout, .contact-grid, .account-grid { gap: 36px; }
+  .checkout-layout { display: flex; flex-direction: column; }
+  .co-summary { order: -1; }
   .quiz-result { grid-template-columns: 120px minmax(0, 1fr); gap: 16px; }
   .co-summary { position: static; }
   .pd-media { position: static; }

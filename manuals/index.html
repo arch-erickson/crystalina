@@ -17,7 +17,7 @@
 </head>
 <body>
 
-<main>
+<main id="main">
   <section class="page-hero page-hero--quiet">
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Manuals</span></nav>
@@ -96,7 +96,7 @@
   function renderCats() {
     const cats = ['All', ...CATEGORIES.map(c => c.name)];
     const el = document.getElementById('manualCats');
-    el.innerHTML = cats.map(c => `<button type="button" class="${c === activeCat ? 'active' : ''}" data-cat="${escapeHTML(c)}">${escapeHTML(c)}</button>`).join('');
+    el.innerHTML = cats.map(c => `<button type="button" class="${c === activeCat ? 'active' : ''}" aria-pressed="${c === activeCat}" data-cat="${escapeHTML(c)}">${escapeHTML(c)}</button>`).join('');
     el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { activeCat = b.dataset.cat; renderCats(); renderGrid(); }));
   }
 

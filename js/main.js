@@ -133,11 +133,11 @@ const LOGO_LOCKUP = `<img src="/logo-mark.png" class="brand-mark" alt=""><img sr
 function navItem(link, active) {
   const cls = 'nav-link' + (active === link.href ? ' active' : '');
   if (!link.menu) return `<li><a href="${link.href}" class="${cls}">${escapeHTML(link.label)}</a></li>`;
-  const col = c => `<div class="mega-col"><h4>${escapeHTML(c.title)}</h4><ul>${c.links.map(k =>
-    `<li><a href="${k.href}">${escapeHTML(k.label)}${k.desc ? `<small>${escapeHTML(k.desc)}</small>` : ''}</a></li>`).join('')}</ul></div>`;
+  const col = c => `<div class="mega-col"><p class="mega-col-title">${escapeHTML(c.title)}</p><ul>${c.links.map(k =>
+    `<li><a href="${k.href}">${escapeHTML(k.label)}${k.desc ? `<small> ${escapeHTML(k.desc)}</small>` : ''}</a></li>`).join('')}</ul></div>`;
   const feat = link.menu.feature ? `<a class="mega-feature" href="${link.menu.feature.href}">
       <div class="mega-feature-media"><img src="${link.menu.feature.image}" alt="${escapeHTML(link.menu.feature.alt)}" loading="lazy"></div>
-      <strong>${escapeHTML(link.menu.feature.title)}</strong><small>${escapeHTML(link.menu.feature.text)}</small></a>` : '';
+      <strong>${escapeHTML(link.menu.feature.title)}</strong><small> ${escapeHTML(link.menu.feature.text)}</small></a>` : '';
   return `<li class="has-menu"><a href="${link.href}" class="${cls}" aria-haspopup="true" aria-expanded="false">${escapeHTML(link.label)}</a>
     <div class="mega"><div class="container mega-inner">${link.menu.columns.map(col).join('')}${feat}</div></div></li>`;
 }
@@ -152,6 +152,7 @@ function renderHeader(active = '') {
   const el = document.createElement('div');
   el.className = 'site-top' + (overlay ? ' site-top--overlay' : '');
   el.innerHTML = `
+  <a class="skip-link" href="#main">Skip to content</a>
   <div class="announce-bar">
     <span>${icon('droplet')} Free delivery in the five boroughs on orders over $99</span>
   </div>
@@ -172,9 +173,9 @@ function renderHeader(active = '') {
             </button>
             <div class="notification-menu" id="notificationMenu"><div class="notification-menu-head"><strong>Notifications</strong><span>${unreadNotifications} new</span></div>${notifications.length ? notifications.map(item => `<article class="notification-item ${item.read ? '' : 'unread'}"><strong>${escapeHTML(item.title)}</strong><p>${escapeHTML(item.message)}</p><small>${new Date(item.sent).toLocaleDateString('en-US', { dateStyle: 'medium' })}</small></article>`).join('') : '<p class="notification-empty">You have no notifications.</p>'}</div>
           </div>` : ''}
-          <a href="${user ? (user.role === 'admin' ? '/admin/' : '/account/') : '/signin/'}" class="icon-btn" title="${user ? user.name : 'Sign in'}">
+          <a href="${user ? (user.role === 'admin' ? '/admin/' : '/account/') : '/signin/'}" class="icon-btn" title="${user ? escapeHTML(user.name) : 'Sign in'}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
-            <span class="icon-label">${user ? user.name.split(' ')[0] : 'Sign In'}</span>
+            <span class="icon-label">${user ? escapeHTML(user.name.split(' ')[0]) : 'Sign In'}</span>
           </a>
           <button class="icon-btn cart-btn" id="cartOpenBtn" title="Cart">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2.5 3.5h3l2.6 12h10.4l2.5-8.5H6.2"/></svg>
@@ -428,7 +429,7 @@ function renderCartDrawer() {
   <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping cart">
     <div class="cart-head">
       <h3>Your Cart</h3>
-      <button class="cart-close" id="cartCloseBtn" aria-label="Close cart">&times;</button>
+      <button class="cart-close" id="cartCloseBtn" aria-label="Close cart">${icon('close')}</button>
     </div>
     <div class="cart-shipbar" id="cartShipBar"></div>
     <div class="cart-items" id="cartItems"></div>
@@ -439,7 +440,7 @@ function renderCartDrawer() {
       <button class="btn btn-ghost btn-block" id="cartContinueBtn">Continue Shopping</button>
     </div>
   </aside>
-  <div class="toast" id="toast"></div>`;
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>`;
   document.body.appendChild(el);
 
   document.getElementById('cartCloseBtn').addEventListener('click', closeCart);
@@ -449,8 +450,25 @@ function renderCartDrawer() {
   renderCartItems();
 }
 
-function openCart() { document.body.classList.add('cart-open'); renderCartItems(); }
-function closeCart() { document.body.classList.remove('cart-open'); }
+/* The cart drawer is a dialog: focus moves into it, the page behind it is
+   inert, Escape closes it, and focus goes back where it came from. */
+let cartOpener = null;
+function openCart() {
+  cartOpener = document.activeElement;
+  document.body.classList.add('cart-open');
+  renderCartItems();
+  document.querySelectorAll('.site-top, main, .site-footer').forEach(el => { el.inert = true; });
+  const close = document.getElementById('cartCloseBtn');
+  if (close) setTimeout(() => close.focus(), 30);
+}
+function closeCart() {
+  if (!document.body.classList.contains('cart-open')) return;
+  document.body.classList.remove('cart-open');
+  document.querySelectorAll('.site-top, main, .site-footer').forEach(el => { el.inert = false; });
+  if (cartOpener && typeof cartOpener.focus === 'function') cartOpener.focus();
+  cartOpener = null;
+}
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && document.body.classList.contains('cart-open')) closeCart(); });
 
 function updateCartBadge() {
   const badge = document.getElementById('cartCount');
@@ -550,9 +568,11 @@ function renderFooter() {
         <h3>Join the Crystalina Club</h3>
         <p>A note when a filter is due, and the Water Facts as they change. Nothing else.</p>
       </div>
-      <form class="newsletter" id="newsletterForm">
-        <input type="email" placeholder="Your email address" required>
+      <form class="newsletter" id="newsletterForm" novalidate>
+        <label class="sr-only" for="newsletterEmail">Your email address</label>
+        <input type="email" id="newsletterEmail" name="email" placeholder="Your email address" autocomplete="email" required aria-describedby="newsletterError">
         <button class="btn btn-accent" type="submit">Subscribe</button>
+        <p class="form-error newsletter-error" id="newsletterError" role="alert"></p>
       </form>
     </div>
   </div>
@@ -594,7 +614,7 @@ function renderFooter() {
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
       <span>© ${new Date().getFullYear()} ${escapeHTML(companyName.replace(/\.$/, ''))}. All rights reserved. Proudly serving the five boroughs.</span>
-      <span class="footer-links"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="#">Shipping &amp; Returns</a> · <a href="/signin/?mode=staff">Staff sign in</a></span>
+      <span class="footer-links"><a href="/privacy/">Privacy Policy</a> · <a href="/terms/">Terms of Service</a> · <a href="/shipping-returns/">Shipping and Returns</a> · <a href="/signin/?mode=staff">Staff sign in</a></span>
     </div>
   </div>`;
   document.body.appendChild(el);
@@ -685,7 +705,12 @@ function bindNewsletter() {
     e.preventDefault();
     const input = form.querySelector('input[type="email"]');
     const button = form.querySelector('button');
+    const errorBox = form.querySelector('.newsletter-error');
     const email = input.value.trim();
+    const fail = message => { if (errorBox) { errorBox.textContent = message; errorBox.classList.add('show'); } input.setAttribute('aria-invalid', 'true'); input.focus(); };
+    if (errorBox) { errorBox.textContent = ''; errorBox.classList.remove('show'); }
+    input.removeAttribute('aria-invalid');
+    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { fail('Enter the email address you would like us to write to.'); return; }
     button.disabled = true;
     try {
       const res = await fetch('/api/newsletter', {
@@ -698,7 +723,7 @@ function bindNewsletter() {
       toast('You are on the list. Welcome to the Crystalina Club.');
       form.reset();
     } catch (error) {
-      toast(error.message);
+      fail(error.message);
     } finally {
       button.disabled = false;
     }

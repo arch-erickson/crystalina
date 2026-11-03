@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<main>
+<main id="main">
   <section class="page-hero page-hero--quiet">
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Contact</span></nav>
@@ -42,7 +42,7 @@
               <div class="field"><label for="cName">Name</label><input required id="cName" autocomplete="name"></div>
               <div class="field"><label for="cEmail">Email</label><input type="email" required id="cEmail" autocomplete="email"></div>
             </div>
-            <div class="field"><label for="cPhone">Phone, if you would rather we call</label><input type="tel" id="cPhone" autocomplete="tel"></div>
+            <div class="field"><label for="cPhone">Phone, if you would rather we call</label><input type="tel" id="cPhone" autocomplete="tel" inputmode="tel"></div>
             <div class="field"><label for="cTopic">About</label>
               <select id="cTopic">
                 <option>A system</option><option>An order</option><option>A fitting</option>
@@ -54,8 +54,8 @@
             <p class="form-note form-note--after">We reply within one business day. For anything urgent, call or WhatsApp (917) 809-4803.</p>
           </div>
         </form>
-        <div id="contactDone" class="receipt-notice" style="display:none">
-          <h2>Received</h2>
+        <div id="contactDone" class="receipt-notice" style="display:none" aria-live="polite">
+          <h2 tabindex="-1" id="contactDoneHeading">Received</h2>
           <p>We reply within one business day, to the email you gave.</p>
           <div class="notice-actions"><a class="text-link" href="/shop/">Meanwhile, the systems</a></div>
         </div>
@@ -99,10 +99,13 @@
       box = document.createElement('div');
       box.id = 'contactError';
       box.className = 'form-error';
+      box.setAttribute('role', 'alert');
+      box.setAttribute('tabindex', '-1');
       contactForm.prepend(box);
     }
     box.textContent = message;
     box.classList.add('show');
+    box.focus();
   }
 
   contactForm.addEventListener('submit', async e => {
@@ -128,6 +131,7 @@
       if (!res.ok) throw new Error(body.error || 'We could not send your message.');
       contactForm.style.display = 'none';
       document.getElementById('contactDone').style.display = 'block';
+      document.getElementById('contactDoneHeading').focus();
     } catch (error) {
       contactError(error.message + ' You can also call or WhatsApp (917) 809-4803.');
       contactBtn.disabled = false;

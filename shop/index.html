@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<main>
+<main id="main">
   <section class="page-hero page-hero--quiet">
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Shop</span></nav>
@@ -37,7 +37,6 @@
             <option value="featured">Sort: Featured</option>
             <option value="price-asc">Price: Low to High</option>
             <option value="price-desc">Price: High to Low</option>
-            <option value="rating">Top Rated</option>
           </select>
         </div>
       </div>
@@ -69,7 +68,7 @@
 
   function renderCats() {
     catFilter.innerHTML = cats.map(c =>
-      `<button class="${c === activeCat ? 'active' : ''}" data-cat="${c}">${c}</button>`).join('');
+      `<button type="button" class="${c === activeCat ? 'active' : ''}" aria-pressed="${c === activeCat}" data-cat="${escapeHTML(c)}">${escapeHTML(c)}</button>`).join('');
     catFilter.querySelectorAll('button').forEach(b =>
       b.addEventListener('click', () => { activeCat = b.dataset.cat; renderCats(); renderGrid(); }));
   }

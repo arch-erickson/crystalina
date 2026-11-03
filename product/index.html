@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<main>
+<main id="main">
   <section class="section" id="pdSection">
     <div class="container pd-layout" id="pdLayout"></div>
   </section>
@@ -152,7 +152,7 @@
     ].filter(Boolean);
 
     layout.innerHTML = `
-      <div class="pd-media"><img src="${p.image}" alt="${escapeHTML(p.name)}"></div>
+      <div class="pd-media"><img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}"></div>
       <div class="pd-buy">
         <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/shop/">Shop</a><span>/</span><a href="/shop/?cat=${encodeURIComponent(p.category)}">${escapeHTML(p.category)}</a></nav>
         <h1 class="pd-name">${escapeHTML(p.name)}</h1>
@@ -166,7 +166,7 @@
         ${configuratorMarkup}
         <div class="pd-qtyrow">
           <div class="qty-picker">
-            <button id="qDec" aria-label="Decrease quantity">−</button><span id="qVal" aria-live="polite">1</span><button id="qInc" aria-label="Increase quantity">+</button>
+            <button type="button" id="qDec" aria-label="Decrease quantity" disabled>−</button><span id="qVal" aria-live="polite">1</span><button type="button" id="qInc" aria-label="Increase quantity" ${p.stock <= 1 ? 'disabled' : ''}>+</button>
           </div>
           <button class="btn btn-primary" style="flex:1" id="addBtn" ${p.stock === 0 ? 'disabled' : ''}>
             ${p.stock === 0 ? 'Sold out' : 'Add to Cart'}
@@ -188,8 +188,11 @@
 
     let qty = 1;
     const qVal = document.getElementById('qVal');
-    document.getElementById('qInc').addEventListener('click', () => { qty = Math.min(qty + 1, Math.max(p.stock, 1)); qVal.textContent = qty; });
-    document.getElementById('qDec').addEventListener('click', () => { qty = Math.max(1, qty - 1); qVal.textContent = qty; });
+    const qInc = document.getElementById('qInc'), qDec = document.getElementById('qDec');
+    const ceiling = Math.max(p.stock, 1);
+    const showQty = () => { qVal.textContent = qty; qInc.disabled = qty >= ceiling; qDec.disabled = qty <= 1; };
+    qInc.addEventListener('click', () => { qty = Math.min(qty + 1, ceiling); showQty(); });
+    qDec.addEventListener('click', () => { qty = Math.max(1, qty - 1); showQty(); });
     const addBtn = document.getElementById('addBtn');
     /* Keep the headline price in step with the chosen configuration. */
     const priceEl = document.getElementById('pdPrice');

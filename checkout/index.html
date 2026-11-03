@@ -16,7 +16,7 @@
 </head>
 <body>
 
-<main>
+<main id="main">
   <section class="page-hero page-hero--quiet">
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/shop/">Shop</a><span>/</span><span>Checkout</span></nav>
@@ -29,7 +29,7 @@
     <div class="container">
       <div class="checkout-layout" id="checkoutLayout">
         <form id="checkoutForm" class="form-sections" novalidate>
-          <div class="form-error" id="coError"></div>
+          <div class="form-error" id="coError" role="alert"></div>
           <div class="form-section">
             <h3>Delivery</h3>
             <div class="field-row">
@@ -37,11 +37,11 @@
               <div class="field"><label for="fLast">Last name</label><input required id="fLast" autocomplete="family-name"></div>
             </div>
             <div class="field"><label for="fEmail">Email</label><input type="email" required id="fEmail" autocomplete="email"></div>
-            <div class="field"><label for="fPhone">Phone</label><input type="tel" id="fPhone" autocomplete="tel" placeholder="(929) 555-0123"></div>
+            <div class="field"><label for="fPhone">Phone</label><input type="tel" id="fPhone" autocomplete="tel" inputmode="tel" placeholder="(929) 555-0123"></div>
             <div class="field"><label for="fAddr">Street address, with apartment</label><input required id="fAddr" autocomplete="street-address"></div>
             <div class="field-row">
               <div class="field"><label for="fBorough">Borough</label>
-                <select id="fBorough">
+                <select id="fBorough" autocomplete="address-level2">
                   <option>Manhattan</option><option>Brooklyn</option><option>Queens</option>
                   <option>The Bronx</option><option>Staten Island</option><option>Outside the five boroughs</option>
                 </select>
@@ -60,9 +60,9 @@
           </div>
           <div class="form-section">
             <h3>Payment</h3>
-            <p class="form-note">We are not taking payment online yet. Message us on WhatsApp or call (917) 809-4803 and we arrange the order with you, at the same price and with the same delivery.</p>
+            <p class="form-note" id="checkoutUnavailable">We are not taking payment online yet. Message us on WhatsApp or call (917) 809-4803 and we arrange the order with you, at the same price and with the same delivery.</p>
             <div class="form-actions">
-              <button type="submit" class="btn btn-primary btn-block" disabled>Pay online</button>
+              <button type="submit" class="btn btn-primary btn-block" disabled aria-describedby="checkoutUnavailable">Pay online</button>
               <a class="btn btn-outline btn-block" href="https://wa.me/19178094803?text=Hi%2C%20I%20would%20like%20to%20order" target="_blank" rel="noopener">Order on WhatsApp</a>
             </div>
           </div>
@@ -110,7 +110,7 @@
     const tax = subtotal * 0.08875;
     document.getElementById('summaryItems').innerHTML = items.map(i => `
       <div class="summary-item">
-        <img src="${i.product.image}" alt="">
+        <img src="${escapeHTML(i.product.image)}" alt="">
         <span>${escapeHTML(i.product.name)}<small>Quantity ${i.qty}</small></span>
         <strong>${money(i.product.price * i.qty)}</strong>
       </div>`).join('');
@@ -133,15 +133,13 @@
       installation: document.getElementById('fInstall').value === 'yes',
       userId: user ? user.id : null
     });
-    if (!order) return;
+    if (!order) { const box = document.getElementById('coError'); box.textContent = 'We are not taking orders online yet. Message us on WhatsApp or call (917) 809-4803.'; box.classList.add('show'); return; }
     document.getElementById('checkoutLayout').style.display = 'none';
     const s = document.getElementById('orderSuccess');
     s.style.display = 'block';
     s.innerHTML = `
-      <div class="big-check">✓</div>
-      <h2>Thank you! Order ${order.id} confirmed.</h2>
-      <p style="color:var(--muted);margin:12px 0 8px;">A confirmation email will be sent to <strong>${order.customer.email}</strong>.
-      Total charged: <strong>${money(order.total)}</strong>.</p>
+      <h2>Order ${escapeHTML(order.id)} is confirmed.</h2>
+      <p>A confirmation is on its way to <strong>${escapeHTML(order.customer.email)}</strong>. The total was ${money(order.total)}.</p>
       ${order.customer.installation ? `<p style="color:var(--muted);display:flex;gap:8px;align-items:center;justify-content:center;">${icon('wrench')} Our installation team will call you within 1 business day to schedule.</p>` : ''}
       <div style="display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap;">
         <a href="/shop/" class="btn btn-primary">Continue Shopping</a>
