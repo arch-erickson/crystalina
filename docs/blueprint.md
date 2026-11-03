@@ -495,6 +495,17 @@ _Decided 2026-10-09._
 - **Right for now.** Both faces are on Google Fonts, so there is no licence to buy and no file to self-host yet.
 - **Replace when.** A licensed display face is bought and self-hosted. Canela was the intended face and was never licensed. On 2026-11-02 thirteen candidates were set in the headings of this site and compared, and Playfair Display was chosen on its merits: the two faces closest to Canela in shape, Marcellus and Gilda Display, carry a single weight each, which would have put synthetic bold back on the page.
 
+#### AD11 · The voice turns to health, and New York water becomes the reason rather than the headline
+
+_Decided 2026-11-02._
+
+- **What it does.** Rewrites the home page, the shop head, the editor defaults in store.js and the navigation. The subject is what a household drinks every day and the quiet confidence of having taken care of it. Affordability is said as value, speed as ease, the product as care. NYC Water Facts becomes Water Facts.
+- **Why we need it.** The previous copy led with the plumbing of the city and a problem. The owner wants to speak to people who care about their health and their family first, and to reach every household and budget, with New York water as the proof that we know what we are doing.
+- **Why it belongs here.** Copy that lives in index.html, in store.js and in site_content at once has to change in all three in one commit, or the editor quietly restores the old voice the next time it publishes.
+- **What it costs.** Rows already published in site_content still carry the old copy until they are republished from the editor. The hero now hides its first sentence on phones, which the editor must respect: the rule is in applyPageSections.
+- **Right for now.** One voice in one commit, recorded in CLAUDE.md under Voice.
+- **Replace when.** The owner changes the positioning again. Then the same three places move together.
+
 #### AD10 · Four weights, and one rule for which face a thing is set in
 
 _Decided 2026-11-02._

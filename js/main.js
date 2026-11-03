@@ -98,13 +98,13 @@ const NAV_LINKS = [
       { title: 'Keep it running', links: CATEGORIES.slice(4).map(c => ({ label: c.name, href: c.href, desc: c.desc })) },
       { title: 'Help choosing', links: [
         { label: 'Find your filter', href: '/quiz/', desc: 'Five questions, one answer' },
-        { label: 'NYC water facts', href: '/nyc-water/', desc: 'What is in the tap, and why' },
+        { label: 'Water facts', href: '/nyc-water/', desc: 'What is in the tap, and why it matters' },
         { label: 'Talk to us', href: '/contact/', desc: 'Call, WhatsApp or visit' },
       ] },
     ],
     feature: { href: '/shop/', image: '/images/products/h5-600-uv-editorial.webp', alt: 'The Crystalina flagship reverse osmosis system', title: 'The flagship', text: 'Ten stages, alkaline, UV, built for New York water.' },
   } },
-  { label: 'NYC Water Facts', href: '/nyc-water/' },
+  { label: 'Water Facts', href: '/nyc-water/' },
   { label: 'Find Your Filter', href: '/quiz/' },
   { label: 'About Us', href: '/about/' },
   { label: 'Contact', href: '/contact/' }
@@ -174,10 +174,12 @@ function renderHeader(active = '') {
         </div>
       </div>
       <nav class="main-nav" id="mainNav" aria-label="Main">
+        <button class="nav-close" id="navCloseBtn" aria-label="Close menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
         <ul>${NAV_LINKS.map(link => navItem(link, active)).join('')}</ul>
       </nav>
     </div>
-  </header>`;
+  </header>
+  <div class="nav-overlay" id="navOverlay"></div>`;
   document.body.prepend(el);
 
   const header = el.querySelector('.site-header');
@@ -197,18 +199,35 @@ function renderHeader(active = '') {
   }
 
   const hamburger = document.getElementById('hamburgerBtn');
-  hamburger.addEventListener('click', () => {
-    const open = nav.classList.toggle('open');
+  const setDrawer = open => {
+    nav.classList.toggle('open', open);
+    document.body.classList.toggle('nav-open', open);
     hamburger.setAttribute('aria-expanded', String(open));
     if (overlay) header.classList.toggle('is-transparent', !open && window.scrollY < 24);
+  };
+  hamburger.addEventListener('click', () => setDrawer(!nav.classList.contains('open')));
+  document.getElementById('navCloseBtn').addEventListener('click', () => setDrawer(false));
+  document.getElementById('navOverlay').addEventListener('click', () => setDrawer(false));
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && nav.classList.contains('open')) { setDrawer(false); hamburger.focus(); } });
+
+  // While a menu is open the bar is white even over the hero, and the link
+  // says so to assistive technology.
+  el.querySelectorAll('.has-menu').forEach(li => {
+    const link = li.querySelector('.nav-link');
+    const show = () => { header.classList.add('menu-open'); link.setAttribute('aria-expanded', 'true'); };
+    const hide = () => { if (!li.classList.contains('is-open')) { header.classList.remove('menu-open'); link.setAttribute('aria-expanded', 'false'); } };
+    li.addEventListener('mouseenter', show);
+    li.addEventListener('mouseleave', hide);
+    li.addEventListener('focusin', show);
+    li.addEventListener('focusout', event => { if (!li.contains(event.relatedTarget)) hide(); });
   });
 
   // Menus: hover and focus open them on their own through CSS. Where there is
   // no hover, or inside the drawer, the first tap opens and the second follows.
-  const closeMenus = () => el.querySelectorAll('.has-menu.is-open').forEach(li => {
+  const closeMenus = () => { el.querySelectorAll('.has-menu.is-open').forEach(li => {
     li.classList.remove('is-open');
     li.querySelector('.nav-link').setAttribute('aria-expanded', 'false');
-  });
+  }); header.classList.remove('menu-open'); };
   el.querySelectorAll('.has-menu > .nav-link').forEach(link => {
     link.addEventListener('click', event => {
       const li = link.parentElement;
@@ -376,7 +395,7 @@ function applyPageSections() {
       const heading = section.querySelector('#homeHeroHeading');
       const body = section.querySelector('#homeHeroBody');
       if (eyebrow) eyebrow.textContent = config.eyebrow || '';
-      if (heading) setHeroText(heading, config.heading, '50 Feet');
+      if (heading) setHeroText(heading, config.heading, heading.querySelector('em')?.textContent || '');
       if (body) setHeroText(body, config.body);
     } else {
       const eyebrow = section.querySelector('.section-head .eyebrow') || section.querySelector('.split .eyebrow');
@@ -395,7 +414,7 @@ function renderCartDrawer() {
   const el = document.createElement('div');
   el.innerHTML = `
   <div class="cart-overlay" id="cartOverlay"></div>
-  <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping cart">
+  <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping cart">
     <div class="cart-head">
       <h3>Your Cart</h3>
       <button class="cart-close" id="cartCloseBtn" aria-label="Close cart">&times;</button>
@@ -527,7 +546,7 @@ function renderFooter() {
     </div>
     <div>
       <h4>Learn</h4>
-      <a href="/nyc-water/">NYC Water Facts</a>
+      <a href="/nyc-water/">Water Facts</a>
       <a href="/quiz/">Find Your Filter</a>
       <a href="/about/">Our Story</a>
       <a href="/contact/">FAQ</a>
@@ -548,7 +567,7 @@ function renderFooter() {
   </div>
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
-      <span>© ${new Date().getFullYear()} ${escapeHTML(companyName)}. All rights reserved. Proudly serving the five boroughs.</span>
+      <span>© ${new Date().getFullYear()} ${escapeHTML(companyName.replace(/\.$/, ''))}. All rights reserved. Proudly serving the five boroughs.</span>
       <span class="footer-links"><a href="#">Privacy Policy</a> · <a href="#">Terms of Service</a> · <a href="#">Shipping &amp; Returns</a> · <a href="/signin/?mode=staff">Staff sign in</a></span>
     </div>
   </div>`;
@@ -602,7 +621,7 @@ function productCard(p) {
     <div class="pc-body">
       <span class="pc-cat">${escapeHTML(p.category)}</span>
       <a href="/product/?id=${encodeURIComponent(p.id)}" class="pc-name">${escapeHTML(p.name)}</a>
-      <div class="pc-rating">★ ${p.rating} <span>(${p.reviews})</span></div>
+      ${p.reviews ? `<div class="pc-rating">★ ${p.rating} <span>(${p.reviews})</span></div>` : ''}
       <div class="pc-prices">
         <span class="pc-price">${money(p.price)}</span>
         ${p.comparePrice ? `<span class="pc-compare">${money(p.comparePrice)}</span>` : ''}

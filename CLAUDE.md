@@ -62,7 +62,11 @@ weight.
 ## Voice
 
 Client facing and professional, addressed to the reader and never to the
-designer.
+designer. The subject is health: what a household drinks every day, and the
+quiet confidence of having taken care of it. New York water is why we know
+what we are doing, not the headline. Affordability is said as value, never
+as cheapness; speed as ease; the product as care. Subtle and eloquent,
+never breathless. "Water Facts", not "NYC Water Facts".
 
 - **No em dashes or en dashes.** Use commas and full stops. Ranges read
   "1961 to 1990".

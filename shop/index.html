@@ -21,7 +21,7 @@
     <div class="container">
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Shop</span></nav>
       <h1>Shop Filtration Systems</h1>
-      <p>Every system is specced for New York City water. Free delivery in the five boroughs on orders over $99.</p>
+      <p>Three tiers of filtration, each tuned for New York water. Free delivery in the five boroughs on orders over $99.</p>
     </div>
   </section>
 
@@ -65,7 +65,9 @@
   let query = '';
   let sort = 'featured';
 
-  const cats = ['All', ...new Set(Store.getProducts().map(p => p.category))];
+  // Every category the site names, from the one list, whether or not it has
+  // stock today; an empty one shows the empty state rather than vanishing.
+  const cats = ['All', ...CATEGORIES.map(c => c.name)];
   const catFilter = document.getElementById('catFilter');
 
   function renderCats() {

@@ -73,6 +73,34 @@ reason to edit and which has to stay identical across all fourteen.
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-02 · Claude Code · The voice turns to health, and the review is answered
+
+The home page, the shop head, the navigation and the editor defaults in
+js/store.js now speak to people who care about what their household drinks:
+health first, every home and budget, quick and easy, with New York water as
+the reason we know what we are doing. Recorded as AD11 and in CLAUDE.md
+under Voice. NYC Water Facts is Water Facts everywhere it is named; the
+/nyc-water/ address is unchanged.
+
+**What this changes for you.** Rows already published in site_content carry
+the old copy and win over the HTML until the owner republishes from the
+editor. The hero hides its first sentence on phones; applyPageSections does
+this for editor copy too, so do not write hero text any other way.
+
+A design review by a subagent found, and this pass fixed: the phone drawer
+could not be closed by touch (it now has a close control, an overlay, a
+scroll lock and Escape); a designer note was printed to customers under the
+home chart; the Shop menu opened a white panel under a transparent bar; the
+header text over the hero fell to 3.3:1; every card printed a 0.0 rating;
+amber and red survived on the product and water pages; the footer left a
+white strip under the full bleed photograph; three different quiet surfaces
+are one; the shop filter lists all six categories; steps have one form
+everywhere; disabled buttons are legible; focus is a ring.
+
+Not taken from the review, and open: the product page is still the previous
+design apart from its image panel; prefers-reduced-motion is not honoured,
+which the stylesheet records as deliberate for the button wipe; the three
+legal links in the footer stay # until the wording is approved.
 ### 2026-11-02 · Claude Code · The legal pages have their component
 
 `.legal` and `.legal-date` are built once in `css/styles.css`, under
