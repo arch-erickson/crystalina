@@ -394,6 +394,7 @@ function flow(f) {
   const seq = sequence({
     participants: f.lanes.map((l) => ({
       id: l.id, label: l.label, detail: l.detail, icon: l.icon, family: l.family,
+      node: l.node,
     })),
     steps: f.steps.map((s) => ({
       from: s.from, to: s.to, text: s.label,
@@ -569,21 +570,25 @@ function performance() {
     svg += text(x, top, String(kb), { size: 9, fill: T.mute, anchor: 'middle' });
   }
 
+  /* Each row is a page, and the page already has a card in the site map,
+     so the row opens the same panel rather than a second description. */
+  const pageKey = Object.fromEntries(M.pages.map((p) => [p.route.split('?')[0], K.page(p.id)]));
   b.rows.forEach((row, i) => {
     const y = top + 18 + i * rowH;
-    svg += text(32, y + 20, row.page, { size: 12.5, weight: 600, family: T.head, fill: T.navy });
+    let one = text(32, y + 20, row.page, { size: 12.5, weight: 600, family: T.head, fill: T.navy });
     const bw = (row.budget / scale) * barW;
-    svg += box(barX, y + 6, bw, 24, { fill: T.paper, stroke: T.blue, rx: 5, dash: '4 3' });
-    svg += text(barX + bw + 8, y + 23, `budget ${row.budget}KB`, { size: 10, fill: T.blue, weight: 600 });
+    one += box(barX, y + 6, bw, 24, { fill: T.paper, stroke: T.blue, rx: 5, dash: '4 3' });
+    one += text(barX + bw + 8, y + 23, `budget ${row.budget}KB`, { size: 10, fill: T.blue, weight: 600 });
     if (row.measured == null) {
-      svg += text(barX + 10, y + 23, 'not measured yet', { size: 10.5, fill: T.mute, italic: true });
+      one += text(barX + 10, y + 23, 'not measured yet', { size: 10.5, fill: T.mute, italic: true });
     } else {
       const mw = (row.measured / scale) * barW;
       const over = row.measured > row.budget;
-      svg += box(barX, y + 6, mw, 24, { fill: over ? T.amberWash : '#E6F2FB', stroke: over ? T.amber : T.blue, rx: 5 });
-      svg += text(barX + 10, y + 23, `${row.measured}KB`, { size: 10.5, fill: over ? '#6B3F08' : T.navy, weight: 600 });
+      one += box(barX, y + 6, mw, 24, { fill: over ? T.amberWash : '#E6F2FB', stroke: over ? T.amber : T.blue, rx: 5 });
+      one += text(barX + 10, y + 23, `${row.measured}KB`, { size: 10.5, fill: over ? '#6B3F08' : T.navy, weight: 600 });
     }
-    svg += block(barX, y + 40, row.heavy, barW + 180, { size: 9.6, fill: T.mute, italic: true }).svg;
+    one += block(barX, y + 40, row.heavy, barW + 180, { size: 9.6, fill: T.mute, italic: true }).svg;
+    svg += nodeWrap(pageKey[row.page], one);
   });
 
   const h = top + 18 + b.rows.length * rowH + 60;

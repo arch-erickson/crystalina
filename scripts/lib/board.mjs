@@ -361,6 +361,15 @@ export function sequence({ participants, steps, colW = 190, top = 20 }) {
   let num = 0;
   let y = top + 108;
 
+  /* A lane is usually the same thing as a card in another drawing: the
+     Worker route, the orders table, Turnstile. Where the caller says which
+     one, the lane head and every message it is part of carry that key, so
+     clicking a lifeline here opens the same panel as clicking the card in
+     the architecture. */
+  const nodeOf = (i) => participants[i] && participants[i].node;
+  const tie = (a, b) => (nodeOf(a) && nodeOf(b)
+    ? ` data-from="${esc(nodeOf(a))}" data-to="${esc(nodeOf(b))}"` : '');
+
   const message = (st) => {
     const a = idx[st.from];
     const b = idx[st.to];
@@ -396,7 +405,7 @@ export function sequence({ participants, steps, colW = 190, top = 20 }) {
         { size: 11.5, weight: 500, fill: INK.body, anchor: 'middle' });
     });
     const ay = y + lines.length * 14 + 8;
-    body += `<path d="M${r(x1 + dir * 14)} ${r(ay)} H${r(x2 - dir * 4)}" fill="none"`
+    body += `<path${tie(a, b)} d="M${r(x1 + dir * 14)} ${r(ay)} H${r(x2 - dir * 4)}" fill="none"`
       + ` stroke="${fam.arrow}" stroke-width="2" stroke-linecap="round"`
       + ` marker-end="url(#m-${st.family || participants[a].family})"`
       + (st.dashed ? ' stroke-dasharray="6 5"' : '') + '/>';
@@ -431,19 +440,21 @@ export function sequence({ participants, steps, colW = 190, top = 20 }) {
     const title = wrap(p.label, w - 56, 12.5, 600).slice(0, 2);
     const sub = wrap(p.detail || '', w - 56, 10.3).slice(0, 2);
     const h = 62;
-    head += `<path d="M${r(cx(i))} ${r(top + h)} V${r(H - 12)}" stroke="${INK.ruleStrong}"`
+    head += `<path${p.node ? ` data-from="${esc(p.node)}" data-to="${esc(p.node)}"` : ''}`
+      + ` d="M${r(cx(i))} ${r(top + h)} V${r(H - 12)}" stroke="${INK.ruleStrong}"`
       + ' stroke-width="1.5" stroke-dasharray="4 5"/>';
-    head += `<rect x="${r(x + 4)}" y="${r(top + 4)}" width="${r(w)}" height="${h}" rx="8"`
+    let card = `<rect x="${r(x + 4)}" y="${r(top + 4)}" width="${r(w)}" height="${h}" rx="8"`
       + ` fill="${INK.paper}" stroke="${INK.title}" stroke-width="1.1"/>`;
-    head += `<rect x="${r(x)}" y="${r(top)}" width="${r(w)}" height="${h}" rx="8"`
+    card += `<rect x="${r(x)}" y="${r(top)}" width="${r(w)}" height="${h}" rx="8"`
       + ` fill="${INK.paper}" stroke="${INK.title}" stroke-width="1.5"/>`;
-    head += `<rect x="${r(x)}" y="${r(top)}" width="5" height="${h}" rx="2" fill="${fam.arrow}"/>`;
-    if (p.icon && hasIcon(p.icon)) head += useIcon(p.icon, x + 12, top + (h - 28) / 2, 28, fam.arrow);
+    card += `<rect x="${r(x)}" y="${r(top)}" width="5" height="${h}" rx="2" fill="${fam.arrow}"/>`;
+    if (p.icon && hasIcon(p.icon)) card += useIcon(p.icon, x + 12, top + (h - 28) / 2, 28, fam.arrow);
     const tx = x + (p.icon ? 46 : 16);
     const block = title.length * 15 + sub.length * 13;
     let ty = top + (h - block) / 2 + 11;
-    title.forEach((l) => { head += text(tx, ty, l, { size: 12.5, weight: 600, fill: INK.title }); ty += 15; });
-    sub.forEach((l) => { head += text(tx, ty, l, { size: 10.3, fill: fam.ink }); ty += 13; });
+    title.forEach((l) => { card += text(tx, ty, l, { size: 12.5, weight: 600, fill: INK.title }); ty += 15; });
+    sub.forEach((l) => { card += text(tx, ty, l, { size: 10.3, fill: fam.ink }); ty += 13; });
+    head += p.node ? `<g class="node" data-node="${esc(p.node)}">${card}</g>` : card;
   });
 
   return { svg: head + body + labels, w: W, h: H };
