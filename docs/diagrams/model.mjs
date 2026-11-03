@@ -660,7 +660,7 @@ export const pages = [
     built: ['What is collected, who handles it, how to have it removed', 'Set in the long-form text component shared by every legal page'],
     remaining: ['Not in the publish allow-list until the owner has approved the wording. Since 2026-11-03 the footer no longer carries a dead link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile', 'Nothing on the server. No server work needed'],
     what: 'The privacy policy, in plain language: what the shop collects, which services see it, and how to have it removed.',
-    why: 'Drafted and styled, not published. The wording is under review and is partly a legal question, so the page exists in the repository and nowhere else until the owner says otherwise.',
+    why: 'Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Until P5, keeping it private means excluding it in _config.yml, which the deploy session has been asked to do.',
     rel: ['page:home'],
   },
   {
@@ -669,7 +669,7 @@ export const pages = [
     built: ['Orders, pricing, warranty, returns and disputes in plain language', 'Set in the long-form text component shared by every legal page'],
     remaining: ['Not in the publish allow-list until the owner has approved the wording. Since 2026-11-03 the footer no longer carries a dead link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile', 'Nothing on the server. No server work needed'],
     what: 'The terms of service: orders, pricing, warranty, returns and disputes.',
-    why: 'Drafted and styled, not published. The wording is under review and is partly a legal question, so the page exists in the repository and nowhere else until the owner says otherwise.',
+    why: 'Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Until P5, keeping it private means excluding it in _config.yml, which the deploy session has been asked to do.',
     rel: ['page:home'],
   },
   {
@@ -678,7 +678,7 @@ export const pages = [
     built: ['Delivery areas, timing, the free shipping threshold and the return window', 'Set in the long-form text component shared by every legal page'],
     remaining: ['Not in the publish allow-list until the owner has approved the wording. Since 2026-11-03 the footer no longer carries a dead link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile', 'Nothing on the server. No server work needed'],
     what: 'Shipping and returns: where we deliver, how fast, the free shipping threshold and the return window.',
-    why: 'Drafted and styled, not published. The wording is under review and is partly a legal question, so the page exists in the repository and nowhere else until the owner says otherwise.',
+    why: 'Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Until P5, keeping it private means excluding it in _config.yml, which the deploy session has been asked to do.',
     rel: ['page:home'],
   },
   {

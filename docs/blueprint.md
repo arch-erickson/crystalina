@@ -617,7 +617,7 @@ _Page · /privacy/._
 
 The privacy policy, in plain language: what the shop collects, which services see it, and how to have it removed.
 
-Drafted and styled, not published. The wording is under review and is partly a legal question, so the page exists in the repository and nowhere else until the owner says otherwise.
+Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Until P5, keeping it private means excluding it in _config.yml, which the deploy session has been asked to do.
 
 - **See also.** Home
 - **Design.** Implemented
@@ -631,7 +631,7 @@ _Page · /terms/._
 
 The terms of service: orders, pricing, warranty, returns and disputes.
 
-Drafted and styled, not published. The wording is under review and is partly a legal question, so the page exists in the repository and nowhere else until the owner says otherwise.
+Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Until P5, keeping it private means excluding it in _config.yml, which the deploy session has been asked to do.
 
 - **See also.** Home
 - **Design.** Implemented
@@ -645,7 +645,7 @@ _Page · /shipping-returns/._
 
 Shipping and returns: where we deliver, how fast, the free shipping threshold and the return window.
 
-Drafted and styled, not published. The wording is under review and is partly a legal question, so the page exists in the repository and nowhere else until the owner says otherwise.
+Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Until P5, keeping it private means excluding it in _config.yml, which the deploy session has been asked to do.
 
 - **See also.** Home
 - **Design.** Implemented
