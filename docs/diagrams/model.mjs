@@ -621,9 +621,9 @@ export const pages = [
   {
     id: 'quiz', icon: 'filter', label: 'Find your filter', route: '/quiz/', area: 'client', col: 1, row: 1,
     design: 'Implemented', server: 'Implemented',
-    built: ['Five questions, recommendation computed in the browser'],
+    built: ['Five questions, recommendation computed in the browser', 'In the frame since 2026-11-03: the quiet page head, a two-pixel navy progress line, options as hairline rows with a line icon, and the answer said as the product with its photograph and price, never graded'],
     remaining: ['Nothing. No server work needed'],
-    what: 'Five questions that end in a recommended system. Entirely client-side, by design: there is nothing here worth a round trip.',
+    what: 'Five questions that end in a recommended system. Entirely client-side, by design: there is nothing here worth a round trip. When the closest fit is above the figure the person gave, the page says so.',
     why: 'Implemented, and finished.',
     rel: ['page:product'],
   },
@@ -639,9 +639,9 @@ export const pages = [
   {
     id: 'about', icon: 'people', label: 'About', route: '/about/', area: 'client', col: 0, row: 2,
     design: 'Implemented', server: 'Missing',
-    built: ['Static brand story'],
+    built: ['Static brand story', 'Rewritten 2026-11-03 in the voice: a tall washed photograph with the one sentence (clean water at home, from people who know New York water), the founding told in half the words, four things a customer can hold us to on the silver band, and the contact band'],
     remaining: ['Nothing. No server work needed'],
-    what: 'The brand story, static on purpose.',
+    what: 'The brand page, static on purpose. The emotional half of the site (Binet and Field): one feeling, care for what a household drinks, with the facts beneath it.',
     why: 'Missing on the server side because it needs none.',
     rel: [],
   },

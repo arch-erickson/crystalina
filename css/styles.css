@@ -247,6 +247,8 @@ body.nav-open { overflow: hidden; }
   background: var(--hero-image, none) center / cover no-repeat var(--navy-900);
 }
 .hero--full { min-height: 100svh; align-items: flex-end; }
+.hero--tall { min-height: min(68vh, 640px); align-items: flex-end; }
+.hero--tall .hero-inner { padding: 0 0 clamp(44px, 7vh, 80px); }
 .hero-inner { padding: 72px 0; }
 .hero--full .hero-inner { padding: 0 0 clamp(56px, 9vh, 112px); }
 .hero-content { max-width: 640px; }
@@ -2162,13 +2164,27 @@ body.viewer-open { overflow: hidden; }
 .route-drive-leg.final { color: var(--success); }
 
 /* ---------- quiz ---------- */
-.quiz-card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-lg); max-width: 640px; margin: 0 auto; padding: 42px; }
-.quiz-q { font-size: 1.25rem; margin-bottom: 22px; }
-.quiz-opts { display: grid; gap: 12px; }
-.quiz-opts button { text-align: left; padding: 16px 20px; border: 2px solid #e4ecf6; background: #fff; border-radius: var(--radius-sm); font-size: .95rem; font-weight: var(--w-medium); transition: all .15s; }
-.quiz-opts button:hover { border-color: var(--blue-500); background: var(--ice-50); }
-.quiz-progress { height: 6px; background: var(--ice-100); border-radius: 999px; margin-bottom: 30px; overflow: hidden; }
-.quiz-progress div { height: 100%; background: linear-gradient(90deg, var(--cyan-300), var(--blue-500)); transition: width .3s; }
+/* ---------- quiz ----------
+   One question at a time on the page itself, no card. A thin navy line
+   shows progress, the options are hairline rows with a line icon, and the
+   answer is the product said plainly with its photograph and price. */
+.quiz-card { max-width: 640px; margin: 0 auto; }
+.quiz-step { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); margin-bottom: 10px; }
+.quiz-q { font-size: clamp(1.4rem, 2.4vw, 1.9rem); margin-bottom: 26px; }
+.quiz-opts { display: grid; gap: 0; border-top: 1px solid var(--silver-200); }
+.quiz-back { margin-top: 24px; }
+.quiz-back .text-link, .quiz-actions .text-link { background: none; border-top: 0; border-left: 0; border-right: 0; padding: 0 0 4px; cursor: pointer; font: inherit; font-size: .76rem; letter-spacing: .13em; text-transform: uppercase; font-weight: var(--w-semibold); }
+.quiz-result { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 24px; align-items: center; margin-bottom: 26px; }
+.quiz-result img { width: 100%; aspect-ratio: 1; object-fit: contain; background: var(--silver-50); }
+.quiz-note { color: var(--muted); font-size: .92rem; line-height: 1.6; }
+.quiz-note--rule { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--silver-200); font-size: .86rem; }
+.quiz-price { font-size: 1.35rem; font-weight: var(--w-semibold); color: var(--navy-800); margin-top: 10px; }
+.quiz-price span { font-family: var(--font-body); font-size: .9rem; color: var(--muted); text-decoration: line-through; font-weight: var(--w-regular); }
+.quiz-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.quiz-opts button { text-align: left; padding: 16px 0; border: 0; border-bottom: 1px solid var(--silver-200); background: none; border-radius: 0; font-size: .95rem; font-weight: var(--w-medium); transition: all .15s; }
+.quiz-opts button:hover { color: var(--blue-500); }
+.quiz-progress { height: 2px; background: var(--silver-200); margin-bottom: 34px; overflow: hidden; }
+.quiz-progress div { height: 100%; background: var(--navy-800); transition: width .3s; }
 
 /* ---------- contact ---------- */
 .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px; align-items: start; }
@@ -2224,9 +2240,9 @@ body.viewer-open { overflow: hidden; }
 
 /* ---------- quiz option icons ---------- */
 .quiz-opts button { display: flex; align-items: center; gap: 15px; }
-.quiz-opt-ic { width: 42px; height: 42px; border-radius: 12px; background: var(--ice-100); color: var(--blue-500); display: flex; align-items: center; justify-content: center; flex: none; transition: background .2s ease, color .2s ease; }
+.quiz-opt-ic { width: 42px; height: 42px; border-radius: 0; background: var(--silver-50); color: var(--navy-800); display: flex; align-items: center; justify-content: center; flex: none; transition: background .2s ease, color .2s ease; }
 .quiz-opt-ic svg { width: 22px; height: 22px; }
-.quiz-opts button:hover .quiz-opt-ic { background: var(--blue-500); color: #fff; }
+.quiz-opts button:hover .quiz-opt-ic { background: var(--navy-800); color: #fff; }
 
 /* ---------- product perks with icons ---------- */
 .pd-perk { display: flex; align-items: center; gap: 11px; font-size: .88rem; color: var(--ink); }
@@ -2310,6 +2326,7 @@ body.viewer-open { overflow: hidden; }
   .nyc-grid, .split, .pd-layout, .checkout-layout, .contact-grid, .account-grid { grid-template-columns: 1fr; }
   .pd-layout { gap: 28px; }
   .checkout-layout { gap: 36px; }
+  .quiz-result { grid-template-columns: 120px minmax(0, 1fr); gap: 16px; }
   .co-summary { position: static; }
   .pd-media { position: static; }
   .pd-media img { aspect-ratio: 1; max-height: 60vh; }

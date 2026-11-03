@@ -17,14 +17,15 @@
 <body>
 
 <main>
-  <section class="page-hero">
+  <section class="page-hero page-hero--quiet">
     <div class="container">
-      <h1>Find Your Perfect Filter</h1>
-      <p>Five quick questions about your NYC home, we'll match you with the right system.</p>
+      <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><span>Find your filter</span></nav>
+      <h1>Find your filter</h1>
+      <p>Five questions about your home, and the system that fits it. Under a minute.</p>
     </div>
   </section>
 
-  <section class="section section-alt">
+  <section class="section">
     <div class="container">
       <div class="quiz-card" id="quizCard"></div>
     </div>
@@ -41,24 +42,24 @@
 
   const QUESTIONS = [
     { q: 'Do you rent or own your home?', opts: [
-      { ic: 'building', t: 'I rent (no plumbing changes allowed)', tag: 'rent' },
-      { ic: 'building', t: 'I rent (small installs are okay)', tag: 'rent-flex' },
-      { ic: 'home', t: 'I own an apartment, co-op, or condo', tag: 'own' },
-      { ic: 'townhouse', t: 'I own a brownstone, townhouse, or full home', tag: 'house' }]},
+      { ic: 'building', t: 'I rent, and cannot touch the plumbing', tag: 'rent' },
+      { ic: 'building', t: 'I rent, and a small fitting is fine', tag: 'rent-flex' },
+      { ic: 'home', t: 'I own an apartment, co-op or condo', tag: 'own' },
+      { ic: 'townhouse', t: 'I own a brownstone, townhouse or house', tag: 'house' }]},
     { q: 'How old is your building?', opts: [
-      { ic: 'shield', t: 'Before 1961 (lead solder era)', tag: 'old' },
+      { ic: 'shield', t: 'Before 1961', tag: 'old' },
       { ic: 'clock', t: '1961 to 1990', tag: 'mid' },
       { ic: 'check', t: 'After 1990', tag: 'new' },
       { ic: 'chat', t: "Not sure", tag: 'old' }]},
-    { q: "What's your top priority?", opts: [
-      { ic: 'purity', t: 'Best possible drinking water (lead, PFAS, microplastics)', tag: 'purity' },
+    { q: 'What matters most?', opts: [
+      { ic: 'purity', t: 'Drinking water: lead, PFAS, microplastics', tag: 'purity' },
       { ic: 'shower', t: 'Softer skin and hair in the shower', tag: 'shower' },
-      { ic: 'shield', t: 'Protecting the whole home and appliances', tag: 'whole' },
-      { ic: 'tag', t: 'Better taste on a budget', tag: 'budget' }]},
-    { q: 'How many people are in your household?', opts: [
+      { ic: 'shield', t: 'The whole home, appliances included', tag: 'whole' },
+      { ic: 'tag', t: 'Better taste, for less', tag: 'budget' }]},
+    { q: 'How many people drink at home?', opts: [
       { ic: 'droplet', t: 'Just me', tag: 'small' }, { ic: 'users', t: '2 to 3 people', tag: 'med' },
       { ic: 'users', t: '4 to 5 people', tag: 'large' }, { ic: 'users', t: '6 or more', tag: 'large' }]},
-    { q: "What's your budget for cleaner water?", opts: [
+    { q: 'What would you put towards it?', opts: [
       { ic: 'tag', t: 'Under $50', tag: 'b1' }, { ic: 'tag', t: '$50 to $200', tag: 'b2' },
       { ic: 'card', t: '$200 to $400', tag: 'b3' }, { ic: 'sparkle', t: '$400 or more', tag: 'b4' }]}
   ];
@@ -136,10 +137,10 @@
       const { q, opts } = QUESTIONS[step];
       card.innerHTML = `
         <div class="quiz-progress"><div style="width:${step / QUESTIONS.length * 100}%"></div></div>
-        <p style="font-size:.8rem;color:var(--muted);font-weight:var(--w-semibold);">QUESTION ${step + 1} OF ${QUESTIONS.length}</p>
+        <p class="quiz-step">Question ${step + 1} of ${QUESTIONS.length}</p>
         <h2 class="quiz-q">${q}</h2>
         <div class="quiz-opts">${opts.map((o, i) => `<button data-i="${i}"><span class="quiz-opt-ic">${svgIcon(o.ic)}</span><span>${o.t}</span></button>`).join('')}</div>
-        ${step > 0 ? '<p style="margin-top:20px"><span class="link" id="quizBack">← Back</span></p>' : ''}`;
+        ${step > 0 ? '<p class="quiz-back"><button type="button" class="text-link" id="quizBack">Back</button></p>' : ''}`;
       card.querySelectorAll('.quiz-opts button').forEach(b =>
         b.addEventListener('click', () => { answers[step] = opts[b.dataset.i].tag; step++; render(); }));
       const back = document.getElementById('quizBack');
@@ -150,26 +151,25 @@
       // budget they picked, rather than quietly recommending past it.
       const ceiling = budgetCeiling();
       const overBudget = p && ceiling !== Infinity && p.price > ceiling;
-      if (!p) { card.innerHTML = '<h2 class="quiz-q">Our catalog is loading</h2><p style="color:var(--muted)">Please refresh in a moment, or <a class="link" href="/shop/">browse all systems</a>.</p>'; return; }
+      if (!p) { card.innerHTML = '<h2 class="quiz-q">The catalogue is loading</h2><p class="quiz-note">Try again in a moment, or <a class="link" href="/shop/">see every system</a>.</p>'; return; }
       card.innerHTML = `
         <div class="quiz-progress"><div style="width:100%"></div></div>
-        <p style="font-size:.8rem;color:var(--success);font-weight:var(--w-bold);display:flex;align-items:center;gap:6px;"><span class="ic" style="width:1.1em;height:1.1em">${svgIcon('check')}</span> YOUR MATCH</p>
-        <h2 class="quiz-q">We recommend the ${escapeHTML(p.name)}</h2>
-        <div style="display:grid;grid-template-columns:140px 1fr;gap:20px;align-items:center;margin-bottom:22px;">
-          <img src="${escapeHTML(p.image)}" style="border-radius:12px;aspect-ratio:1;object-fit:cover;" alt="${escapeHTML(p.name)}">
+        <p class="quiz-step">For your home</p>
+        <h2 class="quiz-q">${escapeHTML(p.name)}</h2>
+        <div class="quiz-result">
+          <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}">
           <div>
-            <p style="color:var(--muted);font-size:.92rem;">${escapeHTML(p.short)}</p>
-            <p class="quiz-price" style="font-size:1.3rem;font-weight:var(--w-bold);color:var(--navy-800);margin-top:8px;">${money(p.price)}
-              ${p.comparePrice ? `<span style="font-size:.9rem;color:var(--muted);text-decoration:line-through;font-weight:var(--w-medium);"> ${money(p.comparePrice)}</span>` : ''}</p>
+            <p class="quiz-note">${escapeHTML(p.short)}</p>
+            <p class="quiz-price">${money(p.price)}${p.comparePrice ? ` <span>${money(p.comparePrice)}</span>` : ''}</p>
           </div>
         </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div class="quiz-actions">
           <button class="btn btn-primary" id="quizAdd">Add to Cart</button>
-          <a class="btn btn-outline" href="/product/?id=${encodeURIComponent(p.id)}">View Details</a>
-          <button class="btn btn-ghost" id="quizRestart">Start Over</button>
+          <a class="btn btn-outline" href="/product/?id=${encodeURIComponent(p.id)}">See the system</a>
+          <button type="button" class="text-link" id="quizRestart">Start again</button>
         </div>
-        ${overBudget ? `<p style="margin-top:18px;font-size:.85rem;background:var(--ice-50);border:1px solid var(--silver);border-radius:10px;padding:12px 14px;color:var(--muted);">This is the closest match we stock today, though it sits above your stated budget. <a class="link" href="/shop/">Browse everything</a> or ask us about payment options.</p>` : ''}
-        <p style="margin-top:22px;font-size:.84rem;color:var(--muted);">Not sure? <a class="link" href="https://wa.me/19178094803" target="_blank" rel="noopener">Message us on WhatsApp</a>, a real New Yorker will help you pick.</p>`;
+        ${overBudget ? `<p class="quiz-note quiz-note--rule">This is the closest fit we stock, and it sits above the figure you gave. <a class="link" href="/shop/">See every system</a>, or ask us.</p>` : ''}
+        <p class="quiz-note quiz-note--rule">Not sure? <a class="link" href="https://wa.me/19178094803" target="_blank" rel="noopener">Message us on WhatsApp</a> and someone here will help you choose.</p>`;
       document.getElementById('quizAdd').addEventListener('click', () => { Store.addToCart(p.id); toast('Added to cart'); openCart(); });
       document.getElementById('quizRestart').addEventListener('click', () => { step = 0; answers.length = 0; render(); });
     }
