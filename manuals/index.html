@@ -53,18 +53,19 @@
   <iframe class="doc-viewer-frame" id="manualViewerFrame" title="Manual" src="about:blank"></iframe>
 </dialog>
 
-<script src="/js/product-catalog.js"></script>
-<script src="/js/supabase-client.js"></script>
-<script src="/js/data-remote.js"></script>
-<script src="/js/store.js"></script>
-<script src="/js/main.js"></script>
+<script src="/js/product-catalog.js?v=20261103-redesign"></script>
+<script src="/js/supabase-client.js?v=20261103-redesign"></script>
+<script src="/js/data-remote.js?v=20261103-redesign"></script>
+<script src="/js/store.js?v=20261103-redesign"></script>
+<script src="/js/main.js?v=20261103-redesign"></script>
 <script>
   initPage('/manuals/');
 
-  /* Every product has a manual at a known address, /manuals/files/<slug>.pdf,
-     unless the catalogue names another. The page checks each address once
-     and says honestly which are here: a manual that is not here yet can be
-     asked for, and nothing on the page promises a date. */
+  /* A manual named on the product row, manualUrl, lives in the site-media
+     bucket and is trusted. Only the guessed address, /manuals/files/<slug>.pdf,
+     is checked, once, so the page makes fewer requests as the library fills.
+     A manual that is not here yet can be asked for, and nothing on the page
+     promises a date. */
   const params = new URLSearchParams(location.search);
   let query = (params.get('q') || '').toLowerCase();
   let activeCat = params.get('cat') || 'All';
@@ -75,6 +76,7 @@
 
   async function probe(p) {
     const url = manualUrl(p);
+    if (p.manualUrl) { available.set(url, true); return true; }
     if (available.has(url)) return available.get(url);
     let ok = false;
     try { const res = await fetch(url, { method: 'HEAD' }); ok = res.ok && /pdf/i.test(res.headers.get('content-type') || ''); } catch { ok = false; }

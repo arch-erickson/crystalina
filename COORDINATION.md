@@ -73,6 +73,27 @@ reason to edit and which has to stay identical across all fourteen.
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-03 · Claude Code · The blank shop after the deploy was a stale main.js, and every script is versioned now
+
+Reported by the deploy session minutes after the first production deploy of
+the redesign: /shop/ showed the filters and nothing below. In a clean browser
+the live page renders 17 cards with no errors and stays that way, so it was
+not the markup and not hydration. Every page loaded main.js either with no
+version or as ?v=20260825-product-editorial, a string the redesign never
+changed, and the new shop script calls CATEGORIES, which the old main.js does
+not define. A browser holding the old file within the 300 second cache
+window dies before renderGrid and shows exactly that.
+
+**The convention, from now on.** Every script tag on every page carries one
+version string, and it changes whenever any of those files change, as the
+stylesheet already did. Today that is ?v=20261103-redesign on 111 tags
+across 18 pages. Fingerprinting at build time would make this automatic and
+is the better answer; until then, bump the string in the same commit as the
+JavaScript.
+
+Also in this commit: the manuals page trusts a manualUrl set on the product
+row and probes only the guessed /manuals/files/<slug>.pdf address, and the
+blueprint records that manual files belong in the site-media bucket.
 ### 2026-11-02 · Claude Code · The voice turns to health, and the review is answered
 
 The home page, the shop head, the navigation and the editor defaults in
