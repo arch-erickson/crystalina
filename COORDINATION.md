@@ -140,6 +140,10 @@ Better pictures do not fix either one.
 **`image-refs/` is not published**, and must stay that way. `DIRS` in
 `scripts/build-site.mjs` does not list it. References are named after their
 target, so `image-refs/hero-bg.png` feeds `images/hero-bg.webp`.
+### 2026-11-02 · Codex · Isolated imagery branch verification
+
+Prepared codex/site-imagery-20261102 from origin/main with only the imagery commits, excluding the other session's blueprint work. On that isolated branch npm run check passes all 35 tests and build:site (128 files), then reports the pre-existing diagram drift described by the user. This distinguishes the shared working tree's transient script failure from the imagery branch itself. No docs or scripts fixes are included. Delivery files and prompt manifest are identical to the shared working tree.
+
 ### 2026-11-02 · Codex · Full P1–P6 imagery delivered
 
 All 11 requested assets now exist in images/: h5-600-exploded (1400 x 1600, transparent), hero-bg (2600 x 1500), lifestyle-hydration, point-of-use, nyc-skyline and all six cat-* tiles (1200 x 900). Category hardware is above the lower-third label area; the RO tile was regenerated specifically to correct this crop. The street scene received a lettering cleanup. User authorized text-only generation where reference slots were empty and explicitly accepted sub-4K native output with disclosure. Native dimensions: 1174 x 1340 P1, 1650 x 953 hero, 1448 x 1086 for all nine remaining images. These are not 4K masters. Delivery uses Lanczos resampling, WebP quality 90, embedded sRGB, and preserves P1 alpha. All native masters remain outside the repository. The 11 delivery files total 2,500,482 bytes; no per-image ceiling was imposed in this pass, per brief section 5.
