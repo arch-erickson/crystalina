@@ -641,6 +641,9 @@ Captured 2026-11-03 at 1366, 834, 390 pixels wide.
 - **Account /account/**: [desktop](screens/page-account-desktop.webp), [tablet](screens/page-account-tablet.webp), [mobile](screens/page-account-mobile.webp)
 - **About /about/**: [desktop](screens/page-about-desktop.webp), [tablet](screens/page-about-tablet.webp), [mobile](screens/page-about-mobile.webp)
 - **Contact /contact/**: [desktop](screens/page-contact-desktop.webp), [tablet](screens/page-contact-tablet.webp), [mobile](screens/page-contact-mobile.webp)
+- **Privacy policy /privacy/**: [desktop](screens/page-privacy-desktop.webp), [tablet](screens/page-privacy-tablet.webp), [mobile](screens/page-privacy-mobile.webp)
+- **Terms of service /terms/**: [desktop](screens/page-terms-desktop.webp), [tablet](screens/page-terms-tablet.webp), [mobile](screens/page-terms-mobile.webp)
+- **Shipping and returns /shipping-returns/**: [desktop](screens/page-shipping-desktop.webp), [tablet](screens/page-shipping-tablet.webp), [mobile](screens/page-shipping-mobile.webp)
 
 ### What the staff see
 - **Admin console /admin/**: [desktop](screens/page-admin-desktop.webp), [tablet](screens/page-admin-tablet.webp), [mobile](screens/page-admin-mobile.webp)
