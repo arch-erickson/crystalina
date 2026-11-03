@@ -112,6 +112,37 @@ window.CrystalinaData = (() => {
     }));
   }
 
+  /* One order of the signed-in customer, by its id, with the address it is
+     going to. RLS returns nothing for an order that is not theirs. */
+  async function myOrder(id) {
+    const supabase = await SB.client();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session || !id) return null;
+    const { data, error } = await supabase
+      .from('orders')
+      .select('id, order_number, status, payment_status, subtotal_cents, shipping_cents, tax_cents, total_cents, installation_requested, shipping_address, created_at, order_items(quantity, unit_price_cents, product_name_snapshot)')
+      .eq('id', id)
+      .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return {
+      id: `CW-${data.order_number}`,
+      dbId: data.id,
+      date: data.created_at,
+      status: data.status,
+      paymentStatus: data.payment_status,
+      subtotal: centsToDollars(data.subtotal_cents),
+      shipping: centsToDollars(data.shipping_cents),
+      tax: centsToDollars(data.tax_cents),
+      total: centsToDollars(data.total_cents),
+      installation: data.installation_requested,
+      address: data.shipping_address,
+      items: (data.order_items || []).map(item => ({
+        name: item.product_name_snapshot, qty: item.quantity, price: centsToDollars(item.unit_price_cents)
+      }))
+    };
+  }
+
   /* Order creation is server-authoritative: /api recomputes every total
      from database prices and decrements stock in one transaction. */
   async function createOrder({ items, shippingAddress, installationRequested, turnstileToken }) {
@@ -254,6 +285,6 @@ window.CrystalinaData = (() => {
   const saveStageOption = option => rpc('upsert_stage_option', { p_option: option });
   const removeStageOption = id => rpc('delete_stage_option', { p_id: id });
 
-  return { loadProducts, myOrders, createOrder, mapRow, loadSiteContent, saveSiteContent, uploadImage,
+  return { loadProducts, myOrders, myOrder, createOrder, mapRow, loadSiteContent, saveSiteContent, uploadImage,
            saveProduct, removeProduct, saveStageOption, removeStageOption };
 })();

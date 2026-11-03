@@ -5,7 +5,10 @@ JavaScript with no bundler, one Cloudflare Worker that serves `dist` and
 routes `/api/*` (AD10), and Supabase for data and identity.
 
 **Read the blueprint before changing anything structural.** It is the record
-of what exists, what is decided and why, and what is still unknown.
+of what exists, what is decided and why, and what is still unknown. It has
+one editor, the design session: send it what you have found or built through
+`COORDINATION.md`, with the evidence, and it decides what is valid and what
+is recorded. Nobody else edits its sources, its generator or the Artifact.
 
 - **https://claude.ai/artifact/SrRGRwrLYrSisyGC53rCLo** is the published
   Artifact, and the copy to send anyone.

@@ -51,6 +51,8 @@ const PAGES = [
   { slug: 'about',      path: '/about/',      title: 'About',            group: 'customer' },
   { slug: 'contact',    path: '/contact/',    title: 'Contact',          group: 'customer' },
   { slug: 'manuals',    path: '/manuals/',    title: 'Manuals and guides', group: 'customer' },
+  { slug: 'order',      path: '/order/',      title: 'Order receipt',    group: 'customer' },
+  { slug: 'not-found',  path: '/404.html',    title: 'Not found',        group: 'customer' },
   { slug: 'privacy',    path: '/privacy/',    title: 'Privacy policy',   group: 'customer' },
   { slug: 'terms',      path: '/terms/',      title: 'Terms of service', group: 'customer' },
   { slug: 'shipping',   path: '/shipping-returns/', title: 'Shipping and returns', group: 'customer' },

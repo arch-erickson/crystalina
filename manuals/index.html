@@ -29,9 +29,11 @@
   <section class="section">
     <div class="container">
       <div class="shop-toolbar doc-toolbar">
-        <label class="sr-only" for="manualSearch">Search manuals</label>
-        <input type="search" id="manualSearch" placeholder="Search by product, model or category" autocomplete="off">
-        <div class="cat-filter cat-filter--row" id="manualCats" role="group" aria-label="Filter by category"></div>
+        <div class="cat-filter" id="manualCats" role="group" aria-label="Filter by category"></div>
+        <div class="shop-tools">
+          <label class="sr-only" for="manualSearch">Search manuals</label>
+          <input type="search" id="manualSearch" placeholder="Search" autocomplete="off">
+        </div>
       </div>
       <p class="doc-count" id="manualCount" aria-live="polite"></p>
       <div class="doc-grid" id="manualGrid"></div>

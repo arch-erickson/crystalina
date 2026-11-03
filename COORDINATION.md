@@ -9,6 +9,21 @@ decides and records it in the log. Where another agent's work is incomplete
 or wrong, the lead corrects it and logs the fix; ownership of paths does not
 change because of a correction.
 
+**Design decisions belong to the design session.** Decided by the owner on
+2026-11-03: the session named "Design work on Crystalina storefront" decides
+anything visual, in the storefront, the dashboards or the blueprint, and may
+override a change another session or a subagent has made, with a note here.
+Propose a visual change to it in the log rather than making it.
+
+**The blueprint has one editor, and it is the same session.** Its sources
+(`docs/blueprint-content.mjs`, `docs/diagrams/model.mjs`), its generator
+(`scripts/blueprint.mjs`, `scripts/lib/`), its outputs and the published
+Artifact are written by the design session only. Every other session and
+every subagent sends what it has found or built through this log, with the
+evidence; the design session decides whether it is valid and whether it
+belongs in the record, and records it. A change to those files from
+anywhere else is proposed, not made.
+
 **Division of labour.** Claude Code does all of the building, in more than
 one session: one holds the storefront, the design system, the content
 editor and the blueprint, and one holds deploys, the server boundary and

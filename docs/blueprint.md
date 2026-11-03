@@ -165,6 +165,8 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | Terms of service | /terms/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
 | Shipping and returns | /shipping-returns/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
 | Manuals and guides | /manuals/ | Implemented | Missing | No manual file exists yet. A manual belongs in the site-media bucket, named on the product row as manualUrl, which the page trusts; only the guessed /manuals/files/<slug>.pdf address is checked when the page loads Nothing on the server. No server work needed |
+| Order receipt | /order/?id= | Implemented | Implemented | No order can be placed until payment exists, so the page has only its signed-out, missing and not-found states to show today Checkout should land here once an order is created |
+| Not found | /404.html | Implemented | Implemented | Nothing. No server work needed |
 | Sign in | /signin/ | Implemented | Implemented | Store.signUp and Store.signIn stubs are still exported from js/store.js and must be retired |
 | Account | /account/ | Implemented | Refactor | Gates on Store.currentUser() from localStorage and does not load js/auth.js at all |
 | Admin console | /admin/ | Implemented | Partial | About thirty record-text interpolations reach innerHTML unescaped (F3) Gated on localStorage, not on the session (F4, U1) No screen for stage options or faucet assignment |
@@ -448,7 +450,7 @@ Partial. What a manager can edit is the part that was finished; what is still in
 
 - **Reached from.** Admin console (publish to website)
 - **Links to.** Shop (browse); NYC water (learn); Find your filter (not sure)
-- **See also.** Published page sections; U7 · Who maintains this after launch, and how technical are they?; Staff changing what a visitor sees; Privacy policy; Terms of service; Shipping and returns; AD11 · The voice turns to health, and New York water becomes the reason rather than the headline; AD12 · Four weights, and one rule for which face a thing is set in
+- **See also.** Published page sections; U7 · Who maintains this after launch, and how technical are they?; Staff changing what a visitor sees; Privacy policy; Terms of service; Shipping and returns; Not found; AD11 · The voice turns to health, and New York water becomes the reason rather than the headline; AD12 · Four weights, and one rule for which face a thing is set in
 - **Design.** Implemented
 - **Server.** Partial
 - **Backend built.** Hydrates hero, sections and best sellers from site_content Products read with the publishable key
@@ -464,7 +466,7 @@ Implemented on the server side, and reading as mostly sold out because of the da
 
 - **Reached from.** Home (browse); NYC water (shop); Admin console (price, stock, copy)
 - **Links to.** Product (open)
-- **See also.** The catalogue is schema-complete and data-empty; products; P7 · Seed the catalogue; Customer browser; Manuals and guides; AD11 · The voice turns to health, and New York water becomes the reason rather than the headline
+- **See also.** The catalogue is schema-complete and data-empty; products; P7 · Seed the catalogue; Customer browser; Manuals and guides; Not found; AD11 · The voice turns to health, and New York water becomes the reason rather than the headline
 - **Design.** Implemented
 - **Server.** Implemented
 - **Backend built.** Catalog, filter, search and sort read from Supabase
@@ -496,7 +498,7 @@ Partial, and deliberately unreachable. Everything except taking the money works 
 
 - **Reached from.** Product (add to cart); Sales (cart recovery (missing))
 - **Links to.** Account (order placed)
-- **See also.** Nothing takes payment; Placing an order, as it works today; Taking the money (Stripe, phase 3); P3 · Stripe checkout and webhook
+- **See also.** Nothing takes payment; Placing an order, as it works today; Taking the money (Stripe, phase 3); P3 · Stripe checkout and webhook; Order receipt
 - **Design.** Implemented
 - **Server.** Partial
 - **Backend built.** POST /api/orders/create, server-authoritative pricing through create_order Borough selector, 8.875% tax, stock enforced in one transaction
@@ -616,6 +618,34 @@ Implemented as a page; empty as a library. The files are the owner's to add, one
 - **Backend built.** Every product listed with its picture, model code and category, searchable by any of them A manual is read in a dialog or downloaded; one that is not on the server yet can be requested by email
 - **Remaining.** No manual file exists yet. A manual belongs in the site-media bucket, named on the product row as manualUrl, which the page trusts; only the guessed /manuals/files/<slug>.pdf address is checked when the page loads Nothing on the server. No server work needed
 
+#### Order receipt · Implemented
+
+_Page · /order/?id=._
+
+The receipt for one order: what was bought, what it cost, where it is going, and its status.
+
+Implemented ahead of payment so the first real order has somewhere to be shown. It reads the rows create_order writes and computes nothing.
+
+- **See also.** Account; Checkout; orders
+- **Design.** Implemented
+- **Server.** Implemented
+- **Backend built.** Reads one order of the signed-in customer, with its items, totals and delivery address, under RLS Print or save, and every figure is the one the database wrote
+- **Remaining.** No order can be placed until payment exists, so the page has only its signed-out, missing and not-found states to show today Checkout should land here once an order is created
+
+#### Not found · Implemented
+
+_Page · /404.html._
+
+What a visitor sees at a dead link: the fact of it, said plainly, and the way back.
+
+Implemented. Until it existed the Worker returned an empty 404, and the alternative of serving the home page would have hidden every broken link.
+
+- **See also.** Home; Shop
+- **Design.** Implemented
+- **Server.** Implemented
+- **Backend built.** The Worker serves it with a 404 status for any address that does not exist Three ways on: the shop, the manuals, and asking
+- **Remaining.** Nothing. No server work needed
+
 #### Sign in · Implemented
 
 _Page · /signin/._
@@ -641,7 +671,7 @@ A customer's own orders. The rows come back under row level security, so the dat
 Refactor. It is the clearest example of F4: the page decides whether to render from localStorage, and signs out by deleting a local key rather than ending the Supabase session.
 
 - **Reached from.** Checkout (order placed); Sign in (customer)
-- **See also.** The gate in front of every private page is localStorage; P4 · Finish the auth migration
+- **See also.** The gate in front of every private page is localStorage; P4 · Finish the auth migration; Order receipt
 - **Design.** Implemented
 - **Server.** Refactor
 - **Backend built.** Order history read under row level security
@@ -1425,7 +1455,7 @@ Partial. Orders can be created and cannot be paid for, so no row ever reaches a 
 
 - **Related from.** profiles (one to many)
 - **Relates to.** order_items (one to many)
-- **See also.** Nothing takes payment; Placing an order, as it works today; Taking the money (Stripe, phase 3); Supabase Postgres; Write with the service role; P8 · Order lifecycle; A visitor reads another customer's orders; Free shipping threshold
+- **See also.** Nothing takes payment; Placing an order, as it works today; Taking the money (Stripe, phase 3); Supabase Postgres; Write with the service role; Order receipt; P8 · Order lifecycle; A visitor reads another customer's orders; Free shipping threshold
 - **Group.** Commerce
 - **Fields.** id, user_id, status, subtotal_cents, tax_cents, total_cents, shipping_address
 

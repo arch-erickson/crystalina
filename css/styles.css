@@ -175,14 +175,13 @@ h1, h2, h3, h4 { line-height: 1.18; color: var(--navy-800); font-weight: var(--w
 .mega-feature strong { display: block; font-family: var(--font-head); font-weight: var(--w-semibold); font-size: 1.05rem; }
 .mega-feature small { color: var(--muted); font-size: .8rem; }
 
-/* Transparent state over the hero. Everything in the bar turns white, and the
-   logo lockup is inverted to a white mark, which is the one place the brand
-   mark is allowed to be monochrome. */
+/* Transparent state over the hero. The text in the bar turns white and the
+   wordmark with it; the mark keeps its colour, always. Decided 2026-11-03. */
 .site-header.is-transparent:not(.menu-open) { background: transparent; backdrop-filter: none; border-bottom-color: rgba(255,255,255,.18); }
 .site-header.is-transparent:not(.menu-open) .nav-link, .site-header.is-transparent:not(.menu-open) .header-link, .site-header.is-transparent:not(.menu-open) .icon-btn { color: #fff; }
 .site-header.is-transparent:not(.menu-open) .nav-link:hover, .site-header.is-transparent:not(.menu-open) .nav-link.active { color: var(--cyan-300); border-bottom-color: var(--cyan-300); }
 .site-header.is-transparent:not(.menu-open) .icon-btn:hover { background: rgba(255,255,255,.12); }
-.site-header.is-transparent:not(.menu-open) .brand-mark, .site-header.is-transparent:not(.menu-open) .brand-wordmark { filter: brightness(0) invert(1); }
+.site-header.is-transparent:not(.menu-open) .brand-wordmark { filter: brightness(0) invert(1); }
 .site-header.is-transparent:not(.menu-open) .hamburger span { background: #fff; }
 .site-header.is-transparent:not(.menu-open) .cart-count { background: var(--cyan-300); color: var(--navy-900); }
 
@@ -290,27 +289,25 @@ body.nav-open { overflow: hidden; }
 .cat-tile:hover .ct-label { color: var(--blue-500); }
 
 /* ---------- product cards ----------
-   One card for the home row, the shop grid and the product page. The image
-   sits on silver with room around it, and the text sits on the page, not in
-   a box. */
-.product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 36px 24px; }
-.product-card { display: flex; flex-direction: column; }
-.pc-img { --pc-image-pad: clamp(18px, 2.4vw, 30px); position: relative; display: grid; place-items: center; box-sizing: border-box; aspect-ratio: 1; overflow: hidden; background: var(--silver-100); }
+   One card for the home row, the shop grid and the quiz result, in the
+   manner of a fashion listing: no border, no radius, no shadow, no panel.
+   The photograph fills its cell, the cells sit almost flush, and beneath
+   each one the name, the price and one quiet line. Nothing competes with
+   the photograph; the badge, the category and the button belong to the
+   product page. */
+.product-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 44px 4px; }
+.product-card { display: flex; flex-direction: column; min-width: 0; }
+.pc-img { --pc-image-pad: 8%; position: relative; display: block; aspect-ratio: 4/5; overflow: hidden; background: transparent; }
 .pc-img img { position: absolute; inset: var(--pc-image-pad); display: block; width: calc(100% - var(--pc-image-pad) - var(--pc-image-pad)); height: calc(100% - var(--pc-image-pad) - var(--pc-image-pad)); object-fit: contain; object-position: center; transition: transform .7s var(--ease-out); }
-.product-card:hover .pc-img img { transform: scale(1.04); }
-.pc-badge, .pc-off, .pc-soldout { position: absolute; top: 12px; font-size: .64rem; font-weight: var(--w-semibold); padding: 5px 10px; letter-spacing: .1em; text-transform: uppercase; }
-.pc-badge { left: 12px; background: var(--navy-800); color: #fff; }
-.pc-off { right: 12px; background: #fff; color: var(--navy-800); }
-.pc-soldout { left: 12px; top: auto; bottom: 12px; background: var(--ink); color: #fff; }
-.pc-body { padding: 16px 0 0; display: flex; flex-direction: column; gap: 5px; flex: 1; }
-.pc-cat { font-size: .66rem; font-weight: var(--w-medium); letter-spacing: .13em; text-transform: uppercase; color: var(--muted); }
-.pc-name { font-weight: var(--w-medium); font-size: .98rem; color: var(--navy-800); line-height: 1.35; flex: 1; transition: color .2s; }
+.product-card:hover .pc-img img { transform: scale(1.03); }
+.pc-badge, .pc-off, .pc-soldout, .pc-cat, .pc-rating, .product-card .pc-add { display: none; }
+.pc-body { padding: 14px 12px 0; display: flex; flex-direction: column; gap: 4px; }
+.pc-name { font-weight: var(--w-regular); font-size: .92rem; color: var(--ink); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; transition: color .2s; }
 .pc-name:hover { color: var(--blue-500); }
-.pc-rating { color: var(--navy-800); font-size: .8rem; font-weight: var(--w-semibold); }
-.pc-rating span { color: var(--muted); font-weight: var(--w-regular); }
-.pc-prices { display: flex; align-items: baseline; gap: 10px; margin: 2px 0 12px; }
-.pc-price { font-size: 1.15rem; font-weight: var(--w-bold); color: var(--navy-800); }
-.pc-compare { color: var(--muted); text-decoration: line-through; font-size: .88rem; }
+.pc-prices { display: flex; align-items: baseline; gap: 10px; margin: 0; }
+.pc-price { font-size: 1rem; font-weight: var(--w-semibold); color: var(--navy-800); }
+.pc-compare { color: var(--muted); text-decoration: line-through; font-size: .84rem; }
+.pc-line { display: block; max-width: 100%; font-size: .8rem; color: var(--muted); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---------- NYC water section ---------- */
 .nyc-band { background: linear-gradient(135deg, var(--navy-900), var(--navy-800) 60%, var(--navy-700)); color: #dbe9fb; }
@@ -362,8 +359,12 @@ body.nav-open { overflow: hidden; }
 .split h2 { font-size: clamp(1.6rem, 3vw, 2.3rem); margin-bottom: 16px; }
 .split p { color: var(--muted); margin-bottom: 14px; }
 .checklist { list-style: none; display: grid; gap: 10px; margin: 18px 0 28px; }
-.checklist li { display: flex; gap: 10px; align-items: flex-start; font-size: .93rem; }
-.checklist li::before { content: '✓'; color: var(--blue-500); font-weight: var(--w-bold); flex: none; }
+/* The tick hangs in the padding and the item is ordinary inline text, so a
+   lead-in such as <strong>Renters:</strong> runs on with its sentence. As a
+   flex row the strong and the sentence became two columns, and a two-word
+   lead-in wrapped inside a 62px column beside its own text. */
+.checklist li { position: relative; padding-left: 1.5em; font-size: .93rem; }
+.checklist li::before { content: '✓'; position: absolute; left: 0; top: 0; color: var(--blue-500); font-weight: var(--w-bold); }
 
 /* ---------- CTA band ----------
    Two forms of one band: a rounded panel inside a section, or the full
@@ -461,18 +462,25 @@ body.cart-open { overflow: hidden; }
 .legal th { font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); }
 
 /* ---------- shop layout ---------- */
-.shop-layout { display: grid; grid-template-columns: 220px 1fr; gap: 56px; align-items: start; }
-.shop-sidebar { position: sticky; top: calc(var(--header-h, 120px) + 28px); }
-.shop-sidebar h4 { font-size: .7rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); padding-bottom: 12px; margin-bottom: 8px; border-bottom: 1px solid var(--silver-200); }
-.cat-filter { display: grid; gap: 2px; }
-.cat-filter button { text-align: left; background: none; border: none; padding: 9px 0; font-size: .9rem; color: var(--ink); font-weight: var(--w-regular); transition: color .2s; }
+/* The content column is minmax(0, 1fr), never a bare 1fr: a bare 1fr has an
+   automatic minimum of the content's min-content width, and the one-row
+   category rail inside it measured 788px wide at a 390px viewport, which
+   stretched the whole layout to 788px and cut the product cards at the
+   right edge of the screen. */
+/* The filter bar: categories in a row, search and sort at the right, one
+   hairline beneath, and the grid under it. On phones the row scrolls. */
+.cat-filter { display: flex; gap: 26px; flex-wrap: wrap; }
+.cat-filter button { text-align: left; background: none; border: none; padding: 9px 0; font-size: .86rem; color: var(--ink); font-weight: var(--w-regular); white-space: nowrap; transition: color .2s; }
 .cat-filter button:hover { color: var(--blue-500); }
 .cat-filter button.active { color: var(--navy-800); font-weight: var(--w-semibold); text-decoration: underline; text-underline-offset: 6px; text-decoration-color: var(--blue-500); }
 .shop-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 30px; padding-bottom: 14px; border-bottom: 1px solid var(--silver-200); flex-wrap: wrap; }
 .shop-toolbar input, .shop-toolbar select { padding: 10px 2px; border: 0; border-bottom: 1px solid transparent; background: transparent; font-size: .9rem; color: var(--ink); transition: border-color .2s; }
 .shop-toolbar input:focus, .shop-toolbar select:focus { outline: none; box-shadow: none; border-bottom-color: var(--blue-500); border-radius: 0; }
 .shop-toolbar input { flex: 1; min-width: 200px; }
-.shop-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px 24px; }
+.cat-filter { flex: 1 1 auto; min-width: 0; }
+.shop-tools { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; margin-left: auto; flex: 0 0 auto; }
+.shop-tools input { flex: 0 1 180px; min-width: 0; }
+.shop-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 44px 4px; margin-top: 36px; }
 .shop-empty { text-align: center; color: var(--muted); padding: 60px; }
 
 /* ---------- documents ----------
@@ -481,9 +489,6 @@ body.cart-open { overflow: hidden; }
    viewer is a native dialog with the PDF in a frame and the download beside
    the title. */
 .doc-toolbar { align-items: flex-end; gap: 18px 28px; }
-.doc-toolbar input { flex: 1 1 320px; }
-.cat-filter--row { display: flex; gap: 22px; flex-wrap: wrap; }
-.cat-filter--row button { padding: 9px 0; white-space: nowrap; }
 .doc-count { font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: -8px 0 24px; min-height: 1.2em; }
 .doc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px 24px; }
 .doc-card { display: flex; flex-direction: column; }
@@ -501,6 +506,45 @@ body.cart-open { overflow: hidden; }
 .doc-viewer-actions { display: flex; gap: 10px; flex: none; }
 .doc-viewer-frame { flex: 1; width: 100%; border: 0; background: var(--silver-50); }
 body.viewer-open { overflow: hidden; }
+
+/* ---------- notice, receipt, questions ----------
+   A notice is one short statement with its ways on: the not found page,
+   and the receipt's signed-out, missing and not-found states. A receipt is
+   a document: a head, a table of lines, the address and the totals, and it
+   prints. The questions are the existing faq-item, in a list. */
+.notice { min-height: 60vh; display: flex; align-items: center; }
+.notice-inner { max-width: 620px; }
+.notice h1, .notice h2, .receipt-notice h2 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); margin: 10px 0 14px; }
+.notice p, .receipt-notice p { color: var(--muted); margin-bottom: 26px; }
+.notice-actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.receipt { max-width: 760px; }
+.receipt-loading { color: var(--muted); }
+.receipt-notice { max-width: 560px; }
+.receipt-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; padding-bottom: 22px; border-bottom: 1px solid var(--silver-200); margin-bottom: 8px; }
+.receipt-head h2 { font-size: 1.6rem; margin: 6px 0 8px; }
+.receipt-meta { color: var(--muted); font-size: .86rem; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.receipt-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.receipt-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+.receipt-table th { text-align: left; font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semibold); padding: 14px 0 10px; border-bottom: 1px solid var(--silver-200); }
+.receipt-table td { padding: 14px 0; border-bottom: 1px solid var(--silver-200); vertical-align: top; }
+.receipt-table th:not(:first-child), .receipt-table td:not(:first-child) { text-align: right; white-space: nowrap; padding-left: 18px; }
+.receipt-grid { display: grid; grid-template-columns: 1fr minmax(240px, 300px); gap: 32px 48px; padding: 26px 0; }
+.receipt-grid h3 { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 10px; }
+.receipt-address { line-height: 1.6; }
+.receipt-note { color: var(--muted); font-size: .86rem; margin-top: 10px; }
+.receipt-totals { display: grid; grid-template-columns: 1fr auto; gap: 8px 18px; margin: 0; font-size: .92rem; align-content: start; }
+.receipt-totals dt { color: var(--muted); }
+.receipt-totals dd { margin: 0; text-align: right; }
+.receipt-totals .receipt-total { padding-top: 10px; border-top: 1px solid var(--silver-200); color: var(--navy-800); font-weight: var(--w-bold); font-family: var(--font-head); font-size: 1.15rem; }
+.receipt-foot { color: var(--muted); font-size: .86rem; border-top: 1px solid var(--silver-200); padding-top: 18px; }
+.faq-list { max-width: 760px; }
+@media print {
+  .site-top, .site-footer, .wa-float, .receipt-actions, .receipt-foot, .breadcrumb, .cart-drawer, .cart-overlay, .nav-overlay { display: none !important; }
+  .page-hero--quiet { background: none; border: 0; padding: 0 0 12px; }
+  .section { padding: 0; }
+  .receipt { max-width: none; }
+  body { color: #000; }
+}
 
 /* ---------- product detail ---------- */
 .pd-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: start; }
@@ -2124,7 +2168,11 @@ body.viewer-open { overflow: hidden; }
   .shop-grid { grid-template-columns: repeat(2, 1fr); }
   .steps, .stat-cards { grid-template-columns: repeat(2, 1fr); }
   .trust-inner { grid-template-columns: repeat(2, 1fr); }
-  .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; }
+  /* Below the five-column footer the brand block takes a row of its own and
+     the four link columns share the next, so no column is ever left alone
+     beside an empty cell. */
+  .footer-grid { grid-template-columns: repeat(4, 1fr); }
+  .footer-brand { grid-column: 1 / -1; max-width: 420px; }
   .staff-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-two-col { grid-template-columns: 1fr; }
   .content-layout, .report-grid { grid-template-columns: 1fr; }
@@ -2138,6 +2186,13 @@ body.viewer-open { overflow: hidden; }
   .staff-availability-form { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 860px) {
+  /* No backdrop blur while the navigation is a drawer. A backdrop-filter
+     makes the header a stacking context and the containing block for its
+     fixed descendants, so the drawer inside it sat beneath the overlay that
+     follows the header in the DOM, began at the header's top edge rather
+     than the screen's, and its first tap went to the overlay and closed it.
+     The bar is 97% white, so nothing is lost. */
+  .site-header { backdrop-filter: none; }
   .main-nav { position: fixed; top: 0; right: 0; width: min(320px, 88vw); height: 100dvh; overflow-y: auto; background: #fff; display: block; padding: 88px 28px 40px; box-shadow: -12px 0 40px rgba(7,29,64,.18); visibility: hidden; transform: translateX(110%); transition: transform .3s, visibility 0s .3s; z-index: 95; }
   .main-nav.open { visibility: visible; transform: translateX(0); transition-delay: 0s; }
   .nav-close { display: grid; place-items: center; position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; background: none; border: 0; color: var(--navy-800); }
@@ -2159,11 +2214,11 @@ body.viewer-open { overflow: hidden; }
   .header-inner { padding: 10px 0; }
   .hamburger { display: flex; min-height: 44px; }
   /* The shop filter rail becomes one scrolling row of names above the grid. */
-  .shop-layout { gap: 18px; }
-  .shop-sidebar h4 { display: none; }
-  .cat-filter { display: flex; gap: 22px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--silver-200); }
+  .cat-filter { flex-wrap: nowrap; gap: 22px; overflow-x: auto; scrollbar-width: none; width: 100%; }
   .cat-filter::-webkit-scrollbar { display: none; }
   .cat-filter button { white-space: nowrap; min-height: 44px; }
+  /* The manuals row still wraps: it sits inside a toolbar that already draws
+     the hairline, and the names run on in rows 44px apart. */
   .shop-toolbar { margin-bottom: 22px; }
   .facts-stats { gap: 28px; }
   .trust-list { grid-template-columns: 1fr 1fr; }
@@ -2183,11 +2238,10 @@ body.viewer-open { overflow: hidden; }
   .hero { background-position: 68% center; }
   .hero:not(.hero--full) .hero-inner { padding: 54px 0; }
   .cat-grid:not(.cat-grid--editorial), .testi-grid { grid-template-columns: 1fr; }
-  .product-grid, .doc-grid { grid-template-columns: repeat(2, 1fr); }
+  .product-grid, .doc-grid, .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 4px; }
   .doc-viewer { width: 100%; height: 100dvh; max-width: none; max-height: none; }
   .doc-viewer-head { flex-direction: column; align-items: flex-start; }
-  .shop-layout { grid-template-columns: 1fr; }
-  .shop-sidebar { position: static; }
+  .shop-tools { width: 100%; }
   .admin-shell { grid-template-columns: 1fr; }
   .admin-side { position: sticky; top: 0; z-index: 80; height: auto; overflow-x: auto; overflow-y: hidden; flex-direction: row; flex-wrap: nowrap; align-items: center; padding: 12px 16px; scrollbar-width: thin; }
   .admin-side .brand { flex: 0 0 180px; width: 180px; margin: 0 10px 0 0; }
@@ -2202,9 +2256,9 @@ body.viewer-open { overflow: hidden; }
   .technician-map { min-height: 460px; }
 }
 @media (max-width: 560px) {
-  .product-grid, .shop-grid { grid-template-columns: 1fr; }
+  .product-grid, .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .doc-grid { grid-template-columns: 1fr; }
   .steps, .stat-cards, .trust-inner { grid-template-columns: 1fr; }
-  .footer-grid { grid-template-columns: 1fr 1fr; }
   .icon-label { display: none; }
   .field-row { grid-template-columns: 1fr; }
   .admin-stat-cards, .staff-grid { grid-template-columns: 1fr; }
@@ -2291,11 +2345,13 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
 }
 
 /* ---------------- iPad landscape and small laptops ---------------- */
+@media (min-width: 861px) and (max-width: 1100px) {
+  .product-grid, .shop-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
 @media (max-width: 1024px) {
   .admin-shell { grid-template-columns: 232px minmax(0, 1fr); }
   .admin-main { padding: 28px 24px; }
   .weekly-schedule-board { grid-template-columns: repeat(7, minmax(120px, 1fr)); }
-  .footer-grid { grid-template-columns: 1.4fr 1fr 1fr; }
 }
 
 /* ---------------- iPad portrait ---------------- */
@@ -2335,7 +2391,7 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
 
   /* Comfortable touch targets. */
   .btn { padding: 13px 22px; min-height: 46px; }
-  .btn-sm { min-height: 40px; }
+  .btn-sm { padding: 9px 18px; min-height: 40px; }
   .nav-link { padding: 14px 0; }
   .cat-filter button, .side-link, .quiz-opts button { min-height: 46px; }
   .admin-select, .field input, .field select, .field textarea, .shop-toolbar input, .shop-toolbar select { min-height: 46px; font-size: 16px; }
@@ -2516,7 +2572,9 @@ p, li, td, th, dd, dt, h1, h2, h3, h4, figcaption, .admin-subtitle { overflow-wr
   .facts-stats { gap: 22px 28px; }
   .cat-grid--editorial { gap: 26px 16px; }
   .cat-tile .ct-label { font-size: .9rem; }
-  .product-grid { gap: 28px 16px; }
+  .product-grid, .shop-grid { gap: 28px 4px; }
+  .shop-tools { gap: 14px; }
+  .shop-tools input { flex: 1 1 120px; }
   .testi { padding: 28px 24px 26px; }
   .cta-band--image { min-height: 440px; }
   .cta-inner { padding-bottom: 40px; }

@@ -550,7 +550,7 @@ function renderFooter() {
       <a href="/nyc-water/">Water Facts</a>
       <a href="/quiz/">Find Your Filter</a>
       <a href="/about/">Our Story</a>
-      <a href="/contact/">FAQ</a>
+      <a href="/contact/#faq">FAQ</a>
     </div>
     <div>
       <h4>Support</h4>
@@ -628,6 +628,7 @@ function productCard(p) {
         <span class="pc-price">${money(p.price)}</span>
         ${p.comparePrice ? `<span class="pc-compare">${money(p.comparePrice)}</span>` : ''}
       </div>
+      <p class="pc-line">${p.stock === 0 ? 'Sold out' : escapeHTML(p.short || p.category || '')}</p>
       <button class="btn btn-primary btn-block pc-add" data-id="${escapeHTML(p.id)}" aria-label="${p.stock === 0 ? `${escapeHTML(p.name)} is out of stock` : `Add ${escapeHTML(p.name)} to cart`}" ${p.stock === 0 ? 'disabled' : ''}>
         ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
       </button>

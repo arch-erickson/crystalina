@@ -31,13 +31,14 @@ const DIST = join(ROOT, 'dist');
 const DIRS = [
   'css', 'js', 'images',
   'about', 'account', 'admin', 'checkout', 'contact', 'manager', 'nyc-water',
-  'manuals', 'product', 'quiz', 'sales', 'shop', 'signin', 'technician',
+  'manuals', 'order', 'product', 'quiz', 'sales', 'shop', 'signin', 'technician',
 ];
 
 /* Single files at the root. Each one is here because something depends on it
    being at exactly this URL. */
 const FILES = [
   ['index.html', 'The home page'],
+  ['404.html', 'Served by the Worker for any address that does not exist'],
   ['robots.txt', 'Points crawlers at the sitemap'],
   ['sitemap.xml', 'Listed in robots.txt'],
   ['site.webmanifest', 'Referenced by the page head'],

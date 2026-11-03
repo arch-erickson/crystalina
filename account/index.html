@@ -92,6 +92,7 @@
           </div>
           <div style="font-size:.82rem;color:var(--muted);margin-bottom:8px;">${new Date(o.date).toLocaleDateString('en-US', { dateStyle: 'medium' })} &middot; ${o.items.reduce((n, i) => n + i.qty, 0)} item(s) &middot; ${money(o.total)}</div>
           <div style="font-size:.84rem;">${o.items.map(i => `${escapeHTML(i.name)} &times; ${i.qty}`).join('<br>')}</div>
+          <p style="margin-top:10px;"><a class="text-link" href="/order/?id=${encodeURIComponent(o.dbId)}">View receipt</a></p>
         </div>`).join('');
     } catch (error) {
       console.error('[account] order load failed', error);
