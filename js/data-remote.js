@@ -272,7 +272,7 @@ window.CrystalinaData = (() => {
     if (!session) return { ok: false, error: 'Sign in as staff to make catalog changes.' };
     const { data, error } = await supabase.rpc(fn, args);
     if (error) {
-      const denied = /not authorised|row-level security|42501/i.test(error.message);
+      const denied = /row-level security|42501/i.test(error.message);
       return { ok: false, error: denied
         ? 'Your account does not have permission to change the catalog.'
         : error.message };

@@ -21,11 +21,14 @@
     <div class="container pd-layout" id="pdLayout"></div>
   </section>
 
-  <section class="section section-alt">
+  <section class="section pd-related">
     <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Keep Exploring</span>
-        <h2>You Might Also Like</h2>
+      <div class="section-head section-head--row">
+        <div>
+          <span class="eyebrow">Also</span>
+          <h2 id="relatedHeading">Also in this category</h2>
+        </div>
+        <a href="/shop/" class="text-link">View all systems</a>
       </div>
       <div class="product-grid" id="relatedGrid"></div>
     </div>
@@ -59,21 +62,21 @@
           <span class="pd-bundle-label">Complete set for ${p.modelCode}</span>
           <h3 id="bundle-${bundle.id}">${bundle.name}</h3>
           <p>${bundle.short}</p>
-          <p class="pd-fit-note">Membrane connector fit is verified against the installed cartridge before fulfillment.</p>
+          <p class="pd-fit-note">We check the membrane connector against the cartridge in your system before it ships.</p>
           <ul class="pd-bundle-list">${bundle.specs.map(item => `<li>${item}</li>`).join('')}</ul>
           <div class="pd-bundle-footer">
             <div><strong>${money(bundle.price)}</strong>${bundle.comparePrice ? `<span>${money(bundle.comparePrice)}</span>` : ''}</div>
             <div class="pd-bundle-actions">
               <a class="btn btn-outline btn-sm" href="/product/?id=${bundle.id}">View complete set</a>
-              <button class="btn btn-primary btn-sm bundle-add" data-id="${bundle.id}" aria-label="${bundle.stock === 0 ? `${bundle.name} is currently unavailable` : `Add ${bundle.name} to cart`}" ${bundle.stock === 0 ? 'disabled' : ''}>${bundle.stock === 0 ? 'Currently unavailable' : 'Add complete set'}</button>
+              <button class="btn btn-primary btn-sm bundle-add" data-id="${bundle.id}" aria-label="${bundle.stock === 0 ? `${bundle.name} is sold out` : `Add ${bundle.name} to cart`}" ${bundle.stock === 0 ? 'disabled' : ''}>${bundle.stock === 0 ? 'Sold out' : 'Add the set'}</button>
             </div>
           </div>
         </div>
       </aside>`).join('');
     const componentMarkup = bundleComponents.length ? `
       <section class="pd-bundle-components" aria-labelledby="bundleContentsHeading">
-        <h3 id="bundleContentsHeading">Included replacement cartridges</h3>
-        <p>This set is matched to the pictured Crystalina configuration.</p>
+        <h3 id="bundleContentsHeading">In the set</h3>
+        <p>Matched to the system in the photograph.</p>
         <ul>${bundleComponents.map(item => `<li><span>${item.quantity} x</span><a href="/product/?id=${item.product.id}">${item.product.name}</a></li>`).join('')}</ul>
       </section>` : '';
     /* Configuration: stage build and faucet. Prices shown here are a preview;
@@ -128,42 +131,59 @@
     const configuratorMarkup = stageMarkup + faucetMarkup;
 
     const stockCls = p.stock === 0 ? 'out' : p.stock <= 15 ? 'low' : 'in';
-    const stockIc = p.stock === 0 ? 'close' : p.stock <= 15 ? 'alert' : 'check';
-    const stockTxt = p.stock === 0 ? 'Out of stock' : p.stock <= 15 ? `Low stock, only ${p.stock} left` : 'In stock, ships in 1 to 2 business days';
+    const stockIc = p.stock === 0 ? 'close' : 'check';
+    const stockTxt = p.stock === 0 ? 'Sold out' : p.stock <= 15 ? `${p.stock} in stock, ships in 1 to 2 business days` : 'In stock, ships in 1 to 2 business days';
     const stockMsg = `<span class="ic" style="width:1.1em;height:1.1em">${svgIcon(stockIc)}</span> ${stockTxt}`;
+    /* The product explained: each accordion is built only from what the
+       catalogue actually says about this product, so nothing is invented. */
+    const compatible = p.productKind === 'system' ? Store.getCompatibleFilters(p.id) : [];
+    const minutes = Number(p.installationMinutes) || 0;
+    const fitsText = p.productKind === 'system'
+      ? [p.category === 'Countertop' ? 'Sits on the counter and connects to the tap, with no change to the plumbing, so it leaves with you when you move.' : p.category === 'Whole House' ? 'Fits at the point where water enters the home and treats every tap.' : 'Fits under a standard kitchen sink and feeds its own faucet.',
+         minutes ? `Most people fit it in about ${minutes} minutes with household tools, or our own team fits it for you.` : 'Our own team fits it for you on request.'].join(' ')
+      : (p.productKind === 'filter_bundle' ? 'A matched set for one system, listed below.' : (p.compatibleSystemIds || []).length ? 'Fits the systems listed under replacement filters on their pages.' : '');
+    const removes = p.category === 'Reverse Osmosis' && p.productKind === 'system' ? [['Lead', 99], ['Chlorine and taste', 98], ['PFAS', 97], ['Microplastics', 99], ['Rust and sediment', 99], ['Fluoride', 95]] : [];
+    const details = [
+      removes.length ? ['What it removes', `${removes.map(([k, v]) => `<div class="bar-row"><span>${k}</span><div class="bar-track"><div class="bar-fill" style="width:${v}%"></div></div><span class="bar-val">${v}%</span></div>`).join('')}<p class="chart-note">Typical reduction for a Crystalina reverse osmosis system under laboratory conditions. Rates vary with water pressure, temperature and a building's plumbing.</p>`] : null,
+      fitsText ? ['What it fits', `<p>${escapeHTML(fitsText)}</p>`] : null,
+      (p.specs || []).length ? ['Specifications', `<ul>${p.specs.map(x => `<li>${escapeHTML(x)}</li>`).join('')}</ul>`] : null,
+      compatible.length ? ['Replacement filters', `<ul class="pd-filters">${compatible.map(c => `<li><a href="/product/?id=${encodeURIComponent(c.product.id)}">${escapeHTML(c.product.name)}</a><small>${c.replacementIntervalDays ? 'every ' + Math.round(c.replacementIntervalDays / 30) + ' months' : ''}</small></li>`).join('')}</ul><p>When a filter is due we say so, and the replacement arrives at your door.</p>`] : null,
+      ['Delivery and returns', '<p>Free delivery in the five boroughs on orders over $99, in 1 to 2 business days. Sixty days to return it, and a one-year warranty.</p>'],
+    ].filter(Boolean);
+
     layout.innerHTML = `
-      <div class="pd-img"><img src="${p.image}" alt="${p.name}"></div>
-      <div>
-        <span class="pd-cat">${p.category}</span>
-        <h1 class="pd-name">${p.name}</h1>
-        <div class="pd-rating">★ ${p.rating} <span>· ${p.reviews} reviews</span></div>
+      <div class="pd-media"><img src="${p.image}" alt="${escapeHTML(p.name)}"></div>
+      <div class="pd-buy">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span>/</span><a href="/shop/">Shop</a><span>/</span><a href="/shop/?cat=${encodeURIComponent(p.category)}">${escapeHTML(p.category)}</a></nav>
+        <h1 class="pd-name">${escapeHTML(p.name)}</h1>
+        ${p.reviews ? `<div class="pd-rating">★ ${p.rating} <span>· ${p.reviews} reviews</span></div>` : ''}
         <div class="pd-prices">
           <span class="pd-price" id="pdPrice">${money(p.price)}</span>
           ${p.comparePrice ? `<span class="pd-compare">${money(p.comparePrice)}</span>` : ''}
         </div>
+        <div class="pd-rule" aria-hidden="true"></div>
+        <p class="pd-line">${escapeHTML(p.short || '')}</p>
         ${configuratorMarkup}
-        <div class="pd-stock ${stockCls}">${stockMsg}</div>
-        <p class="pd-desc">${p.description}</p>
-        <div class="pd-specs">
-          <h4>Key Features</h4>
-          <ul class="checklist">${(p.specs || []).map(s => `<li>${s}</li>`).join('')}</ul>
-        </div>
-        ${completeSetMarkup}
-        ${componentMarkup}
         <div class="pd-qtyrow">
           <div class="qty-picker">
             <button id="qDec" aria-label="Decrease quantity">−</button><span id="qVal" aria-live="polite">1</span><button id="qInc" aria-label="Increase quantity">+</button>
           </div>
           <button class="btn btn-primary" style="flex:1" id="addBtn" ${p.stock === 0 ? 'disabled' : ''}>
-            ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+            ${p.stock === 0 ? 'Sold out' : 'Add to Cart'}
           </button>
         </div>
-        <a href="https://wa.me/19178094803?text=${encodeURIComponent('Hi! I have a question about the ' + p.name)}" target="_blank" rel="noopener" class="btn btn-outline btn-block">${svgIcon('chat')} Ask us about this product on WhatsApp</a>
-        <div class="pd-perks">
-          <span class="pd-perk">${icon('truck')} Free five-borough delivery on orders over $99</span>
-          <span class="pd-perk">${icon('wrench')} Professional NYC installation available at checkout</span>
-          <span class="pd-perk">${icon('returns')} 60-day returns and 1-year warranty</span>
+        <div class="pd-stock ${stockCls}">${stockMsg}</div>
+        <a href="https://wa.me/19178094803?text=${encodeURIComponent('Hi, I have a question about the ' + p.name)}" target="_blank" rel="noopener" class="text-link pd-ask">Ask us about this system</a>
+        <ul class="pd-facts">
+          <li>${icon('truck')} Free delivery in the five boroughs over $99</li>
+          <li>${icon('wrench')} Fitted by our own team, on request</li>
+          <li>${icon('returns')} Sixty-day returns and a one-year warranty</li>
+        </ul>
+        <div class="pd-details">
+          ${details.map(([title, body], i) => `<details class="faq-item" ${i === 0 ? 'open' : ''}><summary>${title}</summary><div class="faq-a">${body}</div></details>`).join('')}
         </div>
+        ${completeSetMarkup}
+        ${componentMarkup}
       </div>`;
 
     let qty = 1;
@@ -204,6 +224,7 @@
 
     const related = Store.getProducts().filter(x => x.id !== p.id && x.category === p.category);
     const fill = Store.getProducts().filter(x => x.id !== p.id && x.category !== p.category);
+    document.getElementById('relatedHeading').textContent = related.length ? 'Also in ' + p.category : 'Also from Crystalina';
     document.getElementById('relatedGrid').innerHTML = [...related, ...fill].slice(0, 4).map(productCard).join('');
     bindAddButtons();
   }
