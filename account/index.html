@@ -49,7 +49,25 @@
 <script src="/js/data-remote.js?v=20261103-redesign"></script>
 <script src="/js/store.js?v=20261103-redesign"></script>
 <script src="/js/main.js?v=20261103-redesign"></script>
+<script src="/js/auth.js?v=20261103-redesign"></script>
 <script>
+  /* Two gates, and they do different jobs.
+
+     The local one is first because it is synchronous: it sends a visitor
+     who was never signed in away before the page paints, with no flash of
+     somebody's account. It is also only a cached answer, and a cached
+     answer can be stale.
+
+     The real one is Supabase, asked a moment later. A session that
+     expired, or was ended on another tab or another device, leaves the
+     local key behind saying yes. If Supabase says there is nobody, the
+     stale key is cleared and the visitor is sent to sign in.
+
+     It does not redirect when the check itself fails, only when Supabase
+     affirmatively answers no. A page that locked out its owner because
+     their train went into a tunnel would be worse than the fault it is
+     guarding against, and everything on it is protected by row level
+     security in any case. */
   const user = Store.currentUser();
   if (!user) location.href = '/signin/';
 
@@ -73,7 +91,38 @@
   document.getElementById('acctSub').textContent = 'Welcome back, ' + user.name.split(' ')[0] + '.';
   document.getElementById('acctName').textContent = user.name;
   document.getElementById('acctEmail').textContent = user.email;
-  document.getElementById('signOutBtn').addEventListener('click', () => { Store.signOut(); location.href = '/'; });
+  /* Signing out ends the Supabase session, not just the local copy of it.
+     Removing the local key alone left the refresh token in this browser,
+     so the next person to open the site was still signed in as whoever
+     had just pressed Sign out. Every dashboard already did it this way;
+     this page was the one that did not. */
+  document.getElementById('signOutBtn').addEventListener('click', async event => {
+    const button = event.currentTarget;
+    button.disabled = true;
+    try {
+      const auth = await window.CrystalinaAuth;
+      await auth.signOut();
+    } catch (error) {
+      console.error('[account] sign out failed', error);
+    } finally {
+      Store.signOut();
+      Store.staffSignOut();
+      location.href = '/';
+    }
+  });
+
+  /* The second gate. See the note at the top of this script. */
+  (async () => {
+    try {
+      const auth = await window.CrystalinaAuth;
+      if (await auth.currentUser()) return;
+    } catch (error) {
+      console.error('[account] could not confirm the session', error);
+      return;
+    }
+    Store.signOut();
+    location.replace('/signin/');
+  })();
 
   const ordersWrap = document.getElementById('ordersWrap');
   const emptyState = '<p class="acct-empty">No orders yet. When you place one, its receipt and where it is appear here.</p>';

@@ -85,6 +85,45 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-03 · Claude Code, deploys and auth · Sign out did not sign anyone out
+
+`account/index.html` is the blueprint's Refactor at F4, and the half of it
+that matters is worse than "gates on localStorage". Its Sign out button ran
+`Store.signOut()`, which is `localStorage.removeItem('crystalina_session')`
+and nothing else. The Supabase refresh token stayed in the browser under its
+own key, so the session was still live: the next person to open the site was
+signed in as whoever had just pressed Sign out. On a shared machine, a family
+computer or a library, that is the whole of it.
+
+Every dashboard already did this correctly, awaiting `CrystalinaAuth.signOut()`
+before clearing the local keys. This page was the only one that did not, and
+it is the only page an ordinary customer ever signs out from.
+
+Fixed in `account/index.html`, which now loads `js/auth.js` like the staff
+pages do. Two changes:
+
+1. Sign out ends the Supabase session first and clears the local keys in a
+   `finally`, so a failed network call still logs the person out of this
+   browser rather than leaving them in a state where neither happened.
+2. A second gate. The local check stays, because it is synchronous and sends
+   a visitor who was never signed in away before the page paints. A moment
+   later Supabase is asked, and if it says there is nobody, the stale local
+   key is cleared and the visitor goes to sign in. It does not redirect when
+   the check itself fails, only when Supabase answers no: a page that locked
+   out its owner because their train went into a tunnel would be worse than
+   the fault it guards against.
+
+**Verified, and the limit of that.** With no session, `/account/` redirects
+to `/signin/` with no console errors. With a stale `crystalina_session` key
+planted by hand and no Supabase session, the page asked Supabase, cleared the
+key and redirected, which is the new path working end to end. The sign-out
+fix itself needs a real signed-in session and I have none, so it is verified
+by reading it against the four dashboards that already do it this way.
+
+For the blueprint: F4 and the Account node. The gate is still browser-side,
+which is U1 and unchanged, but it now reflects the real session rather than a
+cached claim about it, and signing out signs you out.
+
 ### 2026-11-03 · Claude Code, deploys and auth · Workers Builds is failing, and it is not our files
 
 The design session noticed the Worker was hours behind main and stopped
