@@ -81,13 +81,13 @@
     <!-- ORDERS -->
     <section id="view-orders" style="display:none">
       <div class="admin-head"><h1>Orders</h1></div>
-      <div class="admin-toolbar"><div class="field compact-field"><label for="orderSearch">Order or customer</label><input id="orderSearch" type="search" placeholder="Search orders"></div><div class="field compact-field"><label for="orderDateFilter">Order date</label><input id="orderDateFilter" type="date"></div><div class="field compact-field"><label for="orderStatusFilter">Status</label><select id="orderStatusFilter"><option value="">All statuses</option><option>Processing</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select></div></div>
+      <div class="admin-toolbar"><div class="field compact-field"><label for="orderSearch">Order or customer</label><input id="orderSearch" type="search" placeholder="Search orders"></div><div class="field compact-field"><label for="orderDateFilter">Order date</label><input id="orderDateFilter" type="date"></div><div class="field compact-field"><label for="orderStatusFilter">Status</label><select id="orderStatusFilter"><option value="">All statuses</option><option value="pending_payment">Pending payment</option><option value="paid">Paid</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="delivered">Delivered</option><option value="cancelled">Cancelled</option><option value="refunded">Refunded</option></select></div></div>
       <div class="admin-panel" style="overflow-x:auto;">
         <table class="admin-table" id="ordersTable">
           <thead><tr><th>Order</th><th>Date</th><th>Customer</th><th>Borough</th><th>Items</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
           <tbody></tbody>
         </table>
-        <p id="noOrders" style="color:var(--muted);font-size:.9rem;display:none;">No orders yet. Orders placed at checkout will appear here.</p>
+        <p id="noOrders" style="color:var(--muted);font-size:.9rem;display:none;">No orders yet. Orders placed at checkout appear here once you are signed in as staff.</p>
       </div>
     </section>
 

@@ -112,6 +112,38 @@ window.CrystalinaData = (() => {
     }));
   }
 
+  /* Every order, for the dashboard. The orders_staff_read policy returns
+     rows only to an admin or a manager; anyone else gets an empty list,
+     not an error. The customer's name comes from their profile; their
+     email lives in auth.users, which the browser cannot read, so the
+     dashboard shows the name and the delivery borough. */
+  async function staffOrders() {
+    const supabase = await SB.client();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return null;
+    const { data, error } = await supabase
+      .from('orders')
+      .select('id, order_number, status, payment_status, total_cents, installation_requested, shipping_address, created_at, profiles(full_name), order_items(quantity, product_name_snapshot)')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(order => ({
+      id: `CW-${order.order_number}`,
+      dbId: order.id,
+      date: order.created_at,
+      status: order.status,
+      paymentStatus: order.payment_status,
+      total: centsToDollars(order.total_cents),
+      remote: true,
+      customer: {
+        name: (order.profiles && order.profiles.full_name) || (order.shipping_address && order.shipping_address.name) || 'Customer',
+        email: '',
+        borough: (order.shipping_address && (order.shipping_address.borough || order.shipping_address.city)) || '',
+        installation: order.installation_requested
+      },
+      items: (order.order_items || []).map(item => ({ name: item.product_name_snapshot, qty: item.quantity }))
+    }));
+  }
+
   /* One order of the signed-in customer, by its id, with the address it is
      going to. RLS returns nothing for an order that is not theirs. */
   async function myOrder(id) {
@@ -365,7 +397,7 @@ window.CrystalinaData = (() => {
   const saveStageOption = option => rpc('upsert_stage_option', { p_option: option });
   const removeStageOption = id => rpc('delete_stage_option', { p_id: id });
 
-  return { loadProducts, myOrders, myOrder, createOrder, mapRow, loadShippingPolicy, loadSiteContent, saveSiteContent, uploadImage,
+  return { loadProducts, myOrders, myOrder, staffOrders, createOrder, mapRow, loadShippingPolicy, loadSiteContent, saveSiteContent, uploadImage,
            setOrderStatus, orderTransitions, orderHistory,
            saveProduct, removeProduct, saveStageOption, removeStageOption };
 })();

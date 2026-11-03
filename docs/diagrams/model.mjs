@@ -1278,10 +1278,10 @@ export const phases = [
     rel: ['finding:F2', 'table:product_stage_options', 'page:product'],
   },
   {
-    id: 'P8', family: 'green', icon: 'truck', label: 'Order lifecycle', needs: ['P3'], status: 'Missing', col: 3, row: 1, owner: 'Claude Code', detail: 'Dispatch mail, status transitions, refunds',
-    what: 'What happens to an order after it is paid for: statuses, dispatch mail, refunds.',
-    why: 'Missing, and genuinely blocked: there is no paid order to move through a lifecycle yet.',
-    rel: ['phase:P3', 'table:orders'],
+    id: 'P8', family: 'green', icon: 'truck', label: 'Order lifecycle', needs: ['P3'], status: 'Partial', col: 3, row: 1, owner: 'Claude Code', detail: 'Transitions in a table, a trail by trigger, dispatch mail, the dashboard and the receipt reading both',
+    what: 'What happens to an order after it is paid for: statuses, dispatch mail, refunds. Since 2026-11-03: order_transitions holds every legal move, advance_order (gated on has_role admin or manager) makes it, a trigger writes order_events, and /api/orders/status sends the customer mail the row says to send. The dashboard dropdown offers only the moves reachable from the current status and asks for a tracking number before shipped; the receipt shows the trail as a timeline. A refund is never typed: it is issued in Stripe and the webhook writes the record.',
+    why: 'Partial. Written and tested end to end, and not live: the migration is not applied, and there is no paid order to move until P3 is on.',
+    rel: ['phase:P3', 'table:orders', 'def:transitions'],
   },
   {
     id: 'P9', family: 'slate', icon: 'bell', label: 'Backups and monitoring', needs: ['P5'], status: 'Missing', col: 4, row: 0, owner: 'Claude Code', detail: 'Scheduled backups, errors from the Worker and the browser',
@@ -1797,6 +1797,12 @@ export const definitions = [
     what: 'NAV_LINKS and SOCIALS are arrays in js/main.js, rendered into every storefront page by one function. The schema.org sameAs list in index.html names four of the same profiles again.',
     why: 'Partial, and better than it was recorded as: the footer is one definition, and only the sameAs list is a second copy. Two things to fix alongside it, both checked 2026-11-02: the five staff pages have no footer at all, and the three footer legal links still point at "#" although privacy/ and terms/ now exist in the repository. Neither of those two pages is named in the publish allow-list, so neither reaches dist and neither would answer on the live site even once the links are pointed at them.',
     rel: ['def:ui', 'asset:social'],
+  },
+  {
+    id: 'transitions', thing: 'Order lifecycle: the legal moves and their words', home: 'order_transitions, one row per move; ORDER_STATUS_LABELS in js/main.js for the words', readers: ['advance_order', '/api/orders/status', 'Admin dropdown', 'Receipt timeline', 'Account page'], status: 'Implemented',
+    what: 'Which status may follow which, whether the move returns stock and whether the customer hears about it, as rows the database enforces and the dashboard reads through CrystalinaData.orderTransitions(). The seven statuses as a person reads them are one object in js/main.js.',
+    why: 'Implemented on 2026-11-03. The dropdown and the refusal come from the same rows, so they cannot drift; the migration is still to be applied.',
+    rel: ['phase:P8', 'table:orders'],
   },
   {
     id: 'status', thing: 'Status vocabulary, drawings and dependencies', home: 'docs/diagrams/model.mjs', readers: ['Blueprint', 'Contact sheet', 'Any progress report'], status: 'Implemented',

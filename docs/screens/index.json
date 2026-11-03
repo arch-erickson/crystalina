@@ -65,7 +65,7 @@
           "height": 844
         }
       },
-      "h1": "Shop Filtration Systems"
+      "h1": "Filtration Systems"
     },
     {
       "slug": "product",
@@ -560,7 +560,7 @@
         "mobile": {
           "file": "section-categories-mobile.webp",
           "width": 390,
-          "height": 2335
+          "height": 2308
         }
       }
     },
@@ -571,38 +571,38 @@
         "desktop": {
           "file": "section-anatomy-desktop.webp",
           "width": 1366,
-          "height": 980
+          "height": 954
         },
         "tablet": {
           "file": "section-anatomy-tablet.webp",
           "width": 834,
-          "height": 1462
+          "height": 1436
         },
         "mobile": {
           "file": "section-anatomy-mobile.webp",
           "width": 390,
-          "height": 1502
+          "height": 1476
         }
       }
     },
     {
       "slug": "best-sellers",
-      "heading": "What New York households choose",
+      "heading": "Start here",
       "shots": {
         "desktop": {
           "file": "section-best-sellers-desktop.webp",
           "width": 1366,
-          "height": 775
+          "height": 801
         },
         "tablet": {
           "file": "section-best-sellers-tablet.webp",
           "width": 834,
-          "height": 1489
+          "height": 1516
         },
         "mobile": {
           "file": "section-best-sellers-mobile.webp",
           "width": 390,
-          "height": 1010
+          "height": 1009
         }
       }
     },
@@ -629,7 +629,7 @@
     },
     {
       "slug": "process",
-      "heading": "Better water in four unhurried steps",
+      "heading": "Four steps, under an hour",
       "shots": {
         "desktop": {
           "file": "section-process-desktop.webp",
@@ -644,7 +644,7 @@
         "mobile": {
           "file": "section-process-mobile.webp",
           "width": 390,
-          "height": 1090
+          "height": 1062
         }
       }
     },
@@ -660,12 +660,12 @@
         "tablet": {
           "file": "section-why-crystalina-tablet.webp",
           "width": 834,
-          "height": 1482
+          "height": 1456
         },
         "mobile": {
           "file": "section-why-crystalina-mobile.webp",
           "width": 390,
-          "height": 1165
+          "height": 1113
         }
       }
     },

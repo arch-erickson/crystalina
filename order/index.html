@@ -44,10 +44,6 @@
   /* The receipt is read from the order itself, scoped to the signed-in
      customer by row level security. Nothing here is computed in the
      browser: every figure is the one the database wrote. */
-  const STATUS_LABELS = {
-    pending_payment: 'Pending payment', paid: 'Paid', processing: 'Processing',
-    shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded'
-  };
   const receipt = document.getElementById('receipt');
   const id = new URLSearchParams(location.search).get('id');
 
@@ -92,7 +88,7 @@
         <div>
           <span class="eyebrow">Receipt</span>
           <h2>Order ${escapeHTML(order.id)}</h2>
-          <p class="receipt-meta">${new Date(order.date).toLocaleDateString('en-US', { dateStyle: 'long' })} &middot; <span class="status-pill status-${escapeHTML(order.status)}">${escapeHTML(STATUS_LABELS[order.status] || order.status)}</span></p>
+          <p class="receipt-meta">${new Date(order.date).toLocaleDateString('en-US', { dateStyle: 'long' })} &middot; <span class="status-pill status-${escapeHTML(order.status)}">${escapeHTML(orderStatusLabel(order.status))}</span></p>
         </div>
         <div class="receipt-actions">
           <button type="button" class="btn btn-outline btn-sm" id="printBtn">Print or save</button>
@@ -118,8 +114,25 @@
           <dt class="receipt-total">Total</dt><dd class="receipt-total">${money(order.total)}</dd>
         </dl>
       </div>
+      <div class="receipt-history" id="orderHistory"></div>
       <p class="receipt-foot">Questions about this order: <a class="link" href="/contact/">contact us</a> and quote the order number.</p>`;
     document.getElementById('printBtn').addEventListener('click', () => window.print());
+    renderHistory(order);
+  }
+
+  /* Where the order has been. The trail is written by the database on
+     every move; a row whose from and to agree is a note against the
+     order, not a move. The placing of the order opens the list. */
+  async function renderHistory(order) {
+    const wrap = document.getElementById('orderHistory');
+    let events = [];
+    try { events = await window.CrystalinaData.orderHistory(order.dbId); }
+    catch (error) { console.warn('[order] history unavailable', error); }
+    const when = value => new Date(value).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const rows = [{ label: 'Order placed', at: order.date, note: '' }]
+      .concat(events.map(e => ({ label: e.from === e.to ? 'Note' : orderStatusLabel(e.to), at: e.at, note: e.note || '' })));
+    wrap.innerHTML = `<h3>Where it is</h3>
+      <ol class="timeline">${rows.map((r, i) => `<li class="${i === rows.length - 1 ? 'is-now' : ''}"><time datetime="${escapeHTML(r.at)}">${escapeHTML(when(r.at))}</time><strong>${escapeHTML(r.label)}</strong>${r.note ? `<p>${escapeHTML(r.note)}</p>` : ''}</li>`).join('')}</ol>`;
   }
   render();
 </script>

@@ -232,6 +232,23 @@
         </div>
       </section>
 
+      <section class="lib-section" id="lib-status">
+        <h2>Status and time</h2>
+        <p>One vocabulary for an order's seven statuses, written once in <code>ORDER_STATUS_LABELS</code>. The pill's class is the database value. The timeline is the receipt's "Where it is", and the component for anything that happens in order.</p>
+        <div class="lib-row lib-wide" style="display:block">
+          <span class="lib-label">Status pill, the seven statuses</span>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><span class="status-pill status-pending_payment">Pending payment</span><span class="status-pill status-paid">Paid</span><span class="status-pill status-processing">Processing</span><span class="status-pill status-shipped">Shipped</span><span class="status-pill status-delivered">Delivered</span><span class="status-pill status-cancelled">Cancelled</span><span class="status-pill status-refunded">Refunded</span></div>
+        </div>
+        <div class="lib-row lib-wide" style="display:block">
+          <span class="lib-label">Timeline</span>
+          <ol class="timeline" style="max-width:420px">
+            <li><time>Nov 3, 9:14 AM</time><strong>Order placed</strong></li>
+            <li><time>Nov 3, 11:02 AM</time><strong>Processing</strong></li>
+            <li class="is-now"><time>Nov 4, 8:40 AM</time><strong>Shipped</strong><p>Tracking reference 1Z 999 AA1 01 2345 6784.</p></li>
+          </ol>
+        </div>
+      </section>
+
       <section class="lib-section" id="lib-forms">
         <h2>Form controls</h2>
         <p>Inputs inherit the body face. The shop toolbar form is a hairline underneath; everywhere else the field is the outlined form.</p>

@@ -538,6 +538,22 @@ body.viewer-open { overflow: hidden; }
 .receipt-totals dd { margin: 0; text-align: right; }
 .receipt-totals .receipt-total { padding-top: 10px; border-top: 1px solid var(--silver-200); color: var(--navy-800); font-weight: var(--w-bold); font-family: var(--font-head); font-size: 1.15rem; }
 .receipt-foot { color: var(--muted); font-size: .86rem; border-top: 1px solid var(--silver-200); padding-top: 18px; }
+.receipt-history { padding: 4px 0 26px; }
+.receipt-history h3 { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 14px; }
+
+/* ---------- timeline ----------
+   Events in order down a hairline rail: a dot per event, the time in small
+   grey type, the event in navy, a note beneath when there is one. The
+   last event is the present and carries the one filled dot. Used on the
+   receipt for where an order is; built for anything that happens in
+   order. */
+.timeline { list-style: none; margin: 0; padding: 0 0 0 22px; border-left: 1px solid var(--silver-200); display: grid; gap: 18px; }
+.timeline li { position: relative; font-size: .9rem; }
+.timeline li::before { content: ''; position: absolute; left: -27px; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: #fff; border: 1px solid var(--navy-800); }
+.timeline li.is-now::before { background: var(--navy-800); }
+.timeline time { display: block; color: var(--muted); font-size: .74rem; letter-spacing: .04em; margin-bottom: 2px; }
+.timeline strong { color: var(--navy-800); font-weight: var(--w-medium); }
+.timeline p { color: var(--muted); font-size: .86rem; margin: 4px 0 0; max-width: 56ch; }
 .faq-list { max-width: 760px; }
 @media print {
   .site-top, .site-footer, .wa-float, .receipt-actions, .receipt-foot, .breadcrumb, .cart-drawer, .cart-overlay, .nav-overlay { display: none !important; }
@@ -679,11 +695,21 @@ body.viewer-open { overflow: hidden; }
 .account-grid { display: grid; grid-template-columns: 260px 1fr; gap: 32px; align-items: start; }
 .order-card { border: 1px solid #e4ecf6; border-radius: var(--radius-sm); padding: 18px 22px; margin-bottom: 14px; }
 .order-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; font-size: .86rem; }
-.status-pill { padding: 3px 12px; border-radius: 999px; font-size: .74rem; font-weight: var(--w-bold); }
-.status-Processing { background: #fff4e0; color: #b47416; }
-.status-Shipped { background: #e3f0fd; color: var(--blue-500); }
-.status-Delivered { background: #e2f6ec; color: var(--success); }
-.status-Cancelled { background: #fdecec; color: var(--danger); }
+/* The status pill, in the palette: silver for what is waiting, blue tint
+   for what is moving, navy for what has arrived, and muted for what
+   stopped. The class is the database value. */
+.status-pill { padding: 3px 12px; border-radius: 999px; font-size: .74rem; font-weight: var(--w-semibold); background: var(--silver-100); color: var(--navy-800); white-space: nowrap; }
+.status-pending_payment { background: var(--silver-100); color: var(--muted); }
+.status-paid, .status-processing, .status-shipped { background: #E3F0FD; color: var(--blue-500); }
+.status-delivered { background: var(--navy-800); color: #fff; }
+.status-cancelled, .status-refunded { background: var(--silver-100); color: var(--muted); }
+/* The staff pages still write some statuses in title case. */
+.status-Processing, .status-Shipped { background: #E3F0FD; color: var(--blue-500); }
+.status-Delivered { background: var(--navy-800); color: #fff; }
+.status-Cancelled { background: var(--silver-100); color: var(--muted); }
+.order-move { display: grid; gap: 6px; min-width: 170px; }
+.order-move select, .order-move input { padding: 6px 10px; border: 1px solid var(--silver-200); border-radius: 8px; font: inherit; font-size: .84rem; color: var(--ink); background: #fff; width: 100%; }
+.order-move .order-move-tracking { display: flex; gap: 6px; }
 
 /* ---------- admin ---------- */
 .admin-body { background: #F2F6FB; }

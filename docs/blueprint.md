@@ -208,9 +208,9 @@ Captured 2026-11-03 at 1366, 834, 390 pixels wide.
 - **trust**: [desktop](screens/section-trust-desktop.webp), [tablet](screens/section-trust-tablet.webp), [mobile](screens/section-trust-mobile.webp)
 - **A system for every home, and every household.**: [desktop](screens/section-categories-desktop.webp), [tablet](screens/section-categories-tablet.webp), [mobile](screens/section-categories-mobile.webp)
 - **Component by Component**: [desktop](screens/section-anatomy-desktop.webp), [tablet](screens/section-anatomy-tablet.webp), [mobile](screens/section-anatomy-mobile.webp)
-- **What New York households choose**: [desktop](screens/section-best-sellers-desktop.webp), [tablet](screens/section-best-sellers-tablet.webp), [mobile](screens/section-best-sellers-mobile.webp)
+- **Start here**: [desktop](screens/section-best-sellers-desktop.webp), [tablet](screens/section-best-sellers-tablet.webp), [mobile](screens/section-best-sellers-mobile.webp)
 - **Good water is treated at the source. The last mile is yours.**: [desktop](screens/section-water-facts-desktop.webp), [tablet](screens/section-water-facts-tablet.webp), [mobile](screens/section-water-facts-mobile.webp)
-- **Better water in four unhurried steps**: [desktop](screens/section-process-desktop.webp), [tablet](screens/section-process-tablet.webp), [mobile](screens/section-process-mobile.webp)
+- **Four steps, under an hour**: [desktop](screens/section-process-desktop.webp), [tablet](screens/section-process-tablet.webp), [mobile](screens/section-process-mobile.webp)
 - **Made for New York, by people who drink it too.**: [desktop](screens/section-why-crystalina-desktop.webp), [tablet](screens/section-why-crystalina-tablet.webp), [mobile](screens/section-why-crystalina-mobile.webp)
 - **What our neighbors say**: [desktop](screens/section-testimonials-desktop.webp), [tablet](screens/section-testimonials-tablet.webp), [mobile](screens/section-testimonials-mobile.webp)
 - **Not sure where to begin?**: [desktop](screens/section-cta-desktop.webp), [tablet](screens/section-cta-tablet.webp), [mobile](screens/section-cta-mobile.webp)
@@ -1500,7 +1500,7 @@ Partial. Orders can be created and cannot be paid for, so no row ever reaches a 
 
 - **Related from.** profiles (one to many)
 - **Relates to.** order_items (one to many)
-- **See also.** Nothing takes payment; Placing an order, as it works today; Taking the money (Stripe, phase 3); Supabase Postgres; Write with the service role; Order receipt; P8 · Order lifecycle; A visitor reads another customer's orders; Free shipping threshold
+- **See also.** Nothing takes payment; Placing an order, as it works today; Taking the money (Stripe, phase 3); Supabase Postgres; Write with the service role; Order receipt; P8 · Order lifecycle; A visitor reads another customer's orders; Free shipping threshold; Order lifecycle: the legal moves and their words
 - **Group.** Commerce
 - **Fields.** id, user_id, status, subtotal_cents, tax_cents, total_cents, shipping_address
 
@@ -2064,17 +2064,17 @@ Missing, and blocked on nothing. It can be done by whoever is free, today, and i
 - **See also.** Product; product_stage_options; Shop; Admin console; products
 - **Owner.** Claude Code
 
-#### P8 · Order lifecycle · Missing
+#### P8 · Order lifecycle · Partial
 
-_Phase · Dispatch mail, status transitions, refunds._
+_Phase · Transitions in a table, a trail by trigger, dispatch mail, the dashboard and the receipt reading both._
 
-What happens to an order after it is paid for: statuses, dispatch mail, refunds.
+What happens to an order after it is paid for: statuses, dispatch mail, refunds. Since 2026-11-03: order_transitions holds every legal move, advance_order (gated on has_role admin or manager) makes it, a trigger writes order_events, and /api/orders/status sends the customer mail the row says to send. The dashboard dropdown offers only the moves reachable from the current status and asks for a tracking number before shipped; the receipt shows the trail as a timeline. A refund is never typed: it is issued in Stripe and the webhook writes the record.
 
-Missing, and genuinely blocked: there is no paid order to move through a lifecycle yet.
+Partial. Written and tested end to end, and not live: the migration is not applied, and there is no paid order to move until P3 is on.
 
 - **Needs first.** P3 · Stripe checkout and webhook
 - **Waiting on the answer to.** U3 · Which Resend sending domain, and is it verified?
-- **See also.** orders; Subscriptions and replacement reminders
+- **See also.** orders; Order lifecycle: the legal moves and their words; Subscriptions and replacement reminders
 - **Owner.** Claude Code
 
 #### P9 · Backups and monitoring · Missing
@@ -2340,6 +2340,18 @@ Partial, and better than it was recorded as: the footer is one definition, and o
 - **See also.** Four social profiles; Shared UI, icons, escaping
 - **Lives in.** js/main.js, except the schema.org copy
 - **Read by.** Every storefront page, index.html sameAs
+
+#### Order lifecycle: the legal moves and their words · Implemented
+
+_One definition · order_transitions, one row per move; ORDER_STATUS_LABELS in js/main.js for the words._
+
+Which status may follow which, whether the move returns stock and whether the customer hears about it, as rows the database enforces and the dashboard reads through CrystalinaData.orderTransitions(). The seven statuses as a person reads them are one object in js/main.js.
+
+Implemented on 2026-11-03. The dropdown and the refusal come from the same rows, so they cannot drift; the migration is still to be applied.
+
+- **See also.** P8 · Order lifecycle; orders
+- **Lives in.** order_transitions, one row per move; ORDER_STATUS_LABELS in js/main.js for the words
+- **Read by.** advance_order, /api/orders/status, Admin dropdown, Receipt timeline, Account page
 
 #### Status vocabulary, drawings and dependencies · Implemented
 

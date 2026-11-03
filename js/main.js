@@ -51,6 +51,16 @@ const svgIcon = (name, sw = 1.7) =>
 const icon = (name, sw) => `<span class="ic">${svgIcon(name, sw)}</span>`;
 if (typeof window !== 'undefined') { window.ICONS = ICONS; window.svgIcon = svgIcon; window.icon = icon; }
 
+/* The seven order statuses as a person reads them. The values are the
+   database enum; the words are the only place they are written out, read
+   by the receipt, the account page and the dashboard. */
+const ORDER_STATUS_LABELS = {
+  pending_payment: 'Pending payment', paid: 'Paid', processing: 'Processing',
+  shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded'
+};
+const orderStatusLabel = status => ORDER_STATUS_LABELS[status] || String(status || '').replace(/_/g, ' ');
+if (typeof window !== 'undefined') { window.ORDER_STATUS_LABELS = ORDER_STATUS_LABELS; window.orderStatusLabel = orderStatusLabel; }
+
 /* Scroll-reveal: gently fades + lifts elements marked .reveal as they enter view. */
 function initReveal(root = document) {
   const els = root.querySelectorAll('.reveal:not(.reveal-bound)');

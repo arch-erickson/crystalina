@@ -36,9 +36,9 @@
   /* ---------- overview ---------- */
   function renderOverview() {
     const products = Store.getProducts();
-    const orders = Store.getOrders();
+    const orders = ordersSource();
     const customers = Store.getUsers().filter(u => u.role === 'customer');
-    const revenue = orders.filter(o => o.status !== 'Cancelled').reduce((s, o) => s + o.total, 0);
+    const revenue = orders.filter(o => !['Cancelled', 'cancelled', 'refunded'].includes(o.status)).reduce((s, o) => s + o.total, 0);
     const low = products.filter(p => p.stock <= 15);
 
     document.getElementById('statCards').innerHTML = `
@@ -83,11 +83,41 @@
       </tr>`).join('') || '<tr><td colspan="8">No products match these filters.</td></tr>';
   }
 
-  /* ---------- orders table ---------- */
-  const STATUSES = ['Processing', 'Shipped', 'Delivered', 'Cancelled'];
+  /* ---------- orders table ----------
+     Orders come from the database when the signed-in person may read
+     them; the browser-stored list is the fallback for a dashboard with
+     no session. The moves a dropdown offers are the rows of
+     order_transitions, so the list and the database's refusal cannot
+     drift. Marking an order shipped needs a tracking number, so that
+     choice opens a field before anything is sent. */
+  let remoteOrders = null;
+  let transitions = null;
+  const ordersSource = () => remoteOrders || Store.getOrders();
+  async function loadOrders() {
+    if (!window.CrystalinaData?.staffOrders) return;
+    try {
+      const [orders, moves] = await Promise.all([CrystalinaData.staffOrders(), CrystalinaData.orderTransitions()]);
+      if (Array.isArray(orders)) { remoteOrders = orders; transitions = moves; renderOverview(); renderOrders(); }
+    } catch (error) { console.warn('[admin] orders unavailable', error); }
+  }
+  const statusLabel = status => (window.orderStatusLabel ? orderStatusLabel(status) : status);
+  function moveControl(o) {
+    if (!o.remote) {
+      const local = ['Processing', 'Shipped', 'Delivered', 'Cancelled'];
+      return `<select onchange="AdminUI.setStatus('${o.id}', this.value)" style="padding:6px 10px;border:1px solid #d7e2f0;border-radius:8px;">${local.map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}</select>`;
+    }
+    const next = (transitions && transitions.get(o.status)) || [];
+    if (!next.length) return `<span class="status-pill status-${escapeHTML(o.status)}">${escapeHTML(statusLabel(o.status))}</span>`;
+    return `<div class="order-move" id="move-${o.dbId}">
+      <select onchange="AdminUI.chooseStatus('${o.dbId}', this.value)" aria-label="Move order ${escapeHTML(o.id)}">
+        <option value="${escapeHTML(o.status)}" selected>${escapeHTML(statusLabel(o.status))}</option>
+        ${next.map(to => `<option value="${escapeHTML(to)}">${escapeHTML(statusLabel(to))}</option>`).join('')}
+      </select>
+    </div>`;
+  }
   let orderFilters = { search: '', date: '', status: '' };
   function renderOrders() {
-    const allOrders = Store.getOrders();
+    const allOrders = ordersSource();
     const orders = allOrders.filter(order => (!orderFilters.search || `${order.id} ${order.customer.name} ${order.customer.email}`.toLowerCase().includes(orderFilters.search)) && (!orderFilters.date || order.date.slice(0, 10) === orderFilters.date) && (!orderFilters.status || order.status === orderFilters.status));
     document.getElementById('noOrders').style.display = allOrders.length ? 'none' : 'block';
     document.querySelector('#ordersTable tbody').innerHTML = orders.map(o => `
@@ -98,11 +128,8 @@
         <td>${escapeHTML(o.customer.borough || ', ')}${o.customer.installation ? '<br><small style="color:var(--blue-500)">+ installation</small>' : ''}</td>
         <td style="max-width:240px;font-size:.8rem;">${o.items.map(i => `${i.name} × ${i.qty}`).join('<br>')}</td>
         <td><strong>${money(o.total)}</strong></td>
-        <td>
-          <select onchange="AdminUI.setStatus('${o.id}', this.value)" style="padding:6px 10px;border:1px solid #d7e2f0;border-radius:8px;">
-            ${STATUSES.map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
-          </select>
-        </td><td><button class="btn btn-sm btn-danger" onclick="AdminUI.deleteOrder('${o.id}')">Delete</button></td>
+        <td>${moveControl(o)}</td>
+        <td>${o.remote ? `<a class="btn btn-sm btn-outline" href="/order/?id=${encodeURIComponent(o.dbId)}" target="_blank" rel="noopener">Receipt</a>` : `<button class="btn btn-sm btn-danger" onclick="AdminUI.deleteOrder('${o.id}')">Delete</button>`}</td>
       </tr>`).join('') || (allOrders.length ? '<tr><td colspan="8">No orders match these filters.</td></tr>' : '');
   }
 
@@ -219,7 +246,7 @@
   const statusClass = status => {
     if (['Active', 'Confirmed', 'Completed', 'Delivered', 'Available'].includes(status)) return 'is-success';
     if (['Paused', 'Needs assignment', 'Delayed'].includes(status)) return 'is-warning';
-    if (['Cancelled'].includes(status)) return 'is-danger';
+    if (['Cancelled', 'cancelled', 'refunded'].includes(status)) return 'is-danger';
     return '';
   };
 
@@ -1626,7 +1653,36 @@
     setStatus(id, status) {
       Store.updateOrderStatus(id, status);
       renderAll();
-      toast(`Order ${id} → ${status}`);
+      toast(`Order ${id} is now ${status}`);
+    },
+    /* A move chosen in the dropdown. Shipped needs a tracking number, so
+       that choice opens a field in place; every other move goes at once. */
+    chooseStatus(dbId, status) {
+      const order = (remoteOrders || []).find(o => o.dbId === dbId);
+      if (!order || status === order.status) return;
+      if (status === 'shipped') {
+        const wrap = document.getElementById('move-' + dbId);
+        if (!wrap) return;
+        wrap.innerHTML = `<div class="order-move-tracking">
+          <input type="text" id="trk-${dbId}" placeholder="Tracking number" aria-label="Tracking number" maxlength="64">
+          <button class="btn btn-sm btn-primary" onclick="AdminUI.moveOrder('${dbId}', 'shipped')">Ship</button>
+        </div>
+        <button class="btn btn-sm btn-ghost" onclick="AdminUI.cancelMove()">Keep as ${escapeHTML(statusLabel(order.status))}</button>`;
+        document.getElementById('trk-' + dbId).focus();
+        return;
+      }
+      AdminUI.moveOrder(dbId, status);
+    },
+    cancelMove() { renderOrders(); },
+    async moveOrder(dbId, status) {
+      const order = (remoteOrders || []).find(o => o.dbId === dbId);
+      if (!order) return;
+      const trackingNumber = document.getElementById('trk-' + dbId)?.value.trim() || '';
+      if (status === 'shipped' && !trackingNumber) { toast('Add the tracking number before marking it shipped.'); return; }
+      const result = await CrystalinaData.setOrderStatus({ orderId: dbId, status, trackingNumber });
+      if (!result.ok) { toast(result.error || 'We could not change that order.'); renderOrders(); return; }
+      await loadOrders();
+      toast(`Order ${order.id} is now ${statusLabel(status)}`);
     },
     deleteOrder(id) {
       if (!confirm(`Delete order ${id}? This removes the browser-stored order record.`)) return;
@@ -1748,6 +1804,7 @@
 
   function renderAll() {
     renderOverview(); renderProducts(); renderOrders(); renderCustomers();
+    loadOrders();
     renderSubscriptions(); renderService(); renderStaff(); renderSuppliers();
     renderLeads(); renderMarketing(); renderSupport();
     renderContent(); renderFinance(); renderSettings();
