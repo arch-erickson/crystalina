@@ -167,8 +167,6 @@ const Store = (() => {
   const signUp = unavailableAuth;
   const signIn = unavailableAuth;
   const signOut = () => localStorage.removeItem(KEYS.session);
-  const requestStaffCode = () => ({ ok: false, error: 'Staff sign-in is being configured securely.' });
-  const verifyStaffCode = () => ({ ok: false, error: 'Staff sign-in is being configured securely.' });
   const staffSignOut = () => localStorage.removeItem(KEYS.staffSession);
 
   const getOrders = () => read(KEYS.orders, []);
@@ -310,7 +308,7 @@ const Store = (() => {
     placeholder, hydrateFromSupabase, isHydrated, shippingPolicy, hydrateShippingPolicy, hydrateSiteContent, publishSiteContent, getProducts, getProduct, getBundlesForSystem, getBundleComponents, getCompatibleFilters,
     upsertProduct, deleteProduct, deleteAllProducts,
     getCart, addToCart, updateQty, clearCart, cartCount, cartDetails,
-    getUsers, currentUser, setCurrentUser, signUp, signIn, signOut, currentStaff, requestStaffCode, verifyStaffCode, staffSignOut,
+    getUsers, currentUser, setCurrentUser, signUp, signIn, signOut, currentStaff, staffSignOut,
     getOrders, placeOrder, updateOrderStatus, deleteOrder, getAdminData, updateAdminItem, addAdminItem, deleteAdminItem,
     saveAdminCollection, addNotification, getNotificationsForUser, markNotificationsRead, addStaffNotification,
     getStaffNotifications, markStaffNotificationsRead, markStaffNotificationRead, logActivity, getSiteSettings, updateSiteSettings
