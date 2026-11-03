@@ -353,15 +353,15 @@ _**Build plan.** What each phase needs before it can start, and who owns it. Arr
 
 | Phase | What gets built | Needs first | Owner | State |
 | --- | --- | --- | --- | --- |
-| P1 · Cloudflare project and secrets | Pages project, Access on the preview, every secret set per environment | Nothing | Owner, then Codex | Missing |
-| P2 · Port /api to Pages Functions | Three routes, one runtime shim, tests green | P1 | Codex | Partial |
-| P3 · Stripe checkout and webhook | Server repricing, signature check, idempotent write | P2 | Codex | Missing |
-| P4 · Finish the auth migration | Retire the stubs, extend CrystalinaAuth, reset and verification | P1 | Codex | Partial |
+| P1 · Cloudflare project and secrets | Pages project, Access on the preview, every secret set per environment | Nothing | Owner, then Claude Code | Missing |
+| P2 · Port /api to Pages Functions | Three routes, one runtime shim, tests green | P1 | Claude Code | Partial |
+| P3 · Stripe checkout and webhook | Server repricing, signature check, idempotent write | P2 | Claude Code | Missing |
+| P4 · Finish the auth migration | Retire the stubs, extend CrystalinaAuth, reset and verification | P1 | Claude Code | Partial |
 | P5 · DNS cutover to Cloudflare | Nameservers, then the redirect allow-list in Supabase | P2, P3 | Owner | Missing |
-| P6 · Security hardening | XSS sweep, Turnstile widgets, WAF rate limit, advisors | P2 | Codex | Partial |
+| P6 · Security hardening | XSS sweep, Turnstile widgets, WAF rate limit, advisors | P2 | Claude Code | Partial |
 | P7 · Seed the catalog | Stage options, faucet products, real stock | Nothing | Claude Code | Missing |
-| P8 · Order lifecycle | Dispatch mail, status transitions, refunds | P3 | Codex | Missing |
-| P9 · Backups and monitoring | Scheduled Supabase backups, errors from functions and browser | P5 | Codex | Missing |
+| P8 · Order lifecycle | Dispatch mail, status transitions, refunds | P3 | Claude Code | Missing |
+| P9 · Backups and monitoring | Scheduled Supabase backups, errors from functions and browser | P5 | Claude Code | Missing |
 | P10 · Launch | Checklist, analytics, handover | P5, P6, P7, P9 | Both | Missing |
 
 ---
@@ -521,7 +521,7 @@ Numbered, owned, with what each one blocks. An unknown with no owner is a decisi
 
 - **Why it matters.** Row level security should mean the page renders and every query returns nothing. Should is not a result. Until someone signs in as a customer and looks, the browser-side gate is an assumption.
 - **How to resolve.** Create a customer account on a preview, open each of the four dashboards, and read the network tab as well as the screen.
-- **Owner.** Codex
+- **Owner.** Claude Code
 - **Blocks.** Phase 6, and any claim that the dashboards are safe
 
 #### U2 · Are the NYC water figures on /nyc-water/ defensible?
@@ -542,7 +542,7 @@ Numbered, owned, with what each one blocks. An unknown with no owner is a decisi
 
 - **Why it matters.** Two environments with one database is one environment. A test order placed on a preview would decrement real stock and send a real email.
 - **How to resolve.** Decide. If the answer is one project, then preview must be read-only and say so, loudly, in the handoff.
-- **Owner.** Owner, with Codex
+- **Owner.** Owner, with Claude Code
 - **Blocks.** Phase 1
 
 #### U5 · What retention does the workforce data need, and under what rule?

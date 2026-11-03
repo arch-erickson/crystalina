@@ -533,7 +533,7 @@ export const sections = [
       question: 'Does opening /admin/ or /manager/ while signed in as an ordinary customer expose anything at all?',
       why: 'Row level security should mean the page renders and every query returns nothing. Should is not a result. Until someone signs in as a customer and looks, the browser-side gate is an assumption.',
       how: 'Create a customer account on a preview, open each of the four dashboards, and read the network tab as well as the screen.',
-      owner: 'Codex',
+      owner: 'Claude Code',
       blocks: 'Phase 6, and any claim that the dashboards are safe',
     },
     {
@@ -560,7 +560,7 @@ export const sections = [
       question: 'Is there a second Supabase project for preview, or does preview share production data?',
       why: 'Two environments with one database is one environment. A test order placed on a preview would decrement real stock and send a real email.',
       how: 'Decide. If the answer is one project, then preview must be read-only and say so, loudly, in the handoff.',
-      owner: 'Owner, with Codex',
+      owner: 'Owner, with Claude Code',
       blocks: 'Phase 1',
     },
     {

@@ -659,15 +659,15 @@ export const budget = {
  * ------------------------------------------------------------------ */
 
 export const phases = [
-  { id: 'P1', family: 'amber', icon: 'cloud', label: 'Cloudflare project and secrets', needs: [], status: 'Missing', col: 0, row: 0, owner: 'Owner, then Codex', detail: 'Pages project, Access on the preview, every secret set per environment' },
-  { id: 'P2', family: 'amber', icon: 'bolt', label: 'Port /api to Pages Functions', needs: ['P1'], status: 'Partial', col: 1, row: 0, owner: 'Codex', detail: 'Three routes, one runtime shim, tests green' },
-  { id: 'P3', family: 'green', icon: 'card', label: 'Stripe checkout and webhook', needs: ['P2'], status: 'Missing', col: 2, row: 0, owner: 'Codex', detail: 'Server repricing, signature check, idempotent write' },
-  { id: 'P4', family: 'violet', icon: 'key', label: 'Finish the auth migration', needs: ['P1'], status: 'Partial', col: 1, row: 1, owner: 'Codex', detail: 'Retire the stubs, extend CrystalinaAuth, reset and verification' },
+  { id: 'P1', family: 'amber', icon: 'cloud', label: 'Cloudflare project and secrets', needs: [], status: 'Missing', col: 0, row: 0, owner: 'Owner, then Claude Code', detail: 'Pages project, Access on the preview, every secret set per environment' },
+  { id: 'P2', family: 'amber', icon: 'bolt', label: 'Port /api to Pages Functions', needs: ['P1'], status: 'Partial', col: 1, row: 0, owner: 'Claude Code', detail: 'Three routes, one runtime shim, tests green' },
+  { id: 'P3', family: 'green', icon: 'card', label: 'Stripe checkout and webhook', needs: ['P2'], status: 'Missing', col: 2, row: 0, owner: 'Claude Code', detail: 'Server repricing, signature check, idempotent write' },
+  { id: 'P4', family: 'violet', icon: 'key', label: 'Finish the auth migration', needs: ['P1'], status: 'Partial', col: 1, row: 1, owner: 'Claude Code', detail: 'Retire the stubs, extend CrystalinaAuth, reset and verification' },
   { id: 'P5', family: 'amber', icon: 'globe', label: 'DNS cutover to Cloudflare', needs: ['P2', 'P3'], status: 'Missing', col: 3, row: 0, owner: 'Owner', detail: 'Nameservers, then the redirect allow-list in Supabase' },
-  { id: 'P6', family: 'rose', icon: 'shield', label: 'Security hardening', needs: ['P2'], status: 'Partial', col: 2, row: 1, owner: 'Codex', detail: 'XSS sweep, Turnstile widgets, WAF rate limit, advisors' },
+  { id: 'P6', family: 'rose', icon: 'shield', label: 'Security hardening', needs: ['P2'], status: 'Partial', col: 2, row: 1, owner: 'Claude Code', detail: 'XSS sweep, Turnstile widgets, WAF rate limit, advisors' },
   { id: 'P7', family: 'blue', icon: 'box', label: 'Seed the catalog', needs: [], status: 'Missing', col: 0, row: 2, owner: 'Claude Code', detail: 'Stage options, faucet products, real stock' },
-  { id: 'P8', family: 'green', icon: 'truck', label: 'Order lifecycle', needs: ['P3'], status: 'Missing', col: 3, row: 1, owner: 'Codex', detail: 'Dispatch mail, status transitions, refunds' },
-  { id: 'P9', family: 'slate', icon: 'bell', label: 'Backups and monitoring', needs: ['P5'], status: 'Missing', col: 4, row: 0, owner: 'Codex', detail: 'Scheduled Supabase backups, errors from functions and browser' },
+  { id: 'P8', family: 'green', icon: 'truck', label: 'Order lifecycle', needs: ['P3'], status: 'Missing', col: 3, row: 1, owner: 'Claude Code', detail: 'Dispatch mail, status transitions, refunds' },
+  { id: 'P9', family: 'slate', icon: 'bell', label: 'Backups and monitoring', needs: ['P5'], status: 'Missing', col: 4, row: 0, owner: 'Claude Code', detail: 'Scheduled Supabase backups, errors from functions and browser' },
   { id: 'P10', family: 'green', icon: 'rocket', label: 'Launch', needs: ['P5', 'P6', 'P7', 'P9'], status: 'Missing', col: 5, row: 0, owner: 'Both', detail: 'Checklist, analytics, handover' },
 ];
 

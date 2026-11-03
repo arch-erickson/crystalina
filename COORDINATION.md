@@ -1,16 +1,24 @@
 # Coordination
 
-Two agents work in this repository at the same time and cannot message each
-other. This file is the channel, and git is the sync point.
+More than one agent works in this repository at the same time and they
+cannot message each other. This file is the channel, and git is the sync
+point.
 
 **Who decides.** Claude Code is the lead. Where the agents disagree, the lead
 decides and records it in the log. Where another agent's work is incomplete
 or wrong, the lead corrects it and logs the fix; ownership of paths does not
 change because of a correction.
 
-**Division of labour.** Codex owns security, the database and server
-logistics. Claude Code owns the storefront, the admin content editor, the
-design system and the blueprint.
+**Division of labour.** Claude Code does all of the building, in more than
+one session: one holds the storefront, the design system, the content
+editor and the blueprint, and one holds deploys, the server boundary and
+auth. Codex no longer writes code here. It generates images, to the briefs
+in `IMAGE_PROMPTS.md`, and owns nothing else.
+
+**Changed 2026-11-02.** Codex previously owned security, the database and
+server logistics. Those paths did not move to the design session with it:
+read the table below for where each one went, and treat anything marked
+unowned as work that needs a person before it needs a commit.
 
 **Read the claims table before editing, and commit often.** An uncommitted
 change is invisible to everyone else, so work sitting in a working tree for
@@ -25,14 +33,16 @@ not own, add a line to the log and wait rather than taking it.
 
 | Path | Owner | Since | State |
 | --- | --- | --- | --- |
-| `docs/`, `scripts/`, `CLAUDE.md`, `COORDINATION.md` | Claude Code | 2026-10-09 | Active |
-| `css/`, `js/main.js`, `js/store.js`, `js/admin.js` | Claude Code | 2026-10-09 | Active |
-| `api/`, `functions/`, `supabase/` | Codex | 2026-08-31 | Active |
-| `wrangler.toml`, `_headers`, `_routes.json` | Codex | 2026-10-09 | Handed over, see the log |
-| `js/manager.js`, `js/sales.js`, `js/technician.js`, schedule modules | Codex | 2026-08-31 | Active, XSS sweep pending |
+| `docs/`, `scripts/` except `build-site.mjs`, `CLAUDE.md` | Claude Code, design | 2026-10-09 | Active |
+| `css/`, `js/main.js`, `js/store.js`, `js/admin.js` | Claude Code, design | 2026-10-09 | Active |
+| `api/`, `functions/`, `supabase/`, `wrangler.toml`, `_headers`, `_routes.json`, `.github/`, `scripts/build-site.mjs` | Claude Code, deploys and auth | 2026-11-02 | Active |
+| `images/`, `IMAGE_PROMPTS.md` | Codex | 2026-11-02 | Images only, no code |
+| `js/manager.js`, `js/sales.js`, `js/technician.js`, schedule modules | **Nobody** | 2026-11-02 | **Unowned.** Was Codex. The XSS sweep is still pending and is finding 3 in the blueprint |
 
 Shared, so announce in the log before touching: `css/styles.css`,
-`js/main.js`, `index.html`, `package.json`, `docs/diagrams/model.mjs`.
+`js/main.js`, `index.html`, `package.json`, `docs/diagrams/model.mjs`,
+`COORDINATION.md`, and the `<head>` of any page, which both sessions have
+reason to edit and which has to stay identical across all fourteen.
 
 ---
 
@@ -63,6 +73,32 @@ Shared, so announce in the log before touching: `css/styles.css`,
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
 
+### 2026-11-02 · Claude Code · Codex writes no more code, and the table says so
+
+The owner has moved Codex to image generation only. The claims table and the
+division of labour above are rewritten to match, and `CLAUDE.md` with them.
+
+**What this changes for you.** `api/`, `functions/`, `supabase/`,
+`wrangler.toml`, `_headers`, `_routes.json`, `.github/` and
+`scripts/build-site.mjs` are now listed against the Claude Code session that
+holds deploys and auth, which is where that work was already happening. The
+design session does not take them and has not touched them.
+
+**One group has no owner at all.** `js/manager.js`, `js/sales.js`,
+`js/technician.js` and the schedule modules were Codex, and the XSS sweep on
+them was pending when Codex stopped. That sweep is finding 3 in the
+blueprint, a live stored-XSS route where staff text reaches another staff
+member through innerHTML unescaped. It is marked unowned rather than
+quietly reassigned, because pretending it has an owner is how it stays open.
+
+Build plan owners in `docs/diagrams/model.mjs` and the owners on U1 and U4
+moved from Codex to Claude Code, so the blueprint stops naming someone who
+is not coming back.
+
+**One palette decision.** WhatsApp green `#25D366` on the floating button is
+now a sanctioned exception beside the four-colour Google G, recorded in
+`CLAUDE.md`. Those two are the whole list. A third-party mark is not a
+precedent for a third green.
 ### 2026-11-02 · Claude Code · One type rule, and every page head rewritten
 
 Playfair Display is the display face by decision rather than as a stand-in,
