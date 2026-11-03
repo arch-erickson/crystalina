@@ -507,6 +507,8 @@ body.dg-lock{overflow:hidden}
   });
 })();
 </script>
+<h3>Looked at by someone else</h3>
+<p>Two reviews on 2026-11-03, both measured in headless Chrome rather than estimated. The first, docs/ux-review.md, was taken at 80c3b9a by the agent of the deploy session: sixty-seven findings over nineteen pages, ranked against CLAUDE.md, then WCAG 2.1 AA, then the Nielsen Norman heuristics, then Baymard. The second, by the reviewer of this session after the redesign, was nineteen findings over seventeen pages with 246 captures. Everything in either that still stood at the time of reading is fixed on main: a skip link, a focus ring that clears 3 to 1 everywhere, the cart as a real dialog, labels and autocomplete on every form, live regions where a page repaints, 44 pixel targets on phones, contrast on the navy band, one word for delivery and one for fitting, no grade on our own products. Two things were not taken: the three legal pages stay unpublished until the owner approves their wording, and struck-through compare prices are hidden until each is confirmed to have been a real price. Both are on the claims register in docs/voice-guide.md.</p>
 <div class="callout learn">
 <span class="k">Refreshing the captures</span>
 <p>Serve the site, then run npm run screens. The script captures every page and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section and the page bubbles are both generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.</p>
