@@ -13,7 +13,7 @@
  * customer who wanders off must not hold it forever, which is what
  * checkout.session.expired and release_order are for.
  */
-import { json, methodGuard, readJson, clientIp, rateLimit, cleanText } from '../_lib/http.mjs';
+import { json, methodGuard, readJson, clientIp, rateLimit, durableRateLimit, cleanText } from '../_lib/http.mjs';
 import { verifyTurnstile } from '../_lib/turnstile.mjs';
 import { userFromToken, rpcAsUser } from '../_lib/supabase.mjs';
 import { stripePost } from '../_lib/stripe.mjs';
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   if (!methodGuard(req, res)) return;
 
   const ip = clientIp(req);
-  if (!rateLimit(`checkout:${ip}`, { limit: 10, windowMs: 10 * 60000 }).allowed) {
+  if (!(await durableRateLimit(`checkout:${ip}`, { limit: 10, windowMs: 10 * 60000 })).allowed) {
     return json(res, 429, { error: 'Too many attempts. Please try again shortly.' });
   }
 

@@ -37,9 +37,10 @@ export function clientIp(req) {
 }
 
 /* Best-effort in-process rate limit.
-   Serverless instances are short lived and not shared, so this blunts casual
-   abuse and accidental double submits. For hard guarantees put Vercel KV or
-   Upstash behind this function, or enable Vercel's WAF rate limiting. */
+   A Worker isolate is short lived and there are many at once, so this
+   counts per isolate rather than per caller: it stops a double submit and
+   not much else. Kept as the fallback for durableRateLimit below, which
+   is what the routes actually call. */
 const buckets = new Map();
 export function rateLimit(key, { limit = 5, windowMs = 60_000 } = {}) {
   const now = Date.now();
@@ -57,3 +58,37 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 export const isEmail = value => typeof value === 'string' && value.length <= 200 && EMAIL_RE.test(value);
 export const cleanText = (value, max) =>
   typeof value === 'string' ? value.replace(/\u0000/g, '').trim().slice(0, max) : '';
+
+/* A rate limit that survives the isolate.
+ *
+ * Counts in Postgres rather than in memory, through consume_rate_limit,
+ * which increments and decides in one statement so two requests arriving
+ * together cannot both be allowed on the last slot.
+ *
+ * It fails open. If the database is unreachable the in-process limiter
+ * answers instead and the request goes through: a contact form that
+ * refuses everyone because the database is briefly down is a worse
+ * outcome than a few unthrottled submissions. The failure is logged so
+ * it is not silent.
+ *
+ * Cloudflare WAF rate limiting is still better and rejects at the edge
+ * before any of this runs. This works today, on what already exists.
+ */
+export async function durableRateLimit(key, { limit = 5, windowMs = 60_000 } = {}) {
+  const windowSeconds = Math.max(1, Math.round(windowMs / 1000));
+  try {
+    const { admin } = await import('./supabase.mjs');
+    const rows = await admin('rpc/consume_rate_limit', {
+      method: 'POST',
+      body: { p_bucket: key, p_limit: limit, p_window_seconds: windowSeconds },
+    });
+    const row = Array.isArray(rows) ? rows[0] : rows;
+    if (row && typeof row.allowed === 'boolean') {
+      return { allowed: row.allowed, remaining: row.remaining, durable: true };
+    }
+    throw new Error('Unexpected response from consume_rate_limit.');
+  } catch (error) {
+    console.error('[ratelimit] durable check unavailable, falling back', error);
+    return { ...rateLimit(key, { limit, windowMs }), durable: false };
+  }
+}

@@ -1,7 +1,7 @@
 /* POST /api/contact
    Stores the enquiry in Supabase and emails the team. Protected by Turnstile
    (when configured) and a per-IP rate limit. */
-import { json, methodGuard, readJson, clientIp, rateLimit, isEmail, cleanText } from './_lib/http.mjs';
+import { json, methodGuard, readJson, clientIp, rateLimit, durableRateLimit, isEmail, cleanText } from './_lib/http.mjs';
 import { verifyTurnstile } from './_lib/turnstile.mjs';
 import { admin } from './_lib/supabase.mjs';
 import { sendEmail, esc } from './_lib/email.mjs';
@@ -15,7 +15,7 @@ const TOPICS = [
 export default async function handler(req, res) {
   if (!methodGuard(req, res)) return;
   const ip = clientIp(req);
-  if (!rateLimit(`contact:${ip}`, { limit: 5, windowMs: 10 * 60000 }).allowed) {
+  if (!(await durableRateLimit(`contact:${ip}`, { limit: 5, windowMs: 10 * 60000 })).allowed) {
     return json(res, 429, { error: 'Too many messages. Please try again shortly.' });
   }
 
