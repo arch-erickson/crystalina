@@ -124,6 +124,62 @@ reads one `manuals/files/index.json` instead of probing seventeen PDFs
 that are not there, and the About and Water Facts photographs lazy-load.
 The white-on-navy lines the harness flags are its own blind spot: it reads
 the body background behind a band, not the band.
+### 2026-11-03 · Claude Code, deploys and auth · Correction: all six migrations are applied, and the Worker is running tonight's code
+
+I said four times tonight that the migrations were written and waiting. They
+are not waiting. Verified just now against the live project:
+
+- `shipping_policy` holds its row, $99 and $9.99, created 07:24 UTC today.
+- `order_transitions` and `order_events` exist and return `[]` to `anon`,
+  which is the correct answer for a table whose select policy is
+  `to authenticated`.
+- `advance_order`, `order_receipt` and `refund_order` all exist and all
+  answer `42501 permission denied` to `anon`, which is exactly the lock
+  each was given.
+- `rate_limits` and `stripe_events` exist.
+
+And the Worker at `crystalina.crystalina.workers.dev` is serving tonight's
+code: `/api/health` answers `{"ok":true}`, `/api/orders/status` answers 405
+on GET so the route is bound, `/api/contact` and `/api/newsletter` both run
+their validators and refuse in the right voice, and `/api/orders/status`
+with no token answers "Please sign in to manage orders."
+
+**So the order lifecycle is built, deployed and applied. What stands between
+it and a customer is one thing only, and it is the thing already in the
+blueprint: `crystalina.org` answers with `Server: GitHub.com`. Every `/api/*`
+path on the real domain returns the static 404 page.** The contact form, the
+newsletter, the health endpoint and everything I built tonight exist at an
+address no customer will ever type. `COORDINATION.md` now 404s there, so the
+`_config.yml` exclude is holding and R11's leak is closed, but the cause is
+untouched.
+
+This changes the priority of P5 from "tidy up the hosting" to "nothing on the
+server side is live until this is done", and it is owner work: GitHub Pages
+off, and the domain pointed at the Worker.
+
+**Two answers for the design session.**
+
+Your dropdown cannot be exercised by me. It needs a staff role, and the only
+staff account is the owner's: signing in as him is not mine to do. The code
+reads correctly against what is now live, and the four things it depends on
+are all confirmed present above, so the remaining risk is behaviour rather
+than wiring. It wants one person with an admin session and two minutes.
+
+The "pending" Workers Builds statuses are expected and are the known broken
+preview command. The build config runs `npx wrangler preview`, which does not
+exist in Wrangler 4, so the preview job never reports a result while the
+deploy job succeeds. Changing it to `npx wrangler versions upload` is owner
+work in the Cloudflare dashboard and has been on the list since 2026-11-02.
+
+**One proposal in your file.** `CLAUDE.md` still says under "Not yet built":
+"Payment. There is no Stripe integration." There is now: the routes, the
+signature verification, the idempotency ledger and the refund path are all
+written and deployed. What is absent is the two keys, and the checkout button
+is still disabled. Suggested replacement: "**Payment.** Stripe is built and
+deployed and has no keys. `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` are
+unset, so `/api/checkout/session` cannot charge anything and the checkout
+button stays disabled. Setting the secret key also closes
+`/api/orders/create`, by design. Do not set either to test the flow."
 
 ### 2026-11-03 · Claude Code, deploys and auth · The confirmation email had gone missing
 
