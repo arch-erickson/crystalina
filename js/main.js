@@ -77,8 +77,33 @@ const SOCIALS = [
   { name: 'WhatsApp', url: 'https://wa.me/19178094803', icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.2-.8l.5-.7c.1-.2 0-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.9.9-1.1 2.2-.3 3.7a12 12 0 0 0 4.6 4.5c1.7.9 2.7 1 3.6.7.6-.2 1.4-.8 1.6-1.5.2-.7.2-1.2.1-1.3-.1-.2-.3-.2-.6-.3z"/></svg>' }
 ];
 
+/* The six shop categories, written once. The home page tiles, the Shop menu
+   and the footer all read this list; the shop page filters by the name. */
+const CATEGORIES = [
+  { name: 'Reverse Osmosis',     desc: 'Under-sink purity',    image: '/images/cat-reverse-osmosis.webp', alt: 'Reverse osmosis drinking water' },
+  { name: 'Whole House',         desc: 'Every tap protected',  image: '/images/cat-whole-house.webp',     alt: 'Whole house water filtration' },
+  { name: 'Countertop',          desc: 'Renter friendly',      image: '/images/cat-countertop.webp',      alt: 'Countertop water dispenser' },
+  { name: 'Shower & Bath',       desc: 'Softer skin and hair', image: '/images/cat-shower.webp',          alt: 'Shower filtration' },
+  { name: 'Replacement Filters', desc: 'Keep it pure',         image: '/images/cat-replacement.webp',     alt: 'Replacement filters' },
+  { name: 'Accessories',         desc: 'Meters, UV and more',  image: '/images/cat-accessories.webp',     alt: 'Water accessories' },
+].map(c => ({ ...c, href: '/shop/?cat=' + encodeURIComponent(c.name) }));
+
+/* Top navigation. An item with a menu opens a full width panel; its columns
+   are lists of links and an optional feature tile, and every link is to a
+   page or a filter that exists. */
 const NAV_LINKS = [
-  { label: 'Shop', href: '/shop/' },
+  { label: 'Shop', href: '/shop/', menu: {
+    columns: [
+      { title: 'Systems', links: CATEGORIES.slice(0, 4).map(c => ({ label: c.name, href: c.href, desc: c.desc })) },
+      { title: 'Keep it running', links: CATEGORIES.slice(4).map(c => ({ label: c.name, href: c.href, desc: c.desc })) },
+      { title: 'Help choosing', links: [
+        { label: 'Find your filter', href: '/quiz/', desc: 'Five questions, one answer' },
+        { label: 'NYC water facts', href: '/nyc-water/', desc: 'What is in the tap, and why' },
+        { label: 'Talk to us', href: '/contact/', desc: 'Call, WhatsApp or visit' },
+      ] },
+    ],
+    feature: { href: '/shop/', image: '/images/products/h5-600-uv-editorial.webp', alt: 'The Crystalina flagship reverse osmosis system', title: 'The flagship', text: 'Ten stages, alkaline, UV, built for New York water.' },
+  } },
   { label: 'NYC Water Facts', href: '/nyc-water/' },
   { label: 'Find Your Filter', href: '/quiz/' },
   { label: 'About Us', href: '/about/' },
@@ -94,49 +119,110 @@ const LOGO_MARK = `<img src="/logo-mark.png" class="logo-mark" alt="Crystalina" 
 const LOGO_LOCKUP = `<img src="/logo-mark.png" class="brand-mark" alt=""><img src="/logo-text.png" class="brand-wordmark" alt="Crystalina. Pure Water. Pure Life.">`;
 
 /* ---------- header ---------- */
+function navItem(link, active) {
+  const cls = 'nav-link' + (active === link.href ? ' active' : '');
+  if (!link.menu) return `<li><a href="${link.href}" class="${cls}">${escapeHTML(link.label)}</a></li>`;
+  const col = c => `<div class="mega-col"><h4>${escapeHTML(c.title)}</h4><ul>${c.links.map(k =>
+    `<li><a href="${k.href}">${escapeHTML(k.label)}${k.desc ? `<small>${escapeHTML(k.desc)}</small>` : ''}</a></li>`).join('')}</ul></div>`;
+  const feat = link.menu.feature ? `<a class="mega-feature" href="${link.menu.feature.href}">
+      <div class="mega-feature-media"><img src="${link.menu.feature.image}" alt="${escapeHTML(link.menu.feature.alt)}" loading="lazy"></div>
+      <strong>${escapeHTML(link.menu.feature.title)}</strong><small>${escapeHTML(link.menu.feature.text)}</small></a>` : '';
+  return `<li class="has-menu"><a href="${link.href}" class="${cls}" aria-haspopup="true" aria-expanded="false">${escapeHTML(link.label)}</a>
+    <div class="mega"><div class="container mega-inner">${link.menu.columns.map(col).join('')}${feat}</div></div></li>`;
+}
+
 function renderHeader(active = '') {
   const user = Store.currentUser();
   const notifications = user && user.role === 'customer' && Store.getNotificationsForUser ? Store.getNotificationsForUser(user) : [];
   const unreadNotifications = notifications.filter(item => !item.read).length;
+  // The home page carries the header over its full viewport hero; every other
+  // page has it as a sticky white bar in the flow.
+  const overlay = active === '/';
   const el = document.createElement('div');
+  el.className = 'site-top' + (overlay ? ' site-top--overlay' : '');
   el.innerHTML = `
   <div class="announce-bar">
     <span>${icon('droplet')} Free shipping on orders over $99, delivered anywhere in the five boroughs</span>
-    <a href="tel:+19178094803" class="announce-phone">${icon('phone')} (917) 809-4803</a>
   </div>
-  <header class="site-header">
+  <header class="site-header${overlay ? ' is-transparent' : ''}">
     <div class="container header-inner">
-      <a class="brand" href="/" aria-label="Crystalina. Pure Water. Pure Life.">
-        ${LOGO_LOCKUP}
-      </a>
-      <nav class="main-nav" id="mainNav">
-        ${NAV_LINKS.map(l => `<a href="${l.href}" class="${active === l.href ? 'active' : ''}">${l.label}</a>`).join('')}
-      </nav>
-      <div class="header-actions">
-        ${user && user.role === 'customer' ? `<div class="notification-wrap">
-          <button class="icon-btn notification-btn" id="notificationBtn" title="Notifications" aria-label="Notifications">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
-            <span class="icon-label">Alerts</span>${unreadNotifications ? `<span class="notification-count" id="notificationCount">${unreadNotifications}</span>` : ''}
-          </button>
-          <div class="notification-menu" id="notificationMenu"><div class="notification-menu-head"><strong>Notifications</strong><span>${unreadNotifications} new</span></div>${notifications.length ? notifications.map(item => `<article class="notification-item ${item.read ? '' : 'unread'}"><strong>${escapeHTML(item.title)}</strong><p>${escapeHTML(item.message)}</p><small>${new Date(item.sent).toLocaleDateString('en-US', { dateStyle: 'medium' })}</small></article>`).join('') : '<p class="notification-empty">You have no notifications.</p>'}</div>
-        </div>` : ''}
-        <a href="${user ? (user.role === 'admin' ? '/admin/' : '/account/') : '/signin/'}" class="icon-btn" title="${user ? user.name : 'Sign in'}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
-          <span class="icon-label">${user ? user.name.split(' ')[0] : 'Sign In'}</span>
+      <div class="header-row">
+        <div class="header-side header-side--left">
+          <a href="tel:+19178094803" class="header-link">${icon('phone')} (917) 809-4803</a>
+        </div>
+        <a class="brand" href="/" aria-label="Crystalina. Pure Water. Pure Life.">
+          ${LOGO_LOCKUP}
         </a>
-        <button class="icon-btn cart-btn" id="cartOpenBtn" title="Cart">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2.5 3.5h3l2.6 12h10.4l2.5-8.5H6.2"/></svg>
-          <span class="icon-label">Cart</span>
-          <span class="cart-count" id="cartCount">0</span>
-        </button>
-        <button class="hamburger" id="hamburgerBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+        <div class="header-side header-actions">
+          ${user && user.role === 'customer' ? `<div class="notification-wrap">
+            <button class="icon-btn notification-btn" id="notificationBtn" title="Notifications" aria-label="Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
+              <span class="icon-label">Alerts</span>${unreadNotifications ? `<span class="notification-count" id="notificationCount">${unreadNotifications}</span>` : ''}
+            </button>
+            <div class="notification-menu" id="notificationMenu"><div class="notification-menu-head"><strong>Notifications</strong><span>${unreadNotifications} new</span></div>${notifications.length ? notifications.map(item => `<article class="notification-item ${item.read ? '' : 'unread'}"><strong>${escapeHTML(item.title)}</strong><p>${escapeHTML(item.message)}</p><small>${new Date(item.sent).toLocaleDateString('en-US', { dateStyle: 'medium' })}</small></article>`).join('') : '<p class="notification-empty">You have no notifications.</p>'}</div>
+          </div>` : ''}
+          <a href="${user ? (user.role === 'admin' ? '/admin/' : '/account/') : '/signin/'}" class="icon-btn" title="${user ? user.name : 'Sign in'}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>
+            <span class="icon-label">${user ? user.name.split(' ')[0] : 'Sign In'}</span>
+          </a>
+          <button class="icon-btn cart-btn" id="cartOpenBtn" title="Cart">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="20" r="1.6"/><circle cx="18" cy="20" r="1.6"/><path d="M2.5 3.5h3l2.6 12h10.4l2.5-8.5H6.2"/></svg>
+            <span class="icon-label">Cart</span>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+          <button class="hamburger" id="hamburgerBtn" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+        </div>
       </div>
+      <nav class="main-nav" id="mainNav" aria-label="Main">
+        <ul>${NAV_LINKS.map(link => navItem(link, active)).join('')}</ul>
+      </nav>
     </div>
   </header>`;
   document.body.prepend(el);
 
-  document.getElementById('hamburgerBtn').addEventListener('click', () =>
-    document.getElementById('mainNav').classList.toggle('open'));
+  const header = el.querySelector('.site-header');
+  const nav = document.getElementById('mainNav');
+
+  // Height as a custom property, for anything that has to clear the bar.
+  const setHeight = () => document.documentElement.style.setProperty('--header-h', el.offsetHeight + 'px');
+  setHeight();
+  if (window.ResizeObserver) new ResizeObserver(setHeight).observe(el);
+
+  // Transparent over the hero, white once scrolled.
+  if (overlay) {
+    const onScroll = () => header.classList.toggle('is-transparent', window.scrollY < 24 && !nav.classList.contains('open'));
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    nav.addEventListener('transitionend', onScroll);
+  }
+
+  const hamburger = document.getElementById('hamburgerBtn');
+  hamburger.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', String(open));
+    if (overlay) header.classList.toggle('is-transparent', !open && window.scrollY < 24);
+  });
+
+  // Menus: hover and focus open them on their own through CSS. Where there is
+  // no hover, or inside the drawer, the first tap opens and the second follows.
+  const closeMenus = () => el.querySelectorAll('.has-menu.is-open').forEach(li => {
+    li.classList.remove('is-open');
+    li.querySelector('.nav-link').setAttribute('aria-expanded', 'false');
+  });
+  el.querySelectorAll('.has-menu > .nav-link').forEach(link => {
+    link.addEventListener('click', event => {
+      const li = link.parentElement;
+      const tapToOpen = window.matchMedia('(max-width: 860px)').matches || window.matchMedia('(hover: none)').matches;
+      if (!tapToOpen || li.classList.contains('is-open')) return;
+      event.preventDefault();
+      closeMenus();
+      li.classList.add('is-open');
+      link.setAttribute('aria-expanded', 'true');
+    });
+  });
+  document.addEventListener('click', event => { if (!event.target.closest('.has-menu')) closeMenus(); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') { closeMenus(); document.activeElement?.blur(); } });
+
   document.getElementById('cartOpenBtn').addEventListener('click', openCart);
   const notificationBtn = document.getElementById('notificationBtn');
   if (notificationBtn) notificationBtn.addEventListener('click', event => {
@@ -147,6 +233,17 @@ function renderHeader(active = '') {
   });
   document.addEventListener('click', event => { if (!event.target.closest('.notification-wrap')) document.getElementById('notificationMenu')?.classList.remove('open'); });
   updateCartBadge();
+}
+
+/* Home page category tiles, from the same list as the menu. */
+function renderCategoryTiles() {
+  const grid = document.getElementById('categoryGrid');
+  if (!grid) return;
+  grid.innerHTML = CATEGORIES.map((c, i) => `
+    <a href="${c.href}" class="cat-tile">
+      <div class="ct-media"><img src="${c.image}" alt="${escapeHTML(c.alt)}" loading="lazy" onerror="this.onerror=null;this.src=Store.placeholder('${escapeHTML(c.name).replace(/'/g, '')}',${i})"></div>
+      <div class="ct-label">${escapeHTML(c.name)} <small>${escapeHTML(c.desc)}</small></div>
+    </a>`).join('');
 }
 
 function applyAnnouncementStyle(settings) {
@@ -232,7 +329,9 @@ function applySectionTypography(el, typography) {
 function applyPageSections() {
   const main = document.querySelector('main');
   const sections = Store.getAdminData?.().pageSections || [];
-  if (!main || !sections.length) return;
+  // Only the home page has a section stack. Without this guard every other
+  // page grew the whole stack as empty headings beneath its own content.
+  if (!main || !sections.length || !main.querySelector('[data-home-section]')) return;
   const configuredIds = new Set(sections.map(section => section.id));
   main.querySelectorAll('[data-home-section]').forEach(section => {
     // Hide only what the editor explicitly disabled. A section that is simply
@@ -411,11 +510,7 @@ function renderFooter() {
     </div>
     <div>
       <h4>Shop</h4>
-      <a href="/shop/?cat=Reverse%20Osmosis">Reverse Osmosis</a>
-      <a href="/shop/?cat=Whole%20House">Whole House</a>
-      <a href="/shop/?cat=Countertop">Countertop</a>
-      <a href="/shop/?cat=Shower%20%26%20Bath">Shower &amp; Bath</a>
-      <a href="/shop/?cat=Replacement%20Filters">Replacement Filters</a>
+      ${CATEGORIES.map(c => `<a href="${c.href}">${escapeHTML(c.name)}</a>`).join('')}
     </div>
     <div>
       <h4>Learn</h4>
@@ -557,6 +652,7 @@ function initPage(activeNav = '') {
   applySiteSettings();
   renderCartDrawer();
   renderFooter();
+  renderCategoryTiles();
   autoReveal();
   requestAnimationFrame(() => initReveal());
   bindNewsletter();

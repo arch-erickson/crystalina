@@ -5,6 +5,7 @@
  *
  *   npm run screens                        against http://localhost:4321
  *   node scripts/screens.mjs --base http://localhost:4322
+ *   node scripts/screens.mjs --out some/folder      elsewhere, for a comparison
  *
  * Needs puppeteer, like verify.mjs:  npm i -D puppeteer
  * The site has to be served first:   npm run serve
@@ -23,7 +24,8 @@ try { puppeteer = (await import('puppeteer')).default; }
 catch { puppeteer = (await import('puppeteer-core')).default; }
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const OUT = join(HERE, '..', 'docs', 'screens');
+const outArg = process.argv.indexOf('--out');
+const OUT = outArg > -1 ? process.argv[outArg + 1] : join(HERE, '..', 'docs', 'screens');
 const baseArg = process.argv.indexOf('--base');
 const BASE = baseArg > -1 ? process.argv[baseArg + 1] : 'http://localhost:4321';
 /* The three sizes the blueprint toggles between. Tablet is an iPad portrait,

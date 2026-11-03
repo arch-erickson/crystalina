@@ -24,6 +24,7 @@ markup, look for the component. If it half exists, extend it.
 | Concern | File |
 | --- | --- |
 | Design tokens and every component | `css/styles.css` |
+| The library, rendered live, for looking | `docs/components.html` at /docs/components.html when served |
 | Shared UI, icons, `escapeHTML` | `js/main.js` |
 | Local cache, hydrated from Supabase | `js/store.js` |
 | Supabase reads, writes and uploads | `js/data-remote.js` |

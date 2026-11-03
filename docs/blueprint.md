@@ -375,9 +375,11 @@ Anything that appears twice is built once, and a variation is a parameter rather
 
 _**One definition, read everywhere.** Where each shared fact lives, who reads it, and the three that still have no home._
 
+The library can be looked at as well as read. docs/components.html is a page in the repository that loads the real stylesheet and the real script and renders every token, button, heading, band, card and icon the storefront is built from, with the real header above it. Serve the site and open /docs/components.html. It is outside the publish allow-list, so it never reaches a customer, and because it uses the live components rather than copies of them, it cannot drift from the site.
+
 > **Three that have no home yet**
 >
-> The free shipping threshold is written in three places: the header, the cart drawer and checkout. The navigation and social links are in the head of every page. The repeatable items inside home page sections, the trust bar, the category tiles, the testimonials, the water facts and the process steps, are still in the HTML while everything around them is published from site_content. Each one is a small, dull job. Each one becomes an incident the week a price changes in two places out of three.
+> The free shipping threshold is written in nine places, including the arithmetic in checkout. The font link and the stylesheet version are one identical string stored in fourteen page heads. The repeatable items inside home page sections, the trust list, the testimonials, the water facts and the process steps, are still in the HTML while everything around them is published from site_content; the category tiles left that list on 2026-11-02, when they became CATEGORIES in main.js and the menu, the footer and the tiles all started reading it. Each remaining one is a small, dull job. Each one becomes an incident the week a price changes in two places out of three.
 
 ---
 
