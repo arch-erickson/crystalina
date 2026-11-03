@@ -27,6 +27,7 @@ not own, add a line to the log and wait rather than taking it.
 | --- | --- | --- | --- |
 | `docs/`, `scripts/`, `CLAUDE.md`, `COORDINATION.md` | Claude Code | 2026-10-09 | Active |
 | `css/`, `js/main.js`, `js/store.js`, `js/admin.js` | Claude Code | 2026-10-09 | Active |
+| `IMAGE_PROMPTS.md`, `image-refs/`, `images/` | Claude Code, image direction | 2026-11-02 | Active |
 | `api/`, `functions/`, `supabase/` | Codex | 2026-08-31 | Active |
 | `wrangler.toml`, `_headers`, `_routes.json` | Codex | 2026-10-09 | Handed over, see the log |
 | `js/manager.js`, `js/sales.js`, `js/technician.js`, schedule modules | Codex | 2026-08-31 | Active, XSS sweep pending |
@@ -62,6 +63,54 @@ Shared, so announce in the log before touching: `css/styles.css`,
 
 Newest at the top. Date, who, what changed, and anything the other needs to
 do about it.
+
+### 2026-11-02 · Claude Code (image direction) · The palette comes off the photographs
+
+`IMAGE_PROMPTS.md` is rewritten. The old brief forced the brand palette into
+every prompt, and the set it produced reads as AI stock: the hero has the navy
+gradient painted into the picture while the CSS lays a real one on top of it,
+the lifestyle plate contains a bowl of blue apples in a glass condo, and all
+six category tiles are CGI renders. The new standard is photographic realism
+first, neutral white balance, and no brand colour painted onto props, food or
+walls. The house rule in `CLAUDE.md` still holds: neutral is not warm, and the
+ban on green, purple and amber casts is a ban on the cast, not on a real
+object that happens to be that colour.
+
+**One thing is actually broken.** `images/h5-600-exploded.webp` is referenced
+at `index.html:339` and does not exist, so the "Inside the Flagship" section
+falls back to a flat product photograph where an exploded diagram belongs. It
+is P1 in the queue.
+
+**What I claim:** `IMAGE_PROMPTS.md`, the new `image-refs/` folder, and
+`images/`. I am not touching `css/`, page markup, `docs/`, `scripts/`,
+`functions/`, `api/` or `supabase/`.
+
+**What the design session needs to do**, once P1 lands:
+
+1. Point `index.html:128` at `/images/h5-600-exploded.webp` and stop naming
+   the RO-10 in its alt text. That product left the catalogue, and it retires
+   `images/exploded-filter.webp`, 202 KB.
+2. The home page loads **532 KB of imagery across 9 files, all eager**, against
+   the blueprint's 420 KB first-screen budget. There is no `loading="lazy"`,
+   no `srcset` and no hero `preload` in any site page. The hero at 83 KB is
+   not the problem. The six tiles and the 202 KB alpha exploded view being
+   fetched before the first screen paints are. I have recorded the budget in
+   section 5 of the brief and deliberately set no per-image ceiling, because
+   compression is the wrong lever while everything loads eagerly.
+3. `.split img` crops to 4:3 and the three split plates are 900x700, which is
+   9:7, so they are being cropped top and bottom today. The brief specifies
+   1200x900 from here.
+
+**For the lead.** Two decisions are not mine. Twelve product images from the
+retired catalogue are unreferenced and still published, roughly 254 KB,
+because `scripts/build-site.mjs` copies `images/` whole. And the whole house,
+countertop and shower category tiles link to shop filters that return nothing,
+since the catalogue holds only RO systems, replacement filters and bundles.
+Better pictures do not fix either one.
+
+**`image-refs/` is not published**, and must stay that way. `DIRS` in
+`scripts/build-site.mjs` does not list it. References are named after their
+target, so `image-refs/hero-bg.png` feeds `images/hero-bg.webp`.
 
 ### 2026-11-02 · Claude Code · The deploy path changed, and the token is gone
 
