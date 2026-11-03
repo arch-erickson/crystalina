@@ -157,7 +157,7 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | Product | /product/?id= | Implemented | Partial | product_stage_options is empty, so no 5, 6 or 7 stage choice renders No faucet rows exist, so the upgrade control has nothing to offer Low stock reads as a count, never a warning; a rating shows only with its review count, and no product has one yet |
 | Checkout | /checkout/ | Implemented | Partial | No payment: the submit button carries a static disabled attribute No Turnstile widget, though the server expects a token |
 | Find your filter | /quiz/ | Implemented | Implemented | Nothing. No server work needed |
-| NYC water | /nyc-water/ | Implemented | Missing | Figures are illustrative and unverified against NYC DEP reports (U2) |
+| NYC water | /nyc-water/ | Implemented | Missing | The microplastics card makes no numeric claim, by design, because none we found had a source we could stand behind |
 | About | /about/ | Implemented | Missing | Nothing. No server work needed |
 | Contact | /contact/ | Implemented | Implemented | No Turnstile widget, and the page reads a token from one that does not exist The notification lands in a suspended inbox (U8) |
 | Privacy policy | /privacy/ | Implemented | Missing | Not in the publish allow-list and linked from the footer as # until the owner has approved the wording Nothing on the server. No server work needed |
@@ -568,17 +568,17 @@ Implemented, and finished.
 
 _Page · /nyc-water/._
 
-The argument for filtering New York tap water, with charts and a FAQ. The numbers are written into the page.
+What arrives at a New York tap, where it picks up what it carries, and what a system at home does about it. Every figure carries a source mark.
 
-Missing on the server side because it needs none. The problem is the figures: they were drafted as illustrative and are presented as fact. That is U2, and it blocks launch.
+Missing on the server side because it needs none. The figures were first drafted as illustrative and presented as fact; since 2026-11-03 each one is checked against the source it cites, which answers U2.
 
 - **Reached from.** Home (learn)
 - **Links to.** Shop (shop)
 - **See also.** U2 · Are the NYC water figures on /nyc-water/ defensible?; Unverified NYC water figures published as fact
 - **Design.** Implemented
 - **Server.** Missing
-- **Backend built.** Charts and FAQ render from values in the page
-- **Remaining.** Figures are illustrative and unverified against NYC DEP reports (U2)
+- **Backend built.** Rewritten 2026-11-03 in the frame and the voice: the journey as four editorial steps, five things a tap can carry on the navy band, the arithmetic shown in full with its assumption named in place of the unsourced bottled water chart, the questions as the shared accordion, and seven numbered sources at the foot (NYC DEP, NYS DOH, EPA) that every figure on the page points to
+- **Remaining.** The microplastics card makes no numeric claim, by design, because none we found had a source we could stand behind
 
 #### About · Missing
 
@@ -2183,18 +2183,18 @@ Improved on 2026-11-02: it was two half-deployed hosts and is now one working ho
 
 #### Unverified NYC water figures published as fact
 
-_Risk · medium likelihood, high impact._
+_Risk · low likelihood, high impact._
 
-The charts and FAQ on /nyc-water/ present first-draft illustrative numbers to a New York audience as fact.
+The charts and FAQ on /nyc-water/ presented first-draft illustrative numbers to a New York audience as fact.
 
-Publishing an unverified water quality claim is a different kind of mistake from a layout bug. It blocks launch, and it is U2.
+Low now. What remains is drift: a source that updates its figure. The rule in U2 is that a figure changes here when it changes there, in one commit.
 
 - **Closed by.** U2 · Are the NYC water figures on /nyc-water/ defensible?
 - **See also.** NYC water
-- **Likelihood.** medium
+- **Likelihood.** low
 - **Impact.** high
-- **What to do.** Check every number against NYC DEP reports, or mark it illustrative in the page
-- **Effort.** Half a day
+- **What to do.** Done 2026-11-03: every figure on /nyc-water/ and in the home band cites a numbered source on the page
+- **Effort.** Done
 
 #### No backup has ever been restored
 
@@ -2639,17 +2639,17 @@ Answered in part on 2026-11-03, mechanically: tests/data-boundary.test.mjs reads
 - **How to resolve it.** What remains is a product decision for the owner, not a test: does a readable dashboard shell matter? If it does, the fix is Cloudflare Access in front of /admin/, /manager/, /sales/ and /technician/, which is owner configuration and belongs with P5.
 - **Owner.** Erickson
 
-#### U2 · Are the NYC water figures on /nyc-water/ defensible? · Missing
+#### U2 · Are the NYC water figures on /nyc-water/ defensible? · Implemented
 
-_Unknown · Owner: Owner, with Claude Code._
+_Unknown · Owner: Claude Code._
 
-They are presented as fact to a New York audience and were written as first-draft illustrative numbers. Publishing an unverified water quality claim is a different kind of mistake from a layout bug.
+Answered 2026-11-03. Every figure on the page now carries a numbered source at its foot: the DEP water supply page (reservoirs, watershed, distance, gallons a day), the DEP 2024 quality report (chlorine, UV, fluoride at 0.7 mg/L), the DEP lead service line plan of December 2025 (121,100 known lines, 7,000 miles of mains), the Delaware Aqueduct project pages, the 2017 Filtration Avoidance Determination, the EPA lead fact sheet (goal zero) and the EPA PFAS rule (4 ppt). The bottled water chart, which had no source, is replaced by arithmetic shown in full. The home band repeats three of the figures with the same words.
 
 - **Closes.** Unverified NYC water figures published as fact
 - **Blocks.** P10 · Launch
 - **See also.** NYC water
-- **How to resolve it.** Check every figure against the NYC DEP annual water quality reports. Anything that cannot be sourced is removed or labelled illustrative in the page itself.
-- **Owner.** Owner, with Claude Code
+- **How to resolve it.** When a figure changes at its source, change it here and in the home band in the same commit. A new figure comes with a new numbered source or it does not go on the page.
+- **Owner.** Claude Code
 
 #### U3 · Which Resend sending domain, and is it verified? · Missing
 

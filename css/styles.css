@@ -330,6 +330,20 @@ body.nav-open { overflow: hidden; }
 .bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan-300), var(--blue-400)); width: 0; transition: width 1.2s cubic-bezier(.2,.7,.3,1); }
 .bar-val { font-weight: var(--w-bold); color: var(--cyan-300); text-align: right; }
 .chart-note { font-size: .7rem; color: #8aa8ce; margin-top: 14px; }
+.chart-note a { color: #cfe0f5; text-decoration: underline; text-underline-offset: 3px; }
+/* Arithmetic shown in full on the navy band: a term, then its figure. */
+.arith { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 20px; margin: 0; font-size: .9rem; }
+.arith dt { color: #cfe0f5; }
+.arith dd { margin: 0; color: #fff; font-family: var(--font-head); font-size: 1.05rem; text-align: right; white-space: nowrap; }
+/* A source mark in running text, and the list it points to at the foot. */
+.src { color: var(--blue-500); font-size: .7em; vertical-align: super; text-decoration: none; margin-left: 2px; font-weight: var(--w-semibold); }
+.nyc-band .src { color: var(--cyan-300); }
+.section--sources { padding: 34px 0 48px; border-top: 1px solid var(--silver-200); }
+.sources-head { font-size: .68rem; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-family: var(--font-body); font-weight: var(--w-semibold); margin-bottom: 14px; }
+.sources { margin: 0; padding-left: 1.3em; display: grid; gap: 7px; font-size: .78rem; color: var(--muted); max-width: 78ch; line-height: 1.55; }
+.sources a { color: var(--navy-800); text-decoration: underline; text-underline-offset: 3px; }
+.sources a:hover { color: var(--blue-500); }
+.sources li:target { color: var(--navy-800); }
 .chart-cta { margin-top: 22px; }
 
 /* ---------- steps / how it works ----------

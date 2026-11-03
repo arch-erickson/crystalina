@@ -106,7 +106,7 @@ if it does not.
 | "Tested against NSF/ANSI standards" | facts band, trust list | The certificate, per product |
 | 99 percent lead, 98 percent chlorine and the rest of the chart | home, Water Facts | The laboratory report the chart is drawn from |
 | The three testimonials | home | Written consent from Maria R., Devon T. and Sandra K., or their removal |
-| "~130K lead service lines" and the other four Water Facts figures | home, Water Facts | A citation to the NYC DEP or the source used, on the page |
+| The Water Facts figures | home, Water Facts | Settled 2026-11-03: every figure on the page carries a numbered source at its foot (NYC DEP, NYS DOH, EPA), and the home band repeats three of them. The bottled water cost chart, which had no source, is replaced by arithmetic shown in full with its assumption named. |
 
 ## 5. Price with a real anchor, and frame the gain honestly.
 
