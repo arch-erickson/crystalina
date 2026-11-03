@@ -81,7 +81,7 @@
     if (sort === 'featured') list = sortForDisplay(list);
     if (sort === 'price-asc') list.sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list.sort((a, b) => b.price - a.price);
-    document.getElementById('shopCount').textContent = list.length ? list.length + (list.length === 1 ? ' system' : ' systems') + (activeCat === 'All' ? '' : ' in ' + activeCat) + (query ? ' matching "' + query + '"' : '') : '';
+    document.getElementById('shopCount').textContent = list.length ? list.length + (list.length === 1 ? ' product' : ' products') + (activeCat === 'All' ? '' : ' in ' + activeCat) + (query ? ' matching "' + query + '"' : '') : '';
     document.getElementById('shopGrid').innerHTML = list.map(productCard).join('');
     document.getElementById('shopEmpty').style.display = list.length ? 'none' : 'block';
     bindAddButtons();

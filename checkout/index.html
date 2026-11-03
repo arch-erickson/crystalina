@@ -74,7 +74,7 @@
           <p class="co-fine">Every figure is confirmed by us before anything is charged.</p>
         </aside>
       </div>
-      <div class="order-success" id="orderSuccess" style="display:none"></div>
+      <div class="order-success receipt-notice" id="orderSuccess" style="display:none"></div>
     </div>
   </section>
 </main>
@@ -140,10 +140,10 @@
     s.innerHTML = `
       <h2>Order ${escapeHTML(order.id)} is confirmed.</h2>
       <p>A confirmation is on its way to <strong>${escapeHTML(order.customer.email)}</strong>. The total was ${money(order.total)}.</p>
-      ${order.customer.installation ? `<p style="color:var(--muted);display:flex;gap:8px;align-items:center;justify-content:center;">${icon('wrench')} Our installation team will call you within 1 business day to schedule.</p>` : ''}
-      <div style="display:flex;gap:12px;justify-content:center;margin-top:26px;flex-wrap:wrap;">
-        <a href="/shop/" class="btn btn-primary">Continue Shopping</a>
-        <a href="/account/" class="btn btn-outline">View My Orders</a>
+      ${order.customer.installation ? '<p>Our fitting team will call you within one business day to agree a time.</p>' : ''}
+      <div class="notice-actions">
+        <a href="/account/" class="btn btn-primary">Your orders</a>
+        <a href="/shop/" class="text-link">The systems</a>
       </div>`;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });

@@ -96,7 +96,7 @@
         </div>`).join('');
     } catch (error) {
       console.error('[account] order load failed', error);
-      ordersWrap.innerHTML = '<p style="color:var(--muted);font-size:.9rem;">We could not load your orders just now. Please refresh, or contact us if it continues.</p>';
+      ordersWrap.innerHTML = '<p class="acct-empty">We could not load your orders just now. Refresh the page, or contact us if it continues.</p>';
     }
   }
   renderOrders();

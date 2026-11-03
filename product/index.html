@@ -47,10 +47,10 @@
   const layout = document.getElementById('pdLayout');
 
   if (!p) {
-    layout.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px 0;">
-      <h1>Product not found</h1>
-      <p style="color:var(--muted); margin:12px 0 24px;">It may have been removed from the catalog.</p>
-      <a class="btn btn-primary" href="/shop/">Back to Shop</a></div>`;
+    layout.innerHTML = `<div class="receipt-notice" style="grid-column:1/-1">
+      <h1>We could not find that system</h1>
+      <p>It may have left the catalogue, or the address may be incomplete.</p>
+      <div class="notice-actions"><a class="btn btn-primary" href="/shop/">See every system</a></div></div>`;
   } else {
     document.title = p.name + ' | Crystalina';
     const completeSets = Store.getBundlesForSystem(p.id);
@@ -62,10 +62,10 @@
           <span class="pd-bundle-label">Complete set for ${p.modelCode}</span>
           <h3 id="bundle-${bundle.id}">${bundle.name}</h3>
           <p>${bundle.short}</p>
-          <p class="pd-fit-note">We check the membrane connector against the cartridge in your system before it ships.</p>
+          <p class="pd-fit-note">We check the membrane connector against the cartridge in your system before it leaves us.</p>
           <ul class="pd-bundle-list">${bundle.specs.map(item => `<li>${item}</li>`).join('')}</ul>
           <div class="pd-bundle-footer">
-            <div><strong>${money(bundle.price)}</strong>${bundle.comparePrice ? `<span>${money(bundle.comparePrice)}</span>` : ''}</div>
+            <div><strong>${money(bundle.price)}</strong>${window.COMPARE_PRICES_VERIFIED && bundle.comparePrice ? `<span>${money(bundle.comparePrice)}</span>` : ''}</div>
             <div class="pd-bundle-actions">
               <a class="btn btn-outline btn-sm" href="/product/?id=${bundle.id}">View complete set</a>
               <button class="btn btn-primary btn-sm bundle-add" data-id="${bundle.id}" aria-label="${bundle.stock === 0 ? `${bundle.name} is sold out` : `Add ${bundle.name} to cart`}" ${bundle.stock === 0 ? 'disabled' : ''}>${bundle.stock === 0 ? 'Sold out' : 'Add the set'}</button>
@@ -132,7 +132,7 @@
 
     const stockCls = p.stock === 0 ? 'out' : p.stock <= 15 ? 'low' : 'in';
     const stockIc = p.stock === 0 ? 'close' : 'check';
-    const stockTxt = p.stock === 0 ? 'Sold out' : p.stock <= 15 ? `${p.stock} in stock, ships in 1 to 2 business days` : 'In stock, ships in 1 to 2 business days';
+    const stockTxt = p.stock === 0 ? 'Sold out' : p.stock <= 15 ? `${p.stock} in stock, delivered in 1 to 2 business days` : 'In stock, delivered in 1 to 2 business days';
     const stockMsg = `<span class="ic" style="width:1.1em;height:1.1em">${svgIcon(stockIc)}</span> ${stockTxt}`;
     /* The product explained: each accordion is built only from what the
        catalogue actually says about this product, so nothing is invented. */
@@ -159,7 +159,7 @@
         ${p.reviews ? `<div class="pd-rating">★ ${p.rating} <span>· ${p.reviews} reviews</span></div>` : ''}
         <div class="pd-prices">
           <span class="pd-price" id="pdPrice">${money(p.price)}</span>
-          ${p.comparePrice ? `<span class="pd-compare">${money(p.comparePrice)}</span>` : ''}
+          ${window.COMPARE_PRICES_VERIFIED && p.comparePrice ? `<span class="pd-compare">${money(p.comparePrice)}</span>` : ''}
         </div>
         <div class="pd-rule" aria-hidden="true"></div>
         <p class="pd-line">${escapeHTML(p.short || '')}</p>
@@ -168,7 +168,7 @@
           <div class="qty-picker">
             <button type="button" id="qDec" aria-label="Decrease quantity" disabled>−</button><span id="qVal" aria-live="polite">1</span><button type="button" id="qInc" aria-label="Increase quantity" ${p.stock <= 1 ? 'disabled' : ''}>+</button>
           </div>
-          <button class="btn btn-primary" style="flex:1" id="addBtn" ${p.stock === 0 ? 'disabled' : ''}>
+          <button class="btn btn-primary" id="addBtn" ${p.stock === 0 ? 'disabled' : ''}>
             ${p.stock === 0 ? 'Sold out' : 'Add to Cart'}
           </button>
         </div>

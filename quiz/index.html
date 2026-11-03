@@ -161,7 +161,7 @@
           <img src="${escapeHTML(p.image)}" alt="${escapeHTML(p.name)}">
           <div>
             <p class="quiz-note">${escapeHTML(p.short)}</p>
-            <p class="quiz-price">${money(p.price)}${p.comparePrice ? ` <span>${money(p.comparePrice)}</span>` : ''}</p>
+            <p class="quiz-price">${money(p.price)}${window.COMPARE_PRICES_VERIFIED && p.comparePrice ? ` <span>${money(p.comparePrice)}</span>` : ''}</p>
           </div>
         </div>
         <div class="quiz-actions">

@@ -54,6 +54,12 @@ if (typeof window !== 'undefined') { window.ICONS = ICONS; window.svgIcon = svgI
 /* The seven order statuses as a person reads them. The values are the
    database enum; the words are the only place they are written out, read
    by the receipt, the account page and the dashboard. */
+/* Struck-through compare prices show only once the owner confirms each was
+   the real price for a real period (voice guide, section 5). Until then the
+   figures stay in the catalogue and off the page. */
+const COMPARE_PRICES_VERIFIED = false;
+if (typeof window !== 'undefined') window.COMPARE_PRICES_VERIFIED = COMPARE_PRICES_VERIFIED;
+
 const ORDER_STATUS_LABELS = {
   pending_payment: 'Pending payment', paid: 'Paid', processing: 'Processing',
   shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled', refunded: 'Refunded'
@@ -113,7 +119,7 @@ const NAV_LINKS = [
         { label: 'Talk to us', href: '/contact/', desc: 'Call, WhatsApp or visit' },
       ] },
     ],
-    feature: { href: '/shop/', image: '/images/products/h5-600-uv-editorial.webp', alt: 'The Crystalina flagship reverse osmosis system', title: 'The flagship', text: 'Ten stages, alkaline, UV, built for New York water.' },
+    feature: { href: '/shop/', image: '/images/products/h5-600-uv-editorial.webp', alt: 'The Crystalina H5-600 reverse osmosis system', title: 'Inside the H5-600', text: 'Ten stages, alkaline, UV, built for New York water.' },
   } },
   { label: 'Water Facts', href: '/nyc-water/' },
   { label: 'Find Your Filter', href: '/quiz/' },
@@ -426,7 +432,7 @@ function renderCartDrawer() {
   const el = document.createElement('div');
   el.innerHTML = `
   <div class="cart-overlay" id="cartOverlay"></div>
-  <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-label="Shopping cart">
+  <aside class="cart-drawer" id="cartDrawer" role="dialog" aria-modal="true" tabindex="-1" aria-label="Shopping cart">
     <div class="cart-head">
       <h3>Your Cart</h3>
       <button class="cart-close" id="cartCloseBtn" aria-label="Close cart">${icon('close')}</button>
@@ -435,7 +441,7 @@ function renderCartDrawer() {
     <div class="cart-items" id="cartItems"></div>
     <div class="cart-foot">
       <div class="cart-subtotal"><span>Subtotal</span><strong id="cartSubtotal">$0.00</strong></div>
-      <p class="cart-note">Shipping &amp; NYC sales tax calculated at checkout.</p>
+      <p class="cart-note">Delivery and sales tax are shown at checkout.</p>
       <a href="/checkout/" class="btn btn-primary btn-block" id="checkoutBtn">Checkout</a>
       <button class="btn btn-ghost btn-block" id="cartContinueBtn">Continue Shopping</button>
     </div>
@@ -458,8 +464,8 @@ function openCart() {
   document.body.classList.add('cart-open');
   renderCartItems();
   document.querySelectorAll('.site-top, main, .site-footer').forEach(el => { el.inert = true; });
-  const close = document.getElementById('cartCloseBtn');
-  if (close) setTimeout(() => close.focus(), 30);
+  const drawer = document.getElementById('cartDrawer');
+  if (drawer) setTimeout(() => drawer.focus({ preventScroll: true }), 30);
 }
 function closeCart() {
   if (!document.body.classList.contains('cart-open')) return;
@@ -670,7 +676,7 @@ function productCard(p) {
       ${p.reviews ? `<div class="pc-rating">★ ${p.rating} <span>(${p.reviews})</span></div>` : ''}
       <div class="pc-prices">
         <span class="pc-price">${money(p.price)}</span>
-        ${p.comparePrice ? `<span class="pc-compare">${money(p.comparePrice)}</span>` : ''}
+        ${COMPARE_PRICES_VERIFIED && p.comparePrice ? `<span class="pc-compare">${money(p.comparePrice)}</span>` : ''}
       </div>
       <p class="pc-line">${p.stock === 0 ? 'Sold out' : escapeHTML(p.short || p.category || '')}</p>
       <button class="btn btn-primary btn-block pc-add" data-id="${escapeHTML(p.id)}" aria-label="${p.stock === 0 ? `${escapeHTML(p.name)} is out of stock` : `Add ${escapeHTML(p.name)} to cart`}" ${p.stock === 0 ? 'disabled' : ''}>

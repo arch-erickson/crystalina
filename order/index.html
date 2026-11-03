@@ -105,7 +105,7 @@
         <div>
           <h3>Delivery</h3>
           <p class="receipt-address">${addressLines(order.address) || 'As given at checkout.'}</p>
-          ${order.installation ? '<p class="receipt-note">Installation by our own team, requested with this order.</p>' : ''}
+          ${order.installation ? '<p class="receipt-note">Fitting by our own team, requested with this order.</p>' : ''}
         </div>
         <dl class="receipt-totals">
           <dt>Subtotal</dt><dd>${money(order.subtotal)}</dd>

@@ -73,7 +73,7 @@
       </div>
       <ul class="trust-list">
         <li class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l8 3v6c0 5-3.5 9.5-8 11-4.5-1.5-8-6-8-11V5l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-4.5"/></svg> Tested against NSF/ANSI standards</li>
-        <li class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1.5" y="6" width="14" height="11" rx="2"/><path d="M15.5 10h4l3 3v4h-7z"/><circle cx="6" cy="19.5" r="1.8"/><circle cx="18" cy="19.5" r="1.8"/></svg> Free delivery in the five boroughs over <span data-ship-threshold>$99</span></li>
+        <li class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1.5" y="6" width="14" height="11" rx="2"/><path d="M15.5 10h4l3 3v4h-7z"/><circle cx="6" cy="19.5" r="1.8"/><circle cx="18" cy="19.5" r="1.8"/></svg> Free delivery over <span data-ship-threshold>$99</span></li>
         <li class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v5h-5"/></svg> One-year warranty and 60-day returns</li>
         <li class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v5h5"/><path d="M5 21V5a2 2 0 0 1 2-2h7l5 5v13a0 0 0 0 1 0 0H5z"/><path d="M9 13h6M9 17h6"/></svg> Fitted by our own team, on request</li>
       </ul>
@@ -102,9 +102,9 @@
       </div>
       <div class="anatomy-inner">
         <div class="anatomy-figure reveal">
-          <span class="anatomy-badge">The flagship</span>
-          <img src="/images/products/h5-600-uv-editorial.webp" alt="The Crystalina flagship reverse osmosis system, photographed against a plain background"
-               onerror="this.onerror=null;this.src=Store.placeholder('Flagship system', 3)">
+          <span class="anatomy-badge">The H5-600</span>
+          <img src="/images/products/h5-600-uv-editorial.webp" alt="The Crystalina H5-600 reverse osmosis system, photographed against a plain background"
+               onerror="this.onerror=null;this.src=Store.placeholder('H5-600', 3)">
         </div>
         <div class="anatomy-stages" id="anatomyStages"></div>
       </div>
@@ -199,7 +199,7 @@
           <li>Sized for apartments, co-ops and brownstones</li>
           <li>Targeted at lead, chloramine, PFAS and microplastics</li>
           <li>Systems for every budget, one standard of care</li>
-          <li>Our own installers, across the five boroughs</li>
+          <li>Fitted by our own team, across the five boroughs</li>
           <li>Replacement filters delivered when they are due</li>
         </ul>
         <a href="/about/" class="btn btn-primary">Our Story</a>
@@ -216,17 +216,14 @@
       </div>
       <div class="testi-grid">
         <div class="testi">
-          <div class="stars" aria-label="Five stars">★★★★★</div>
           <p>"Our building is from 1928 and the tap always had a metallic edge. Two weeks after installing the system, my TDS meter went from 42 to 6. Coffee tastes completely different."</p>
           <div class="who"><div class="avatar">MR</div><div><strong>Maria R.</strong><span>Washington Heights, Manhattan</span></div></div>
         </div>
         <div class="testi">
-          <div class="stars" aria-label="Five stars">★★★★★</div>
           <p>"As a renter I couldn't touch the plumbing. The countertop system took five minutes to set up and I've stopped buying bottled water entirely. Saving about $60 a month."</p>
           <div class="who"><div class="avatar">DT</div><div><strong>Devon T.</strong><span>Bushwick, Brooklyn</span></div></div>
         </div>
         <div class="testi">
-          <div class="stars" aria-label="Five stars">★★★★★</div>
           <p>"Whole-home system in our Bay Ridge brownstone. The installer was on time, tidy, and walked us through filter changes. No more rust-tinted water after main breaks."</p>
           <div class="who"><div class="avatar">SK</div><div><strong>Sandra K.</strong><span>Bay Ridge, Brooklyn</span></div></div>
         </div>
@@ -321,7 +318,7 @@
         <div><h4>${escapeHTML(stage.h)}</h4>${stage.p ? `<p>${escapeHTML(stage.p)}</p>` : ''}</div>
       </div>`).join('') + `
       <div class="anatomy-cta reveal">
-        <span class="anatomy-price">${money(product.price)}${product.comparePrice ? ` <small>${money(product.comparePrice)}</small>` : ''}</span>
+        <span class="anatomy-price">${money(product.price)}${window.COMPARE_PRICES_VERIFIED && product.comparePrice ? ` <small>${money(product.comparePrice)}</small>` : ''}</span>
         <a href="/product/?id=${encodeURIComponent(product.id)}" class="btn btn-primary">${svgIcon('arrowRight')} View the ${escapeHTML(product.modelCode || product.name)}</a>
         ${product.stock > 0 ? `<button class="btn btn-outline anatomy-add" data-id="${escapeHTML(product.id)}">Add to Cart</button>` : ''}
       </div>`;
