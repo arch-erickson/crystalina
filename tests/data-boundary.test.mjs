@@ -302,6 +302,37 @@ test('nothing a visitor can read says it is unfinished', () => {
   }
 });
 
+test('signing out ends the Supabase session, not just the local copy', () => {
+  /* Store.signOut() removes one localStorage key. On its own it leaves
+     the Supabase refresh token in the browser under its own key, so the
+     session is still live and the next person to open the site is signed
+     in as whoever just pressed Sign out. The account page did exactly
+     that until 2026-11-03.
+
+     So: anywhere that clears the local key must also end the real
+     session. The pairing is what this checks, not the wording. */
+  const files = [
+    ...readdirSync(join(ROOT, 'js')).filter((f) => f.endsWith('.js'))
+      .map((f) => join(ROOT, 'js', f)),
+    ...readdirSync(ROOT, { withFileTypes: true })
+      .filter((e) => e.isDirectory() && !e.name.startsWith('.'))
+      .map((e) => join(ROOT, e.name, 'index.html'))
+      .filter((f) => existsSync(f)),
+  ];
+
+  let checked = 0;
+  for (const file of files) {
+    const src = readFileSync(file, 'utf8');
+    if (!src.includes('Store.signOut()')) continue;
+    checked += 1;
+    assert.match(src, /CrystalinaAuth/,
+      `${file} clears the local session without reaching the real one`);
+    assert.match(src, /\.signOut\(\)/,
+      `${file} must end the Supabase session too`);
+  }
+  assert.ok(checked >= 5, `every sign-out should be checked, found ${checked}`);
+});
+
 test('the forbidden list still covers everything that leaked', () => {
   const build = readFileSync(join(ROOT, 'scripts', 'build-site.mjs'), 'utf8');
   const forbidden = build.slice(build.indexOf('const FORBIDDEN'), build.indexOf('const walk'));
