@@ -56,6 +56,12 @@ function shortOf(key) {
 const CHECK = process.argv.includes('--check');
 let WRITE = true;
 
+/* A checkout on Windows rewrites every line ending, and the generator
+   always writes LF, so a byte comparison reports every drawing as stale
+   the moment someone clones the repository. The comparison is about
+   content, so it is made on content. */
+const lf = (s) => String(s).split('\r\n').join('\n');
+
 const written = [];
 const drift = [];
 
@@ -69,7 +75,7 @@ function emit(name, { w, h, title, desc, body, caption }) {
   const file = join(OUT, name);
   if (CHECK) {
     const old = existsSync(file) ? readFileSync(file, 'utf8') : '';
-    if (old !== svg) drift.push(name);
+    if (lf(old) !== lf(svg)) drift.push(name);
   } else if (WRITE) {
     writeFileSync(file, svg);
   }
@@ -1223,7 +1229,7 @@ ${items}
   const file = join(OUT, 'index.html');
   if (CHECK) {
     const old = existsSync(file) ? readFileSync(file, 'utf8') : '';
-    if (old !== html) drift.push('index.html');
+    if (lf(old) !== lf(html)) drift.push('index.html');
   } else if (WRITE) {
     writeFileSync(file, html);
   }

@@ -533,12 +533,15 @@ const outputs = [
   ['blueprint.artifact.html', artifact],
   ['blueprint.md', md],
 ];
+/* See the note in scripts/diagrams.mjs: the comparison is about content,
+   and a checkout on Windows changes every line ending. */
+const lf = (s) => String(s).split('\r\n').join('\n');
 const stale = [];
 for (const [name, body] of outputs) {
   const file = join(DOCS, name);
   if (CHECK) {
     const old = existsSync(file) ? readFileSync(file, 'utf8') : '';
-    if (old !== body) stale.push(name);
+    if (lf(old) !== lf(body)) stale.push(name);
   } else {
     writeFileSync(file, body);
     console.log(`wrote   docs/${name}`);
