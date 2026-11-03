@@ -49,6 +49,27 @@ exclude:
   - README.md
   - design-qa.md
 
+  # Written, not yet approved.
+  #
+  # The owner's decision is that the three legal pages stay unpublished
+  # until he has read the wording, which is partly a legal question and
+  # entirely his. The Worker honours it by not naming them in the
+  # allow-list in scripts/build-site.mjs. Pages did not: it publishes the
+  # repository root, so all three answered 200 at their own addresses on
+  # 2026-11-03, unlinked but crawlable, with robots.txt saying Allow: /
+  # and no noindex on any of them. Unlinked is not unpublished, and terms
+  # a business has not approved are still terms it is read as offering.
+  #
+  # They are not in sitemap.xml, so excluding them costs nothing in
+  # Search Console.
+  #
+  # The day he approves them: delete these three lines and add the three
+  # paths to the PUBLISH list in scripts/build-site.mjs. Both, or they go
+  # live on one host and not the other.
+  - privacy/
+  - terms/
+  - shipping-returns/
+
   # Build and deploy configuration.
   - package.json
   - package-lock.json
