@@ -155,8 +155,29 @@ html[data-js] .np>h3{display:flex;font-size:.78rem;font-weight:600;margin:0}
 html[data-js] .np>h3 .st{font-size:.56rem}
 html[data-js] .np:hover{background:var(--tile);border-left-color:var(--blue)}
 
-/* --- the drawer ----------------------------------------------------- */
-.np-drawer{position:fixed;z-index:1200;right:0;top:0;bottom:0;width:min(420px,92vw);background:#fff;border-left:1px solid var(--line);box-shadow:-14px 0 40px rgba(15,23,42,.1);display:flex;flex-direction:column}
+/* --- the bubble ----------------------------------------------------- *
+   Positioned in the document next to the card that opened it, not pinned
+   to the edge of the window. A side panel had to push the page over to
+   make room, which moved the card out from under the cursor the moment
+   it was clicked. Nothing reflows now.
+
+   Translucent, so the drawing stays visible behind it and you can see
+   what you are reading about. The blur is what keeps the text legible
+   over a busy diagram; where it is unsupported the background is still
+   opaque enough to read against.                                        */
+.np-drawer{
+  position:absolute;z-index:1200;
+  width:min(390px,calc(100vw - 32px));
+  background:rgba(255,255,255,.90);
+  -webkit-backdrop-filter:saturate(180%) blur(16px);
+  backdrop-filter:saturate(180%) blur(16px);
+  border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 20px 50px rgba(15,23,42,.20),0 2px 6px rgba(15,23,42,.06);
+  display:flex;flex-direction:column;overflow:hidden
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .np-drawer{background:rgba(255,255,255,.98)}
+}
 .np-drawer[hidden]{display:none}
 .np-top{display:flex;align-items:center;gap:.4rem;padding:.6rem .7rem;border-bottom:1px solid var(--line-soft);background:var(--wash)}
 .np-top .np-trail{font-size:.68rem;color:var(--ink-3);margin-right:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -173,13 +194,16 @@ html[data-js] .np-scroll .np>h3 .st{font-size:.63rem}
 .np-dep li{display:flex;gap:.4rem;align-items:baseline;justify-content:space-between}
 .dg-btn[hidden]{display:none}
 
-/* With the drawer open on a wide screen the page makes room for it, so a
-   drawing and its detail can be read at the same time. */
-@media (min-width:1100px){
-  html[data-np-open] .shell{padding-right:420px}
-}
+/* The page never moves. There is deliberately no rule here that reflows
+   the layout when a bubble opens: that was the whole bug. */
+.np-scroll{max-height:min(58vh,480px)}
+
+/* On a phone there is nowhere sensible to anchor a bubble, so it becomes
+   a sheet at the bottom. Fixed, because it should stay put while the
+   drawing behind it is scrolled. */
 @media (max-width:760px){
-  .np-drawer{right:0;left:0;top:auto;height:min(66vh,560px);width:auto;border-left:0;border-top:1px solid var(--line);box-shadow:0 -14px 40px rgba(15,23,42,.14)}
+  .np-drawer{position:fixed;left:12px;right:12px;bottom:12px;top:auto!important;width:auto;border-radius:16px}
+  .np-scroll{max-height:min(62vh,460px)}
 }
 
 /* --- full screen ---------------------------------------------------- */
@@ -2894,8 +2918,47 @@ body.dg-lock{overflow:hidden}
     drawer.hidden = false;
     root.setAttribute('data-np-open','');
     scroll.scrollTop = 0;
+    place();
     paint(k);
     if (keepFocus) scroll.focus();
+  }
+
+  /* Put the bubble beside the card that opened it: to the right if there
+     is room, otherwise to the left, otherwise wherever it fits. Document
+     coordinates, so it travels with the page rather than floating over
+     whatever happens to scroll past. */
+  function place() {
+    if (!drawer || drawer.hidden) return;
+    if (window.matchMedia('(max-width:760px)').matches) {
+      drawer.style.left = '';
+      drawer.style.top = '';
+      return;
+    }
+    var anchor = opener && document.contains(opener) ? opener : null;
+    if (!anchor) return;
+
+    var r = anchor.getBoundingClientRect();
+    var sx = window.pageXOffset || document.documentElement.scrollLeft;
+    var sy = window.pageYOffset || document.documentElement.scrollTop;
+    var vw = document.documentElement.clientWidth;
+    var vh = document.documentElement.clientHeight;
+    var w = drawer.offsetWidth;
+    var h = drawer.offsetHeight;
+    var gap = 14;
+    var edge = 12;
+
+    var left = r.right + gap;
+    if (left + w > vw - edge) left = r.left - w - gap;
+    if (left < edge) left = Math.max(edge, Math.min(r.left, vw - w - edge));
+
+    /* Line the top up with the card, then pull it back inside the window
+       if that would run it off the bottom. */
+    var top = r.top;
+    if (top + h > vh - edge) top = vh - h - edge;
+    if (top < edge) top = edge;
+
+    drawer.style.left = (left + sx) + 'px';
+    drawer.style.top = (top + sy) + 'px';
   }
 
   function close(restore) {
@@ -2957,7 +3020,12 @@ body.dg-lock{overflow:hidden}
       return;
     }
     var svg = e.target.closest('svg.fx');
-    if (!svg) return;
+    if (!svg) {
+      /* Anywhere else on the page dismisses it, except inside the bubble
+         itself, where the links and the Back button live. */
+      if (drawer && !drawer.hidden && !drawer.contains(e.target)) close(false);
+      return;
+    }
     if (stage && stage.contains(svg) && stage.dataset.moved === '1') return;
     var g = hit(e);
     if (!g) { close(false); return; }
@@ -2966,6 +3034,9 @@ body.dg-lock{overflow:hidden}
     if (k === current) { close(false); return; }
     show(k, false);
   });
+  /* The anchor moves when the window does, so the bubble has to follow. */
+  window.addEventListener('resize', function () { place(); });
+
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && drawer && !drawer.hidden && (!full || full.hidden)) {
       close(true);
