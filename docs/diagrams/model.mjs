@@ -1681,11 +1681,11 @@ export const decisions = [
 
 export const unknowns = [
   {
-    id: 'U1', status: 'Missing', icon: 'lock', family: 'violet',
+    id: 'U1', status: 'Partial', icon: 'lock', family: 'violet',
     question: 'Does opening /admin/ as an ordinary customer expose anything at all?',
-    why: 'Row level security should mean the page renders and every query returns nothing. Should is not a result. Until someone signs in as a customer and looks, the gate is an assumption.',
-    how: 'Create a customer account on a preview, open each of the five private pages, and read the network tab as well as the screen.',
-    owner: 'Claude Code',
+    why: 'Answered in part on 2026-11-03, mechanically: tests/data-boundary.test.mjs reads every migration and fails the build if any of the 28 tables lacks row level security, if a security definer function that writes neither checks a role nor auth.uid() nor is revoked from anon and authenticated, or if user_roles can be written by anyone but an admin. Nothing can hand itself a role, so the browser-side gate is weak rather than decorative: it reads the real table through RLS and the claim cannot be forged. What the shell shows without a role is markup and empty queries.',
+    how: 'What remains is a product decision for the owner, not a test: does a readable dashboard shell matter? If it does, the fix is Cloudflare Access in front of /admin/, /manager/, /sales/ and /technician/, which is owner configuration and belongs with P5.',
+    owner: 'Erickson',
     blocks: ['phase:P4', 'phase:P6', 'finding:F4'],
     rel: ['risk:R4', 'threat:gate'],
   },

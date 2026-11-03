@@ -2628,16 +2628,16 @@ Four weights carry every component on the site, and the whole rule is one commen
 
 ### Unknowns
 
-#### U1 · Does opening /admin/ as an ordinary customer expose anything at all? · Missing
+#### U1 · Does opening /admin/ as an ordinary customer expose anything at all? · Partial
 
-_Unknown · Owner: Claude Code._
+_Unknown · Owner: Erickson._
 
-Row level security should mean the page renders and every query returns nothing. Should is not a result. Until someone signs in as a customer and looks, the gate is an assumption.
+Answered in part on 2026-11-03, mechanically: tests/data-boundary.test.mjs reads every migration and fails the build if any of the 28 tables lacks row level security, if a security definer function that writes neither checks a role nor auth.uid() nor is revoked from anon and authenticated, or if user_roles can be written by anyone but an admin. Nothing can hand itself a role, so the browser-side gate is weak rather than decorative: it reads the real table through RLS and the claim cannot be forged. What the shell shows without a role is markup and empty queries.
 
 - **Blocks.** P4 · Finish the auth migration; P6 · Security hardening; The gate in front of every private page is localStorage
 - **See also.** Every private page gated in the browser only; A customer opening a staff page; Staff browser; Signing in, and what a role is allowed to do
-- **How to resolve it.** Create a customer account on a preview, open each of the five private pages, and read the network tab as well as the screen.
-- **Owner.** Claude Code
+- **How to resolve it.** What remains is a product decision for the owner, not a test: does a readable dashboard shell matter? If it does, the fix is Cloudflare Access in front of /admin/, /manager/, /sales/ and /technician/, which is owner configuration and belongs with P5.
+- **Owner.** Erickson
 
 #### U2 · Are the NYC water figures on /nyc-water/ defensible? · Missing
 
