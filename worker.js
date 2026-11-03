@@ -18,6 +18,7 @@ import { toPagesFunction } from './functions/_shim.js';
 import contact from './api/contact.mjs';
 import newsletter from './api/newsletter.mjs';
 import createOrder from './api/orders/create.mjs';
+import orderStatus from './api/orders/status.mjs';
 import checkoutSession from './api/checkout/session.mjs';
 import stripeWebhook from './api/stripe/webhook.mjs';
 import health from './api/health.mjs';
@@ -27,6 +28,9 @@ const ROUTES = new Map([
   ['/api/contact', toPagesFunction(contact)],
   ['/api/newsletter', toPagesFunction(newsletter)],
   ['/api/orders/create', toPagesFunction(createOrder)],
+  /* Staff only, and the check is inside advance_order rather than here:
+     it runs as the signed-in person, so has_role decides. */
+  ['/api/orders/status', toPagesFunction(orderStatus)],
   ['/api/checkout/session', toPagesFunction(checkoutSession)],
   /* Stripe calls this one, not a browser. It verifies a signature rather
      than a session, so it is deliberately outside everything that

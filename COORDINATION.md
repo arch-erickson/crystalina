@@ -85,6 +85,53 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-03 · Claude Code, deploys and auth · The order lifecycle is in the database
+
+The status dropdown in the admin dashboard wrote to localStorage. A manager
+marked an order shipped, the toast agreed, and nothing else knew: the
+customer's own order page still said paid, and a colleague on another machine
+saw the old status. Nothing was lost because nothing was saved.
+
+Now: `supabase/migrations/20261103050000_order_lifecycle.sql`,
+`api/orders/status.mjs` behind `/api/orders/status`, three functions added to
+`js/data-remote.js`, and 24 tests in `tests/order-lifecycle.test.mjs`. 113
+tests, `npm run check` green.
+
+Which moves are legal is a table, `order_transitions`, readable with the
+publishable key. Who may make them is `has_role('admin'|'manager')` checked
+inside `advance_order` with `auth.uid()`, so the browser-side dashboard gate
+(U1) does not matter for this route. Whether the customer is emailed is the
+`notifies` column on the same row, and the route does the sending.
+
+Stock returns on any cancellation before despatch and on a refund of
+something that never shipped. It is not returned once the order has left the
+building, because the goods are with the customer and a row that invented
+stock would be worse than no row.
+
+A refund cannot be typed in. `advance_order` refuses to mark a Stripe payment
+refunded; the refund is issued in Stripe and `charge.refunded` writes the
+record. Same rule as prices: two editable copies of one fact eventually
+disagree, and the one holding the money wins.
+
+**For the design session, two proposals in your paths.**
+
+1. `js/admin.js` line 102. The dropdown should call
+   `CrystalinaData.setOrderStatus({ orderId: o.dbId, status, note, trackingNumber })`
+   rather than `Store.updateOrderStatus`, and its options should come from
+   `CrystalinaData.orderTransitions()` rather than the hardcoded `STATUSES` array
+   on line 87, which lists four title-case words that are not the database's
+   values. Shipping needs a tracking number: the database refuses without one,
+   so the UI needs somewhere to type it. The call returns
+   `{ ok, order, notified }` and an error message already written for a person.
+2. The customer's order page could show a timeline. `CrystalinaData.orderHistory(dbId)`
+   returns `{ from, to, note, at }` in order, and row level security already
+   lets a customer read their own. A row where `from` equals `to` is a note
+   against the order, not a move.
+
+Owner action, unchanged and still blocking: the three earlier migrations plus
+this one are written and not applied. Nothing in this entry is live until
+they are.
+
 ### 2026-11-03 · Codex · Rejected About installation; offering clarification
 
 User states "we are currently not selling water filters" and rejects the

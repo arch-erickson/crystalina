@@ -169,6 +169,70 @@ window.CrystalinaData = (() => {
   }
 
   /* ---------------------------------------------------------------
+     The life of an order after it is paid.
+
+     The dashboard's status dropdown used to write to localStorage, so a
+     manager marked an order shipped and only that browser ever knew.
+     These three go to the database instead.
+
+     Which moves are legal is a table, order_transitions, read with the
+     publishable key. The dropdown is built from the same rows the
+     database enforces, so the two cannot drift apart.
+     --------------------------------------------------------------- */
+
+  /* Move an order, and let the customer know where the transition says to.
+     /api checks the role inside advance_order, as the signed-in person. */
+  async function setOrderStatus({ orderId, status, note, trackingNumber }) {
+    const supabase = await SB.client();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return { ok: false, error: 'Sign in as staff to manage orders.' };
+    let body = {};
+    try {
+      const res = await fetch('/api/orders/status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ orderId, status, note, trackingNumber })
+      });
+      body = await res.json().catch(() => ({}));
+      if (!res.ok) return { ok: false, error: body.error || 'We could not change that order. Please try again.' };
+    } catch {
+      return { ok: false, error: 'We could not reach the server. Check the connection and try again.' };
+    }
+    return { ok: true, order: body.order, notified: body.notified === true };
+  }
+
+  /* Where an order may go from where it is now. Returns a Map from status
+     to the statuses reachable from it. */
+  async function orderTransitions() {
+    const rows = await SB.restGet('order_transitions?select=from_status,to_status,notifies');
+    const map = new Map();
+    for (const row of rows || []) {
+      if (!map.has(row.from_status)) map.set(row.from_status, []);
+      map.get(row.from_status).push(row.to_status);
+    }
+    return map;
+  }
+
+  /* The trail. Readable by the customer for their own order, which is what
+     a timeline on the order page is made of, and by staff for any order. */
+  async function orderHistory(orderId) {
+    if (!orderId) return [];
+    const supabase = await SB.client();
+    const { data, error } = await supabase
+      .from('order_events')
+      .select('from_status, to_status, note, created_at')
+      .eq('order_id', orderId)
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    return (data || []).map(row => ({
+      from: row.from_status, to: row.to_status, note: row.note, at: row.created_at
+    }));
+  }
+
+  /* ---------------------------------------------------------------
      Site content. Everything the admin edits in "Content & Website"
      lives in the site_content table so real visitors see it. Public
      read is open; only admin and manager roles may write.
@@ -302,5 +366,6 @@ window.CrystalinaData = (() => {
   const removeStageOption = id => rpc('delete_stage_option', { p_id: id });
 
   return { loadProducts, myOrders, myOrder, createOrder, mapRow, loadShippingPolicy, loadSiteContent, saveSiteContent, uploadImage,
+           setOrderStatus, orderTransitions, orderHistory,
            saveProduct, removeProduct, saveStageOption, removeStageOption };
 })();
