@@ -19,6 +19,8 @@
 import { json, methodGuard } from '../_lib/http.mjs';
 import { verifyWebhook } from '../_lib/stripe.mjs';
 import { admin } from '../_lib/supabase.mjs';
+import { sendEmail } from '../_lib/email.mjs';
+import { confirmationEmail } from '../_lib/receipt.mjs';
 
 /* The raw bytes, exactly as sent. Reparsing and re-serialising would
    change the signed payload and every signature would fail. */
@@ -36,6 +38,43 @@ async function rawBody(req) {
 
 async function callRpc(fn, args) {
   return admin(`rpc/${fn}`, { method: 'POST', body: args });
+}
+
+/* Mark it paid, and if this delivery is the one that moved it, say thank
+ * you. The order exists before the money does on this path, so the
+ * confirmation belongs here rather than at checkout: a customer who
+ * abandons the payment page has an order in the database and must not be
+ * thanked for it.
+ *
+ * mark_order_paid returns false for a redelivered event, which is also
+ * what stops a second email. The send is wrapped because a refused email
+ * must not turn into a 500: Stripe would retry, mark_order_paid would
+ * answer false, and the email would never be sent at all. A failure here
+ * is logged and the payment still stands.
+ */
+async function markPaidAndThank(event, object, sessionId) {
+  const moved = await callRpc('mark_order_paid', {
+    p_event_id: event.id,
+    p_event_type: event.type,
+    p_session_id: sessionId,
+    p_payment_intent: typeof object.payment_intent === 'string' ? object.payment_intent : null,
+  });
+
+  if (moved !== true) return { applied: false, thanked: false };
+
+  let thanked = false;
+  try {
+    const order = await callRpc('order_receipt', { p_session_id: sessionId });
+    if (order && order.email) {
+      await sendEmail({ to: order.email, ...confirmationEmail(order) });
+      thanked = true;
+    } else {
+      console.error('[stripe] no address to confirm order on session', sessionId);
+    }
+  } catch (error) {
+    console.error('[stripe] confirmation email failed for session', sessionId, error);
+  }
+  return { applied: true, thanked };
 }
 
 export default async function handler(req, res) {
@@ -73,13 +112,8 @@ export default async function handler(req, res) {
         if (object.payment_status && object.payment_status !== 'paid') {
           return json(res, 200, { received: true, ignored: 'awaiting payment' });
         }
-        const moved = await callRpc('mark_order_paid', {
-          p_event_id: event.id,
-          p_event_type: event.type,
-          p_session_id: sessionId,
-          p_payment_intent: typeof object.payment_intent === 'string' ? object.payment_intent : null,
-        });
-        return json(res, 200, { received: true, applied: moved === true });
+        const outcome = await markPaidAndThank(event, object, sessionId);
+        return json(res, 200, { received: true, ...outcome });
       }
 
       case 'checkout.session.expired':
@@ -93,13 +127,8 @@ export default async function handler(req, res) {
       }
 
       case 'checkout.session.async_payment_succeeded': {
-        const moved = await callRpc('mark_order_paid', {
-          p_event_id: event.id,
-          p_event_type: event.type,
-          p_session_id: sessionId,
-          p_payment_intent: typeof object.payment_intent === 'string' ? object.payment_intent : null,
-        });
-        return json(res, 200, { received: true, applied: moved === true });
+        const outcome = await markPaidAndThank(event, object, sessionId);
+        return json(res, 200, { received: true, ...outcome });
       }
 
       case 'charge.refunded': {

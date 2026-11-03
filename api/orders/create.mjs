@@ -20,7 +20,8 @@
 import { json, methodGuard, readJson, clientIp, rateLimit, durableRateLimit, cleanText } from '../_lib/http.mjs';
 import { verifyTurnstile } from '../_lib/turnstile.mjs';
 import { userFromToken, rpcAsUser } from '../_lib/supabase.mjs';
-import { sendEmail, esc } from '../_lib/email.mjs';
+import { sendEmail } from '../_lib/email.mjs';
+import { confirmationEmail } from '../_lib/receipt.mjs';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -100,14 +101,18 @@ export default async function handler(req, res) {
     });
   }
 
-  const total = (order.total_cents / 100).toFixed(2);
+  /* The same confirmation the Stripe path sends, from api/_lib/receipt.mjs.
+     Two copies of this email would drift, and the one that drifts is
+     always the one nobody is looking at. */
   try {
     await sendEmail({
       to: shippingAddress.email || user.email,
-      subject: `Crystalina order CW-${order.order_number} confirmed`,
-      html: `<h2>Thank you, ${esc(shippingAddress.name)}</h2>
-        <p>Order <strong>CW-${esc(order.order_number)}</strong> is confirmed. Total $${esc(total)}.</p>
-        <p>We will email tracking as soon as it ships. Questions? Reply here or WhatsApp (917) 809-4803.</p>`
+      ...confirmationEmail({
+        number: order.order_number,
+        name: shippingAddress.name,
+        totalCents: order.total_cents,
+        installation: Boolean(body.installationRequested),
+      }),
     });
   } catch (error) {
     console.error('[orders] confirmation email failed', error);
