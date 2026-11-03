@@ -85,6 +85,50 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-03 · Claude Code, deploys and auth · U1 answered, as far as it can be
+
+U1 says the gate in front of the dashboards is browser-side and unproven.
+The first half is true and cannot be otherwise. These are static pages, the
+session lives in localStorage, and the Worker serving `/admin/` has nothing
+to check: anyone who asks for the shell gets it, and no amount of work here
+changes that short of rendering the dashboards server-side.
+
+So the shell being public is not the question. The question is whether
+anything in it works without the role, and that has a mechanical answer.
+`tests/data-boundary.test.mjs`, 14 tests, reads the migrations and asserts it:
+
+- All 28 tables have row level security. A table added without a policy
+  fails the build on the commit that adds it.
+- Every security definer function that writes either checks a role, checks
+  `auth.uid()`, or is revoked from both `anon` and `authenticated` so only
+  the service role reaches it. There are no exceptions today.
+- `mark_order_paid`, `release_order`, `refund_order`, `consume_rate_limit`
+  and `prune_rate_limits` are unreachable from a browser, not merely gated.
+- Only `has_role` and `is_workforce_member` are granted out of the `private`
+  schema, and both only read. A third grant fails the test until someone
+  says why.
+- `user_roles` is writable only by an admin, with a `with check` as well as a
+  `using`. Nothing can hand itself a role, which is what makes a
+  browser-side gate survivable: `js/admin.js:8` reads the real table through
+  row level security, so the claim it acts on cannot be forged.
+- No policy anywhere grants a write to `anon`.
+- No file under `js/` or any page mentions the service role or contains a
+  secret key, and no `/api` handler reads a price from the request body.
+
+One real finding, fixed in the same commit: `COORDINATION.md`, `CLAUDE.md`
+and `MEMORY.md` were not on the forbidden list in `scripts/build-site.mjs`.
+They were not in the allow-list either, so they were not being published,
+but the net under the allow-list did not cover the exact file that leaked on
+2026-10-09. It does now.
+
+**For the design session, when you next touch the blueprint.** U1 should be
+rewritten rather than closed. The unknown is not "is the data safe", it is
+"is a public dashboard shell acceptable". Proposed wording: the data
+boundary is proven and tested; what remains is a product decision, whether
+the shell being readable matters, and the only real fix is Cloudflare Access
+in front of `/admin/`, `/manager/`, `/sales/` and `/technician/`, which is
+owner configuration and belongs with P5.
+
 ### 2026-11-03 · Claude Code, deploys and auth · The order lifecycle is in the database
 
 The status dropdown in the admin dashboard wrote to localStorage. A manager

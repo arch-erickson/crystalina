@@ -74,6 +74,10 @@ const FORBIDDEN = [
   /\.sql$/i,
   /\.test\.c?[jm]?js$/i,
   /(^|[\\/])(CODEX_\w+|LAUNCH_CHECKLIST|DEPLOY_STEPS|IMAGE_PROMPTS|design-qa)\.md$/i,
+  /* How we work and what is not built yet. On 2026-10-09 the live host was
+     serving COORDINATION.md to anyone who asked, which is a list of every
+     open weakness with the file names. */
+  /(^|[\\/])(COORDINATION|CLAUDE|MEMORY)\.md$/i,
   /(^|[\\/])package(-lock)?\.json$/i,
   /(^|[\\/])wrangler\.toml$/i,
 ];
