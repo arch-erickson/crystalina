@@ -141,3 +141,27 @@ Read `COORDINATION.md` before you start, take the claims table seriously
 because another session may be in the same file, `git pull` before you start
 and before each push, and keep commits small and clearly described. Amend
 the blueprint in the same commit as the change it describes.
+
+## Pushing goes straight to the live site
+
+**Owner's instruction, 2026-11-03, until he says otherwise: commit and push
+to `main` directly. Do not open a pull request and do not wait to be told
+to push.** Cloudflare builds every push to `main` and the Worker serves it,
+so a push is a deploy. He does not want to approve them one at a time.
+
+That removes the only thing standing between a mistake and a customer, so
+the checks have to carry the weight instead:
+
+- **`npm run check` passes before every push.** Tests, the publish
+  allow-list, and both drift checks. No exceptions, including for a change
+  that "only touches documentation".
+- **Serve it and look at the page** you changed, at desktop and phone
+  width, before pushing. On 2026-11-03 a blank shop page reached the live
+  site because a stale `main.js` was cached and nobody loaded `/shop/`
+  after the deploy.
+- **Push small.** A push that does one thing can be reverted in one
+  command; a push that does nine cannot.
+- **If you break the live site, say so and fix it forward.** Rolling back
+  is promoting the previous deployment in the Cloudflare dashboard, which
+  only the owner can do, so a fix you can push beats a rollback you have
+  to ask for.
