@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   if (!methodGuard(req, res)) return;
   const ip = clientIp(req);
   if (!(await durableRateLimit(`contact:${ip}`, { limit: 5, windowMs: 10 * 60000 })).allowed) {
-    return json(res, 429, { error: 'Too many messages. Please try again shortly.' });
+    return json(res, 429, { error: 'That is a lot of messages at once. Wait a minute, or call us.' });
   }
 
   let body;
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('[contact] store failed', error);
-    return json(res, 500, { error: 'We could not save your message. Please call or WhatsApp us.' });
+    return json(res, 500, { error: 'Your message did not send. Call or WhatsApp us and we will take it that way.' });
   }
 
   try {

@@ -25,11 +25,11 @@ export default async function handler(req, res) {
 
   const ip = clientIp(req);
   if (!(await durableRateLimit(`checkout:${ip}`, { limit: 10, windowMs: 10 * 60000 })).allowed) {
-    return json(res, 429, { error: 'Too many attempts. Please try again shortly.' });
+    return json(res, 429, { error: 'Too many attempts in a short time. Wait a minute and try again.' });
   }
 
   const user = await userFromToken(req.headers.authorization);
-  if (!user) return json(res, 401, { error: 'Please sign in to check out.' });
+  if (!user) return json(res, 401, { error: 'Sign in to check out.' });
 
   let body;
   try { body = await readJson(req); }
@@ -40,24 +40,24 @@ export default async function handler(req, res) {
 
   /* Ids and quantities only. Anything resembling a price is not read. */
   const items = Array.isArray(body.items) ? body.items : [];
-  if (!items.length) return json(res, 400, { error: 'Your cart is empty.' });
-  if (items.length > 50) return json(res, 400, { error: 'Too many items in one order.' });
+  if (!items.length) return json(res, 400, { error: 'Your cart is empty. Add a system to check out.' });
+  if (items.length > 50) return json(res, 400, { error: 'That is more than one order can hold. Split it into two, or call us and we will take it by phone.' });
 
   const cleanItems = [];
   for (const item of items) {
     const productId = String(item?.productId || '');
     const quantity = Number(item?.quantity);
-    if (!UUID_RE.test(productId)) return json(res, 400, { error: 'Unrecognized product in cart.' });
+    if (!UUID_RE.test(productId)) return json(res, 400, { error: 'One item in your cart is no longer available. Refresh the page and try again.' });
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
-      return json(res, 400, { error: 'Invalid quantity.' });
+      return json(res, 400, { error: 'Choose a quantity of one or more.' });
     }
     const line = { productId, quantity };
     if (item?.stageOptionId) {
-      if (!UUID_RE.test(String(item.stageOptionId))) return json(res, 400, { error: 'Unrecognized configuration.' });
+      if (!UUID_RE.test(String(item.stageOptionId))) return json(res, 400, { error: 'That option is no longer available for this system. Refresh the page and choose again.' });
       line.stageOptionId = String(item.stageOptionId);
     }
     if (item?.faucetId) {
-      if (!UUID_RE.test(String(item.faucetId))) return json(res, 400, { error: 'Unrecognized faucet.' });
+      if (!UUID_RE.test(String(item.faucetId))) return json(res, 400, { error: 'That faucet is no longer available. Refresh the page and choose again.' });
       line.faucetId = String(item.faucetId);
     }
     cleanItems.push(line);
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     line1: cleanText(a.line1, 200), borough: cleanText(a.borough, 60), zip: cleanText(a.zip, 12),
   };
   if (!shippingAddress.name || !shippingAddress.line1 || !shippingAddress.zip) {
-    return json(res, 400, { error: 'A delivery name, address and ZIP code are required.' });
+    return json(res, 400, { error: 'Add a name, a street address and a ZIP code for delivery.' });
   }
 
   /* 1. The database prices it and holds the stock. */
@@ -86,7 +86,7 @@ export default async function handler(req, res) {
     const shopperFacing = /insufficient stock|unavailable|quantity/i.test(detail);
     console.error('[checkout] create_order failed', error);
     return json(res, shopperFacing ? 409 : 500, {
-      error: shopperFacing ? detail : 'We could not start that checkout. Please try again.',
+      error: shopperFacing ? detail : 'Checkout did not start. Please try again, or call us.',
     });
   }
 
@@ -119,7 +119,7 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('[checkout] stripe session failed', error);
-    return json(res, 502, { error: 'We could not reach the payment provider. Please try again.' });
+    return json(res, 502, { error: 'The payment service did not answer. Nothing was charged. Please try again.' });
   }
 
   /* 3. Remember which session belongs to this order, so the webhook can

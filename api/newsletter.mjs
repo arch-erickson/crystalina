@@ -7,7 +7,7 @@ export default async function handler(req, res) {
   if (!methodGuard(req, res)) return;
   const ip = clientIp(req);
   if (!(await durableRateLimit(`news:${ip}`, { limit: 8, windowMs: 10 * 60000 })).allowed) {
-    return json(res, 429, { error: 'Too many attempts. Please try again shortly.' });
+    return json(res, 429, { error: 'Too many attempts in a short time. Wait a minute and try again.' });
   }
 
   let body;
@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('[newsletter] store failed', error);
-    return json(res, 500, { error: 'We could not add you just now. Please try again.' });
+    return json(res, 500, { error: 'We could not add you just now. Please try again in a moment.' });
   }
   return json(res, 200, { ok: true });
 }

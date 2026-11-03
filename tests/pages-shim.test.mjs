@@ -90,3 +90,14 @@ test('invalid JSON is rejected by the handler, not by the shim', async () => {
   const res = await call(contact, post('{not json'));
   assert.equal(res.status, 400);
 });
+
+test('the query string reaches the handler', async () => {
+  /* A Node req.url carries path and query. Giving only the path drops
+     every parameter, and a handler that reads one cannot tell: it just
+     sees undefined. /api/health?key= was built on this and silently
+     refused its own key until the shim was fixed. */
+  let seen = null;
+  const handler = async (req, res) => { seen = req.url; res.status(200).send(''); };
+  await call(handler, new Request('https://crystalina.org/api/health?key=abc&x=1'));
+  assert.equal(seen, '/api/health?key=abc&x=1');
+});

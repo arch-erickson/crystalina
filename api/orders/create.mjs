@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   if (!methodGuard(req, res)) return;
   const ip = clientIp(req);
   if (!(await durableRateLimit(`order:${ip}`, { limit: 10, windowMs: 10 * 60000 })).allowed) {
-    return json(res, 429, { error: 'Too many attempts. Please try again shortly.' });
+    return json(res, 429, { error: 'Too many attempts in a short time. Wait a minute and try again.' });
   }
 
   const user = await userFromToken(req.headers.authorization);
@@ -27,25 +27,25 @@ export default async function handler(req, res) {
   if (!captcha.ok) return json(res, 400, { error: captcha.error });
 
   const items = Array.isArray(body.items) ? body.items : [];
-  if (!items.length) return json(res, 400, { error: 'Your cart is empty.' });
-  if (items.length > 50) return json(res, 400, { error: 'Too many items in one order.' });
+  if (!items.length) return json(res, 400, { error: 'Your cart is empty. Add a system to check out.' });
+  if (items.length > 50) return json(res, 400, { error: 'That is more than one order can hold. Split it into two, or call us and we will take it by phone.' });
 
   const cleanItems = [];
   for (const item of items) {
     const productId = String(item?.productId || '');
     const quantity = Number(item?.quantity);
-    if (!UUID_RE.test(productId)) return json(res, 400, { error: 'Unrecognized product in cart.' });
+    if (!UUID_RE.test(productId)) return json(res, 400, { error: 'One item in your cart is no longer available. Refresh the page and try again.' });
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) {
-      return json(res, 400, { error: 'Invalid quantity.' });
+      return json(res, 400, { error: 'Choose a quantity of one or more.' });
     }
     // Optional configuration. Ids only: the database recomputes every price.
     const line = { productId, quantity };
     if (item?.stageOptionId) {
-      if (!UUID_RE.test(String(item.stageOptionId))) return json(res, 400, { error: 'Unrecognized configuration.' });
+      if (!UUID_RE.test(String(item.stageOptionId))) return json(res, 400, { error: 'That option is no longer available for this system. Refresh the page and choose again.' });
       line.stageOptionId = String(item.stageOptionId);
     }
     if (item?.faucetId) {
-      if (!UUID_RE.test(String(item.faucetId))) return json(res, 400, { error: 'Unrecognized faucet.' });
+      if (!UUID_RE.test(String(item.faucetId))) return json(res, 400, { error: 'That faucet is no longer available. Refresh the page and choose again.' });
       line.faucetId = String(item.faucetId);
     }
     cleanItems.push(line);
@@ -57,7 +57,7 @@ export default async function handler(req, res) {
     line1: cleanText(a.line1, 200), borough: cleanText(a.borough, 60), zip: cleanText(a.zip, 12)
   };
   if (!shippingAddress.name || !shippingAddress.line1 || !shippingAddress.zip) {
-    return json(res, 400, { error: 'A delivery name, address and ZIP code are required.' });
+    return json(res, 400, { error: 'Add a name, a street address and a ZIP code for delivery.' });
   }
 
   let order;
