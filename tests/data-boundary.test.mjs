@@ -21,7 +21,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -235,6 +235,72 @@ test('the server boundary never trusts money from the browser', () => {
  * document root. The allow-list in build-site.mjs is the fix; this is the
  * net under it.
  * ---------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------- *
+ * One door to the staff rooms.
+ *
+ * Each of the four dashboards used to carry a sign-in form of its own,
+ * behind a verification step that was never built. They were refused by
+ * a stub rather than reachable, so nothing got in, but a second door
+ * nobody is keeping correct is how a real one eventually appears.
+ * ---------------------------------------------------------------- */
+
+const DASHBOARDS = ['admin', 'manager', 'sales', 'technician'];
+
+test('no dashboard carries a sign-in form of its own', () => {
+  for (const dir of DASHBOARDS) {
+    const html = readFileSync(join(ROOT, dir, 'index.html'), 'utf8');
+    assert.doesNotMatch(html, /class="portal-auth"/,
+      `${dir}/ must not have its own auth screen`);
+    assert.doesNotMatch(html, /type="password"/,
+      `${dir}/ must not collect a password; sign in is /signin/?mode=staff`);
+    assert.doesNotMatch(html, /verification code/i,
+      `${dir}/ must not run a verification step of its own`);
+  }
+});
+
+test('every dashboard script sends a stranger to the one gate', () => {
+  for (const dir of DASHBOARDS) {
+    const src = readFileSync(join(ROOT, 'js', `${dir === 'admin' ? 'admin' : dir}.js`), 'utf8');
+    assert.match(src, /\/signin\/\?mode=staff/,
+      `js/${dir}.js must redirect anyone without the role`);
+    assert.match(src, /roles\??\.?\s*(\.|\?\.)?includes\(|location\.(replace|href)/,
+      `js/${dir}.js must decide on the role, not on the page being loaded`);
+  }
+});
+
+test('nothing a visitor can read says it is unfinished', () => {
+  /* CLAUDE.md: no "placeholder", "coming soon", "concept" or notes to
+     self in visible text. If something is not built, the blueprint says
+     so, not the page.
+
+     Four things are stripped first because none of them is visible to
+     a reader: comments, script blocks, inline event handlers, and
+     attribute names. The last two matter here. Every page carries
+     onerror="…Store.placeholder('New York City',0)", the generator for
+     a missing image, and the dashboards are full of
+     placeholder="Search catalog". Both are the word in code. Attribute
+     values are kept, because a placeholder attribute's value is read. */
+  const pages = readdirSync(ROOT, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !e.name.startsWith('.')
+      && !['node_modules', 'dist', 'docs', 'scripts', 'tests', 'supabase',
+           'api', 'functions', 'images', 'image-refs', 'js', 'css',
+           'manuals', 'design', 'output'].includes(e.name))
+    .map((e) => join(ROOT, e.name, 'index.html'))
+    .concat(join(ROOT, 'index.html'))
+    .filter((f) => existsSync(f));
+
+  assert.ok(pages.length >= 15, `the sweep must read the pages, found ${pages.length}`);
+  for (const page of pages) {
+    const visible = readFileSync(page, 'utf8')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<script\b[\s\S]*?<\/script>/gi, '')
+      .replace(/\son\w+="[^"]*"/gi, '')
+      .replace(/\s[a-zA-Z-]+=(?=["'])/g, ' ');
+    assert.doesNotMatch(visible, /\b(placeholder|coming soon|prototype|lorem ipsum)\b/i,
+      `${page} says it is unfinished where a customer can read it`);
+  }
+});
 
 test('the forbidden list still covers everything that leaked', () => {
   const build = readFileSync(join(ROOT, 'scripts', 'build-site.mjs'), 'utf8');
