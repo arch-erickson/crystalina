@@ -7,7 +7,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { formEncode, verifyWebhook } from '../api/_lib/stripe.mjs';
@@ -165,13 +165,33 @@ test('the checkout route never computes a price', () => {
     'a price from the browser must never be read');
 });
 
+/* The functions the webhook calls that only read. Named here rather than
+   detected, so adding a write and forgetting the event id fails below
+   instead of quietly passing. */
+const READERS = new Set(['order_receipt']);
+
 test('every webhook write is keyed on the Stripe event id', () => {
   const src = readFileSync(join(ROOT, 'api', 'stripe', 'webhook.mjs'), 'utf8');
   /* Only the invocations, not the one-line definition of the helper. */
   const calls = [...src.matchAll(/callRpc\(\s*'([a-z_]+)'\s*,\s*\{([\s\S]*?)\}\s*\)/g)];
-  assert.ok(calls.length >= 2, 'the webhook should call the ledgered functions');
-  for (const [, fn, args] of calls) {
+  const writes = calls.filter(([, fn]) => !READERS.has(fn));
+  assert.ok(writes.length >= 2, 'the webhook should call the ledgered functions');
+  for (const [, fn, args] of writes) {
     assert.ok(args.includes('p_event_id'), `callRpc('${fn}') must pass the event id`);
+  }
+});
+
+test('the functions the webhook reads from really are read only', () => {
+  const migrations = join(ROOT, 'supabase', 'migrations');
+  const sql = readdirSync(migrations)
+    .filter((f) => f.endsWith('.sql')).sort()
+    .map((f) => readFileSync(join(migrations, f), 'utf8')).join('\n');
+  for (const fn of READERS) {
+    const body = sql.slice(sql.indexOf(`function public.${fn}(`));
+    const definition = body.slice(body.indexOf('as $$'), body.indexOf('$$;'));
+    assert.ok(definition.length > 10, `${fn} must be findable in a migration`);
+    assert.doesNotMatch(definition, /\b(insert into|update|delete from)\b/i,
+      `${fn} is exempt from the event-id rule and must therefore not write`);
   }
 });
 

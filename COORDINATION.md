@@ -85,6 +85,32 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-03 · Claude Code, deploys and auth · The confirmation email had gone missing
+
+`/api/orders/create` sent the order confirmation, and that route closes
+itself the moment Stripe is configured. So turning payment on would have
+taken money and said nothing to the customer, and nothing would have
+reported it: the order was correct, the stock was correct, and the silence
+was the bug.
+
+The confirmation now belongs to the webhook, which is the only place that
+knows the money arrived. On the Stripe path the order exists before the
+payment does, so a customer who abandons the payment page has an order in
+the database and must not be thanked for it. `mark_order_paid` already
+answers whether this delivery is the one that moved the order, and that
+answer is what stops a second email on a redelivery.
+
+The copy lives once, in `api/_lib/receipt.mjs`, and both routes call it.
+Two confirmation emails drift, and the one that drifts is always the one
+nobody is looking at. It itemises the lines, says free shipping as free,
+and leaves out any figure it was not given rather than printing it empty.
+
+`supabase/migrations/20261103060000_paid_order_receipt.sql` adds
+`order_receipt(text)`, read only and revoked from every browser role since
+it returns a name, an email and an address. 142 tests, check green.
+
+Not applied: this makes five migrations written and waiting for the owner.
+
 ### 2026-11-03 · Claude Code, deploys and auth · U1 answered, as far as it can be
 
 U1 says the gate in front of the dashboards is browser-side and unproven.
