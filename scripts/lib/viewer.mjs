@@ -60,6 +60,20 @@ export const css = `
 .np dd{margin:0;color:var(--ink-2)}
 .np .np-where{font-size:.74rem;color:var(--ink-3);margin:.6rem 0 0}
 
+/* --- the capture inside a page's bubble ----------------------------- *
+   Cropped from the top, because the top of a page is the part anyone
+   recognises and a full capture is eight thousand pixels tall. The whole
+   thing is one click away.                                              */
+.np-shot{margin:.5rem 0 .2rem}
+.np-shot a{display:block;border:1px solid var(--line);border-radius:8px;overflow:hidden;max-height:190px;background:var(--tile)}
+.np-shot img{display:block;width:100%;height:auto}
+.np-shot figcaption{font-size:.68rem;color:var(--ink-3);margin-top:.3rem}
+/* The other two widths sit on the caption line, not under it. The panel's
+   own link rule turns anchors into blocks in some contexts. */
+.np-shot figcaption a{display:inline;border-bottom:1px solid var(--line)}
+/* In the collapsed index a card is a one-line lookup, so no picture. */
+html[data-js] .np-index .np-shot{display:none}
+
 /* --- with scripting on, the index becomes a lookup grid ------------- */
 html[data-js] .np-index{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.4rem}
 html[data-js] .np{padding:.45rem .6rem;border-left-width:2px;cursor:pointer}

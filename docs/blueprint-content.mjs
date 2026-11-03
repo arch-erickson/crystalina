@@ -132,10 +132,17 @@ export const sections = [
   id: 'pages',
   title: 'Every page, and the state of the work behind it',
   blocks: [
-    { t: 'p', text: 'The one picture that answers "how far along are we". Menu, search and footer links are left out on purpose: drawn, they turn the arrows into a web. Dashed arrows are staff actions that reach a customer page.' },
+    { t: 'p', text: 'The one picture that answers "how far along are we". Click any page for what it looks like today beside what is left to do on it. Menu, search and footer links are left out on purpose: drawn, they turn the arrows into a web. Dashed arrows are staff actions that reach a customer page.' },
     { t: 'diagram', name: 'sitemap.svg' },
     { t: 'h3', text: 'The same thing as a table' },
     { t: 'matrix' },
+    { t: 'h3', text: 'And the same thing as photographs' },
+    { t: 'p', text: 'Captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them. Each of these also appears inside its own page bubble above.' },
+    { t: 'screens' },
+    {
+      t: 'callout', kind: 'learn', title: 'Refreshing the captures',
+      text: 'Serve the site, then run npm run screens. The script captures every page and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section and the page bubbles are both generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.',
+    },
   ],
 },
 
@@ -343,16 +350,4 @@ export const sections = [
 },
 
 /* ================================================================= */
-{
-  id: 'screens',
-  title: 'What every screen looks like today',
-  blocks: [
-    { t: 'p', text: 'The site map says what each page is for. This section shows what each one actually looks like, captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them.' },
-    { t: 'screens' },
-    {
-      t: 'callout', kind: 'learn', title: 'Refreshing the captures',
-      text: 'Serve the site, then run npm run screens. The script captures every page, seventeen at the time of writing, and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.',
-    },
-  ],
-},
 ];

@@ -40,7 +40,6 @@ A readable version of this document, with every drawing inline, is at
 18. [The drawing system](#18-the-drawing-system)
 19. [Everything, one card at a time](#19-everything-one-card-at-a-time)
 20. [How this document is kept true](#20-how-this-document-is-kept-true)
-21. [What every screen looks like today](#21-what-every-screen-looks-like-today)
 
 ---
 
@@ -143,7 +142,7 @@ _**Channels and accounts already held.** The domain, Search Console, the Meta Bu
 
 ## 6. Every page, and the state of the work behind it
 
-The one picture that answers "how far along are we". Menu, search and footer links are left out on purpose: drawn, they turn the arrows into a web. Dashed arrows are staff actions that reach a customer page.
+The one picture that answers "how far along are we". Click any page for what it looks like today beside what is left to do on it. Menu, search and footer links are left out on purpose: drawn, they turn the arrows into a web. Dashed arrows are staff actions that reach a customer page.
 
 ![Site map, with a status on every page](diagrams/sitemap.svg)
 
@@ -171,6 +170,49 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | Manager | /manager/ | Implemented | Partial | Same localStorage gate as every other private page (F4) |
 | Sales | /sales/ | Implemented | Partial | Cart recovery sends nothing: no scheduled job exists Same localStorage gate (F4) |
 | Technician | /technician/ | Implemented | Partial | Photos upload but are not tied to an order record Same localStorage gate (F4) |
+
+### And the same thing as photographs
+
+Captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them. Each of these also appears inside its own page bubble above.
+
+Captured 2026-11-03 at 1366, 834, 390 pixels wide.
+
+### What a customer sees
+- **Home /**: [desktop](screens/page-home-desktop.webp), [tablet](screens/page-home-tablet.webp), [mobile](screens/page-home-mobile.webp)
+- **Shop /shop/**: [desktop](screens/page-shop-desktop.webp), [tablet](screens/page-shop-tablet.webp), [mobile](screens/page-shop-mobile.webp)
+- **Product /product/**: [desktop](screens/page-product-desktop.webp), [tablet](screens/page-product-tablet.webp), [mobile](screens/page-product-mobile.webp)
+- **Checkout /checkout/**: [desktop](screens/page-checkout-desktop.webp), [tablet](screens/page-checkout-tablet.webp), [mobile](screens/page-checkout-mobile.webp)
+- **NYC water /nyc-water/**: [desktop](screens/page-nyc-water-desktop.webp), [tablet](screens/page-nyc-water-tablet.webp), [mobile](screens/page-nyc-water-mobile.webp)
+- **Find your filter /quiz/**: [desktop](screens/page-quiz-desktop.webp), [tablet](screens/page-quiz-tablet.webp), [mobile](screens/page-quiz-mobile.webp)
+- **Sign in /signin/**: [desktop](screens/page-signin-desktop.webp), [tablet](screens/page-signin-tablet.webp), [mobile](screens/page-signin-mobile.webp)
+- **Account /account/**: [desktop](screens/page-account-desktop.webp), [tablet](screens/page-account-tablet.webp), [mobile](screens/page-account-mobile.webp)
+- **About /about/**: [desktop](screens/page-about-desktop.webp), [tablet](screens/page-about-tablet.webp), [mobile](screens/page-about-mobile.webp)
+- **Contact /contact/**: [desktop](screens/page-contact-desktop.webp), [tablet](screens/page-contact-tablet.webp), [mobile](screens/page-contact-mobile.webp)
+- **Privacy policy /privacy/**: [desktop](screens/page-privacy-desktop.webp), [tablet](screens/page-privacy-tablet.webp), [mobile](screens/page-privacy-mobile.webp)
+- **Terms of service /terms/**: [desktop](screens/page-terms-desktop.webp), [tablet](screens/page-terms-tablet.webp), [mobile](screens/page-terms-mobile.webp)
+- **Shipping and returns /shipping-returns/**: [desktop](screens/page-shipping-desktop.webp), [tablet](screens/page-shipping-tablet.webp), [mobile](screens/page-shipping-mobile.webp)
+
+### What the staff see
+- **Admin console /admin/**: [desktop](screens/page-admin-desktop.webp), [tablet](screens/page-admin-tablet.webp), [mobile](screens/page-admin-mobile.webp)
+- **Manager /manager/**: [desktop](screens/page-manager-desktop.webp), [tablet](screens/page-manager-tablet.webp), [mobile](screens/page-manager-mobile.webp)
+- **Sales /sales/**: [desktop](screens/page-sales-desktop.webp), [tablet](screens/page-sales-tablet.webp), [mobile](screens/page-sales-mobile.webp)
+- **Technician /technician/**: [desktop](screens/page-technician-desktop.webp), [tablet](screens/page-technician-tablet.webp), [mobile](screens/page-technician-mobile.webp)
+
+### The home page, section by section
+- **Most of what your family drinks is water. Make it the purest thing in the house.**: [desktop](screens/section-hero-desktop.webp), [tablet](screens/section-hero-tablet.webp), [mobile](screens/section-hero-mobile.webp)
+- **trust**: [desktop](screens/section-trust-desktop.webp), [tablet](screens/section-trust-tablet.webp), [mobile](screens/section-trust-mobile.webp)
+- **A system for every home, and every household.**: [desktop](screens/section-categories-desktop.webp), [tablet](screens/section-categories-tablet.webp), [mobile](screens/section-categories-mobile.webp)
+- **Component by Component**: [desktop](screens/section-anatomy-desktop.webp), [tablet](screens/section-anatomy-tablet.webp), [mobile](screens/section-anatomy-mobile.webp)
+- **What New York households choose**: [desktop](screens/section-best-sellers-desktop.webp), [tablet](screens/section-best-sellers-tablet.webp), [mobile](screens/section-best-sellers-mobile.webp)
+- **Good water is treated at the source. The last mile is yours.**: [desktop](screens/section-water-facts-desktop.webp), [tablet](screens/section-water-facts-tablet.webp), [mobile](screens/section-water-facts-mobile.webp)
+- **Better water in four unhurried steps**: [desktop](screens/section-process-desktop.webp), [tablet](screens/section-process-tablet.webp), [mobile](screens/section-process-mobile.webp)
+- **Made for New York, by people who drink it too.**: [desktop](screens/section-why-crystalina-desktop.webp), [tablet](screens/section-why-crystalina-tablet.webp), [mobile](screens/section-why-crystalina-mobile.webp)
+- **What our neighbors say**: [desktop](screens/section-testimonials-desktop.webp), [tablet](screens/section-testimonials-tablet.webp), [mobile](screens/section-testimonials-mobile.webp)
+- **Not sure where to begin?**: [desktop](screens/section-cta-desktop.webp), [tablet](screens/section-cta-tablet.webp), [mobile](screens/section-cta-mobile.webp)
+
+> **Refreshing the captures**
+>
+> Serve the site, then run npm run screens. The script captures every page and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section and the page bubbles are both generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.
 
 ---
 
@@ -2643,48 +2685,3 @@ The Workspace subscription is suspended behind a Squarespace reseller lock, so i
 > **Publish from one place**
 >
 > The Artifact is published from this repository and nowhere else. Anyone republishing it pulls first and republishes to the same URL rather than creating a second one. A generated document published from two places stops matching its own sources quietly, and the next person to rebuild wipes out work nobody remembers doing.
-
----
-
-## 21. What every screen looks like today
-
-The site map says what each page is for. This section shows what each one actually looks like, captured from the served site at three widths, so a redesign has a before to be judged against and a reader who has never opened the shop can see it without a server. Every page is here, and the home page is here twice: whole, and then section by section, in the order a visitor meets them.
-
-Captured 2026-11-03 at 1366, 834, 390 pixels wide.
-
-### What a customer sees
-- **Home /**: [desktop](screens/page-home-desktop.webp), [tablet](screens/page-home-tablet.webp), [mobile](screens/page-home-mobile.webp)
-- **Shop /shop/**: [desktop](screens/page-shop-desktop.webp), [tablet](screens/page-shop-tablet.webp), [mobile](screens/page-shop-mobile.webp)
-- **Product /product/**: [desktop](screens/page-product-desktop.webp), [tablet](screens/page-product-tablet.webp), [mobile](screens/page-product-mobile.webp)
-- **Checkout /checkout/**: [desktop](screens/page-checkout-desktop.webp), [tablet](screens/page-checkout-tablet.webp), [mobile](screens/page-checkout-mobile.webp)
-- **NYC water /nyc-water/**: [desktop](screens/page-nyc-water-desktop.webp), [tablet](screens/page-nyc-water-tablet.webp), [mobile](screens/page-nyc-water-mobile.webp)
-- **Find your filter /quiz/**: [desktop](screens/page-quiz-desktop.webp), [tablet](screens/page-quiz-tablet.webp), [mobile](screens/page-quiz-mobile.webp)
-- **Sign in /signin/**: [desktop](screens/page-signin-desktop.webp), [tablet](screens/page-signin-tablet.webp), [mobile](screens/page-signin-mobile.webp)
-- **Account /account/**: [desktop](screens/page-account-desktop.webp), [tablet](screens/page-account-tablet.webp), [mobile](screens/page-account-mobile.webp)
-- **About /about/**: [desktop](screens/page-about-desktop.webp), [tablet](screens/page-about-tablet.webp), [mobile](screens/page-about-mobile.webp)
-- **Contact /contact/**: [desktop](screens/page-contact-desktop.webp), [tablet](screens/page-contact-tablet.webp), [mobile](screens/page-contact-mobile.webp)
-- **Privacy policy /privacy/**: [desktop](screens/page-privacy-desktop.webp), [tablet](screens/page-privacy-tablet.webp), [mobile](screens/page-privacy-mobile.webp)
-- **Terms of service /terms/**: [desktop](screens/page-terms-desktop.webp), [tablet](screens/page-terms-tablet.webp), [mobile](screens/page-terms-mobile.webp)
-- **Shipping and returns /shipping-returns/**: [desktop](screens/page-shipping-desktop.webp), [tablet](screens/page-shipping-tablet.webp), [mobile](screens/page-shipping-mobile.webp)
-
-### What the staff see
-- **Admin console /admin/**: [desktop](screens/page-admin-desktop.webp), [tablet](screens/page-admin-tablet.webp), [mobile](screens/page-admin-mobile.webp)
-- **Manager /manager/**: [desktop](screens/page-manager-desktop.webp), [tablet](screens/page-manager-tablet.webp), [mobile](screens/page-manager-mobile.webp)
-- **Sales /sales/**: [desktop](screens/page-sales-desktop.webp), [tablet](screens/page-sales-tablet.webp), [mobile](screens/page-sales-mobile.webp)
-- **Technician /technician/**: [desktop](screens/page-technician-desktop.webp), [tablet](screens/page-technician-tablet.webp), [mobile](screens/page-technician-mobile.webp)
-
-### The home page, section by section
-- **Most of what your family drinks is water. Make it the purest thing in the house.**: [desktop](screens/section-hero-desktop.webp), [tablet](screens/section-hero-tablet.webp), [mobile](screens/section-hero-mobile.webp)
-- **trust**: [desktop](screens/section-trust-desktop.webp), [tablet](screens/section-trust-tablet.webp), [mobile](screens/section-trust-mobile.webp)
-- **A system for every home, and every household.**: [desktop](screens/section-categories-desktop.webp), [tablet](screens/section-categories-tablet.webp), [mobile](screens/section-categories-mobile.webp)
-- **Component by Component**: [desktop](screens/section-anatomy-desktop.webp), [tablet](screens/section-anatomy-tablet.webp), [mobile](screens/section-anatomy-mobile.webp)
-- **What New York households choose**: [desktop](screens/section-best-sellers-desktop.webp), [tablet](screens/section-best-sellers-tablet.webp), [mobile](screens/section-best-sellers-mobile.webp)
-- **Good water is treated at the source. The last mile is yours.**: [desktop](screens/section-water-facts-desktop.webp), [tablet](screens/section-water-facts-tablet.webp), [mobile](screens/section-water-facts-mobile.webp)
-- **Better water in four unhurried steps**: [desktop](screens/section-process-desktop.webp), [tablet](screens/section-process-tablet.webp), [mobile](screens/section-process-mobile.webp)
-- **Made for New York, by people who drink it too.**: [desktop](screens/section-why-crystalina-desktop.webp), [tablet](screens/section-why-crystalina-tablet.webp), [mobile](screens/section-why-crystalina-mobile.webp)
-- **What our neighbors say**: [desktop](screens/section-testimonials-desktop.webp), [tablet](screens/section-testimonials-tablet.webp), [mobile](screens/section-testimonials-mobile.webp)
-- **Not sure where to begin?**: [desktop](screens/section-cta-desktop.webp), [tablet](screens/section-cta-tablet.webp), [mobile](screens/section-cta-mobile.webp)
-
-> **Refreshing the captures**
->
-> Serve the site, then run npm run screens. The script captures every page, seventeen at the time of writing, and every data-home-section element at 1366, 834 and 390 pixels wide, writes them to docs/screens as webp and rewrites docs/screens/index.json, which this section is generated from. Run npm run blueprint afterwards, as for any other change. Staff pages are captured signed out, so they show what a visitor who guesses the address sees, which is the honest version.
