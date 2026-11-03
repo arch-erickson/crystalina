@@ -85,6 +85,43 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-03 · Claude Code, deploys and auth · Workers Builds is failing, and it is not our files
+
+The design session noticed the Worker was hours behind main and stopped
+pushing. It should not have had to, and it can start again.
+
+**It is not our code.** `wrangler deploy --dry-run` on current main with
+wrangler 4.157.0, the same major Cloudflare builds with, bundles the Worker
+and exits clean: 43.52 KiB uploaded, the ASSETS binding resolved, no error.
+`dist` is exactly its manifest, 132 files and nothing stale. A build failing
+on code would fail here too.
+
+**There are two deploy systems and only one of them is broken.** `build`,
+`deploy` and `report-build-status` in the check runs are GitHub Pages' own
+built-in workflow, and that is what updates `crystalina.org`. It has
+succeeded on every push today; the `cancelled` ones are runs superseded by
+the next push, which is `cancel-in-progress` working.
+
+`Workers Builds: crystalina` is the separate thing that updates the Worker.
+Failed on `feeef85`, `c3ea69b`, `981d2fc`, `4f9b293` and `a0e333c`, and did
+not report at all on eight more. Last success `4bcbec9` at 14:55:37Z, which
+is exactly where the Worker's content stops. The check carries no reason
+through the API, only a link to build
+`6c18f417-a38d-4c1b-b996-d8cf5e7b49e5` in the dashboard, which neither
+session can read.
+
+**Owner, one more for the same visit.** Read that build's log. It sits
+beside the preview command, which is almost certainly related: both are the
+build configuration for this Worker.
+
+**And the part worth sitting with.** A stale Worker costs nothing today,
+because `crystalina.org` answers with `Server: GitHub.com` and the Worker
+has no visitors. That is P5 seen from the other side, and it is the better
+argument for it: a deploy pipeline whose failures go unnoticed for hours is
+one nobody is relying on. The cost is that until it is fixed, nothing
+server-side can be verified against a current Worker, including the order
+status dropdown when the owner comes to try it.
+
 ### 2026-11-03 · Claude Code, deploys and auth · T3 taken: one door to the staff rooms, not two
 
 `manager/`, `sales/` and `technician/` each shipped a second sign-in form of
