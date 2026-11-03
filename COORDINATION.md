@@ -140,6 +140,33 @@ Better pictures do not fix either one.
 **`image-refs/` is not published**, and must stay that way. `DIRS` in
 `scripts/build-site.mjs` does not list it. References are named after their
 target, so `image-refs/hero-bg.png` feeds `images/hero-bg.webp`.
+### 2026-11-02 · Codex · P1 generation blocked by native resolution
+
+User authorized imagery work and this log. Read the revised IMAGE_PROMPTS.md in full from origin/main at c4598ce794d6a97cabc921648d43af1c1438050d; the working-tree brief is older. Inspected all four protected studio photographs and all H5-600 variants. Protected photographs were not edited.
+
+Two built-in imagegen attempts produced transparent RGBA drafts, both 1174 x 1340, despite explicit 3584 x 4096 requests. Neither meets section 2.1 (3840 px minimum long edge). No draft was installed in images/, no fake upscale was substituted, and the missing production asset remains unresolved. Masters/drafts remain outside the repository under C:/Users/erick/.codex/generated_images/01a19ee5-03e6-7ce2-91cc-53e0ce4e4539/: exec-a6a28da5-f388-4b5f-ad31-ad44be9721de.png and exec-f3a94233-14ff-4bc0-9cee-f0632de10bc6.png.
+
+Reference precedence applied: black membrane casing with amber collar and three real cartridge forms, rather than the prose's stainless casing/mineral cartridge. Removed printed labels, numbers and branding. P2–P6 remain pending user references; image-refs/ is absent locally. Next step: a generation path that can actually deliver native 4K plus transparency. CLI fallback requires explicit user authorization under the imagegen skill; no fallback was invoked.
+
+Validation: npm run check ran. All 35 tests and build:site passed (127 published files); diagrams:check passed (23 drawings); blueprint:check failed on existing source/output drift. Other agents' docs/scripts changes were left untouched. No push: working tree contains another agent's active edits and HEAD is two commits behind origin/main; no rebase/autostash of their work attempted.
+
+Exact first generation prompt (built-in tool; H5-600 studio and transparent references):
+
+```text
+Use case: product-mockup. Generate P1, a technical exploded photographic view of the real Crystalina H5-600 system. Output 3584 x 4096 pixels (7:8 portrait), genuine transparent alpha background, for later downsampling to 1400 x 1600. Reference images 1 and 2 are the H5-600 hardware ground truth. Do not reproduce their printed markings. 
+Precise industrial product photography, not advertising gloss or CGI appearance. Components separated vertically with generous even spacing and thin neutral grey leader lines connecting actual corresponding parts; narrow silhouette, generous margins, clear at 460px wide. Top to bottom: single black cylindrical LED-UVC module; single horizontal RO membrane housing matching reference (black with real amber ribbed collar, not invented stainless casing); three vertical cartridge/housing assemblies side by side matching reference dimensions, clear outer housings and black caps, white sediment and dark carbon media with white support spirals; below them the empty black powder-coated open steel mounting frame carrying exactly two round analogue gauges on left and small dark blank display with three orange physical buttons beside it; bottom a single brushed stainless drinking-water faucet as specified by the exploded-view brief. Do not duplicate the filters inside the empty frame. Preserve hardware geometry and true material colours. Single broad neutral studio key above left, believable material roughness and fine texture, clear plastic refraction, metal reflections, sharp focus throughout, no colour cast. No text, no numbers even on gauges, no logo, no UI; gauge needles and unnumbered ticks permitted; screen blank. No background or checkerboard drawn into image. Intentional technical exploded separation is the sole exception to no floating objects.
+Negative prompt (mandatory): text, letters, numbers, words, signage, watermark, logo, brand name, UI overlay,
+airbrushed skin, poreless face, plastic skin, waxy skin, symmetrical face,
+identical expressions, extra fingers, malformed hands, fused fingers,
+empty sterile room, staged showroom, stock photo look, advertising gloss,
+blue colour grade, cool colour grade, warm colour grade, orange tint, green tint,
+purple tint, teal and orange, heavy vignette, lens flare, bokeh haze background,
+HDR halo, oversharpened, CGI render, 3D render, video game lighting,
+floating objects, duplicated parts, impossible plumbing, low-res, jpeg artifacts
+```
+
+Retry prepended: "Generate this exact technical exploded product photograph at native 3584 x 4096 pixel resolution. Required long edge at least 3840 pixels; this is a production master, not a thumbnail. Preserve composition with extra transparent margin above and below." References were the first draft and H5-600 studio photograph.
+
 
 ### 2026-11-02 · Claude Code · The deploy path changed, and the token is gone
 
