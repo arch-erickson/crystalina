@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-03",
+  "target": "images/nyc-skyline.webp",
+  "supersedes": "P5 in generation-log-2026-11-03-reference-led.json",
+  "reason": "User rejected implausible product installation and stated not currently selling water filters.",
+  "generator": "built-in image_gen",
+  "prompt": "Generate an original photographic editorial image for a New York company About page. Landscape4:3, request native4K or better, delivery1200x900. Quiet believable view from an ordinary Brooklyn apartment upper-floor window across residential brick rooftops toward distant Manhattan buildings across the East River. No window frame necessary. Human-scale foreground of well-maintained older brick apartment buildings, parapets, simple real rooftop vents, restrained fire escapes, modest variation in brick and roof colour. Distant skyline reads as NYC without inventing a fantasy cluster of landmarks. A clear softly overcast late-morning sky, neutral white balance and realistic atmospheric perspective; no sunset, orange or teal grade. Natural35-50mm photographic perspective, crisp masonry detail in foreground, honest distance softness, no HDR sharpening, no luxury rooftop terrace. Compose with buildings filling lower two thirds and calm sky upper third. No kitchen, no water filters, no products, no sales message, no people required. No text, icons, logos, watermarks, signage or readable building names. Attractive editorial quality, clean and ordinary, not glossy tourism poster. Negative prompt: text, letters, numbers, logos, wordmarks, icons, certification badges, signage,\nwatermark, captions, labels, UI overlay, floating product cutout, pasted collage,\ngiant filter, distorted hardware, impossible plumbing, blocked walkway,\npeople behind wall-backed countertop, impossible kitchen geometry,\nmatching advertising smiles, identical faces, plastic skin, airbrushed skin,\nwaxy skin, exaggerated wrinkles, extra fingers, malformed hands, fused fingers,\nduplicated people, unsupported baby, dirt, grime, mould, mildew, stained grout,\npeeling paint, chipped cabinets, water stains, limescale, rust, crumbs, rubbish,\ndistressed surfaces, neglected apartment, luxury penthouse, blue colour grade,\ncool colour grade, warm colour grade, orange tint, green tint, purple tint,\nteal and orange, heavy vignette, lens flare, artificial background haze,\nHDR halo, oversharpened, CGI render, 3D render, video game lighting,\nfloating objects, duplicated parts, low-res, jpeg artifacts",
+  "source": "C:/Users/erick/.codex/generated_images/01a19ee5-03e6-7ce2-91cc-53e0ce4e4539/exec-2a7b5c09-2068-44cc-82e1-60e78c6cf244.png",
+  "native": [
+    1448,
+    1086
+  ],
+  "delivery": [
+    1200,
+    900
+  ],
+  "note": "Generated NYC-inspired scene, not documentary evidence of a precise viewpoint. Sub-4K native result accepted under user's recorded resolution exception.",
+  "bytes": 303280,
+  "sha256": "86cd7c20a77717a94bead5d9f49667122ad51783f78268aadc5cdf71a7a729ec"
+}

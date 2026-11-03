@@ -33,7 +33,10 @@ function nodeRequest(request, bodyBytes) {
 
   return {
     method: request.method,
-    url: new URL(request.url).pathname,
+    /* Path and query, the way Node sets req.url. Giving only the path
+       silently drops every query parameter, which a handler that reads
+       one cannot detect. */
+    url: new URL(request.url).pathname + new URL(request.url).search,
     headers,
     /* Cloudflare always sets cf-connecting-ip, and sets x-forwarded-for too.
        clientIp() prefers the forwarded header and falls back to this. */

@@ -3,6 +3,9 @@ Revised 2026-11-03 following the user's latest visual review. This complete revi
 supersedes the logo-heavy, oversized-product and invented-kitchen prompts.
 
 ## 1. Direction
+Latest user correction: "we are currently not selling water filters." Do not
+treat the product concepts below as evidence of current offerings. Broader
+imagery direction is awaiting clarification. P5 is now a non-product NYC scene.
 Original editorial photographs in clean, attractive, attainable middle-income
 apartments. Start with an actual photographed apartment kitchen, inspect its
 architecture, then generate an original scene grounded in that layout.
@@ -166,11 +169,13 @@ normal scale, small drinking tap above/nearby. No person required. Ordinary
 materials, soft daylight, accurate hardware. No text/icons/logos.
 
 ### P5 — nyc-skyline.webp
-1200x900; filename retained. Original NYC apartment kitchen detail grounded in
-real architecture, clean sink/drinking tap and modest window with brick outside.
-H5 visible in practical adjacent utility cabinet, actual scale and clearance.
-No staged luxury, no giant appliance, no text/icons/logos.
-Design owner handles old skyline-specific alt text.
+1200x900. Natural editorial view across ordinary Brooklyn residential rooftops
+toward a distant Manhattan skyline. Modest brick apartment buildings, believable
+fire escapes and rooftop details, soft neutral daylight and true material colour.
+Human-scale residential foreground, restrained distant skyline, no luxury terrace
+or invented kitchen installation. No filtration equipment, product placement,
+text, icons, logos or signage. This supersedes the rejected utility-cabinet scene
+and again matches the existing NYC skyline alt text.
 
 ### P6 — six category tiles
 All1200x900. Upper-two-thirds product placement; clean quiet lower third.

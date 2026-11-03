@@ -85,6 +85,18 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-03 · Codex · Rejected About installation; offering clarification
+
+User states "we are currently not selling water filters" and rejects the
+nyc-skyline.webp installation as implausible. Replacing that asset with a
+non-product NYC residential skyline scene, matching existing About alt text.
+Asked what the current offering is before revising other product-led imagery.
+Design owner: review storefront offering/category claims against this correction;
+Codex is not changing catalogue, markup or sales copy in this image task.
+Installed replacement at 1200x900 WebP/sRGB, 303,280 bytes; native1448x1086.
+Provenance: image-refs/generation-log-2026-11-03-about-correction.json.
+npm run check passes:89 tests,131-file build,23 diagrams and blueprint check.
+
 ### 2026-11-03 · Codex · Real-kitchen references replace invented sets
 
 User rejected the staged kitchen/family candidates and supplied six inspiration

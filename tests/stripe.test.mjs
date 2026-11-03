@@ -192,3 +192,50 @@ test('payment is built but not switched on', () => {
   assert.match(checkout, /disabled/,
     'the checkout button stays disabled until the owner says otherwise');
 });
+
+/* ---------------------------------------------------------------- *
+ * The unpaid-order route closes itself when payment exists.
+ * ---------------------------------------------------------------- */
+
+const withEnv = async (vars, fn) => {
+  const before = { ...process.env };
+  for (const [k, v] of Object.entries(vars)) {
+    if (v === undefined) delete process.env[k]; else process.env[k] = v;
+  }
+  try { return await fn(); } finally {
+    for (const k of Object.keys(vars)) {
+      if (k in before) process.env[k] = before[k]; else delete process.env[k];
+    }
+  }
+};
+
+test('with no Stripe key, the old order route still works', () => withEnv(
+  { STRIPE_SECRET_KEY: undefined },
+  async () => {
+    const res = await call('/api/orders/create', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ items: [] }),
+    });
+    assert.equal(res.status, 401, 'it should get as far as asking for a session');
+  },
+));
+
+test('once Stripe is configured, the unpaid order route is gone', () => withEnv(
+  { STRIPE_SECRET_KEY: 'sk_test_anything' },
+  async () => {
+    const res = await call('/api/orders/create', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ items: [] }),
+    });
+    assert.equal(res.status, 410,
+      'an account could otherwise hold every unit in the catalogue without paying');
+  },
+));
+
+test('turning payment on is what closes it, with no second switch to forget', () => {
+  const src = readFileSync(join(ROOT, 'api', 'orders', 'create.mjs'), 'utf8');
+  assert.match(src, /process\.env\.STRIPE_SECRET_KEY[\s\S]{0,200}410/,
+    'the gate must be the presence of the payment key itself');
+});

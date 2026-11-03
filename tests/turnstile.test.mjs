@@ -63,7 +63,10 @@ test('both keys set and no token is refused, because by then there is a widget',
   async () => {
     const r = await verifyTurnstile(undefined, '203.0.113.1');
     assert.equal(r.ok, false);
-    assert.match(r.error, /verification/i);
+    /* The behaviour is the contract. The wording belongs to
+       docs/voice-guide.md and the design session, so this asserts that
+       the customer is told something and not what it says. */
+    assert.ok(r.error && r.error.length > 10, 'a refusal must carry a message');
   },
 ));
 

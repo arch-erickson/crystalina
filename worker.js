@@ -20,6 +20,7 @@ import newsletter from './api/newsletter.mjs';
 import createOrder from './api/orders/create.mjs';
 import checkoutSession from './api/checkout/session.mjs';
 import stripeWebhook from './api/stripe/webhook.mjs';
+import health from './api/health.mjs';
 
 /* Exact paths only. A prefix match would route /api/contact-us here too. */
 const ROUTES = new Map([
@@ -31,6 +32,10 @@ const ROUTES = new Map([
      than a session, so it is deliberately outside everything that
      expects a signed-in user. */
   ['/api/stripe/webhook', toPagesFunction(stripeWebhook)],
+  /* GET, and the only route that is not a POST. Liveness is public;
+     the detail behind HEALTH_KEY says what this Worker is configured
+     with, which is how a missing key gets noticed. */
+  ['/api/health', toPagesFunction(health)],
 ]);
 
 const json = (status, body) => new Response(JSON.stringify(body), {

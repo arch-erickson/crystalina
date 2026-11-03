@@ -48,7 +48,7 @@ export async function verifyTurnstile(token, ip) {
     return { ok: true, skipped: 'secret missing' };
   }
 
-  if (!token) return { ok: false, error: 'Please complete the verification and try again.' };
+  if (!token) return { ok: false, error: 'Complete the check below, then send again.' };
 
   try {
     const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -59,7 +59,7 @@ export async function verifyTurnstile(token, ip) {
     const data = await res.json();
     if (data.success) return { ok: true };
     console.warn('[turnstile] rejected:', (data['error-codes'] || []).join(', '));
-    return { ok: false, error: 'That verification did not pass. Please try again.' };
+    return { ok: false, error: 'The check did not pass. Try it once more.' };
   } catch (error) {
     /* Cloudflare unreachable. Refusing the customer because our captcha
        provider is down punishes the wrong person. */
