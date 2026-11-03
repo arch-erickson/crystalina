@@ -137,7 +137,7 @@
           "height": 844
         }
       },
-      "h1": "What is in New York's water, and why it matters at home"
+      "h1": "Water Facts"
     },
     {
       "slug": "quiz",
@@ -161,7 +161,7 @@
           "height": 844
         }
       },
-      "h1": "Find Your Perfect Filter"
+      "h1": "Find your filter"
     },
     {
       "slug": "signin",
@@ -185,7 +185,7 @@
           "height": 844
         }
       },
-      "h1": "Welcome back"
+      "h1": "Sign in"
     },
     {
       "slug": "account",
@@ -209,7 +209,7 @@
           "height": 844
         }
       },
-      "h1": "Welcome back"
+      "h1": "Sign in"
     },
     {
       "slug": "about",
@@ -233,7 +233,7 @@
           "height": 844
         }
       },
-      "h1": "Pure Water. Pure Life. Pure New York."
+      "h1": "Clean water at home, from people who know New York water."
     },
     {
       "slug": "contact",
@@ -257,7 +257,7 @@
           "height": 844
         }
       },
-      "h1": "Talk to a Real New Yorker"
+      "h1": "Talk to us"
     },
     {
       "slug": "manuals",
@@ -613,7 +613,7 @@
         "desktop": {
           "file": "section-water-facts-desktop.webp",
           "width": 1366,
-          "height": 861
+          "height": 872
         },
         "tablet": {
           "file": "section-water-facts-tablet.webp",
@@ -623,7 +623,7 @@
         "mobile": {
           "file": "section-water-facts-mobile.webp",
           "width": 390,
-          "height": 1686
+          "height": 1728
         }
       }
     },

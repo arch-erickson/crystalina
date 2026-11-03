@@ -612,7 +612,7 @@ export const pages = [
   {
     id: 'checkout', icon: 'card', label: 'Checkout', route: '/checkout/', area: 'client', col: 3, row: 0,
     design: 'Implemented', server: 'Partial',
-    built: ['POST /api/orders/create, server-authoritative pricing through create_order', 'Borough selector, 8.875% tax, stock enforced in one transaction'],
+    built: ['POST /api/orders/create, server-authoritative pricing through create_order', 'Borough selector, 8.875% tax, stock enforced in one transaction', 'In the frame since 2026-11-03: three hairline form sections (Delivery, Fitting, Payment) with the order on the silver panel at the right, sticky while the form scrolls; the delivery quote reads shipping_policy; the payment section says plainly that we do not take payment online yet and offers WhatsApp and the phone'],
     remaining: ['No payment: the submit button carries a static disabled attribute', 'No Turnstile widget, though the server expects a token'],
     what: 'The last page before money. The browser sends ids, quantities, a stage option, a faucet choice and an address; the database decides every price.',
     why: 'Partial, and deliberately unreachable. Everything except taking the money works and is tested. The button reads "Checkout unavailable" so the gap cannot be reached by accident.',
@@ -648,7 +648,7 @@ export const pages = [
   {
     id: 'contact', icon: 'mail', label: 'Contact', route: '/contact/', area: 'client', col: 1, row: 2,
     design: 'Implemented', server: 'Implemented',
-    built: ['POST /api/contact validates, rate limits and writes contact_messages', 'Answers 200 on the Worker, checked 2026-11-02'],
+    built: ['POST /api/contact validates, rate limits and writes contact_messages', 'Answers 200 on the Worker, checked 2026-11-02', 'In the frame since 2026-11-03: the ways to reach us as a hairline definition list, the form in the same form section component the checkout uses, the questions beneath as the shared accordion'],
     remaining: ['No Turnstile widget, and the page reads a token from one that does not exist', 'The notification lands in a suspended inbox (U8)'],
     what: 'A form that writes contact_messages and emails the team. The first server route to work anywhere.',
     why: 'Implemented as of 2026-11-02: the route answers on the Worker, the method guard and validator both fire. What is not implemented is the captcha widget and a mailbox that receives.',
@@ -693,7 +693,7 @@ export const pages = [
   {
     id: 'order', icon: 'card', label: 'Order receipt', route: '/order/?id=', area: 'client', col: 2, row: 3,
     design: 'Implemented', server: 'Implemented',
-    built: ['Reads one order of the signed-in customer, with its items, totals and delivery address, under RLS', 'Print or save, and every figure is the one the database wrote'],
+    built: ['Reads one order of the signed-in customer, with its items, totals and delivery address, under RLS', 'Print or save, and every figure is the one the database wrote', 'Since 2026-11-03, "Where it is": the order_events trail as the timeline component, the placing of the order first, a note where from and to agree'],
     remaining: ['No order can be placed until payment exists, so the page has only its signed-out, missing and not-found states to show today', 'Checkout should land here once an order is created'],
     what: 'The receipt for one order: what was bought, what it cost, where it is going, and its status.',
     why: 'Implemented ahead of payment so the first real order has somewhere to be shown. It reads the rows create_order writes and computes nothing.',
@@ -711,7 +711,7 @@ export const pages = [
   {
     id: 'signin', icon: 'key', label: 'Sign in', route: '/signin/', area: 'client', col: 2, row: 1,
     design: 'Implemented', server: 'Implemented',
-    built: ['CrystalinaAuth on Supabase Auth: a code by email, or Continue with Google', 'Real sessions and a JWT on every query'],
+    built: ['CrystalinaAuth on Supabase Auth: a code by email, or Continue with Google', 'Real sessions and a JWT on every query', 'Since 2026-11-03 a bare centred form with no card, the two modes as hairline tabs, the copy said plainly'],
     remaining: ['Store.signUp and Store.signIn stubs are still exported from js/store.js and must be retired'],
     what: 'The only page that holds a real session. Passwordless: an eight-digit code by email, or Google. There is no password in the project.',
     why: 'Implemented as of 2026-11-02, Google included. The unfinished part is the six other pages that still read localStorage rather than this session.',
@@ -720,7 +720,7 @@ export const pages = [
   {
     id: 'account', icon: 'person', label: 'Account', route: '/account/', area: 'client', col: 3, row: 1,
     design: 'Implemented', server: 'Refactor',
-    built: ['Order history read under row level security'],
+    built: ['Order history read under row level security', 'Since 2026-11-03: who you are on the left with text links, orders as hairline rows with the shared status pill and a link to the receipt and where it is; the status words come from ORDER_STATUS_LABELS'],
     remaining: ['Gates on Store.currentUser() from localStorage and does not load js/auth.js at all'],
     what: 'A customer\'s own orders. The rows come back under row level security, so the data is right even though the gate is not.',
     why: 'Refactor. It is the clearest example of F4: the page decides whether to render from localStorage, and signs out by deleting a local key rather than ending the Supabase session.',

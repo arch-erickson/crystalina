@@ -546,7 +546,7 @@ Partial, and deliberately unreachable. Everything except taking the money works 
 - **See also.** Nothing takes payment; Placing an order, as it works today; Taking the money (Stripe, phase 3); P3 · Stripe checkout and webhook; Order receipt
 - **Design.** Implemented
 - **Server.** Partial
-- **Backend built.** POST /api/orders/create, server-authoritative pricing through create_order Borough selector, 8.875% tax, stock enforced in one transaction
+- **Backend built.** POST /api/orders/create, server-authoritative pricing through create_order Borough selector, 8.875% tax, stock enforced in one transaction In the frame since 2026-11-03: three hairline form sections (Delivery, Fitting, Payment) with the order on the silver panel at the right, sticky while the form scrolls; the delivery quote reads shipping_policy; the payment section says plainly that we do not take payment online yet and offers WhatsApp and the phone
 - **Remaining.** No payment: the submit button carries a static disabled attribute No Turnstile widget, though the server expects a token
 
 #### Find your filter · Implemented
@@ -604,7 +604,7 @@ Implemented as of 2026-11-02: the route answers on the Worker, the method guard 
 - **See also.** A stranger sending something in; U8 · How does Google Workspace on crystalina.org get unlocked, and what does the DNS move do to it?; Turnstile
 - **Design.** Implemented
 - **Server.** Implemented
-- **Backend built.** POST /api/contact validates, rate limits and writes contact_messages Answers 200 on the Worker, checked 2026-11-02
+- **Backend built.** POST /api/contact validates, rate limits and writes contact_messages Answers 200 on the Worker, checked 2026-11-02 In the frame since 2026-11-03: the ways to reach us as a hairline definition list, the form in the same form section component the checkout uses, the questions beneath as the shared accordion
 - **Remaining.** No Turnstile widget, and the page reads a token from one that does not exist The notification lands in a suspended inbox (U8)
 
 #### Privacy policy · Missing
@@ -674,7 +674,7 @@ Implemented ahead of payment so the first real order has somewhere to be shown. 
 - **See also.** Account; Checkout; orders
 - **Design.** Implemented
 - **Server.** Implemented
-- **Backend built.** Reads one order of the signed-in customer, with its items, totals and delivery address, under RLS Print or save, and every figure is the one the database wrote
+- **Backend built.** Reads one order of the signed-in customer, with its items, totals and delivery address, under RLS Print or save, and every figure is the one the database wrote Since 2026-11-03, "Where it is": the order_events trail as the timeline component, the placing of the order first, a note where from and to agree
 - **Remaining.** No order can be placed until payment exists, so the page has only its signed-out, missing and not-found states to show today Checkout should land here once an order is created
 
 #### Not found · Implemented
@@ -704,7 +704,7 @@ Implemented as of 2026-11-02, Google included. The unfinished part is the six ot
 - **See also.** Supabase Auth; The gate in front of every private page is localStorage; Signing in, and what a role is allowed to do
 - **Design.** Implemented
 - **Server.** Implemented
-- **Backend built.** CrystalinaAuth on Supabase Auth: a code by email, or Continue with Google Real sessions and a JWT on every query
+- **Backend built.** CrystalinaAuth on Supabase Auth: a code by email, or Continue with Google Real sessions and a JWT on every query Since 2026-11-03 a bare centred form with no card, the two modes as hairline tabs, the copy said plainly
 - **Remaining.** Store.signUp and Store.signIn stubs are still exported from js/store.js and must be retired
 
 #### Account · Refactor
@@ -719,7 +719,7 @@ Refactor. It is the clearest example of F4: the page decides whether to render f
 - **See also.** The gate in front of every private page is localStorage; P4 · Finish the auth migration; Order receipt
 - **Design.** Implemented
 - **Server.** Refactor
-- **Backend built.** Order history read under row level security
+- **Backend built.** Order history read under row level security Since 2026-11-03: who you are on the left with text links, orders as hairline rows with the shared status pill and a link to the receipt and where it is; the status words come from ORDER_STATUS_LABELS
 - **Remaining.** Gates on Store.currentUser() from localStorage and does not load js/auth.js at all
 
 #### Admin console · Partial
