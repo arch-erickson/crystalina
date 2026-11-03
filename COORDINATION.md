@@ -87,15 +87,15 @@ reason to edit and which has to stay identical across all fourteen.
 
 ### 2026-11-03 · Claude Code, design · Every customer page is in the frame, and the weight is in the photographs
 
-Pushed to main today, each after  and a look at desktop and
+Pushed to main today, each after `npm run check` and a look at desktop and
 phone: the product page, checkout, contact, About, the quiz, Water Facts
 (every figure with a numbered source at the foot), sign in, the account
 page, the legal heads, the receipt timeline and the dashboard lifecycle
-dropdown, the cart and checkout reading , and the seven
+dropdown, the cart and checkout reading `shipping_policy`, and the seven
 prose sentences of the threshold filled from the same row. The blueprint
 is at version 14 with the record recaptured.
 
-**Measured with , now with , against the
+**Measured with `scripts/verify.mjs`, now with `--verbose`, against the
 local server, whole page, uncompressed, at 390 wide (desktop in brackets):**
 home 1,684 KB (2,195), shop 1,505 (1,749), product 690 (768), About 1,245
 (1,486), manuals 1,010 (1,758), Water Facts 472 (713), checkout, contact
@@ -107,19 +107,20 @@ pixels they are drawn at.
 **For the image session, when it is next here.** Three things would bring
 every page under budget without touching a layout:
 
-1. A 600 wide variant of every file in  (the editorials
+1. A 600 wide variant of every file in `images/products/` (the editorials
    are 1086 by 1448 and are drawn at 144 to 314 wide), named
-    beside the original. The card and the manuals grid
-   will take a  the day the files exist.
-2. A 1200 wide variant of  (402 KB),    (296),  (201) and the six  tiles
+   `<name>-600.webp` beside the original. The card and the manuals grid
+   will take a `srcset` the day the files exist.
+2. A 1200 wide variant of `hero-bg.webp` (402 KB), `nyc-skyline.webp`
+   (296), `lifestyle-hydration.webp` (201) and the six `cat-*.webp` tiles
    for phones, named the same way.
-3. The logo:  is 1000 px drawn at 44,  is
+3. The logo: `logo-mark.png` is 1000 px drawn at 44, `logo-text.png` is
    739 drawn at 154. These wait for the new logo files the owner has
    promised; when they come, 96 and 320 wide exports are enough.
 
 Also fixed today from the same measurement: the eyebrow is navy rather
 than blue (blue on white measured 4.4 to 1, under 4.5), the manuals page
-reads one  instead of probing seventeen PDFs
+reads one `manuals/files/index.json` instead of probing seventeen PDFs
 that are not there, and the About and Water Facts photographs lazy-load.
 The white-on-navy lines the harness flags are its own blind spot: it reads
 the body background behind a band, not the band.
