@@ -736,6 +736,44 @@ function bindNewsletter() {
   });
 }
 
+/* ------------------------------------------------------------
+   Visitor counting, with no cookie
+   ------------------------------------------------------------
+   Cloudflare Web Analytics. It sets no cookie, stores nothing on the
+   device and builds no profile of a person, which is why the site needs
+   no consent banner (AD1, AD13). It reports page views, referrers,
+   countries and device classes. It does not report a click on a button:
+   that needs an events table of our own, which is not built.
+
+   ANALYTICS_TOKEN is public by design. It is readable in the page source
+   of every site that uses this, it authorises nothing, and it names
+   which site the counts belong to. It is not a secret and does not
+   belong in the Cloudflare dashboard beside the ones that are. An empty
+   token means the beacon never loads, which is the state until the owner
+   creates the site under Web Analytics and puts the token here.
+
+   One home, called by initPage, so no page carries its own copy of the
+   snippet. The four staff dashboards are left out: counting staff as
+   customers makes every number on the page a lie.
+   ------------------------------------------------------------ */
+const ANALYTICS_TOKEN = '';
+const ANALYTICS_OFF_PATHS = ['/admin/', '/manager/', '/sales/', '/technician/', '/docs/'];
+
+function analyticsCounts(path = location.pathname) {
+  if (!ANALYTICS_TOKEN) return false;
+  return !ANALYTICS_OFF_PATHS.some(prefix => path.startsWith(prefix));
+}
+
+function loadAnalytics() {
+  if (!analyticsCounts()) return;
+  if (document.querySelector('script[data-cf-beacon]')) return;
+  const beacon = document.createElement('script');
+  beacon.defer = true;
+  beacon.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+  beacon.setAttribute('data-cf-beacon', JSON.stringify({ token: ANALYTICS_TOKEN }));
+  document.head.appendChild(beacon);
+}
+
 /* ---------- page boot ---------- */
 function initPage(activeNav = '') {
   renderHeader(activeNav);
@@ -750,6 +788,7 @@ function initPage(activeNav = '') {
   autoReveal();
   requestAnimationFrame(() => initReveal());
   bindNewsletter();
+  loadAnalytics();
   // Refresh pricing, stock and publication state from Supabase.
   if (Store.hydrateFromSupabase) Store.hydrateFromSupabase();
   applyShippingThreshold();

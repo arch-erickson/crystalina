@@ -119,9 +119,9 @@ export const findings = [
   {
     id: 'F5', severity: 'Medium', icon: 'tag', family: 'amber',
     label: 'The accounts that would bring people in are held and unconnected',
-    detail: 'No feed, no analytics, no attribution',
+    detail: 'No feed, no attribution, page counts written but not switched on',
     status: 'Missing',
-    what: 'The domain, Google Search Console, the Meta Business account and the WhatsApp number all exist and have history. There is no product feed for Google Merchant Center or the Meta catalogue, no analytics of any kind, and no pixel or Conversions API. Seventeen products with no feed is free traffic left on the table, and a pixel added after a campaign starts cannot report on the days before it.',
+    what: 'The domain, Google Search Console, the Meta Business account and the WhatsApp number all exist and have history. There is no product feed for Google Merchant Center or the Meta catalogue, and no pixel or Conversions API. Page counting is written as of 2026-11-25 and waiting on one token (AD13). Seventeen products with no feed is free traffic left on the table, and a pixel added after a campaign starts cannot report on the days before it.',
     why: 'Missing. None of it blocks launch and all of it is cheaper to decide now than to retrofit. A pixel also turns the cookie banner into a real question, which Cloudflare Web Analytics on its own does not.',
     rel: ['asset:merchant', 'asset:pixel', 'asset:analytics'],
   },
@@ -304,10 +304,10 @@ export const architecture = {
             rel: ['risk:R3', 'phase:P6', 'threat:spam'],
           },
           {
-            id: 'cfanalytics', family: 'blue', icon: 'chart', label: 'Web Analytics', detail: 'No cookie, no consent banner', status: 'Missing',
-            what: 'Who arrives and from where, measured at the edge with no cookie and therefore no consent banner.',
-            why: 'Missing. It needs the zone on Cloudflare first, so it follows the cutover.',
-            rel: ['asset:analytics', 'phase:P5'],
+            id: 'cfanalytics', family: 'blue', icon: 'chart', label: 'Web Analytics', detail: 'No cookie, no consent banner', status: 'Partial',
+            what: 'Who arrives and from where, with no cookie and therefore no consent banner. The JS beacon is injected by one function in js/main.js, so it does not wait for the zone; the server-side version, which needs no script at all, does.',
+            why: 'Partial since 2026-11-25. The code is in place with an empty token, so nothing is counted yet. The remaining step is the owner creating the site in the dashboard, and publishing the privacy policy in the same move. See AD13.',
+            rel: ['asset:analytics', 'ad:AD13', 'page:privacy', 'phase:P5'],
           },
           {
             id: 'cfcron', family: 'slate', icon: 'clock', label: 'Cron Triggers', detail: 'Abandoned cart, expiry, reconciliation', status: 'Post-MVP',
@@ -499,10 +499,10 @@ export const assets = {
         },
         {
           id: 'analytics', icon: 'chart', label: 'Analytics', detail: 'Who arrives, and from where',
-          wired: 'Missing',
-          what: 'Nothing measures traffic today. Cloudflare Web Analytics is the choice: no cookie, so no consent banner.',
-          why: 'Missing. It needs the zone on Cloudflare, so it follows the cutover.',
-          rel: ['target:cfanalytics', 'finding:F5'],
+          wired: 'Partial',
+          what: 'Cloudflare Web Analytics, loaded once from js/main.js on the customer pages and left off the four dashboards. Page views, referrers, countries and device classes. No clicks: that is a second decision, trigger:clicks.',
+          why: 'Partial since 2026-11-25. Written, tested and inert: the token is empty, so no request is made and nothing is recorded. The owner creates the site and pastes the token. See AD13.',
+          rel: ['target:cfanalytics', 'ad:AD13', 'finding:F5'],
         },
       ],
     },
@@ -1165,7 +1165,7 @@ export const deployment = {
  * ------------------------------------------------------------------ */
 
 export const ownerSteps = {
-  note: 'Seven things that need a person signed in to a dashboard. An agent can name every value and write every line of configuration; it cannot create an account, accept terms or move a nameserver. Ordered by what blocks what.',
+  note: 'Eight things that need a person signed in to a dashboard. An agent can name every value and write every line of configuration; it cannot create an account, accept terms or move a nameserver. Ordered by what blocks what.',
   steps: [
     {
       id: 'own-secrets', icon: 'key', family: 'violet', label: 'Set every secret on the Worker', status: 'Partial',
@@ -1202,6 +1202,12 @@ export const ownerSteps = {
       what: 'Point crystalina.org at Cloudflare, then add the new origin to the Supabase redirect allow-list.',
       why: 'Missing, and the single step that turns a working Worker into a working site. Do it only when a preview has passed, and check what it does to Workspace mail first.',
       rel: ['phase:P5', 'target:cfdns', 'unknown:U8'],
+    },
+    {
+      id: 'own-analytics', icon: 'chart', family: 'blue', label: 'Create the Web Analytics site, and publish the privacy policy', status: 'Missing',
+      what: 'Add crystalina.org under Web Analytics, copy the site token into ANALYTICS_TOKEN in js/main.js, and in the same commit take the privacy policy out of the _config.yml exclude and into the publish allow-list.',
+      why: 'Missing, free, and the only step left on AD13. The policy approval is the part that is a judgement rather than a click: it now describes the counting, and the test refuses the token until the page is published.',
+      rel: ['ad:AD13', 'page:privacy', 'finding:F5'],
     },
     {
       id: 'own-rollback', icon: 'undo', family: 'slate', label: 'Practise a rollback once', status: 'Missing',
@@ -1465,6 +1471,7 @@ export const personalData = [
   { what: 'Contact form messages', where: 'Supabase: contact_messages, with the sender IP as a truncated hash', how: 'Indefinite. Worth a rule before volume makes one urgent' },
   { what: 'Newsletter addresses', where: 'Supabase: newsletter_subscribers', how: 'Until unsubscribed, and no unsubscribe path is built' },
   { what: 'Card details', where: 'Never touched. Stripe would hold them on its own hosted page', how: 'Not applicable, and it must stay that way' },
+  { what: 'Visitor page counts', where: 'Cloudflare Web Analytics, once the token is set. No cookie, nothing stored on the device', how: 'Aggregated at Cloudflare. Nothing that identifies a person, and nothing we can tie back to one' },
   { what: 'Staff hours, shifts, time off', where: 'Supabase: ten workforce tables and an audit log', how: 'For the life of employment, plus whatever payroll law requires. Unresolved: U5' },
 ];
 
@@ -1487,6 +1494,13 @@ export const triggers = [
     what: 'Moving the data to Cloudflare\'s own database.',
     why: 'Post-MVP, and the most expensive idea in this list. D1 has no row level security, so moving would mean reimplementing every policy as application code. See AD3.',
     rel: ['ad:AD3', 'now:pg'],
+  },
+  {
+    id: 'clicks', icon: 'funnel', family: 'slate', label: 'Click and funnel events of our own', status: 'Post-MVP',
+    trigger: 'A decision actually turns on which button was pressed: payment is live, and the question becomes how many people who opened a product reached the checkout',
+    what: 'An events table in Supabase and one write from the browser, or a product like PostHog. Page counts say a visit happened and nothing about what was done in it.',
+    why: 'Post-MVP. AD13 gives the counts with no cookie and no consent banner. Anything that records what a person did on a page is the kind of tracking the privacy policy currently says this site does not do, so it is a decision with a page to rewrite attached rather than an afternoon of work.',
+    rel: ['ad:AD13', 'page:privacy', 'phase:P3'],
   },
   {
     id: 'cron', icon: 'clock', family: 'slate', label: 'Cron Triggers for carts and reconciliation', status: 'Post-MVP',
@@ -1671,6 +1685,17 @@ export const decisions = [
     replace: 'A component genuinely needs a fifth weight. Add it to the token block and to the loader in every page head in the same commit, never as a literal.',
     rel: ['ad:AD8', 'page:home'],
   },
+  {
+    id: 'AD13', theme: 'Platform', date: '2026-11-25', status: 'Partial', icon: 'chart', family: 'blue',
+    title: 'Page counts with no cookie, injected once, and no click tracking',
+    does: 'Cloudflare Web Analytics, loaded by one function in js/main.js that initPage calls. One snippet and one token for every customer page, with the four staff dashboards and the docs pages left out, because staff counted as customers makes every number on the page a lie.',
+    need: 'Nothing measured traffic at all, which is half of F5. The question the owner asked, how many people visit and what do they click, had no answer anywhere in the project.',
+    here: 'It sets no cookie and stores nothing on the device, so the site still needs no consent banner. That is the property AD1 picked it for. The thing that would also measure clicks, a pixel or a product like PostHog, turns the banner into a real question and is a separate decision.',
+    costs: 'A third-party script on every customer page, deferred and injected after the page boots, so anything it reports about load timing is measured a moment late. It reports no clicks at all: which button was pressed needs an events table of our own, which is trigger:clicks. The token sits in the source, which is correct and is worth saying out loud: it is public on every site that uses this, it authorises nothing, and it is not one of the eleven secrets.',
+    now: 'Partial on 2026-11-25. Every line is in place and the token is empty, so nothing is sent and nothing is counted. tests/analytics.test.cjs runs the real block against a pretend document and refuses a filled-in token while the privacy policy is unpublished, so switching the counting on and telling visitors about it are one commit rather than two. The earlier reading, that this had to follow the nameserver move, was wrong: the JS beacon works on any host, GitHub Pages included.',
+    replace: 'Clicks or funnels are genuinely needed, or the zone reaches Cloudflare and the server-side version replaces the script tag entirely.',
+    rel: ['ad:AD1', 'finding:F5', 'asset:analytics', 'target:cfanalytics', 'def:analytics', 'page:privacy', 'trigger:clicks'],
+  },
 ];
 
 /* ------------------------------------------------------------------ *
@@ -1803,6 +1828,13 @@ export const definitions = [
     what: 'Which status may follow which, whether the move returns stock and whether the customer hears about it, as rows the database enforces and the dashboard reads through CrystalinaData.orderTransitions(). The seven statuses as a person reads them are one object in js/main.js.',
     why: 'Implemented on 2026-11-03. The dropdown and the refusal come from the same rows, so they cannot drift; the migration is still to be applied.',
     rel: ['phase:P8', 'table:orders'],
+  },
+  {
+    id: 'analytics', thing: 'The Web Analytics token and the pages it counts', home: 'ANALYTICS_TOKEN and ANALYTICS_OFF_PATHS in js/main.js', readers: ['Every storefront page, through initPage'], status: 'Implemented',
+    note: 'Twenty-five page heads would have been twenty-five copies of the snippet',
+    what: 'The site token and the list of paths that are not counted. loadAnalytics injects the beacon once, from initPage, so no page carries the snippet and the dashboards are excluded in one place.',
+    why: 'Implemented on 2026-11-25, and the reason to write it this way: the pasted snippet is the normal way to install this, and the normal way is a copy per page. A test fails the build if any page in the repository carries its own.',
+    rel: ['ad:AD13', 'def:ui'],
   },
   {
     id: 'status', thing: 'Status vocabulary, drawings and dependencies', home: 'docs/diagrams/model.mjs', readers: ['Blueprint', 'Contact sheet', 'Any progress report'], status: 'Implemented',

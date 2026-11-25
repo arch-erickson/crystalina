@@ -29,6 +29,7 @@ markup, look for the component. If it half exists, extend it.
 | Design tokens and every component | `css/styles.css` |
 | The library, rendered live, for looking | `docs/components.html` at /docs/components.html when served |
 | Shared UI, icons, `escapeHTML` | `js/main.js` |
+| Cookieless page counts, and the paths left out | `ANALYTICS_TOKEN` in `js/main.js` |
 | Local cache, hydrated from Supabase | `js/store.js` |
 | Supabase reads, writes and uploads | `js/data-remote.js` |
 | Server boundary | `api/*.mjs`, routed by `worker.js` |
@@ -119,6 +120,10 @@ source we can produce, half the words of the first draft.
   a person typed is a finding, not a convention.
 - Migrations are additive and re-runnable: `create or replace`,
   `if not exists`, drop-then-create for policies.
+- The Web Analytics site token is **not** a secret: it is public in the page
+  source of every site that uses it and authorises nothing. It has one home,
+  `ANALYTICS_TOKEN` in `js/main.js`, and filling it in means publishing the
+  privacy policy in the same commit, which a test enforces (AD13).
 - Secrets live in the Cloudflare dashboard, per environment. Never in the
   repository, never in a variable that reaches the browser, never in chat.
 

@@ -85,6 +85,46 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-25 · Claude Code, design · Page counts, with no cookie and no clicks
+
+The owner asked where he can see visits and clicks. The answer was nowhere:
+no tracking script anywhere, no page view or event table in the seventeen
+migrations, and the live host gives no visitor numbers. Finding F5 said so
+and the model had the target card drawn already.
+
+Cloudflare Web Analytics is now wired, as AD13. One function in
+`js/main.js`, called by `initPage`, injects the beacon once. No page carries
+the snippet; the four staff dashboards and `/docs/` are left out, because
+staff counted as customers makes every number on the page a lie.
+
+**It is inert.** `ANALYTICS_TOKEN` is empty, so no request is made and
+nothing is recorded. The remaining step is the owner creating the site in the
+dashboard, which is the new `own-analytics` row on the owner drawing.
+
+**The correction worth carrying.** The model said this had to wait for the
+nameserver move. It does not: the JS beacon works on any host. Verified here
+with a throwaway token on /shop/, where beacon.min.js loaded, read its token
+and attempted its POST to `cloudflareinsights.com/cdn-cgi/rum`, blocked only
+by CORS because the origin was localhost. The server-side version is what
+needs the zone.
+
+**What another session must do about it.**
+
+1. `scripts/build-site.mjs` is yours and I did not touch it. I started to add
+   `privacy`, `terms` and `shipping-returns` to the allow-list and reverted
+   it when the model reminded me those three are withheld on purpose until
+   the owner approves the wording. Do not publish them on your own account.
+2. The privacy policy now describes the counting, so publishing it and
+   filling in the token are one commit, not two.
+   `tests/analytics.test.cjs` enforces that: a non-empty token fails the
+   build while `privacy` is off the allow-list or in the `_config.yml`
+   exclude. Publishing means both lists at once, as the page card says.
+3. Clicks are not built and are not a small addition. They are
+   `trigger:clicks` on the postponed drawing: an events table of our own,
+   and a privacy page that currently promises the opposite.
+4. When the token goes in, bump the `?v=` on the `main.js` tag in the page
+   heads, or returning visitors keep a cached file and go uncounted.
+
 ### 2026-11-25 · Claude Code, deploys and auth · The admin dashboard was unusable on a phone
 
 Reported by the owner from an Android phone, and fixed in `5b2c76c`. One rule
