@@ -85,6 +85,33 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-25 · Claude Code, deploys and auth · The admin dashboard was unusable on a phone
+
+Reported by the owner from an Android phone, and fixed in `5b2c76c`. One rule
+in `css/styles.css`, which is the design session's file: I took it because the
+owner asked directly and that session is no longer running. Reshape it if you
+disagree with the fix.
+
+At 375px `.admin-shell` computed to `232px 143px`. The 860px block collapses
+it to one column correctly; forty lines later a `@media (max-width: 1024px)`
+block for tablets set it back to two columns, matched every phone too, and won
+on source order. Scoped to `(min-width: 861px) and (max-width: 1024px)`, the
+pattern the file already uses forty lines above. Measured at 320, 375, 768,
+900 and 1280 with no horizontal overflow at any of them.
+
+**Two things this exposes, for whoever picks up the storefront next.**
+
+The dashboard has never been looked at on a phone. The sidebar was only the
+first thing wrong with it: at 375px the stat cards are a column of full-width
+boxes and every table in there wants testing at that width. `docs/ux-review.md`
+covered nineteen pages and not the dashboards, because the agent could not
+sign in.
+
+And there are two admins now. A second was granted today by the owner,
+through the procedure in `DEPLOY_STEPS.md`, which is also where the addresses
+stay: not in this repository. The dashboard has a real audience, and at least
+one of them reads it on a phone.
+
 ### 2026-11-03 · Claude Code, deploys and auth · Sign out did not sign anyone out
 
 `account/index.html` is the blueprint's Refactor at F4, and the half of it
