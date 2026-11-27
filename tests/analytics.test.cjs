@@ -72,10 +72,15 @@ test('a page that already has a beacon does not get a second one', () => {
   assert.deepEqual(appended, [], 'two beacons count every visit twice');
 });
 
+/* docs/ is left out on purpose: the blueprint is writing about the beacon and
+   quotes both hostnames in AD13, which is the one place in the repository
+   where the string is content rather than a snippet. Nothing under docs/ is
+   in the publish allow-list either, so a page there reaches no customer. */
 test('the snippet has one home: no page carries its own copy', () => {
   const pages = fs.readdirSync(root, { recursive: true })
     .filter((f) => typeof f === 'string' && f.endsWith('.html'))
-    .filter((f) => !f.startsWith('dist') && !f.startsWith('node_modules') && !f.includes('.claude'));
+    .filter((f) => !f.startsWith('dist') && !f.startsWith('node_modules') && !f.includes('.claude'))
+    .filter((f) => !f.startsWith('docs'));
   assert.ok(pages.length > 10, 'the page list is still being found');
   for (const page of pages) {
     assert.doesNotMatch(read(page), /cloudflareinsights|data-cf-beacon/,
