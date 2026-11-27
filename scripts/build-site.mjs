@@ -32,6 +32,10 @@ const DIRS = [
   'css', 'js', 'images',
   'about', 'account', 'admin', 'checkout', 'contact', 'manager', 'nyc-water',
   'manuals', 'order', 'product', 'quiz', 'sales', 'shop', 'signin', 'technician',
+  // privacy/ on 2026-11-26, with the matching line out of _config.yml, because
+  // the page describes the counting in AD13. terms/ and shipping-returns/ are
+  // still withheld until the owner has read them.
+  'privacy',
 ];
 
 /* Single files at the root. Each one is here because something depends on it

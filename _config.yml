@@ -63,10 +63,14 @@ exclude:
   # They are not in sitemap.xml, so excluding them costs nothing in
   # Search Console.
   #
-  # The day he approves them: delete these three lines and add the three
-  # paths to the PUBLISH list in scripts/build-site.mjs. Both, or they go
-  # live on one host and not the other.
-  - privacy/
+  # The day he approves them: delete the line here and add the path to the
+  # PUBLISH list in scripts/build-site.mjs. Both, or it goes live on one
+  # host and not the other.
+  #
+  # privacy/ went that way on 2026-11-26, because the page counting in AD13
+  # is described on it, and counting people while the page that tells them
+  # answers 404 is not a thing to ship. Terms and shipping and returns are
+  # still waiting on the owner.
   - terms/
   - shipping-returns/
 

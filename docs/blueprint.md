@@ -160,7 +160,7 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | NYC water | /nyc-water/ | Implemented | Missing | The microplastics card makes no numeric claim, by design, because none we found had a source we could stand behind |
 | About | /about/ | Implemented | Missing | Nothing. No server work needed |
 | Contact | /contact/ | Implemented | Implemented | No Turnstile widget, and the page reads a token from one that does not exist The notification lands in a suspended inbox (U8) |
-| Privacy policy | /privacy/ | Implemented | Missing | Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
+| Privacy policy | /privacy/ | Implemented | Implemented | Nothing on the server. No server work needed |
 | Terms of service | /terms/ | Implemented | Missing | Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
 | Shipping and returns | /shipping-returns/ | Implemented | Missing | Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
 | Manuals and guides | /manuals/ | Implemented | Missing | No manual file exists yet. A manual belongs in the site-media bucket, named on the product row as manualUrl, which the page trusts; only the guessed /manuals/files/<slug>.pdf address is checked when the page loads Nothing on the server. No server work needed |
@@ -281,7 +281,7 @@ _**The threats that apply, and what stands in front of each.** The right-hand co
 | Contact form messages | Supabase: contact_messages, with the sender IP as a truncated hash | Indefinite. Worth a rule before volume makes one urgent |
 | Newsletter addresses | Supabase: newsletter_subscribers | Until unsubscribed, and no unsubscribe path is built |
 | Card details | Never touched. Stripe would hold them on its own hosted page | Not applicable, and it must stay that way |
-| Visitor page counts | Cloudflare Web Analytics, once the token is set. No cookie, nothing stored on the device | Aggregated at Cloudflare. Nothing that identifies a person, and nothing we can tie back to one |
+| Visitor page counts | Cloudflare Web Analytics, counting since 2026-11-26. No cookie, nothing stored on the device | Aggregated at Cloudflare. Nothing that identifies a person, and nothing we can tie back to one |
 | Staff hours, shifts, time off | Supabase: ten workforce tables and an audit log | For the life of employment, plus whatever payroll law requires. Unresolved: U5 |
 
 > **Deliberately accepted**
@@ -479,9 +479,9 @@ Refactor. The protection that matters is in the database and is in place, and si
 
 #### The accounts that would bring people in are held and unconnected · Missing
 
-_Finding · No feed, no attribution, page counts written but not switched on._
+_Finding · No feed, no attribution. Page counts are live._
 
-The domain, Google Search Console, the Meta Business account and the WhatsApp number all exist and have history. There is no product feed for Google Merchant Center or the Meta catalogue, and no pixel or Conversions API. Page counting is written as of 2026-11-25 and waiting on one token (AD13). Seventeen products with no feed is free traffic left on the table, and a pixel added after a campaign starts cannot report on the days before it.
+The domain, Google Search Console, the Meta Business account and the WhatsApp number all exist and have history. There is no product feed for Google Merchant Center or the Meta catalogue, and no pixel or Conversions API. Page counting is live as of 2026-11-26 and is the one part of this that is now answered (AD13). Seventeen products with no feed is free traffic left on the table, and a pixel added after a campaign starts cannot report on the days before it.
 
 Missing. None of it blocks launch and all of it is cheaper to decide now than to retrofit. A pixel also turns the cookie banner into a real question, which Cloudflare Web Analytics on its own does not.
 
@@ -612,19 +612,19 @@ Implemented as of 2026-11-02: the route answers on the Worker, the method guard 
 - **Backend built.** POST /api/contact validates, rate limits and writes contact_messages Answers 200 on the Worker, checked 2026-11-02 In the frame since 2026-11-03: the ways to reach us as a hairline definition list, the form in the same form section component the checkout uses, the questions beneath as the shared accordion
 - **Remaining.** No Turnstile widget, and the page reads a token from one that does not exist The notification lands in a suspended inbox (U8)
 
-#### Privacy policy · Missing
+#### Privacy policy · Implemented
 
 _Page · /privacy/._
 
-The privacy policy, in plain language: what the shop collects, which services see it, and how to have it removed.
+The privacy policy, in plain language: what the shop collects, which services see it, what the page counting records, and how to have it removed.
 
-Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Since 0ecd26f, later the same day, it is excluded in _config.yml as well, and answers 404 at crystalina.org; publishing it on approval means both lists at once, the three lines out of _config.yml and the three paths into scripts/build-site.mjs, or it goes live on one host and missing from the other.
+Published on both hosts on 2026-11-26, out of the _config.yml exclude and into the allow-list together, which is what the page cards for terms and shipping and returns still describe. It went first because AD13 counts page views and the policy is where a visitor is told so. The footer carries a Privacy link as of the same commit, since an unlinked disclosure discloses nothing.
 
-- **See also.** Home; Web Analytics; Create the Web Analytics site, and publish the privacy policy; Click and funnel events of our own; AD13 · Page counts with no cookie, injected once, and no click tracking
+- **See also.** Home; AD13 · Page counts with no cookie, injected once, and no click tracking; Web Analytics; Create the Web Analytics site, and publish the privacy policy; Click and funnel events of our own
 - **Design.** Implemented
-- **Server.** Missing
-- **Backend built.** What is collected, who handles it, how to have it removed Set in the long-form text component shared by every legal page
-- **Remaining.** Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed
+- **Server.** Implemented
+- **Backend built.** What is collected, who handles it, how to have it removed What the page counting records, and that it sets no cookie Set in the long-form text component shared by every legal page Linked from the footer of every page
+- **Remaining.** Nothing on the server. No server work needed
 
 #### Terms of service · Missing
 
@@ -632,7 +632,7 @@ _Page · /terms/._
 
 The terms of service: orders, pricing, warranty, returns and disputes.
 
-Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Since 0ecd26f, later the same day, it is excluded in _config.yml as well, and answers 404 at crystalina.org; publishing it on approval means both lists at once, the three lines out of _config.yml and the three paths into scripts/build-site.mjs, or it goes live on one host and missing from the other.
+Drafted and styled, and unpublished until the owner approves the wording, which is partly a legal question. It is excluded in _config.yml and absent from the allow-list, so it answers 404 on both hosts. Publishing it on approval means both lists at once, the line out of _config.yml and the path into scripts/build-site.mjs, or it goes live on one host and missing from the other. The privacy policy went that way on 2026-11-26 and is the worked example.
 
 - **See also.** Home
 - **Design.** Implemented
@@ -1143,13 +1143,13 @@ Missing, and an hour of work. It cannot be fixed in application code: a counter 
 - **See also.** Rate limit does not survive the instance; P6 · Security hardening; Form spam and abuse; Method, rate limit, body cap
 - **Zone.** Cloudflare (one account)
 
-#### Web Analytics · Partial
+#### Web Analytics · Implemented
 
 _Architecture after the cutover · No cookie, no consent banner._
 
 Who arrives and from where, with no cookie and therefore no consent banner. The JS beacon is injected by one function in js/main.js, so it does not wait for the zone; the server-side version, which needs no script at all, does.
 
-Partial since 2026-11-25. The code is in place with an empty token, so nothing is counted yet. The remaining step is the owner creating the site in the dashboard, and publishing the privacy policy in the same move. See AD13.
+Implemented on 2026-11-26. The site exists in the dashboard with no zone on the account, which Cloudflare allows, and the JS beacon carries its token. The server-side version, which needs no script at all, still waits for the zone. See AD13.
 
 - **See also.** Analytics; AD13 · Page counts with no cookie, injected once, and no click tracking; Privacy policy; P5 · DNS cutover
 - **Zone.** Cloudflare (one account)
@@ -1294,13 +1294,13 @@ Missing. Seventeen products with no feed is free traffic left on the table.
 - **See also.** The accounts that would bring people in are held and unconnected; Meta product catalog
 - **Group.** Domain and search
 
-#### Analytics · Partial
+#### Analytics · Implemented
 
 _Channel · Who arrives, and from where._
 
 Cloudflare Web Analytics, loaded once from js/main.js on the customer pages and left off the four dashboards. Page views, referrers, countries and device classes. No clicks: that is a second decision, trigger:clicks.
 
-Partial since 2026-11-25. Written, tested and inert: the token is empty, so no request is made and nothing is recorded. The owner creates the site and pastes the token. See AD13.
+Implemented on 2026-11-26. The token is in and the beacon reports. It is the first thing in the project that measures anything about who visits. See AD13.
 
 - **See also.** The accounts that would bring people in are held and unconnected; Web Analytics; AD13 · Page counts with no cookie, injected once, and no click tracking; P10 · Launch; Meta Pixel or Conversions API
 - **Group.** Domain and search
@@ -1959,13 +1959,13 @@ Missing, and the single step that turns a working Worker into a working site. Do
 
 - **See also.** P5 · DNS cutover; Cloudflare DNS; U8 · How does Google Workspace on crystalina.org get unlocked, and what does the DNS move do to it?
 
-#### Create the Web Analytics site, and publish the privacy policy · Missing
+#### Create the Web Analytics site, and publish the privacy policy · Implemented
 
 _Owner task · Needs a person in a dashboard._
 
 Add crystalina.org under Web Analytics, copy the site token into ANALYTICS_TOKEN in js/main.js, and in the same commit take the privacy policy out of the _config.yml exclude and into the publish allow-list.
 
-Missing, free, and the only step left on AD13. The policy approval is the part that is a judgement rather than a click: it now describes the counting, and the test refuses the token until the page is published.
+Done on 2026-11-26. The owner added the hostname, which Cloudflare accepted as a site with no zone on the account and issued a JS snippet for, and sent the token. The policy went live on both hosts in the same commit. Terms and shipping and returns are still withheld.
 
 - **See also.** AD13 · Page counts with no cookie, injected once, and no click tracking; Privacy policy; The accounts that would bring people in are held and unconnected
 
@@ -2664,15 +2664,15 @@ Four weights carry every component on the site, and the whole rule is one commen
 - **What it costs.** Thirty two places are one step lighter than they were, which is the difference between a drawn bold and a real one. The page head asks for the same seven files as before, and every one of them is now a weight the stylesheet uses.
 - **Replace when.** A component genuinely needs a fifth weight. Add it to the token block and to the loader in every page head in the same commit, never as a literal.
 
-#### AD13 · Page counts with no cookie, injected once, and no click tracking · Partial
+#### AD13 · Page counts with no cookie, injected once, and no click tracking · Implemented
 
 _Decision · Decided 2026-11-25._
 
 Cloudflare Web Analytics, loaded by one function in js/main.js that initPage calls. One snippet and one token for every customer page, with the four staff dashboards and the docs pages left out, because staff counted as customers makes every number on the page a lie.
 
-Partial on 2026-11-25. Every line is in place and the token is empty, so nothing is sent and nothing is counted. tests/analytics.test.cjs runs the real block against a pretend document and refuses a filled-in token while the privacy policy is unpublished, so switching the counting on and telling visitors about it are one commit rather than two. The earlier reading, that this had to follow the nameserver move, was wrong: the JS beacon works on any host, GitHub Pages included.
+Live on 2026-11-26. The owner created the site and supplied the token, and the same commit published the privacy policy on both hosts, put a Privacy link in the footer so the page can be reached, and bumped the cache-busting query on every page head so returning visitors load the new main.js rather than a cached one. tests/analytics.test.cjs runs the real block against a pretend document and refuses a filled-in token while the policy is unpublished, so the counting and the sentence that tells visitors about it cannot come apart. The earlier reading, that this had to follow the nameserver move, was wrong: the JS beacon works on any host, and the host it is working on is GitHub Pages.
 
-- **See also.** Web Analytics; Click and funnel events of our own; AD1 · Cloudflare, rather than staying on Vercel or on GitHub Pages; The accounts that would bring people in are held and unconnected; Analytics; The Web Analytics token and the pages it counts; Privacy policy; Create the Web Analytics site, and publish the privacy policy
+- **See also.** Web Analytics; Privacy policy; Click and funnel events of our own; AD1 · Cloudflare, rather than staying on Vercel or on GitHub Pages; The accounts that would bring people in are held and unconnected; Analytics; The Web Analytics token and the pages it counts; Create the Web Analytics site, and publish the privacy policy
 - **Why we need it.** Nothing measured traffic at all, which is half of F5. The question the owner asked, how many people visit and what do they click, had no answer anywhere in the project.
 - **Why it belongs here.** It sets no cookie and stores nothing on the device, so the site still needs no consent banner. That is the property AD1 picked it for. The thing that would also measure clicks, a pixel or a product like PostHog, turns the banner into a real question and is a separate decision.
 - **What it costs.** A third-party script on every customer page, deferred and injected after the page boots, so anything it reports about load timing is measured a moment late. It reports no clicks at all: which button was pressed needs an events table of our own, which is trigger:clicks. The token sits in the source, which is correct and is worth saying out loud: it is public on every site that uses this, it authorises nothing, and it is not one of the eleven secrets.

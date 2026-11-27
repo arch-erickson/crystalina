@@ -620,7 +620,7 @@ function renderFooter() {
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
       <span>© ${new Date().getFullYear()} ${escapeHTML(companyName.replace(/\.$/, ''))}. All rights reserved. Proudly serving the five boroughs.</span>
-      <span class="footer-links"><a href="/signin/?mode=staff">Staff sign in</a></span>
+      <span class="footer-links"><a href="/privacy/">Privacy</a><a href="/signin/?mode=staff">Staff sign in</a></span>
     </div>
   </div>`;
   document.body.appendChild(el);
@@ -749,14 +749,18 @@ function bindNewsletter() {
    of every site that uses this, it authorises nothing, and it names
    which site the counts belong to. It is not a secret and does not
    belong in the Cloudflare dashboard beside the ones that are. An empty
-   token means the beacon never loads, which is the state until the owner
-   creates the site under Web Analytics and puts the token here.
+   token means the beacon never loads; the owner created the site and
+   supplied this one on 2026-11-26.
+
+   type and src are copied from the snippet Cloudflare issued for this
+   site rather than chosen here, so the beacon is loaded the way the
+   people who wrote it expect.
 
    One home, called by initPage, so no page carries its own copy of the
    snippet. The four staff dashboards are left out: counting staff as
    customers makes every number on the page a lie.
    ------------------------------------------------------------ */
-const ANALYTICS_TOKEN = '';
+const ANALYTICS_TOKEN = 'df8a261d97d74a2bbb4eab91c42144f2';
 const ANALYTICS_OFF_PATHS = ['/admin/', '/manager/', '/sales/', '/technician/', '/docs/'];
 
 function analyticsCounts(path = location.pathname) {
@@ -768,7 +772,7 @@ function loadAnalytics() {
   if (!analyticsCounts()) return;
   if (document.querySelector('script[data-cf-beacon]')) return;
   const beacon = document.createElement('script');
-  beacon.defer = true;
+  beacon.type = 'module';
   beacon.src = 'https://static.cloudflareinsights.com/beacon.min.js';
   beacon.setAttribute('data-cf-beacon', JSON.stringify({ token: ANALYTICS_TOKEN }));
   document.head.appendChild(beacon);

@@ -85,6 +85,42 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-26 · Claude Code, design · The counting is on, and the privacy policy is published
+
+The owner created the Web Analytics site and sent the token, so AD13 is
+Implemented rather than Partial. One commit does all of it, because the test
+written yesterday refuses the token on its own.
+
+- `ANALYTICS_TOKEN` in `js/main.js` is set. The beacon is loaded the way
+  Cloudflare issues it for this site, `type="module"` rather than `defer`;
+  the snippet changed under us between writing it and turning it on, and
+  theirs is the one to copy.
+- `privacy/` is published on both hosts: out of the `_config.yml` exclude
+  and into the allow-list in `scripts/build-site.mjs`. Terms and shipping
+  and returns stay withheld, and the page cards now give the instruction
+  per page rather than for all three at once.
+- The footer carries a Privacy link, in `renderFooter`, because an
+  unlinked disclosure discloses nothing. It is the first legal link in the
+  footer; the other two wait on their pages.
+- `.footer-links` in `css/styles.css` is an inline-flex row with a gap
+  now. With one link in it the missing gap never showed; with two it read
+  "PrivacyStaff sign in".
+- Every page head moved from `?v=20261103-redesign` to
+  `?v=20261126-analytics`, twenty files, so a returning visitor does not
+  keep a cached `main.js` and go uncounted.
+
+**Two files I took that are not mine.** `scripts/build-site.mjs` and
+`_config.yml` belong to deploys and auth. The owner asked for this directly
+and the change is four lines across the two of them, both reversible in one
+command, so I took them rather than leaving the policy live on one host and
+404 on the other. Same precedent as `css/styles.css` yesterday, in the
+other direction. Reshape it if you disagree.
+
+**What another session must do about it.** Nothing, unless you are about to
+touch the publish lists. If you are: the rule is now one page at a time, and
+both lists in the same commit, which the `terms` and `shipping-returns`
+page cards spell out.
+
 ### 2026-11-25 · Claude Code, design · Page counts, with no cookie and no clicks
 
 The owner asked where he can see visits and clicks. The answer was nowhere:

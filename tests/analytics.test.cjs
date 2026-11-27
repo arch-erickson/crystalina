@@ -51,11 +51,11 @@ test('no token means no beacon, which is the state until the owner makes one', (
   assert.deepEqual(appended, [], 'an empty token must not load a script that reports to nobody');
 });
 
-test('a token counts a customer page, deferred and with the token attached', () => {
+test('a token counts a customer page, as a module with the token attached', () => {
   const { appended } = runAnalytics({ token: 'test-token', pathname: '/shop/' });
   assert.equal(appended.length, 1);
   assert.equal(appended[0].src, BEACON);
-  assert.equal(appended[0].defer, true, 'the beacon must never block the page');
+  assert.equal(appended[0].type, 'module', 'the snippet Cloudflare issued for this site, copied');
   assert.deepEqual(JSON.parse(appended[0].attrs['data-cf-beacon']), { token: 'test-token' });
 });
 
