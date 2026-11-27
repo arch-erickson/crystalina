@@ -15,9 +15,11 @@
 # names are in section 9 of the blueprint and in .env.example.
 #
 # Plain values:  SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, PUBLIC_SITE_URL,
-#                TURNSTILE_SITE_KEY, EMAIL_FROM, CONTACT_INBOX
+#                TURNSTILE_SITE_KEY, EMAIL_FROM, CONTACT_INBOX,
+#                CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_RUM_SITE_TAG
 # Secrets:       SUPABASE_SERVICE_ROLE_KEY, TURNSTILE_SECRET_KEY,
-#                RESEND_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET
+#                RESEND_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
+#                CLOUDFLARE_API_TOKEN
 
 name = "crystalina"
 main = "worker.js"

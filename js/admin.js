@@ -1045,6 +1045,61 @@
   }
 
 
+  /* The traffic panel. It has four honest states and no broken one: the
+     numbers, this address runs no server, no token yet, or not your role.
+     Each says what to do next, and the full report is a click away in the
+     panel header whichever it is. */
+  async function renderTraffic() {
+    const stats = document.getElementById('trafficStats');
+    const chart = document.getElementById('trafficChart');
+    const rows = document.querySelector('#trafficPagesTable tbody');
+    const note = document.getElementById('trafficNote');
+    const table = document.getElementById('trafficPagesTable');
+    if (!stats || !window.CrystalinaData || !CrystalinaData.trafficSummary) return;
+
+    const days = Number(document.getElementById('trafficPeriod')?.value || 30);
+    const show = (visible) => {
+      stats.style.display = visible ? '' : 'none';
+      chart.style.display = visible ? '' : 'none';
+      table.style.display = visible ? '' : 'none';
+      note.style.display = visible ? 'none' : '';
+    };
+
+    note.textContent = 'Reading the traffic figures.';
+    show(false);
+
+    const result = await CrystalinaData.trafficSummary(days);
+    if (!result.ok) {
+      note.textContent = {
+        'no-server': 'These figures are read through the server, which this address does not run. The full report has them in the meantime.',
+        'no-token': 'Counting is on. The figures appear here once the Cloudflare API token is set on the Worker.',
+        'signed-out': 'Sign in as staff to read the traffic figures here.',
+        'not-staff': 'Your account cannot read the traffic figures.',
+      }[result.reason] || 'Cloudflare did not answer. The full report is the place to look until it does.';
+      return;
+    }
+
+    show(true);
+    const period = `last ${result.period} days`;
+    const perDay = result.period ? Math.round(result.totals.views / result.period) : 0;
+    stats.innerHTML =
+      statCard('Page views', result.totals.views.toLocaleString(), period) +
+      statCard('Visits', result.totals.visits.toLocaleString(), period) +
+      statCard('Views a day', perDay.toLocaleString(), 'on average') +
+      statCard('Busiest page', result.pages[0] ? escapeHTML(result.pages[0].path) : 'None yet', result.pages[0] ? `${result.pages[0].views.toLocaleString()} views` : period);
+
+    /* One bar a day, scaled to the busiest day, the same component the
+       revenue chart above is drawn with. */
+    const peak = Math.max(1, ...result.series.map(day => day.views));
+    chart.innerHTML = result.series.length
+      ? result.series.map(day => `<div class="chart-month"><div class="chart-bar" style="height:${Math.round((day.views / peak) * 100)}%" data-value="${day.views} views"></div><span>${escapeHTML(String(day.date).slice(5))}</span></div>`).join('')
+      : '<p class="empty-state">No days with traffic yet.</p>';
+
+    rows.innerHTML = result.pages.length
+      ? result.pages.map(page => `<tr><td><strong>${escapeHTML(page.path)}</strong></td><td>${page.views.toLocaleString()}</td><td>${page.visits.toLocaleString()}</td></tr>`).join('')
+      : '<tr><td colspan="3">No pages counted yet.</td></tr>';
+  }
+
   function renderFinance() {
     const adminData = Store.getAdminData();
     const finance = adminData.finance;
@@ -1082,6 +1137,7 @@
     document.querySelector('#areaSalesTable tbody').innerHTML = finance.areas.map(area => { const share = Math.round((area.revenue / areaTotal) * 100); return `<tr><td><strong>${escapeHTML(area.name)}</strong></td><td>${area.orders}</td><td>${money(area.revenue)}</td><td><div class="share-bar"><i style="width:${share}%"></i></div><small>${share}%</small></td></tr>`; }).join('');
     document.querySelector('#productSalesTable tbody').innerHTML = finance.products.map(product => `<tr><td><strong>${escapeHTML(product.name)}</strong></td><td>${product.units}</td><td>${money(product.revenue)}</td><td>${escapeHTML(product.margin)}%</td></tr>`).join('');
     const averageOrder = revenue / orders;
+    renderTraffic();
     document.querySelector('#marketingFinanceTable tbody').innerHTML = adminData.campaigns.map(campaign => { const estimatedOrders = Math.round(Number(campaign.sent) * Number(campaign.conversion) / 100); return `<tr><td><strong>${escapeHTML(campaign.name)}</strong></td><td>${escapeHTML(campaign.channel)}</td><td>${Number(campaign.sent).toLocaleString()}</td><td>${campaign.conversion}%</td><td>${estimatedOrders}</td><td><strong>${money(estimatedOrders * averageOrder)}</strong></td></tr>`; }).join('');
   }
 

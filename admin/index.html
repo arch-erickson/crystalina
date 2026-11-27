@@ -382,6 +382,16 @@
         <div class="table-actions"><select class="admin-select" id="financePeriod"><option>Last 6 months</option><option>Year to date</option><option>Last 12 months</option></select><button class="btn btn-sm btn-outline" id="exportReportBtn">Export Report</button></div>
       </div>
       <div class="stat-cards" id="financeStats"></div>
+      <div class="admin-panel">
+        <div class="panel-title-row">
+          <div><h3>Traffic</h3><p class="admin-subtitle">Page views and visits, counted with no cookie.</p></div>
+          <span class="table-actions"><select class="admin-select" id="trafficPeriod"><option value="30">Last 30 days</option><option value="7">Last 7 days</option><option value="90">Last 90 days</option></select><a class="btn btn-sm btn-outline" href="https://dash.cloudflare.com/?to=/:account/web-analytics" target="_blank" rel="noopener">Open the full report</a></span>
+        </div>
+        <div class="stat-cards" id="trafficStats"></div>
+        <div class="revenue-chart" id="trafficChart"></div>
+        <table class="admin-table" id="trafficPagesTable"><thead><tr><th>Page</th><th>Views</th><th>Visits</th></tr></thead><tbody></tbody></table>
+        <p class="empty-state" id="trafficNote"></p>
+      </div>
       <div class="report-grid">
         <div class="admin-panel report-wide"><div class="panel-title-row"><h3>Revenue &amp; Gross Profit</h3><span class="chart-legend"><i></i> Revenue <i></i> Profit</span></div><div class="revenue-chart" id="revenueChart"></div></div>
         <div class="admin-panel"><div class="panel-title-row"><h3>Sales by Borough</h3></div><div class="borough-summary"><div class="donut-chart" id="boroughDonut"><span></span></div><div id="boroughLegend"></div></div></div>
@@ -636,15 +646,15 @@
 
 <div class="toast" id="toast"></div>
 
-<script src="/js/product-catalog.js?v=20261126-analytics"></script>
-<script src="/js/store.js?v=20261126-analytics"></script>
-<script src="/js/main.js?v=20261126-analytics"></script>
-<script src="/js/auth.js?v=20261126-analytics"></script>
-<script src="/js/role-switcher.js?v=20261126-analytics"></script>
+<script src="/js/product-catalog.js?v=20261126-traffic"></script>
+<script src="/js/store.js?v=20261126-traffic"></script>
+<script src="/js/main.js?v=20261126-traffic"></script>
+<script src="/js/auth.js?v=20261126-traffic"></script>
+<script src="/js/role-switcher.js?v=20261126-traffic"></script>
 <script src="/js/vendor/qrcode-generator.js"></script>
-<script src="/js/admin.js?v=20261126-analytics"></script>
-<script src="/js/qr-admin.js?v=20261126-analytics"></script>
-<script src="/js/schedule-domain.js?v=20261126-analytics"></script>
-<script src="/js/admin-schedule.js?v=20261126-analytics"></script>
+<script src="/js/admin.js?v=20261126-traffic"></script>
+<script src="/js/qr-admin.js?v=20261126-traffic"></script>
+<script src="/js/schedule-domain.js?v=20261126-traffic"></script>
+<script src="/js/admin-schedule.js?v=20261126-traffic"></script>
 </body>
 </html>

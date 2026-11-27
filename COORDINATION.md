@@ -85,6 +85,45 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-26 · Claude Code, design · The traffic figures in Finance and Analytics (AD14)
+
+The owner asked to read the page counts in the admin dashboard rather than in
+Cloudflare. `GET /api/analytics` asks Cloudflare GraphQL for views and visits
+by day and by path; the Finance and Analytics view draws them with the stat
+cards, the bar chart and the table that were already there, so no new CSS.
+
+**This is in your files, and it is more than four lines.** `api/analytics.mjs`
+is new, `worker.js` gains one route and one import, `wrangler.toml` gains
+three names in its comment, `.env.example` gains the three values, and
+`js/data-remote.js` gains `trafficSummary`. All of it is additive and none of
+it touches an existing route. The owner asked for it directly, in the same
+conversation as the analytics work, and waiting would have left the request
+unanswered with nobody to hand it to. Reshape any of it you like, including
+moving the route somewhere you prefer.
+
+**What it refuses to do.** The API token can read every analytic on the
+account, so it never reaches a browser; the route holds it. The route checks
+admin or manager against `user_roles` itself rather than trusting the gate in
+front of the dashboards, which is browser-side (U1). Unconfigured answers 200
+with `configured:false` rather than an error, so the panel says what is
+missing instead of drawing an empty chart.
+
+**What has never run.** The GraphQL query itself. There is no API token yet,
+so the field names come from Cloudflare's schema and `summarise()` is tested
+against a recorded answer rather than a live one. If it is wrong, the panel
+says Cloudflare refused the query and the route logs the GraphQL errors.
+That is the one part of this worth a second pair of eyes.
+
+**The finding underneath it, which is not about analytics.** Every `/api`
+route answers 404 on crystalina.org, because GitHub Pages serves that host and
+runs no server. Checked by request today: `/api/contact`, `/api/newsletter`
+and `/api/orders/status` are all 404 there and all 405 on the Worker, which is
+the method guard answering, so the Worker is fine and the host is the problem.
+That means the contact form and the newsletter signup on the live site cannot
+reach anything, and neither can the new panel. It is the same single fix as
+everything else waiting on P5, `own-dns`, and it is now the most expensive
+thing that step is holding up.
+
 ### 2026-11-26 · Claude Code, design · The other two legal pages are published
 
 The owner approved the wording for terms and delivery and returns, so all

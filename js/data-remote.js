@@ -392,12 +392,40 @@ window.CrystalinaData = (() => {
     return { ok: true, data };
   }
 
+  /* Traffic, from Cloudflare by way of /api/analytics. The API token that
+     reads it is a real credential and stays on the Worker, so this asks the
+     server rather than Cloudflare. Three answers matter to the caller:
+     numbers, "no server here", and "no token yet". */
+  async function trafficSummary(days = 30) {
+    const supabase = await SB.client();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return { ok: false, reason: 'signed-out' };
+    let res;
+    try {
+      res = await fetch(`/api/analytics?days=${encodeURIComponent(days)}`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+    } catch {
+      return { ok: false, reason: 'no-server' };
+    }
+    /* GitHub Pages answers the 404 page for /api/*, so a 404 here means
+       this host runs no server, not that the route is missing. */
+    if (res.status === 404) return { ok: false, reason: 'no-server' };
+    if (res.status === 401) return { ok: false, reason: 'signed-out' };
+    if (res.status === 403) return { ok: false, reason: 'not-staff' };
+    let body = {};
+    try { body = await res.json(); } catch { return { ok: false, reason: 'no-server' }; }
+    if (!res.ok) return { ok: false, reason: 'error', error: body.error };
+    if (body.configured === false) return { ok: false, reason: 'no-token', missing: body.missing || [] };
+    return { ok: true, ...body };
+  }
+
   const saveProduct = product => rpc('upsert_product', { p_product: splitDetails(product) });
   const removeProduct = id => rpc('delete_product', { p_id: id });
   const saveStageOption = option => rpc('upsert_stage_option', { p_option: option });
   const removeStageOption = id => rpc('delete_stage_option', { p_id: id });
 
   return { loadProducts, myOrders, myOrder, staffOrders, createOrder, mapRow, loadShippingPolicy, loadSiteContent, saveSiteContent, uploadImage,
-           setOrderStatus, orderTransitions, orderHistory,
+           setOrderStatus, orderTransitions, orderHistory, trafficSummary,
            saveProduct, removeProduct, saveStageOption, removeStageOption };
 })();

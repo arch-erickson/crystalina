@@ -168,7 +168,7 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | Not found | /404.html | Implemented | Implemented | Nothing. No server work needed |
 | Sign in | /signin/ | Implemented | Implemented | Store.signUp and Store.signIn stubs are still exported from js/store.js and must be retired |
 | Account | /account/ | Implemented | Refactor | The first gate is still the local key, read before the page paints; the real answer comes from Supabase a moment later. Browser-side either way, which is U1 |
-| Admin console | /admin/ | Implemented | Partial | About thirty record-text interpolations reach innerHTML unescaped (F3) Gated on localStorage, not on the session (F4, U1) No screen for stage options or faucet assignment |
+| Admin console | /admin/ | Implemented | Partial | Gated on localStorage, not on the session (F4, U1) No screen for stage options or faucet assignment The traffic panel reads nothing on crystalina.org, which runs no server; it shows the link to Cloudflare there |
 | Manager | /manager/ | Implemented | Partial | Same localStorage gate as every other private page (F4) |
 | Sales | /sales/ | Implemented | Partial | Cart recovery sends nothing: no scheduled job exists Same localStorage gate (F4) |
 | Technician | /technician/ | Implemented | Partial | Photos upload but are not tied to an order record Same localStorage gate (F4) |
@@ -311,6 +311,9 @@ _**Deployment, environments and secrets.** One deploy path, two environments, an
 | EMAIL_FROM | No | Function |
 | CONTACT_INBOX | No | Function |
 | PUBLIC_SITE_URL | No | Function and build |
+| CLOUDFLARE_API_TOKEN | Yes | Function only. Reads every analytic on the account |
+| CLOUDFLARE_ACCOUNT_ID | No | Function |
+| CLOUDFLARE_RUM_SITE_TAG | No | Function. Not the beacon token, which is public and in js/main.js |
 
 > **One deploy path, not two**
 >
@@ -382,7 +385,7 @@ _**Deliberately not built, and what would change that.** Eight things that are n
 
 ## 16. Architecture decisions
 
-Thirteen decisions, numbered, dated and never renumbered, grouped by what they decide rather than by when they were taken. Click a card for what it does, why it belongs here, what it costs and when it should be replaced. The last of those is the field people skip and the one that matters in a year.
+Fourteen decisions, numbered, dated and never renumbered, grouped by what they decide rather than by when they were taken. Click a card for what it does, why it belongs here, what it costs and when it should be replaced. The last of those is the field people skip and the one that matters in a year.
 
 ![Architecture decisions, and what rests on what](diagrams/decisions.svg)
 
@@ -733,14 +736,14 @@ _Page · /admin/._
 
 Where the catalogue and the published page content are edited, and where images are uploaded. Every write goes through a security definer function that refuses a caller without the role.
 
-Partial. The writes are correct and gated in the database. The page around them is the one file in the project with an open escaping gap, and it has no screen for the two empty tables that F2 is about.
+Partial. The writes are correct and gated in the database, and the escaping gap that made this the worst file in the project was swept on 2026-11-03 and is pinned by a test (F3). What is left is the gate in front of the page, which is browser-side (U1), and the two empty tables F2 is about, which have no screen.
 
 - **Links to.** Home (publish to website); Shop (price, stock, copy)
-- **See also.** One dashboard interpolated record text unescaped; The gate in front of every private page is localStorage; Staff changing what a visitor sees; P7 · Seed the catalogue; Staff browser; Staff text reaching another staff member as script
+- **See also.** One dashboard interpolated record text unescaped; The gate in front of every private page is localStorage; Staff changing what a visitor sees; P7 · Seed the catalogue; Staff browser; Create the Cloudflare API token for the traffic panel; Staff text reaching another staff member as script; AD14 · The traffic figures are read back through the server, into Finance and Analytics
 - **Design.** Implemented
 - **Server.** Partial
-- **Backend built.** Catalog writes through upsert_product and delete_product, gated on has_role Content editor publishes site_content Image upload to the site-media bucket
-- **Remaining.** About thirty record-text interpolations reach innerHTML unescaped (F3) Gated on localStorage, not on the session (F4, U1) No screen for stage options or faucet assignment
+- **Backend built.** Catalog writes through upsert_product and delete_product, gated on has_role Content editor publishes site_content Image upload to the site-media bucket Traffic panel in Finance and Analytics, reading /api/analytics (AD14)
+- **Remaining.** Gated on localStorage, not on the session (F4, U1) No screen for stage options or faucet assignment The traffic panel reads nothing on crystalina.org, which runs no server; it shows the link to Cloudflare there
 
 #### Manager · Partial
 
@@ -1151,7 +1154,7 @@ Who arrives and from where, with no cookie and therefore no consent banner. The 
 
 Implemented on 2026-11-26. The site exists in the dashboard with no zone on the account, which Cloudflare allows, and the JS beacon carries its token. The server-side version, which needs no script at all, still waits for the zone. See AD13.
 
-- **See also.** Analytics; AD13 · Page counts with no cookie, injected once, and no click tracking; Privacy policy; P5 · DNS cutover
+- **See also.** Analytics; AD13 · Page counts with no cookie, injected once, and no click tracking; Privacy policy; P5 · DNS cutover; AD14 · The traffic figures are read back through the server, into Finance and Analytics
 - **Zone.** Cloudflare (one account)
 
 #### Cron Triggers · Post-MVP
@@ -1969,6 +1972,16 @@ Done on 2026-11-26. The owner added the hostname, which Cloudflare accepted as a
 
 - **See also.** AD13 · Page counts with no cookie, injected once, and no click tracking; Privacy policy; The accounts that would bring people in are held and unconnected
 
+#### Create the Cloudflare API token for the traffic panel · Missing
+
+_Owner task · Needs a person in a dashboard._
+
+An API token with Account Analytics Read, plus the account id and the Web Analytics site tag, set on the Worker as CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_RUM_SITE_TAG.
+
+Missing, and the only step left on AD14. The site tag is in the Web Analytics site settings and is not the beacon token. Until all three are set the panel says so rather than drawing an empty chart.
+
+- **See also.** AD14 · The traffic figures are read back through the server, into Finance and Analytics; Admin console
+
 #### Practise a rollback once · Missing
 
 _Owner task · Needs a person in a dashboard._
@@ -2048,7 +2061,7 @@ Missing, and the only server-side item that matters until it is done. Checked 20
 - **Waiting on the answer to.** U8 · How does Google Workspace on crystalina.org get unlocked, and what does the DNS move do to it?
 - **Closes.** The domain still points at the half that cannot run code
 - **Unblocks.** P9 · Backups and monitoring; P10 · Launch
-- **See also.** Cloudflare DNS; Cloudflare Worker; GitHub Pages; Squarespace DNS; Web Analytics; Supabase Auth; A request arrives; Move the nameservers to Cloudflare; Production; The repository is published with the site; crystalina.org; sitemap.xml and robots.txt
+- **See also.** Cloudflare DNS; Cloudflare Worker; GitHub Pages; Squarespace DNS; Web Analytics; Supabase Auth; A request arrives; Move the nameservers to Cloudflare; Production; The repository is published with the site; AD14 · The traffic figures are read back through the server, into Finance and Analytics; crystalina.org; sitemap.xml and robots.txt
 - **Owner.** Owner
 
 #### P6 · Security hardening · Partial
@@ -2546,7 +2559,7 @@ The browser sends product ids and quantities. create_order prices every line, in
 
 This is the one flow that has to be right the first time. Being taken twice for the same order is not something you can apologise your way out of.
 
-- **See also.** Placing an order, as it works today; Taking the money (Stripe, phase 3); P3 · Stripe checkout and webhook; Payment taken twice on a webhook redelivery; Nothing takes payment; Write with the service role; order_items; A visitor pays less than the price
+- **See also.** Placing an order, as it works today; Taking the money (Stripe, phase 3); P3 · Stripe checkout and webhook; Payment taken twice on a webhook redelivery; Nothing takes payment; Write with the service role; order_items; A visitor pays less than the price; AD14 · The traffic figures are read back through the server, into Finance and Analytics
 - **Why we need it.** A price that the browser can influence is a price a customer can choose. A redirect that the browser can skip is a payment that can be lost.
 - **Why it belongs here.** Half of it already exists and is tested. The payment work extends it rather than inventing a parallel path.
 - **What it costs.** The webhook has to verify its signature and be keyed on the event id, because Stripe will redeliver.
@@ -2672,11 +2685,25 @@ Cloudflare Web Analytics, loaded by one function in js/main.js that initPage cal
 
 Live on 2026-11-26. The owner created the site and supplied the token, and the same commit published the privacy policy on both hosts, put a Privacy link in the footer so the page can be reached, and bumped the cache-busting query on every page head so returning visitors load the new main.js rather than a cached one. tests/analytics.test.cjs runs the real block against a pretend document and refuses a filled-in token while the policy is unpublished, so the counting and the sentence that tells visitors about it cannot come apart. The earlier reading, that this had to follow the nameserver move, was wrong: the JS beacon works on any host, and the host it is working on is GitHub Pages. Verified on the live site the same day rather than assumed: crystalina.org/ and /shop/ each load static.cloudflareinsights.com/beacon.min.js and then post to cloudflareinsights.com/cdn-cgi/rum, with no console error, and /privacy/ answers 200 where it answered 404 the day before.
 
-- **See also.** Web Analytics; Privacy policy; Click and funnel events of our own; AD1 · Cloudflare, rather than staying on Vercel or on GitHub Pages; The accounts that would bring people in are held and unconnected; Analytics; The Web Analytics token and the pages it counts; Create the Web Analytics site, and publish the privacy policy
+- **See also.** Web Analytics; Privacy policy; Click and funnel events of our own; AD1 · Cloudflare, rather than staying on Vercel or on GitHub Pages; The accounts that would bring people in are held and unconnected; Analytics; The Web Analytics token and the pages it counts; Create the Web Analytics site, and publish the privacy policy; AD14 · The traffic figures are read back through the server, into Finance and Analytics
 - **Why we need it.** Nothing measured traffic at all, which is half of F5. The question the owner asked, how many people visit and what do they click, had no answer anywhere in the project.
 - **Why it belongs here.** It sets no cookie and stores nothing on the device, so the site still needs no consent banner. That is the property AD1 picked it for. The thing that would also measure clicks, a pixel or a product like PostHog, turns the banner into a real question and is a separate decision.
 - **What it costs.** A third-party script on every customer page, deferred and injected after the page boots, so anything it reports about load timing is measured a moment late. It reports no clicks at all: which button was pressed needs an events table of our own, which is trigger:clicks. The token sits in the source, which is correct and is worth saying out loud: it is public on every site that uses this, it authorises nothing, and it is not one of the eleven secrets.
 - **Replace when.** Clicks or funnels are genuinely needed, or the zone reaches Cloudflare and the server-side version replaces the script tag entirely.
+
+#### AD14 · The traffic figures are read back through the server, into Finance and Analytics · Partial
+
+_Decision · Decided 2026-11-26._
+
+GET /api/analytics asks Cloudflare GraphQL for page views and visits by day and by path, and the Finance and Analytics view draws them with the stat cards, the bar chart and the table it already has. Admin or manager only, checked in the route against user_roles.
+
+Partial on 2026-11-26. Route, panel and nine tests are in; the token is not created, so the route answers configured:false and the panel says so in a sentence rather than drawing an empty chart. The GraphQL query has not been run against Cloudflare once, because there is no token to run it with: the field names come from the schema and summarise() is tested against a recorded answer, not a real one.
+
+- **See also.** AD13 · Page counts with no cookie, injected once, and no click tracking; AD4 · The money is recomputed in the database, and the webhook is the source of truth; U1 · Does opening /admin/ as an ordinary customer expose anything at all?; Admin console; P5 · DNS cutover; Web Analytics; Create the Cloudflare API token for the traffic panel
+- **Why we need it.** The owner asked to read the traffic beside the revenue. A figure that lives only in another company dashboard is a figure nobody opens, and the question it answers, is the shop busier this week, is a question about the business rather than about Cloudflare.
+- **Why it belongs here.** The API token that reads this can read every analytic on the account, so it is a secret and the read is a server route. The browser never sees it, which is the same rule that keeps the service-role key out of there (AD4). The route checks the role itself rather than trusting the browser-side gate (U1).
+- **What it costs.** Three more values the owner sets, one of them a real credential. It is also the first thing in the dashboard that needs /api to answer, and /api does not answer on crystalina.org: GitHub Pages serves that host and runs no server, so the panel shows the link to Cloudflare there and the numbers only at the workers.dev address. P5 fixes that for this and for the contact form in the same move.
+- **Replace when.** Clicks arrive and this needs a second source, or the zone reaches Cloudflare and a Worker binding replaces the token.
 
 ### Unknowns
 
@@ -2687,7 +2714,7 @@ _Unknown · Owner: Erickson._
 Answered in part on 2026-11-03, mechanically: tests/data-boundary.test.mjs reads every migration and fails the build if any of the 28 tables lacks row level security, if a security definer function that writes neither checks a role nor auth.uid() nor is revoked from anon and authenticated, or if user_roles can be written by anyone but an admin. Nothing can hand itself a role, so the browser-side gate is weak rather than decorative: it reads the real table through RLS and the claim cannot be forged. What the shell shows without a role is markup and empty queries.
 
 - **Blocks.** P4 · Finish the auth migration; P6 · Security hardening; The gate in front of every private page is localStorage
-- **See also.** Every private page gated in the browser only; A customer opening a staff page; Staff browser; Signing in, and what a role is allowed to do
+- **See also.** Every private page gated in the browser only; A customer opening a staff page; Staff browser; Signing in, and what a role is allowed to do; AD14 · The traffic figures are read back through the server, into Finance and Analytics
 - **How to resolve it.** What remains is a product decision for the owner, not a test: does a readable dashboard shell matter? If it does, the fix is Cloudflare Access in front of /admin/, /manager/, /sales/ and /technician/, which is owner configuration and belongs with P5.
 - **Owner.** Erickson
 

@@ -22,6 +22,7 @@ import orderStatus from './api/orders/status.mjs';
 import checkoutSession from './api/checkout/session.mjs';
 import stripeWebhook from './api/stripe/webhook.mjs';
 import health from './api/health.mjs';
+import analytics from './api/analytics.mjs';
 
 /* Exact paths only. A prefix match would route /api/contact-us here too. */
 const ROUTES = new Map([
@@ -40,6 +41,10 @@ const ROUTES = new Map([
      the detail behind HEALTH_KEY says what this Worker is configured
      with, which is how a missing key gets noticed. */
   ['/api/health', toPagesFunction(health)],
+  /* GET, staff only, and the check is in the handler rather than in a
+     database function: there is no row to read here, only a Cloudflare
+     token that must never reach a browser. */
+  ['/api/analytics', toPagesFunction(analytics)],
 ]);
 
 const json = (status, body) => new Response(JSON.stringify(body), {

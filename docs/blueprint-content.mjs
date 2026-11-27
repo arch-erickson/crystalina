@@ -278,7 +278,7 @@ export const sections = [
   id: 'decisions',
   title: 'Architecture decisions',
   blocks: [
-    { t: 'p', text: 'Thirteen decisions, numbered, dated and never renumbered, grouped by what they decide rather than by when they were taken. Click a card for what it does, why it belongs here, what it costs and when it should be replaced. The last of those is the field people skip and the one that matters in a year.' },
+    { t: 'p', text: 'Fourteen decisions, numbered, dated and never renumbered, grouped by what they decide rather than by when they were taken. Click a card for what it does, why it belongs here, what it costs and when it should be replaced. The last of those is the field people skip and the one that matters in a year.' },
     { t: 'diagram', name: 'decisions.svg' },
   ],
 },
