@@ -605,6 +605,7 @@ function renderFooter() {
     <div>
       <h4>Support</h4>
       <a href="/manuals/">Manuals and Guides</a>
+      <a href="/shipping-returns/">Delivery and Returns</a>
       <a href="/contact/">Contact Us</a>
       <a href="/account/">My Account</a>
       <a href="${telHref}">${escapeHTML(companyPhone)}</a>
@@ -620,7 +621,7 @@ function renderFooter() {
   <div class="footer-bottom">
     <div class="container footer-bottom-inner">
       <span>© ${new Date().getFullYear()} ${escapeHTML(companyName.replace(/\.$/, ''))}. All rights reserved. Proudly serving the five boroughs.</span>
-      <span class="footer-links"><a href="/privacy/">Privacy</a><a href="/signin/?mode=staff">Staff sign in</a></span>
+      <span class="footer-links"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/signin/?mode=staff">Staff sign in</a></span>
     </div>
   </div>`;
   document.body.appendChild(el);

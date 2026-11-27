@@ -161,8 +161,8 @@ _**Site map, with a status on every page.** The one picture that answers "how fa
 | About | /about/ | Implemented | Missing | Nothing. No server work needed |
 | Contact | /contact/ | Implemented | Implemented | No Turnstile widget, and the page reads a token from one that does not exist The notification lands in a suspended inbox (U8) |
 | Privacy policy | /privacy/ | Implemented | Implemented | Nothing on the server. No server work needed |
-| Terms of service | /terms/ | Implemented | Missing | Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
-| Shipping and returns | /shipping-returns/ | Implemented | Missing | Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed |
+| Terms of service | /terms/ | Implemented | Implemented | Nothing on the server. No server work needed |
+| Shipping and returns | /shipping-returns/ | Implemented | Implemented | Nothing on the server. No server work needed |
 | Manuals and guides | /manuals/ | Implemented | Missing | No manual file exists yet. A manual belongs in the site-media bucket, named on the product row as manualUrl, which the page trusts; only the guessed /manuals/files/<slug>.pdf address is checked when the page loads Nothing on the server. No server work needed |
 | Order receipt | /order/?id= | Implemented | Implemented | No order can be placed until payment exists, so the page has only its signed-out, missing and not-found states to show today Checkout should land here once an order is created |
 | Not found | /404.html | Implemented | Implemented | Nothing. No server work needed |
@@ -618,7 +618,7 @@ _Page · /privacy/._
 
 The privacy policy, in plain language: what the shop collects, which services see it, what the page counting records, and how to have it removed.
 
-Published on both hosts on 2026-11-26, out of the _config.yml exclude and into the allow-list together, which is what the page cards for terms and shipping and returns still describe. It went first because AD13 counts page views and the policy is where a visitor is told so. The footer carries a Privacy link as of the same commit, since an unlinked disclosure discloses nothing.
+Published on both hosts on 2026-11-26, out of the _config.yml exclude and into the allow-list together. It went first, hours before the other two: AD13 counts page views and the policy is where a visitor is told so. The footer carries a Privacy link as of the same commit, since an unlinked disclosure discloses nothing.
 
 - **See also.** Home; AD13 · Page counts with no cookie, injected once, and no click tracking; Web Analytics; Create the Web Analytics site, and publish the privacy policy; Click and funnel events of our own
 - **Design.** Implemented
@@ -626,33 +626,33 @@ Published on both hosts on 2026-11-26, out of the _config.yml exclude and into t
 - **Backend built.** What is collected, who handles it, how to have it removed What the page counting records, and that it sets no cookie Set in the long-form text component shared by every legal page Linked from the footer of every page
 - **Remaining.** Nothing on the server. No server work needed
 
-#### Terms of service · Missing
+#### Terms of service · Implemented
 
 _Page · /terms/._
 
 The terms of service: orders, pricing, warranty, returns and disputes.
 
-Drafted and styled, and unpublished until the owner approves the wording, which is partly a legal question. It is excluded in _config.yml and absent from the allow-list, so it answers 404 on both hosts. Publishing it on approval means both lists at once, the line out of _config.yml and the path into scripts/build-site.mjs, or it goes live on one host and missing from the other. The privacy policy went that way on 2026-11-26 and is the worked example.
+Published on 2026-11-26, when the owner approved the wording, out of the _config.yml exclude and into the allow-list together. It was drafted on 2026-11-03 and withheld for twenty-three days on the principle that terms a business has not approved are still terms it is read as offering.
 
 - **See also.** Home
 - **Design.** Implemented
-- **Server.** Missing
-- **Backend built.** Orders, pricing, warranty, returns and disputes in plain language Set in the long-form text component shared by every legal page
-- **Remaining.** Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed
+- **Server.** Implemented
+- **Backend built.** Orders, pricing, warranty, returns and disputes in plain language Set in the long-form text component shared by every legal page Linked beside Privacy in the footer bottom row
+- **Remaining.** Nothing on the server. No server work needed
 
-#### Shipping and returns · Missing
+#### Shipping and returns · Implemented
 
 _Page · /shipping-returns/._
 
 Shipping and returns: where we deliver, how fast, the free shipping threshold and the return window.
 
-Drafted and styled, and meant to be unpublished until the owner approves the wording, which is partly a legal question. Checked 2026-11-03: the allow-list keeps it off the Worker, but crystalina.org is still served by GitHub Pages from the repository root, so the page answers there today at its own address. Nothing links to it. Since 0ecd26f, later the same day, it is excluded in _config.yml as well, and answers 404 at crystalina.org; publishing it on approval means both lists at once, the three lines out of _config.yml and the three paths into scripts/build-site.mjs, or it goes live on one host and missing from the other.
+Published on 2026-11-26 with the terms, when the owner approved the wording. It reads the free shipping threshold from the same row as the cart and the checkout, so the page and the arithmetic cannot disagree. It is the one of the three a shopper actually goes looking for, which is why its link sits with Manuals and Contact rather than in the legal row.
 
-- **See also.** Home
+- **See also.** Home; Free shipping threshold
 - **Design.** Implemented
-- **Server.** Missing
-- **Backend built.** Delivery areas, timing, the free shipping threshold and the return window Set in the long-form text component shared by every legal page
-- **Remaining.** Unpublished on both hosts until the owner has approved the wording: off the Worker by the allow-list, off crystalina.org by the _config.yml exclude. The footer carries no link to it; the delivery and returns facts a shopper needs are on every product page and in the contact questions meanwhile Nothing on the server. No server work needed
+- **Server.** Implemented
+- **Backend built.** Delivery areas, timing, the free shipping threshold and the return window Set in the long-form text component shared by every legal page Linked from the Support column of the footer, where a shopper looks for it rather than in the legal row
+- **Remaining.** Nothing on the server. No server work needed
 
 #### Manuals and guides · Missing
 
@@ -2340,7 +2340,7 @@ The $99 free delivery threshold and the $9.99 fee below it. Since 2026-11-03 the
 
 Implemented on 2026-11-03. The six arithmetic sites are one row, so the figure the customer is quoted is the figure the order is charged, and the seven sentences of prose wrap the figure in [data-ship-threshold], which main.js fills from the same row on every page. The one copy left is the announcement bar, which staff edit as a sentence and own as content.
 
-- **See also.** U7 · Who maintains this after launch, and how technical are they?; orders
+- **See also.** U7 · Who maintains this after launch, and how technical are they?; orders; Shipping and returns
 - **Lives in.** shipping_policy, one row, read by create_order and by Store.shippingPolicy()
 - **Read by.** Cart drawer, Checkout, Shop copy, Home trust list, Product page, Contact and shipping pages, create_order
 

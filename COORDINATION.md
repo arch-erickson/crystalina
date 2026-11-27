@@ -85,6 +85,37 @@ reason to edit and which has to stay identical across all fourteen.
 
 ## Log
 
+### 2026-11-26 · Claude Code, design · The other two legal pages are published
+
+The owner approved the wording for terms and delivery and returns, so all
+three are live and the twenty-three day hold is over. Same two lists as the
+privacy policy: out of the `_config.yml` exclude, into the allow-list in
+`scripts/build-site.mjs`. The exclude block there is now history rather than
+a rule, and says what the rule that outlives it is.
+
+- `/terms/` is linked beside Privacy in the footer bottom row.
+- `/shipping-returns/` is linked from the **Support** column, next to
+  Manuals and Contact, because it is the one of the three a shopper goes
+  looking for. Its link reads "Delivery and Returns", which is the page's
+  own h1 rather than its folder name.
+- All three joined `sitemap.xml`, which had eight entries and now has
+  eleven. They were left out while they were withheld.
+- The fixed WhatsApp button sat over the end of the footer bottom row and
+  covered the last link. `body:has(.wa-float) .footer-bottom-inner` now
+  reserves 84px for it. Only `index.html` carries that button, so only the
+  home page pays for the clearance. Measured at 1280 and 375: a 44px gap at
+  desktop, no overlap, no overflow at either width.
+
+**Still not mine, taken again.** `scripts/build-site.mjs`, `_config.yml` and
+`sitemap.xml` belong to deploys and auth. The owner asked directly in the
+same conversation as yesterday's analytics work. Seven lines across the
+three, all additive.
+
+**What another session must do about it.** Nothing. The three page cards in
+the model now read Implemented on both axes, and the instruction that used
+to live on them, both lists or neither, now lives in the `_config.yml`
+comment where the next person to publish a page will actually meet it.
+
 ### 2026-11-26 · Claude Code, design · The counting is on, and the privacy policy is published
 
 The owner created the Web Analytics site and sent the token, so AD13 is

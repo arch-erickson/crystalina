@@ -49,30 +49,16 @@ exclude:
   - README.md
   - design-qa.md
 
-  # Written, not yet approved.
+  # The three legal pages were excluded here from 2026-11-03 to 2026-11-26,
+  # because the owner had not read the wording and terms a business has not
+  # approved are still terms it is read as offering. He approved them on
+  # 2026-11-26 and all three are published: privacy/ earlier that day with
+  # the page counting in AD13, terms/ and shipping-returns/ with this line.
   #
-  # The owner's decision is that the three legal pages stay unpublished
-  # until he has read the wording, which is partly a legal question and
-  # entirely his. The Worker honours it by not naming them in the
-  # allow-list in scripts/build-site.mjs. Pages did not: it publishes the
-  # repository root, so all three answered 200 at their own addresses on
-  # 2026-11-03, unlinked but crawlable, with robots.txt saying Allow: /
-  # and no noindex on any of them. Unlinked is not unpublished, and terms
-  # a business has not approved are still terms it is read as offering.
-  #
-  # They are not in sitemap.xml, so excluding them costs nothing in
-  # Search Console.
-  #
-  # The day he approves them: delete the line here and add the path to the
-  # PUBLISH list in scripts/build-site.mjs. Both, or it goes live on one
-  # host and not the other.
-  #
-  # privacy/ went that way on 2026-11-26, because the page counting in AD13
-  # is described on it, and counting people while the page that tells them
-  # answers 404 is not a thing to ship. Terms and shipping and returns are
-  # still waiting on the owner.
-  - terms/
-  - shipping-returns/
+  # The rule that outlives them, for whatever is written next: a page is
+  # published in two lists at once, here and in scripts/build-site.mjs, or
+  # it is live on one host and 404 on the other. The exclude above this is
+  # the working notes, which stay excluded.
 
   # Build and deploy configuration.
   - package.json

@@ -7,5 +7,8 @@
   <url><loc>https://crystalina.org/quiz/</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://crystalina.org/about/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://crystalina.org/contact/</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://crystalina.org/shipping-returns/</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
   <url><loc>https://crystalina.org/signin/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://crystalina.org/privacy/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://crystalina.org/terms/</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
 </urlset>
